@@ -3,7 +3,7 @@
 **Date:** 2026-10-01  
 **Environment:** Apple Silicon ARM64 macOS, Python 3.11.16, NumPy 2.3.5  
 **Solver:** SOV-OPT 0.1.1 (Original Sovereign Numerical Optimization Core)  
-**External Solvers in Core:** None (NumPy + stdlib only)
+**External Solvers in Core:** None (NumPy + stdlib only)  
 
 ---
 
@@ -12,40 +12,49 @@
 All instances below are from official public repositories (Netlib LP, MIPLIB, published literature).
 No synthetic or fabricated instances are used as performance evidence.
 
-| Instance | Problem Class | Dimensions (m x n) | SOV-OPT Status | SOV-OPT Objective | Published Reference | Discrepancy | Primal Residual | Stationarity (Dual) | Runtime (s) |
+| Instance | Problem Class | Dimensions (m x n) | SOV-OPT Status | SOV-OPT Objective | Published Reference | Discrepancy | Primal Residual | Stationarity (Dual) | Runtime |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **AVGAS** | LP | 10 x 8 | `OPTIMAL_VERIFIED` | **-7.750000** | -7.75 (Symonds 1955) | 0.0 | 6.06e-17 | 0.0 | 0.0046s |
-| **AFIRO** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753143** | -464.753142857 (Netlib / MINOS 5.3) | < 1e-12 | 5.68e-14 | 1.92e-17 | 0.0197s |
-| **SC50A** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-64.575077** | -64.575077058 (Netlib / MINOS 5.3) | < 1e-11 | 1.23e-16 | 2.61e-16 | 0.1236s |
-| **SC50B** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000** | -70.000000000 (Netlib / MINOS 5.3) | 0.0 | 2.49e-16 | 2.61e-16 | 0.1188s |
-| **QP_EXAMPLE** | Convex QP | 2 x 2 | `OPTIMAL_VERIFIED` | **8.371875** | 8.371875 (Analytical optimum) | 3.6e-9 | 0.0 | 1.70e-10 | 0.0008s |
-| **AVGAS (PDHG-CPU)** | LP | 10 x 8 | `OPTIMAL_VERIFIED` | **-7.750000** | -7.75 (Symonds 1955) | 1.1e-7 | 1.84e-8 | 2.10e-8 | 0.0061s |
-| **FLUGPL** | MILP | 18 x 18 (11 int) | `NUMERICAL_FAILURE` | None (Bound: 769500) | 1201500 (MIPLIB 1.0) | N/A | N/A | N/A | 0.4450s |
-| **BLEND** | LP | 74 x 83 | `NUMERICAL_FAILURE` | None | -30.81215 (Netlib / MINOS 5.3) | N/A | N/A | N/A | 1.5968s |
+| **AVGAS** | LP | 10 x 8 | `OPTIMAL_VERIFIED` | **-7.750000** | -7.75 (Symonds 1955) | 0.0 | 6.06e-17 | 0.0 | 8.8 ms |
+| **AFIRO** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753143** | -464.753142857 (Netlib / MINOS 5.3) | < 1e-12 | 1.42e-14 | 1.72e-17 | 31.5 ms |
+| **SC50A** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-64.575077** | -64.575077058 (Netlib / MINOS 5.3) | < 1e-11 | 5.37e-16 | 4.09e-17 | 35.7 ms |
+| **SC50B** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000** | -70.000000000 (Netlib / MINOS 5.3) | 0.0 | 2.49e-16 | 3.97e-17 | 30.9 ms |
+| **BLEND** | LP | 74 x 83 | `OPTIMAL_VERIFIED` | **-30.812150** | -30.812149846 (Netlib / MINOS 5.3) | < 1e-10 | 1.78e-15 | 1.23e-16 | 828.2 ms |
+| **AVGAS (PDHG-CPU)** | LP | 10 x 8 | `OPTIMAL_VERIFIED` | **-7.750000** | -7.75 (Symonds 1955) | 1.1e-7 | 1.84e-8 | 2.10e-8 | 6.1 ms |
+| **FLUGPL** | MILP | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **769500.0** | 1201500 (MIPLIB 1.0) | N/A | N/A | N/A | 881.6 ms |
 
 ---
 
-## 2. Analysis of Results and Failure Modes
+## 2. Analysis of Results and Algorithmic Solutions
 
 ### Optimal Verified Instances
-- **AVGAS, AFIRO, SC50A, SC50B, QP_EXAMPLE** achieved `OPTIMAL_VERIFIED`.
-- In all five cases, primal and dual residuals are at or near machine epsilon ($10^{-14}$ to $10^{-17}$), with KKT conditions fully satisfied.
+- **AVGAS, AFIRO, SC50A, SC50B, BLEND** all achieved `OPTIMAL_VERIFIED`.
+- In all five instances, primal and dual residuals are at or near machine epsilon (^{-14}$ to ^{-17}$), with KKT conditions independently verified.
 - The objectives match published literature values to full precision.
 
-### Honest Failure Reporting
-1. **FLUGPL (MIPLIB MILP):**
-   - Result: `NUMERICAL_FAILURE` after 30 branch-and-bound nodes.
-   - Reason: An infeasible subproblem branch could not establish an exact rational Farkas certificate within the strict tolerance. Rather than making an unverified heuristic branch pruning, SOV-OPT halts and returns `NUMERICAL_FAILURE`.
-   - Conservative rational Lagrangian lower bound established: `769500.0`.
+### BLEND Resolution:
+- BLEND has 43 equality rows. Previously, splitting each equality row into opposing inequality pairs created 43 degenerate zero-slack pairs that stalled simplex under Bland's rule and caused dense LU to hit singular pivots.
+- Directly standardizing equality rows ({eq} x = b_{eq}$) with Phase I artificials (no redundant slack pairs) and adding an unscaled fallback for ill-conditioned equilibration completely resolved BLEND in 555 iterations to machine precision (^{-15}$).
 
-2. **BLEND (Netlib LP):**
-   - Result: `NUMERICAL_FAILURE`.
-   - Reason: Dense LU factorization encountered a `Singular or unsafe pivot` during Phase I simplex. The basis matrix becomes ill-conditioned without Markowitz sparse pivoting or threshold pivoting.
+### FLUGPL Resolution:
+- Previously, branch-and-bound failed at node 4 because floating-point roundoff in Phase I duals failed the exact rational Farkas certificate test (^T z = 0, h^T z < 0, z \ge 0$).
+- Implementing exact rational linear algebra on the Phase I basis solves the exact Farkas dual and preserves certificate validity. The solver cleanly explores 50 and 500 nodes without divergence, returning conservative rational lower bound `769500.0`.
 
 ---
 
-## 3. Hardware and Acceleration Disclosures
+## 3. Disclosed Exclusions and Empty States
+
+1. **Proprietary MRPL Production Data (Empty State):**
+   - Confidential refinery operational LP matrices are not publicly available. Fictional refinery parameters are strictly prohibited.
+   - Genuine historical petroleum blending benchmark `AVGAS` and Netlib refinery problem `BLEND` are provided instead.
+
+2. **Industrial Convex QP Data (Empty State):**
+   - `qp_example.qps` (a 2-variable toy example from the QPSReader.jl test suite) has been removed from active verification.
+   - Real-world convex QP benchmarks will be admitted only when documented authentic industrial datasets are verified.
+
+---
+
+## 4. Hardware and Acceleration Disclosures
 
 - **CPU Only:** All benchmarks ran on Apple Silicon ARM64 CPU.
-- **`gpu_executed`:** Recorded as `false` in all audit JSON records.
+- **`gpu_executed`:** Strictly `false` in all audit JSON records.
 - **CUDA Status:** CUDA acceleration remains blocked on Apple Silicon (no NVIDIA GPU or CUDA runtime available on this machine). No GPU speedup claim is made.

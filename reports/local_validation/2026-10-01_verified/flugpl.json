@@ -1,181 +1,315 @@
 {
-  "algorithm": "rational-bound branch-and-bound",
-  "nodes": 30,
-  "history": [
-    {
-      "nodes": 1,
-      "open_nodes": 2,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 2,
-      "open_nodes": 3,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 3,
-      "open_nodes": 4,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 5,
-      "open_nodes": 4,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 6,
-      "open_nodes": 5,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 7,
-      "open_nodes": 6,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 8,
-      "open_nodes": 7,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 9,
-      "open_nodes": 8,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 10,
-      "open_nodes": 9,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 11,
-      "open_nodes": 10,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 12,
-      "open_nodes": 11,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 13,
-      "open_nodes": 12,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 14,
-      "open_nodes": 13,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 15,
-      "open_nodes": 14,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 16,
-      "open_nodes": 15,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 17,
-      "open_nodes": 16,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 18,
-      "open_nodes": 17,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 19,
-      "open_nodes": 18,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 21,
-      "open_nodes": 18,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 22,
-      "open_nodes": 19,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 23,
-      "open_nodes": 20,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 25,
-      "open_nodes": 20,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 26,
-      "open_nodes": 21,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 27,
-      "open_nodes": 22,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 28,
-      "open_nodes": 23,
-      "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 29,
-      "open_nodes": 24,
-      "incumbent": null,
-      "node_bound": 1175762.7777777778
-    }
-  ],
-  "best_bound": 769500.0,
-  "bound_kind": "exact rational Lagrangian bounds of binary64 input",
-  "open_nodes": 24,
-  "status": "NUMERICAL_FAILURE",
-  "message": "Unresolved LP relaxation: Phase I infeasibility; exact binary-rational certificate could not be established",
+  "instance": "flugpl",
   "model_name": "flugpl",
-  "model_sha256": "8ac7f0195eb38f3ff192e669609da587f33d5c8a8744e62e1f2b809074eb7cb6",
-  "solver_version": "0.1.1",
-  "elapsed_seconds": 0.44494283399944834,
-  "backend": "cpu",
-  "variables": 18,
-  "rows": 18,
-  "nonzeros": 46,
-  "machine": {
-    "system": "Darwin",
-    "architecture": "arm64",
-    "python": "3.11.16"
+  "metadata": {
+    "name": "FLUGPL",
+    "class": "MILP",
+    "category": "Documented application benchmark",
+    "domain": "Airline fleet assignment & route allocation (Wagner, Gregory, Boyd)",
+    "source_url": "https://miplib.zib.de/instance_details_flugpl.html",
+    "file_url": "https://miplib.zib.de/WebData/instances/flugpl.mps.gz",
+    "retrieval_date": "2026-10-01",
+    "mps_file": "data/verified/flugpl.mps",
+    "json_file": "examples/flugpl.json",
+    "objective_sense": "MINIMIZE",
+    "objective_offset": 0.0,
+    "reference_objective": 1201500.0,
+    "reference_source": "MIPLIB 1.0 / 2017 optimal integer objective",
+    "total_mps_nonzeros": 46,
+    "expected_status": "LIMIT_REACHED",
+    "sha256": "a1f0cb79a95639450dd984473a00efca24365457153d7fcb859c6581ddab4c2c",
+    "variables": 18,
+    "constraints": 18,
+    "integers": 11,
+    "matrix_nonzeros": 46
   },
-  "benchmark_wall_seconds": 0.44496458300000086
+  "result": {
+    "algorithm": "rational-bound branch-and-bound",
+    "nodes": 50,
+    "history": [
+      {
+        "nodes": 1,
+        "open_nodes": 2,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 2,
+        "open_nodes": 3,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 3,
+        "open_nodes": 4,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 5,
+        "open_nodes": 4,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 6,
+        "open_nodes": 5,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 7,
+        "open_nodes": 6,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 8,
+        "open_nodes": 7,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 9,
+        "open_nodes": 8,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 10,
+        "open_nodes": 9,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 11,
+        "open_nodes": 10,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 12,
+        "open_nodes": 11,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 13,
+        "open_nodes": 12,
+        "incumbent": null,
+        "node_bound": 1171755.3921568627
+      },
+      {
+        "nodes": 14,
+        "open_nodes": 13,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 15,
+        "open_nodes": 14,
+        "incumbent": null,
+        "node_bound": 1174709.5679012344
+      },
+      {
+        "nodes": 16,
+        "open_nodes": 15,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 17,
+        "open_nodes": 16,
+        "incumbent": null,
+        "node_bound": 1171757.4074074072
+      },
+      {
+        "nodes": 18,
+        "open_nodes": 17,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 19,
+        "open_nodes": 18,
+        "incumbent": null,
+        "node_bound": 1174674.019607843
+      },
+      {
+        "nodes": 21,
+        "open_nodes": 18,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 22,
+        "open_nodes": 19,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 23,
+        "open_nodes": 20,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 24,
+        "open_nodes": 21,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 25,
+        "open_nodes": 22,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 26,
+        "open_nodes": 23,
+        "incumbent": null,
+        "node_bound": 1172969.9999999998
+      },
+      {
+        "nodes": 27,
+        "open_nodes": 24,
+        "incumbent": null,
+        "node_bound": 1172429.9999999998
+      },
+      {
+        "nodes": 29,
+        "open_nodes": 24,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 30,
+        "open_nodes": 25,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 31,
+        "open_nodes": 26,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 33,
+        "open_nodes": 26,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 34,
+        "open_nodes": 27,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 35,
+        "open_nodes": 28,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 36,
+        "open_nodes": 29,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 38,
+        "open_nodes": 29,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 39,
+        "open_nodes": 30,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 40,
+        "open_nodes": 31,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 41,
+        "open_nodes": 32,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 42,
+        "open_nodes": 33,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 44,
+        "open_nodes": 33,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 45,
+        "open_nodes": 34,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 46,
+        "open_nodes": 35,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 47,
+        "open_nodes": 36,
+        "incumbent": null,
+        "node_bound": 1175777.5588235292
+      },
+      {
+        "nodes": 48,
+        "open_nodes": 37,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 49,
+        "open_nodes": 38,
+        "incumbent": null,
+        "node_bound": 769500.0
+      },
+      {
+        "nodes": 50,
+        "open_nodes": 39,
+        "incumbent": null,
+        "node_bound": 769500.0
+      }
+    ],
+    "bound_kind": "exact rational Lagrangian bounds of binary64 input",
+    "open_nodes": 39,
+    "best_bound": 769500.0,
+    "status": "LIMIT_REACHED",
+    "model_name": "flugpl",
+    "model_sha256": "8ac7f0195eb38f3ff192e669609da587f33d5c8a8744e62e1f2b809074eb7cb6",
+    "solver_version": "0.1.1",
+    "elapsed_seconds": 0.8815789999989647,
+    "backend": "cpu",
+    "variables": 18,
+    "rows": 18,
+    "nonzeros": 46,
+    "machine": {
+      "system": "Darwin",
+      "architecture": "arm64",
+      "python": "3.11.16"
+    },
+    "input_mps_sha256": "a1f0cb79a95639450dd984473a00efca24365457153d7fcb859c6581ddab4c2c"
+  },
+  "solve_timestamp": "2026-09-30T22:00:52Z"
 }

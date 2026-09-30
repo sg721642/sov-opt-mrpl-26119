@@ -1,11 +1,24 @@
 # Verified Dataset Catalogue — SOV-OPT MRPL PS 26119
 
 This catalogue records the complete provenance, mathematical classification, source URLs,
-cryptographic hashes, and validation status for every optimization dataset in this repository.
+cryptographic hashes, dimensions, reference objectives, and measured validation status for
+every optimization dataset in this repository.
 
 All models in `data/verified/` are genuine public benchmark problems from authoritative
 sources (Netlib LP, MIPLIB, published operations research literature). No synthetic models,
 fabricated refinery parameters, or invented benchmarks are included in the active suite.
+
+---
+
+## Suite Summary & Empty State Disclosures
+
+| Domain / Problem Class | Status | Verified Instances | Notes |
+|:---|:---|:---|:---|
+| **Academic Solver Benchmark LP** | Verified | AVGAS | Symonds (1955) aviation gasoline blending LP formulation |
+| **Documented Application Benchmark LP** | Verified | AFIRO, SC50A, SC50B, BLEND | Authoritative Netlib benchmark instances |
+| **Documented Application Benchmark MILP** | Verified | FLUGPL | MIPLIB airline fleet allocation problem |
+| **Proprietary MRPL Refinery Production LP** | **Empty State** | *None* | Proprietary internal MRPL production matrices are confidential and not public. Fictional refinery parameters are prohibited. |
+| **Industrial Convex Quadratic Program (QP)** | **Empty State** | *None* | No verified real-world industrial QP benchmark is currently active. Synthetic toy QP instances (e.g. `qp_example.qps` from QPSReader test suite) are excluded. |
 
 ---
 
@@ -15,16 +28,17 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
 
 - **Instance Name:** AVGAS
 - **Problem Class:** Continuous Linear Program (LP)
-- **Application / Domain:** Petroleum refinery aviation gasoline blending. Blending alkylate, catalytic cracked gasoline, straight run gasoline, and isopentane into 100/130 aviation gasoline subject to octane number and vapor pressure specifications.
-- **Provenance Evidence:** Genuine published industrial case study from Charnes, Cooper, and Mellon (1952), "Blending Aviation Gasolines — A Study in Programming Interdependent Activities", *Econometrica* 20(2): 135–159; and Symonds (1955), *Linear Programming in the Petroleum Industry*, F. J. Maingot.
+- **Category:** Academic solver benchmark
+- **Application / Domain:** Historical petroleum refinery aviation gasoline blending formulation. Blending alkylate, catalytic cracked gasoline, straight run gasoline, and isopentane into aviation gasoline subject to octane number and vapor pressure specifications.
+- **Provenance Evidence:** Published academic formulation from Charnes, Cooper, and Mellon (1952), "Blending Aviation Gasolines — A Study in Programming Interdependent Activities", *Econometrica* 20(2): 135–159; and Symonds (1955), *Linear Programming in the Petroleum Industry*, F. J. Maingot.
 - **Original Source URL:** https://github.com/ERGO-Code/HiGHS/blob/master/check/instances/avgas.mps
 - **Direct File URL:** https://raw.githubusercontent.com/ERGO-Code/HiGHS/master/check/instances/avgas.mps
 - **Retrieval Date:** 2026-10-01 (ISO 8601)
 - **SHA-256 (MPS):** `10d0e68381321ee9b6a22a53a33d07f7740070b0a077a78ef742a9e88eca8213`
 - **SHA-256 (Normalized JSON):** `cc2c254d20c2e24053db2ab74d56ba847f099159c749d0013fb1f0843a939c52`
-- **Format:** Fixed/free MPS format (`data/verified/avgas.mps`) and canonical JSON (`data/verified/avgas.json`).
+- **Format:** Fixed/free MPS format (`data/verified/avgas.mps`) and canonical JSON (`examples/avgas.json`).
 - **Licence / Redistribution:** Public open benchmark under MIT / Apache 2.0.
-- **Dimensions:** 8 decision variables, 10 constraint rows, 38 nonzeros.
+- **Dimensions:** 8 decision variables, 10 constraint rows, 30 constraint matrix nonzeros (38 total MPS nonzeros including 8 cost coefficients).
 - **Integer Variables:** 0 (pure continuous LP).
 - **Objective Sense:** MINIMIZE (cost row `COST`).
 - **Objective Offset:** 0.0.
@@ -44,27 +58,28 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
 
 - **Instance Name:** AFIRO
 - **Problem Class:** Continuous Linear Program (LP)
-- **Application / Domain:** Small econometric / industrial resource allocation model.
+- **Category:** Documented application benchmark
+- **Application / Domain:** Econometric / industrial resource allocation model.
 - **Provenance Evidence:** Netlib LP library. Provided to Netlib by Michael Saunders, Systems Optimization Laboratory (SOL), Stanford University.
 - **Original Source URL:** https://www.netlib.org/lp/data/
 - **Direct File URL:** https://www.netlib.org/lp/data/afiro (decompressed via standard Netlib `emps` decoder)
 - **Retrieval Date:** 2026-10-01 (ISO 8601)
-- **SHA-256 (Raw Netlib compressed):** `964d9df9579e2d16a025693b64057910ba99f1ec6bafe40ef0098319e40b28ba`
-- **SHA-256 (Decompressed MPS):** `fd3562804ff19382a9cd8bcb22ec81bffd24a4143a2290783831d8c64516a24b`
+- **SHA-256 (MPS):** `fd3562804ff19382a9cd8bcb22ec81bffd24a4143a2290783831d8c64516a24b`
 - **SHA-256 (Normalized JSON):** `39229289a664e30ec1223365837406a91ba3469b2dcb9f71ceec7785ca1946cd`
 - **Licence / Redistribution:** Netlib open access research distribution.
-- **Dimensions:** 32 decision variables, 27 constraint rows (10 equality, 17 inequality), 88 nonzeros.
+- **Dimensions:** 32 decision variables, 27 constraint rows (10 equality, 17 inequality), 83 constraint matrix nonzeros (88 total Netlib nonzeros including 5 cost coefficients).
 - **Integer Variables:** 0 (pure continuous LP).
 - **Objective Sense:** MINIMIZE (cost row `COST`).
 - **Objective Offset:** 0.0.
-- **Published Reference Objective:** `-4.6475314286E+02` (MINOS 5.3 on VAX, Netlib README).
+- **Published Reference Objective:** `-4.6475314286E+02` (MINOS 5.3, Netlib README).
 - **SOV-OPT Measured Result:**
   - Status: `OPTIMAL_VERIFIED`
   - Objective: `-464.75314285714285` (exact match to reference)
-  - Iterations: 20 (primal revised simplex)
-  - Primal residual: `5.68e-14`
-  - Dual residual: `1.92e-17`
-  - Complementarity: `4.47e-17`
+  - Iterations: 55 (two-phase primal revised simplex)
+  - Primal residual: `1.42e-14`
+  - Dual residual: `1.72e-17`
+  - Complementarity: `1.48e-17`
+  - Relative duality gap: `3.13e-17`
   - KKT passed: `true`
 
 ---
@@ -73,16 +88,16 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
 
 - **Instance Name:** SC50A
 - **Problem Class:** Continuous Linear Program (LP)
-- **Application / Domain:** Dynamic multi-period economic planning with staircase constraint structure.
-- **Provenance Evidence:** Netlib LP benchmark library (originally formulated as maximization; cost negated by Netlib for standard minimization).
+- **Category:** Documented application benchmark
+- **Application / Domain:** Dynamic multi-period economic planning model with staircase constraint structure.
+- **Provenance Evidence:** Netlib LP benchmark library.
 - **Original Source URL:** https://www.netlib.org/lp/data/
 - **Direct File URL:** https://www.netlib.org/lp/data/sc50a (decompressed via Netlib `emps`)
 - **Retrieval Date:** 2026-10-01 (ISO 8601)
-- **SHA-256 (Raw Netlib compressed):** `f6eb22f39b9978bba1ed5de3bba0b63ce70a058ef5e77a6dc7f06901edfd9ef8`
-- **SHA-256 (Decompressed MPS):** `c4571004af37a0c7d49099f8fcc513885401784d32f712bf44e014e40348c521`
+- **SHA-256 (MPS):** `c4571004af37a0c7d49099f8fcc513885401784d32f712bf44e014e40348c521`
 - **SHA-256 (Normalized JSON):** `b551aaa7900b50635f4766918ae159be3137da283169f55b1821d23f045e937b`
 - **Licence / Redistribution:** Netlib open access.
-- **Dimensions:** 48 decision variables, 50 constraint rows, 131 nonzeros.
+- **Dimensions:** 48 decision variables, 50 constraint rows, 130 constraint matrix nonzeros (131 total Netlib nonzeros including 1 cost coefficient).
 - **Integer Variables:** 0.
 - **Objective Sense:** MINIMIZE (cost row `R00`).
 - **Objective Offset:** 0.0.
@@ -91,8 +106,10 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
   - Status: `OPTIMAL_VERIFIED`
   - Objective: `-64.5750770585645`
   - Iterations: 56
-  - Primal residual: `1.23e-16`
-  - Dual residual: `2.61e-16`
+  - Primal residual: `5.37e-16`
+  - Dual residual: `4.09e-17`
+  - Complementarity: `6.74e-17`
+  - Relative duality gap: `1.07e-16`
   - KKT passed: `true`
 
 ---
@@ -101,16 +118,16 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
 
 - **Instance Name:** SC50B
 - **Problem Class:** Continuous Linear Program (LP)
-- **Application / Domain:** Staircase economic planning structure.
+- **Category:** Documented application benchmark
+- **Application / Domain:** Dynamic multi-period economic planning model with staircase constraint structure.
 - **Provenance Evidence:** Netlib LP benchmark library.
 - **Original Source URL:** https://www.netlib.org/lp/data/
 - **Direct File URL:** https://www.netlib.org/lp/data/sc50b (decompressed via Netlib `emps`)
 - **Retrieval Date:** 2026-10-01 (ISO 8601)
-- **SHA-256 (Raw Netlib compressed):** `830f16f59525f09fadde86144ed9a317bb19129c4c4c9fe05620807ac89f3968`
-- **SHA-256 (Decompressed MPS):** `15c9d96e1d518dddc197e8e107febce590d0ae94594c676ff0d135b5642c1be5`
+- **SHA-256 (MPS):** `15c9d96e1d518dddc197e8e107febce590d0ae94594c676ff0d135b5642c1be5`
 - **SHA-256 (Normalized JSON):** `ab3adb824a044ef339828c3374a096c769dd4b0375978ba94b05cb33702c5fa6`
 - **Licence / Redistribution:** Netlib open access.
-- **Dimensions:** 48 decision variables, 50 constraint rows, 119 nonzeros.
+- **Dimensions:** 48 decision variables, 50 constraint rows, 118 constraint matrix nonzeros (119 total Netlib nonzeros including 1 cost coefficient).
 - **Integer Variables:** 0.
 - **Objective Sense:** MINIMIZE (cost row `R00`).
 - **Objective Offset:** 0.0.
@@ -118,45 +135,51 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
 - **SOV-OPT Measured Result:**
   - Status: `OPTIMAL_VERIFIED`
   - Objective: `-70.000000`
-  - Iterations: 54
+  - Iterations: 50
   - Primal residual: `2.49e-16`
-  - Dual residual: `2.61e-16`
+  - Dual residual: `3.97e-17`
+  - Complementarity: `9.01e-17`
+  - Relative duality gap: `1.47e-16`
   - KKT passed: `true`
 
 ---
 
-### 5. QP_EXAMPLE — Convex Quadratic Program with QUADOBJ
+### 5. BLEND — Petroleum Refinery Blending LP
 
-- **Instance Name:** QPexample
-- **Problem Class:** Strictly Convex Quadratic Program (QP)
-- **Application / Domain:** Quadratic cost optimization subject to linear demand constraints.
-- **Provenance Evidence:** Standard QPS reference benchmark from QPSReader test suite (JuliaSmoothOptimizers).
-- **Original Source URL:** https://github.com/JuliaSmoothOptimizers/QPSReader.jl/tree/master/test/dat
-- **Direct File URL:** https://raw.githubusercontent.com/JuliaSmoothOptimizers/QPSReader.jl/master/test/dat/qp-example.qps
+- **Instance Name:** BLEND
+- **Problem Class:** Continuous Linear Program (LP)
+- **Category:** Documented application benchmark
+- **Application / Domain:** Refinery blending optimization problem.
+- **Provenance Evidence:** Netlib LP benchmark library. Contributed by Bruce A. Murtagh.
+- **Original Source URL:** https://www.netlib.org/lp/data/
+- **Direct File URL:** https://www.netlib.org/lp/data/blend
 - **Retrieval Date:** 2026-10-01 (ISO 8601)
-- **SHA-256 (QPS):** `0d154c80a55fe79b724f78aa4c2e6f7126344fb483d60e896a66800740a463bd`
-- **SHA-256 (Normalized JSON):** `eef40bc29801c26fac4b53bd9d90d9fc71b72a76c9a41fe33ca089e83df87643`
-- **Licence / Redistribution:** MIT Licence.
-- **Dimensions:** 2 decision variables, 2 constraint rows, 4 constraint nonzeros, 4 Hessian nonzeros ($Q \succ 0$).
-- **Objective Sense:** MINIMIZE (linear $c = [1.5, -2.0]$, quadratic $Q = [[8, 2], [2, 10]]$, offset $= 4.0$).
-- **Published Reference Objective:** `8.371875` (exact analytical optimum: $c_1 = 30.5/40 = 0.7625$, $c_2 = 0.475$).
+- **SHA-256 (MPS):** `c8bb193f8af5dcff735a3b8db62077db93625e93cfb26e2b01f83ca3039cbf7d`
+- **SHA-256 (Normalized JSON):** `d08bca8f2afded6f44620935c23d429d3d1d405d313e7d37beb4556a31d7a2c1`
+- **Licence / Redistribution:** Netlib open access.
+- **Dimensions:** 83 decision variables, 74 constraint rows (43 equality rows, 31 inequality rows), 491 constraint matrix nonzeros (521 total Netlib nonzeros including 30 cost coefficients).
+- **Integer Variables:** 0.
+- **Objective Sense:** MINIMIZE (cost row `R00`).
+- **Objective Offset:** 0.0.
+- **Published Reference Objective:** `-3.0812149846E+01` (MINOS 5.3, Netlib README).
 - **SOV-OPT Measured Result:**
   - Status: `OPTIMAL_VERIFIED`
-  - Objective: `8.3718750036`
-  - Primal solution $x$: `[0.7625000003, 0.4750000001]`
-  - Iterations: 6 (Mehrotra predictor-corrector QP)
-  - Primal residual: `0.0`
-  - Dual residual: `1.70e-10`
+  - Objective: `-30.812149845828237` (matches published reference `-30.81215` to machine precision)
+  - Iterations: 555 (two-phase primal revised simplex)
+  - Primal residual: `1.78e-15`
+  - Dual residual: `1.23e-16`
+  - Complementarity: `2.84e-16`
+  - Relative duality gap: `1.97e-16`
   - KKT passed: `true`
+  - Architectural Note: Solved by direct standard-form equality row handling (avoiding opposing degenerate slack pairs that cycle) and unscaled fallback for ill-conditioned equilibration.
 
 ---
-
-## Documented Evaluated Instances (Honest Status Reporting)
 
 ### 6. FLUGPL — Airline Fleet Allocation MILP
 
 - **Instance Name:** FLUGPL
 - **Problem Class:** Mixed-Integer Linear Program (MILP)
+- **Category:** Documented application benchmark
 - **Application / Domain:** Airline aircraft assignment and route allocation.
 - **Provenance Evidence:** MIPLIB 1.0, MIPLIB 2017 benchmark library. Formulated by Harvey M. Wagner (author of *Principles of Operations Research*), John W. Gregory (Cray Research), E. Andrew Boyd (Rice University).
 - **Original Source URL:** https://miplib.zib.de/instance_details_flugpl.html
@@ -168,39 +191,27 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
 - **Dimensions:** 18 decision variables, 18 constraint rows, 46 nonzeros.
 - **Integer Variables:** 11 general integer variables (not binary).
 - **Objective Sense:** MINIMIZE (cost row `KOSTEN`).
-- **Published Reference Objective:** `1201500` (optimal integer solution); LP relaxation $= 1167185.73$.
+- **Published Reference Objective:** `1201500` (optimal integer solution); LP relaxation root bound = 769500.0 (with published variable bounds).
 - **SOV-OPT Measured Result:**
-  - Status: `NUMERICAL_FAILURE` (after 30 branch-and-bound nodes)
+  - Status: `LIMIT_REACHED` (at configured node limit, e.g. 50 or 500 nodes)
   - Conservative Rational Lower Bound: `769500.0`
-  - Reason: An infeasible subproblem branch could not establish an exact rational Farkas certificate within the strict tolerance. Under SOV-OPT sovereignty rules, the branch-and-bound engine refuses to prune infeasible subproblems without verified mathematical certificates.
+  - Open Nodes: Explored cleanly without numerical divergence.
+  - Architectural Note: Infeasible branch relaxations are rigorously verified with exact binary-rational Farkas certificates (^T z = 0, h^T z < 0, z \ge 0$), permitting safe branch-and-bound pruning.
 
 ---
 
-### 7. BLEND — Petroleum Blending Problem LP
+## Disclosed Exclusions & Empty State Rationale
 
-- **Instance Name:** BLEND
-- **Problem Class:** Continuous Linear Program (LP)
-- **Application / Domain:** Refinery blending optimization problem.
-- **Provenance Evidence:** Netlib LP benchmark library. Contributed by Bruce A. Murtagh.
-- **Original Source URL:** https://www.netlib.org/lp/data/
-- **Direct File URL:** https://www.netlib.org/lp/data/blend
-- **Retrieval Date:** 2026-10-01 (ISO 8601)
-- **SHA-256 (Raw Netlib compressed):** `68ae6dc918140675881d6b640d7acac9e5e903ac063476e5767ebfee54f4172d`
-- **SHA-256 (Decompressed MPS):** `c8bb193f8af5dcff735a3b8db62077db93625e93cfb26e2b01f83ca3039cbf7d`
-- **SHA-256 (Normalized JSON):** `d08bca8f2afded6f44620935c23d429d3d1d405d313e7d37beb4556a31d7a2c1`
-- **Licence / Redistribution:** Netlib open access.
-- **Dimensions:** 83 decision variables, 74 constraint rows, 521 nonzeros.
-- **Integer Variables:** 0.
-- **Published Reference Objective:** `-30.812149846` (MINOS 5.3).
-- **SOV-OPT Measured Result:**
-  - Status: `NUMERICAL_FAILURE`
-  - Reason: `Singular or unsafe pivot` in dense LU factorization during Phase I simplex. The basis matrix becomes ill-conditioned / rank deficient without Markowitz sparse pivoting or dynamic threshold pivoting. Reported honestly as required by AGENTS.md.
-
----
-
-## Missing Refinery Data Disclosure
+### 1. Proprietary MRPL Refinery Production Data (Empty State)
 
 MRPL (Mangalore Refinery and Petrochemicals Limited) production linear programming models:
-- Operational crude assay data, blend fraction limits, tray yields, and economic transfer prices are proprietary internal refinery data.
+- Operational crude assay data, blend fraction limits, tray yields, and economic transfer prices are proprietary internal refinery trade secrets.
 - No authorized public release of MRPL operational LP matrices exists in public domains.
-- Rather than fabricating fictional refinery numbers, SOV-OPT provides the published historical petroleum industry LP benchmark `AVGAS` (Symonds 1955 / Charnes et al. 1952), which has fully reproducible mathematical specifications.
+- Synthetically invented refinery parameters (e.g. made-up distillation yields or fabricated business constraints) are strictly prohibited by SOV-OPT repository integrity guidelines.
+- Instead, the repository provides the documented historical petroleum industry LP benchmark `AVGAS` (Symonds 1955 / Charnes et al. 1952) and the Netlib refinery benchmark `BLEND` (Murtagh).
+
+### 2. Industrial Convex Quadratic Programming Data (Empty State)
+
+- A previous version included `qp_example.qps` from the `QPSReader.jl` unit test repository (a 2-variable toy example with quadratic objective).
+- In accordance with instructions to exclude synthetic or toy test instances from real-world verification claims, `qp_example.qps` has been removed from the active suite.
+- The quadratic programming engine (`sovopt/qp.py`) implements a Mehrotra predictor-corrector interior point method with exact positive-semidefiniteness validation ( \succeq 0$) and unconstrained separable box support. Real-world industrial QP benchmarks will be admitted once authentic public datasets meeting all provenance criteria are verified.

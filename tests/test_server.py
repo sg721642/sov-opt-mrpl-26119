@@ -22,6 +22,12 @@ class ServerTests(unittest.TestCase):
             data=json.load(r)
             self.assertIn('avgas',data)
             self.assertIn('afiro',data)
+            self.assertIn('blend',data)
+        with urllib.request.urlopen(self.url+'/api/manifest') as r:
+            manifest=json.load(r)
+            self.assertIn('instances',manifest)
+            self.assertIn('blend',manifest['instances'])
+            self.assertEqual(manifest['instances']['blend']['expected_status'],'OPTIMAL_VERIFIED')
     def test_http_solve(self):
         m=json.loads((ROOT/'examples/avgas.json').read_text());r=self.post({'model':m})
         self.assertEqual(r['status'],'OPTIMAL_VERIFIED');self.assertAlmostEqual(r['objective'],-7.75,places=4)

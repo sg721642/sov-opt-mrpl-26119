@@ -1,106 +1,112 @@
 {
-  "status": "OPTIMAL_VERIFIED",
-  "algorithm": "diagonal PDHG with periodic averaging restart",
-  "x": [
-    0.0,
-    1.0,
-    0.7500000318086253,
-    0.2499999444742482,
-    0.5000000813890545,
-    0.2500000315735347,
-    0.7499999115359716,
-    0.0
-  ],
-  "dual": [
-    2.691034040704421,
-    1.6666666895815336,
-    0.0,
-    0.0,
-    1.3749999835731814,
-    0.0,
-    1.4166666596118185,
-    0.2083333414284605,
-    1.3333333242502434,
-    0.0,
-    0.0,
-    0.19103399791166287,
-    0.6422992835458226,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    1.666666621251217
-  ],
-  "objective": -7.749999888911532,
-  "verification": {
-    "feasible": true,
-    "objective": -7.749999888911532,
-    "primal_residual": 1.3064950580199562e-08,
-    "absolute_primal_violation": 6.027725896196046e-08,
-    "integrality_residual": 0.0,
-    "kkt_passed": true,
-    "precision_bits": 53,
-    "certification": "floating-point residual checks",
-    "dual_residual": 3.027696621109042e-09,
-    "dual_sign_violation": 0.0,
-    "complementarity": 1.9472715515294347e-08,
-    "relative_duality_gap": 1.2695825071795595e-08
-  },
-  "iterations": 500,
-  "history": [
-    {
-      "iteration": 100,
-      "primal_residual": 0.00178313578788352,
-      "dual_residual": 0.0009230374314631848,
-      "relative_gap": 0.0019017892827452641
-    },
-    {
-      "iteration": 200,
-      "primal_residual": 7.65875523314733e-05,
-      "dual_residual": 6.601111599712792e-05,
-      "relative_gap": 7.837443165693178e-05
-    },
-    {
-      "iteration": 300,
-      "primal_residual": 3.429041851792297e-06,
-      "dual_residual": 2.7754409378921543e-06,
-      "relative_gap": 3.6063973073822875e-06
-    },
-    {
-      "iteration": 400,
-      "primal_residual": 3.4816014223151544e-07,
-      "dual_residual": 1.7390832982414096e-07,
-      "relative_gap": 2.9415820970940397e-08
-    },
-    {
-      "iteration": 500,
-      "primal_residual": 1.3064950580199562e-08,
-      "dual_residual": 3.027696621109042e-09,
-      "relative_gap": 1.2695825071795595e-08
-    }
-  ],
-  "setup_seconds": 6.962499992368976e-05,
-  "iteration_and_verification_seconds": 0.0036165419996905257,
-  "gpu_executed": false,
+  "instance": "avgas_pdhg",
   "model_name": "AVGAS",
-  "model_sha256": "42e4186dfe26d2e46321e8a253d2af05f85d2cefc3404de7fa2c36c47279b965",
-  "solver_version": "0.1.1",
-  "elapsed_seconds": 0.005457749999550288,
   "backend": "pdhg-cpu",
-  "variables": 8,
-  "rows": 10,
-  "nonzeros": 30,
-  "machine": {
-    "system": "Darwin",
-    "architecture": "arm64",
-    "python": "3.11.16"
-  }
+  "result": {
+    "status": "OPTIMAL_VERIFIED",
+    "algorithm": "diagonal PDHG with periodic averaging restart",
+    "x": [
+      0.0,
+      1.0,
+      0.7500000318086253,
+      0.2499999444742482,
+      0.5000000813890545,
+      0.2500000315735347,
+      0.7499999115359716,
+      0.0
+    ],
+    "dual": [
+      2.691034040704421,
+      1.6666666895815336,
+      0.0,
+      0.0,
+      1.3749999835731814,
+      0.0,
+      1.4166666596118185,
+      0.2083333414284605,
+      1.3333333242502434,
+      0.0,
+      0.0,
+      0.19103399791166287,
+      0.6422992835458226,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.666666621251217
+    ],
+    "objective": -7.749999888911532,
+    "verification": {
+      "feasible": true,
+      "objective": -7.749999888911532,
+      "primal_residual": 1.3064950580199562e-08,
+      "absolute_primal_violation": 6.027725896196046e-08,
+      "integrality_residual": 0.0,
+      "kkt_passed": true,
+      "precision_bits": 53,
+      "certification": "floating-point residual checks",
+      "dual_residual": 1.901111838150597e-09,
+      "dual_sign_violation": 0.0,
+      "complementarity": 1.481619658507008e-08,
+      "relative_duality_gap": 1.2695825071795595e-08
+    },
+    "iterations": 500,
+    "history": [
+      {
+        "iteration": 100,
+        "primal_residual": 0.00178313578788352,
+        "dual_residual": 0.0005801669742719144,
+        "relative_gap": 0.0019017892827452641
+      },
+      {
+        "iteration": 200,
+        "primal_residual": 7.65875523314733e-05,
+        "dual_residual": 2.6343863381056913e-05,
+        "relative_gap": 7.837443165693178e-05
+      },
+      {
+        "iteration": 300,
+        "primal_residual": 3.429041851792297e-06,
+        "dual_residual": 1.742724015208935e-06,
+        "relative_gap": 3.6063973073822875e-06
+      },
+      {
+        "iteration": 400,
+        "primal_residual": 3.4816014223151544e-07,
+        "dual_residual": 6.275681625553137e-08,
+        "relative_gap": 2.9415820970940397e-08
+      },
+      {
+        "iteration": 500,
+        "primal_residual": 1.3064950580199562e-08,
+        "dual_residual": 1.901111838150597e-09,
+        "relative_gap": 1.2695825071795595e-08
+      }
+    ],
+    "setup_seconds": 4.375000025902409e-05,
+    "iteration_and_verification_seconds": 0.0036305829999037087,
+    "gpu_executed": false,
+    "model_name": "AVGAS",
+    "model_sha256": "42e4186dfe26d2e46321e8a253d2af05f85d2cefc3404de7fa2c36c47279b965",
+    "solver_version": "0.1.1",
+    "elapsed_seconds": 0.0038639169997622957,
+    "backend": "pdhg-cpu",
+    "variables": 8,
+    "rows": 10,
+    "nonzeros": 30,
+    "machine": {
+      "system": "Darwin",
+      "architecture": "arm64",
+      "python": "3.11.16"
+    }
+  },
+  "solve_timestamp": "2026-09-30T22:00:52Z"
 }

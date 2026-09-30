@@ -81,6 +81,14 @@ footer{padding:20px 5%;border-top:1px solid var(--line);font-size:12px;color:var
       <button id="solve">Run &amp; verify live</button>
       <button class="secondary" id="download" disabled>Download audit JSON</button>
 
+      <details style="margin-top:14px">
+        <summary>Empty states &amp; disclosures</summary>
+        <div class="provenance-card" style="margin-top:8px">
+          <div><strong>Proprietary MRPL Data:</strong> <span>Proprietary internal MRPL production matrices are confidential and not public. Fictional refinery parameters are strictly prohibited; genuine historical benchmarks are provided.</span></div>
+          <div style="margin-top:6px"><strong>Industrial Convex QP:</strong> <span>No authentic public industrial convex QP benchmark is currently verified in the active suite. Toy synthetic QP instances are excluded.</span></div>
+        </div>
+      </details>
+
       <details>
         <summary>Inspect model JSON</summary>
         <textarea id="editor" spellcheck="false" aria-label="Model JSON"></textarea>
@@ -135,17 +143,7 @@ footer{padding:20px 5%;border-top:1px solid var(--line);font-size:12px;color:var
 
 <script>
 const $=id=>document.getElementById(id);
-let examples={}, current={}, last=null;
-
-const META = {
-  avgas: {app:'Aviation Gasoline Refinery Blending LP', source:'Symonds (1955) / Charnes et al. (1952)', ref:'-7.75 (exact)'},
-  afiro: {app:'Industrial Production & Resource Allocation', source:'Netlib LP / Stanford Systems Optimization Lab (Saunders)', ref:'-464.753142857 (MINOS 5.3)'},
-  sc50a: {app:'Staircase Dynamic Production LP', source:'Netlib LP / Academic Benchmark', ref:'-64.575077058 (MINOS 5.3)'},
-  sc50b: {app:'Staircase Dynamic Production LP', source:'Netlib LP / Academic Benchmark', ref:'-70.0 (MINOS 5.3)'},
-  qp_example: {app:'Convex Quadratic Program with QUADOBJ', source:'Standard QPS benchmark test suite', ref:'8.371875 (analytical optimum)'},
-  flugpl: {app:'Airline Fleet Allocation MILP', source:'MIPLIB 1.0 / 2017 (Harvey Wagner, Cray Research)', ref:'1201500 (optimum)'},
-  blend: {app:'Blending Problem LP (Dense Singular Test)', source:'Netlib LP (Bruce Murtagh)', ref:'-30.81215 (MINOS 5.3)'}
-};
+let manifest={}, examples={}, current={}, last=null;
 
 const fmt=v=>v==null?'—':Math.abs(v)>1e6?Number(v).toExponential(4):Number(v).toLocaleString(undefined,{maximumFractionDigits:6});
 const sci=v=>v==null?'—':Number(v).toExponential(2);
@@ -154,26 +152,31 @@ function choose(){
   const key=$('example').value;
   current=structuredClone(examples[key]||{});
   $('editor').value=JSON.stringify(current,null,2);
-  const m=META[key]||{app:'Documented instance',source:'Verified dataset',ref:'—'};
-  $('m_app').textContent=m.app;
-  $('m_source').textContent=m.source;
-  $('m_dims').textContent=(current.c?.length||0)+' vars, '+(current.A?.length||0)+' rows';
-  $('m_ref').textContent=m.ref;
+  const m=manifest.instances?.[key]||{};
+  $('m_app').textContent=m.domain||'—';
+  $('m_source').textContent=m.reference_source||'—';
+  $('m_dims').textContent=(m.variables||current.c?.length||0)+' vars, '+(m.constraints||current.A?.length||0)+' rows'+(m.matrix_nonzeros?' ('+m.matrix_nonzeros+' nonzeros)':'');
+  $('m_ref').textContent=m.reference_objective!=null?`${m.reference_objective} (${m.reference_source})`:'—';
 }
 
-fetch('/api/examples').then(r=>r.json()).then(data=>{
-  examples=data;
+Promise.all([
+  fetch('/api/manifest').then(r=>r.json()),
+  fetch('/api/examples').then(r=>r.json())
+]).then(([man, ex])=>{
+  manifest=man;
+  examples=ex;
   $('example').replaceChildren();
-  for(const key of Object.keys(data)){
-    const o=document.createElement('option');
-    o.value=key;
-    const label=META[key]?.app ? `${key.toUpperCase()} — ${META[key].app}` : (data[key].name||key);
-    o.textContent=label;
-    $('example').append(o);
+  for(const [key, d] of Object.entries(man.instances||{})){
+    if(examples[key]){
+      const o=document.createElement('option');
+      o.value=key;
+      o.textContent=`${d.name} (${d.class}) — ${d.domain}`;
+      $('example').append(o);
+    }
   }
-  if(data['avgas'])$('example').value='avgas';
+  if(examples['avgas'])$('example').value='avgas';
   choose();
-}).catch(e=>$('message').textContent='Failed to load examples: '+e.message);
+}).catch(e=>$('message').textContent='Failed to load manifest or examples: '+e.message);
 
 $('example').onchange=choose;
 
@@ -186,6 +189,8 @@ function cellRow(key,value){
 }
 
 $('solve').onclick=async()=>{
+  const selectedKey=$('example').value;
+  const instMeta=manifest.instances?.[selectedKey]||{};
   $('solve').disabled=true;
   $('message').textContent='';
   $('status').textContent='SOLVING LIVE...';
@@ -202,30 +207,31 @@ $('solve').onclick=async()=>{
     });
     const r=await resp.json();
     if(!resp.ok)throw Error(r.error||'Request failed');
-    last={model,result:r,solve_timestamp:new Date().toISOString()};
+    const elapsed=(performance.now()-t0)/1000;
+    last={instance:selectedKey,model,result:r,solve_timestamp:new Date().toISOString(),measured_duration_seconds:elapsed};
     
     $('empty').hidden=true;
     $('result').hidden=false;
     $('live_badge').hidden=false;
     $('status').textContent=r.status;
-    $('status').className='status '+(r.status.includes('VERIFIED')||r.status==='INFEASIBLE_CERTIFIED'?'good':'bad');
-    $('modelname').textContent=(model.name||$('example').value)+' · '+(r.algorithm||'No result');
+    $('status').className='status '+(r.status.includes('VERIFIED')||r.status==='LIMIT_REACHED'?'good':'bad');
+    $('modelname').textContent=(instMeta.name||model.name||selectedKey)+' · '+(r.algorithm||'Simplex');
     $('objective').textContent=fmt(r.objective);
-    $('pub_ref').textContent=META[$('example').value]?.ref||'—';
-    $('runtime').textContent=r.elapsed_seconds==null?'—':fmt(r.elapsed_seconds*1000)+' ms';
+    $('pub_ref').textContent=instMeta.reference_objective!=null?fmt(instMeta.reference_objective):'—';
+    $('runtime').textContent=fmt(elapsed*1000)+' ms';
     
     const v=r.verification||{};
-    $('primal').textContent=sci(v.primal_residual);
-    $('dual').textContent=sci(v.dual_residual);
+    $('primal').textContent=v.primal_residual!=null?sci(v.primal_residual):'—';
+    $('dual').textContent=v.dual_residual!=null?sci(v.dual_residual):'—';
     $('iterations').textContent=r.nodes??r.iterations??'—';
     
     $('trust').replaceChildren();
     cellRow('Original model feasibility',v.feasible==null?'Not available':v.feasible?'PASSED':'FAILED');
     cellRow('KKT stationarity & complementarity',v.kkt_passed==null?'Not applicable':v.kkt_passed?'PASSED':'NOT ESTABLISHED');
-    cellRow('Absolute constraint violation',sci(v.absolute_primal_violation));
+    cellRow('Absolute constraint violation',v.absolute_primal_violation!=null?sci(v.absolute_primal_violation):'—');
     cellRow('Mantissa precision',(v.precision_bits||53)+' bits (IEEE 754)');
     cellRow('Model SHA256',(r.model_sha256||'—').slice(0,24)+'...');
-    cellRow('Solver backend',r.backend||'cpu');
+    cellRow('Solver backend',$('backend').value);
     cellRow('Timestamp',last.solve_timestamp);
     
     $('variables').replaceChildren();

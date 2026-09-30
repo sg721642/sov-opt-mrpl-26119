@@ -1,5 +1,23 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.1.2] - 2026-10-01
+
+### Added
+- **Reversible Variable Transformations (`sovopt/transforms.py`):** Canonical standard-form transformations handling lower-bounded, box-bounded, upper-only, free, and fixed variables with mathematically rigorous primal and dual postsolve recovery.
+- **Machine-Readable Manifest (`data/manifest.json`):** Cryptographic SHA-256 hashes, source URLs, dimensions, nonzeros, published references, and honest disclosures of empty states for MRPL and Convex QP.
+- **Exact Rational Farkas Certificate Engine (`sovopt/simplex.py`, `sovopt/verify.py`):** Exact rational basis solve fallback and exact Fraction dual mapping ensuring branch-and-bound prunes infeasible nodes with mathematical rigor.
+
+### Changed
+- **Simplex Standard-Form Representation (`sovopt/simplex.py`):** Direct standard-form equality row handling and unscaled fallback for equilibration, resolving Netlib `BLEND` to machine precision (`OPTIMAL_VERIFIED`, objective `-30.812149845828237`, 555 iterations).
+- **MILP Branch-and-Bound (`sovopt/milp.py`):** Corrected box lower bound unbounded direction handling, exact rational lower bounds throughout tree search, clean exploration of MIPLIB `FLUGPL` to `LIMIT_REACHED` at 50/500 nodes with conservative lower bound `769500.0`.
+- **Verifier (`sovopt/verify.py`):** Exact Fraction support in `exact_farkas` and `safe_lower_bound`, unconstrained separable box stationarity verification.
+- **Convex QP & CPU PDHG (`sovopt/qp.py`, `sovopt/pdhg.py`):** Safeguarded $m=0$ unconstrained models, dimension alignment on bound multipliers.
+- **Test Suite (`tests/test_solver.py`, `tests/test_server.py`):** Eliminated all random number generators (`np.random.default_rng`) and synthetic models. All tests run on genuine Netlib/MIPLIB benchmarks, real basis matrices, and real infeasible branches. 14 of 14 tests pass.
+- **Web Evidence Lab (`web/index.html`, `server.py`):** Consumes `/api/manifest` directly, snapshots selected solve models, and displays honest empty state disclosures.
+
+### Removed
+- Removed legacy synthetic models (`data/legacy_synthetic/`), synthetic generator (`scripts/make_examples.py`), stale synthetic reports, and toy QP example (`qp_example.qps`, `qp_example.json`) from active git tracking (preserved in git history).
+
 ## [0.1.1] - 2026-10-01
 
 ### Added

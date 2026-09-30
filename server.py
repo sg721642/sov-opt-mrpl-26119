@@ -13,6 +13,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(status);self.send_header('Content-Type',kind);self.send_header('Content-Length',str(len(data)));self.send_header('X-Content-Type-Options','nosniff');self.send_header('Cache-Control','no-store');self.end_headers();self.wfile.write(data)
     def do_GET(self):
         if self.path=='/health':return self.send(200,{'status':'ok','version':'0.1.1'})
+        if self.path=='/api/manifest':return self.send(200,json.loads((ROOT/'data/manifest.json').read_text()))
         if self.path=='/api/examples':return self.send(200,{k:json.loads(p.read_text()) for k,p in EXAMPLES.items()})
         if self.path in ('/','/index.html'):return self.send(200,(ROOT/'web/index.html').read_bytes(),'text/html; charset=utf-8')
         self.send(404,{'error':'Not found'})
@@ -37,6 +38,8 @@ class Handler(BaseHTTPRequestHandler):
                 run=subprocess.run([sys.executable,'-m','sovopt',str(p),'--backend',backend],cwd=ROOT,env=env,capture_output=True,text=True,timeout=35)
                 try:r=json.loads(run.stdout)
                 except ValueError:r={'status':'NUMERICAL_FAILURE','message':'Worker failed; inspect local server logs'}
+                r['model_sha256']=model.fingerprint()
+                r['model_name']=model.name
                 self.send(200,r)
         except subprocess.TimeoutExpired:self.send(200,{'status':'LIMIT_REACHED','message':'35-second web worker deadline reached'})
         finally:SLOTS.release()
