@@ -194,7 +194,7 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
 - **Published Reference Objective:** `1201500` (optimal integer solution); LP relaxation root bound = 769500.0 (with published variable bounds).
 - **SOV-OPT Measured Result:**
   - Status: `LIMIT_REACHED` (at configured node limit, e.g. 50 nodes)
-  - Conservative Rational Lower Bound: `769500.0`
+  - Conservative Rational Lower Bound: `1173645.0` (exact rational basis duals advance bound from LP relaxation root 769500.0)
   - Open Nodes: Explored cleanly without numerical divergence.
   - Architectural Note: Infeasible branch relaxations are rigorously verified with exact binary-rational Farkas certificates ($G^T z = 0, h^T z < 0, z \ge 0$), permitting safe branch-and-bound pruning.
 

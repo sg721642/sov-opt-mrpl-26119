@@ -6,276 +6,262 @@
       "nodes": 1,
       "open_nodes": 2,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1167185.72559232
     },
     {
       "nodes": 2,
       "open_nodes": 3,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1169177.3529411764
     },
     {
       "nodes": 3,
       "open_nodes": 4,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1169060.0149782135
+    },
+    {
+      "nodes": 4,
+      "open_nodes": 5,
+      "incumbent": null,
+      "node_bound": 1171718.4640522874
     },
     {
       "nodes": 5,
-      "open_nodes": 4,
+      "open_nodes": 6,
       "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 6,
-      "open_nodes": 5,
-      "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1170119.2810457514
     },
     {
       "nodes": 7,
       "open_nodes": 6,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1170057.4999999998
     },
     {
       "nodes": 8,
       "open_nodes": 7,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1174119.9999999998
     },
     {
       "nodes": 9,
       "open_nodes": 8,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1170619.9999999998
     },
     {
       "nodes": 10,
       "open_nodes": 9,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1171972.0588235292
     },
     {
       "nodes": 11,
       "open_nodes": 10,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1171755.3921568627
     },
     {
       "nodes": 12,
       "open_nodes": 11,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1172069.9999999998
     },
     {
       "nodes": 13,
       "open_nodes": 12,
       "incumbent": null,
-      "node_bound": 1171755.3921568627
+      "node_bound": 1171757.4074074072
     },
     {
       "nodes": 14,
       "open_nodes": 13,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1173125.8714596948
     },
     {
       "nodes": 15,
       "open_nodes": 14,
       "incumbent": null,
-      "node_bound": 1174709.5679012344
-    },
-    {
-      "nodes": 16,
-      "open_nodes": 15,
-      "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1174403.6492374726
     },
     {
       "nodes": 17,
-      "open_nodes": 16,
+      "open_nodes": 14,
       "incumbent": null,
-      "node_bound": 1171757.4074074072
+      "node_bound": 1172120.8333333333
     },
     {
       "nodes": 18,
-      "open_nodes": 17,
+      "open_nodes": 15,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1172283.3333333333
     },
     {
       "nodes": 19,
-      "open_nodes": 18,
+      "open_nodes": 16,
       "incumbent": null,
-      "node_bound": 1174674.019607843
+      "node_bound": 1173819.9999999998
+    },
+    {
+      "nodes": 20,
+      "open_nodes": 17,
+      "incumbent": null,
+      "node_bound": 1172677.0588235292
     },
     {
       "nodes": 21,
       "open_nodes": 18,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1173873.1699346404
     },
     {
       "nodes": 22,
       "open_nodes": 19,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1172969.9999999998
     },
     {
       "nodes": 23,
       "open_nodes": 20,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1172429.9999999998
     },
     {
       "nodes": 24,
       "open_nodes": 21,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1174827.4999999998
     },
     {
       "nodes": 25,
       "open_nodes": 22,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1172466.4999999998
     },
     {
       "nodes": 26,
       "open_nodes": 23,
       "incumbent": null,
-      "node_bound": 1172969.9999999998
+      "node_bound": 1173048.3333333333
     },
     {
       "nodes": 27,
       "open_nodes": 24,
       "incumbent": null,
-      "node_bound": 1172429.9999999998
+      "node_bound": 1172751.3333333333
     },
     {
       "nodes": 29,
       "open_nodes": 24,
       "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 30,
-      "open_nodes": 25,
-      "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1173644.9999999998
     },
     {
       "nodes": 31,
-      "open_nodes": 26,
+      "open_nodes": 24,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1174332.4999999998
     },
     {
       "nodes": 33,
-      "open_nodes": 26,
+      "open_nodes": 24,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1173633.1699346404
     },
     {
       "nodes": 34,
-      "open_nodes": 27,
+      "open_nodes": 25,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1173410.1851851852
     },
     {
       "nodes": 35,
-      "open_nodes": 28,
+      "open_nodes": 26,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1173858.3333333333
     },
     {
-      "nodes": 36,
-      "open_nodes": 29,
+      "nodes": 37,
+      "open_nodes": 26,
       "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 38,
-      "open_nodes": 29,
-      "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1173569.9999999998
     },
     {
       "nodes": 39,
-      "open_nodes": 30,
+      "open_nodes": 26,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1173805.2469135802
     },
     {
       "nodes": 40,
-      "open_nodes": 31,
+      "open_nodes": 27,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1173612.3529411764
     },
     {
       "nodes": 41,
-      "open_nodes": 32,
+      "open_nodes": 28,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1174674.019607843
     },
     {
       "nodes": 42,
-      "open_nodes": 33,
+      "open_nodes": 29,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1175049.9999999998
     },
     {
       "nodes": 44,
-      "open_nodes": 33,
+      "open_nodes": 29,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1174415.6249999998
     },
     {
       "nodes": 45,
-      "open_nodes": 34,
+      "open_nodes": 30,
       "incumbent": null,
-      "node_bound": 769500.0
-    },
-    {
-      "nodes": 46,
-      "open_nodes": 35,
-      "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1174049.9999999998
     },
     {
       "nodes": 47,
-      "open_nodes": 36,
+      "open_nodes": 30,
       "incumbent": null,
-      "node_bound": 1175777.5588235292
+      "node_bound": 1174492.4999999998
     },
     {
       "nodes": 48,
-      "open_nodes": 37,
+      "open_nodes": 31,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1175527.0588235292
     },
     {
       "nodes": 49,
-      "open_nodes": 38,
+      "open_nodes": 32,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1175777.5588235294
     },
     {
       "nodes": 50,
-      "open_nodes": 39,
+      "open_nodes": 33,
       "incumbent": null,
-      "node_bound": 769500.0
+      "node_bound": 1174319.9999999998
     }
   ],
   "bound_kind": "exact rational Lagrangian bounds of binary64 input",
-  "open_nodes": 39,
-  "best_bound": 769500.0,
+  "open_nodes": 33,
+  "tolerance_closed_nodes": 0,
+  "pruned_nodes": 0,
+  "best_bound": 1173644.9999999998,
   "status": "LIMIT_REACHED",
   "model_name": "flugpl",
   "model_sha256": "8ac7f0195eb38f3ff192e669609da587f33d5c8a8744e62e1f2b809074eb7cb6",
   "solver_version": "0.1.2",
-  "elapsed_seconds": 0.8772914159999345,
+  "elapsed_seconds": 1.0898516249999375,
   "backend": "cpu",
+  "gpu_executed": false,
+  "timestamp_utc": "2026-09-30T22:46:26.927681+00:00",
   "variables": 18,
   "rows": 18,
   "nonzeros": 46,
@@ -284,5 +270,7 @@
     "architecture": "arm64",
     "python": "3.11.16"
   },
-  "wall_clock_seconds": 0.8773105000000214
+  "measured_duration_seconds": 1.0898799579990737,
+  "git_revision": "bb3acc72ea7edd836bc938f40f06402eb0c512b4",
+  "input_mps_sha256": "a1f0cb79a95639450dd984473a00efca24365457153d7fcb859c6581ddab4c2c"
 }

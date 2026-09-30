@@ -62,7 +62,24 @@ All results generated natively on Apple Silicon ARM64 CPU with `gpu_executed: fa
 | **SC50B** | LP | Application benchmark | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000000000** | -70.000000000 (Netlib / MINOS 5.3) | 0.0 | 2.49e-16 | 3.97e-17 | 30.9 ms |
 | **BLEND** | LP | Application benchmark | 74 x 83 | `OPTIMAL_VERIFIED` | **-30.812149845828** | -30.812149846 (Netlib / MINOS 5.3) | +1.72e-10 | 1.78e-15 | 1.23e-16 | 828.2 ms |
 | **AVGAS (PDHG)** | LP | First-order CPU route | 10 x 8 | `OPTIMAL_VERIFIED` | **-7.750000085449** | -7.75 (Symonds 1955) | 1.1e-7 | 1.84e-8 | 2.10e-8 | 6.1 ms |
-| **FLUGPL** | MILP | Application benchmark | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **769500.0** | 1201500 (MIPLIB 1.0) | N/A (Node limit: 50) | N/A | N/A | 881.6 ms |
+| **FLUGPL** | MILP | Application benchmark | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **1173645.0** | 1201500 (MIPLIB 1.0) | N/A (Node limit: 50) | N/A | N/A | 1042.8 ms |
+
+---
+
+## 2.1. Independent Differential Verification (Native HiGHS 1.15.1)
+
+All 6 genuine instances were solved using the native C++ HiGHS 1.15.1 solver via `highspy` in an isolated external process (completely separated from the sovereign solver core; record preserved in `reports/external_validation.json`):
+
+| Instance | Input MPS File | HiGHS C++ Status | HiGHS Objective | SOV-OPT Objective / Bound | Discrepancy (SOV-OPT vs HiGHS) | Match Status |
+|:---|:---|:---:|:---:|:---:|:---:|:---:|
+| **AVGAS** | `data/verified/avgas.mps` | `HighsModelStatus.kOptimal` | -7.750000 | -7.750000 | 0.0 | `EXACT_MATCH` |
+| **AFIRO** | `data/verified/afiro.mps` | `HighsModelStatus.kOptimal` | -464.753143 | -464.753143 | 5.68e-14 | `MATCH (< 1e-12)` |
+| **SC50A** | `data/verified/sc50a.mps` | `HighsModelStatus.kOptimal` | -64.575077 | -64.575077 | 0.0 | `EXACT_MATCH` |
+| **SC50B** | `data/verified/sc50b.mps` | `HighsModelStatus.kOptimal` | -70.000000 | -70.000000 | 0.0 | `EXACT_MATCH` |
+| **BLEND** | `data/verified/blend.mps` | `HighsModelStatus.kOptimal` | -30.812150 | -30.812150 | 0.0 | `EXACT_MATCH` |
+| **FLUGPL** | `data/verified/flugpl.mps` | `HighsModelStatus.kOptimal` | 1201500.000000 | Bound: 1173645.0 | Safe lower bound <= 1201500 | `VALIDATED_BOUND` |
+
+Key takeaway: Netlib BLEND objective `-30.812149845828237` matches native C++ HiGHS 1.15.1 to machine precision ($0.0$ difference at double precision), proving that the discrepancy against the 1988 Netlib README (`-3.0812149846E+01`) is due entirely to 11-digit text truncation in historical MINOS 5.3 output, not a solver defect.
 
 ---
 
@@ -85,9 +102,11 @@ All results generated natively on Apple Silicon ARM64 CPU with `gpu_executed: fa
 - **Verification:** `test_variable_transformations_equiv` passes with machine precision.
 
 ### Area 3: MILP Bound Accounting & Branch-and-Bound Correctness
-- **Issue:** `all_bounds` in `sovopt/milp.py` unconditionally pinned the root lower bound `[rootlb]`, preventing lower bound progression if child nodes improved. Objective offsets were added to float bounds without exact arithmetic.
+- **Issue:** `all_bounds` in `sovopt/milp.py` unconditionally pinned the root lower bound `[rootlb]`, preventing lower bound progression if child nodes improved. Objective offsets were added to float bounds without exact arithmetic. In addition, floating-point rounding errors in dual calculation on FLUGPL (e.g. $-3.33 \times 10^{-14}$ residual on infinite upper bound variable) caused `safe_lower_bound` to return `None` and fall back to crude box bounds.
 - **Resolution:**
-  - Removed `[rootlb]` pinning. The lower bound is computed as the minimum of the open branch node heap and valid terminal leaves.
+  - Removed `[rootlb]` pinning. The lower bound is computed as the minimum of open branch nodes and valid terminal leaves.
+  - Implemented `_exact_dual_from_basis` using `_exact_solve_BT` in exact rational arithmetic (`Fraction`), ensuring reduced costs on basic variables are mathematically zero ($0/1$).
+  - With exact rational duals, `safe_lower_bound` evaluates reliably on every branch node, advancing the conservative lower bound on MIPLIB FLUGPL from $769500.0$ to **$1173645.0$** at 50 nodes (and $1176210.0$ at 150 nodes).
   - Added `model.obj_offset` in exact rational arithmetic (`Fraction`) prior to conservative downward rounding via `downward_float(global_lower + offset_F)`.
   - Updated FLUGPL bounds test to accept verified improvements while verifying bounds remain strictly $\le 1201500.0$.
 - **Verification:** `test_milib_flugpl_solve_and_lower_bound` passes, verifying valid bounds and honest `LIMIT_REACHED` status.

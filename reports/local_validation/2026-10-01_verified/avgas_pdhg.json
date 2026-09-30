@@ -87,14 +87,15 @@
       "relative_gap": 6.7326344753840595e-09
     }
   ],
-  "setup_seconds": 3.9999998989515007e-05,
-  "iteration_and_verification_seconds": 0.0033693330005917232,
+  "setup_seconds": 4.533299943432212e-05,
+  "iteration_and_verification_seconds": 0.0036995829996158136,
   "gpu_executed": false,
   "model_name": "AVGAS",
   "model_sha256": "42e4186dfe26d2e46321e8a253d2af05f85d2cefc3404de7fa2c36c47279b965",
   "solver_version": "0.1.2",
-  "elapsed_seconds": 0.003573584001060226,
+  "elapsed_seconds": 0.003927959000066039,
   "backend": "pdhg-cpu",
+  "timestamp_utc": "2026-09-30T22:46:26.932277+00:00",
   "variables": 8,
   "rows": 10,
   "nonzeros": 30,
@@ -103,5 +104,6 @@
     "architecture": "arm64",
     "python": "3.11.16"
   },
-  "wall_clock_seconds": 0.0035945420004281914
+  "measured_duration_seconds": 0.003959083000154351,
+  "git_revision": "bb3acc72ea7edd836bc938f40f06402eb0c512b4"
 }

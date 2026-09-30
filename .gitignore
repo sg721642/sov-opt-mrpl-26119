@@ -45,6 +45,7 @@ secrets.json
 data/raw/*.gz
 data/raw/*.bz2
 data/raw/*.zip
+*.zip
 
 # Temporary server log
 /tmp/sovopt_server.log

@@ -25,8 +25,8 @@ python -c "import cupy; print(cupy.__version__); print(cupy.cuda.runtime.getDevi
 Do not install several CuPy wheel variants together. The optional GPU dependency is not pinned in the CPU requirements because the correct binary package depends on the machine. Record the resolved version and CUDA/driver versions in your experiment. This package's CUDA path was not executed on delivery hardware and may require compatibility fixes.
 
 ```bash
-python -m sovopt examples/refinery_lp.json --backend pdhg-cuda --output reports/cuda_lp.json
-python scripts/compare_gpu.py examples/refinery_lp.json
+python -m sovopt examples/avgas.json --backend pdhg-cuda --output reports/cuda_lp.json
+python scripts/compare_gpu.py examples/avgas.json
 python -m pip freeze > reports/gpu_environment.txt
 nvidia-smi > reports/nvidia_smi.txt
 ```

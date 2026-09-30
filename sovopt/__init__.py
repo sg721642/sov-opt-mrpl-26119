@@ -22,13 +22,17 @@ def solve(model,backend='cpu',tol=1e-7,**options):
     else:
         from .simplex import solve_lp
         r=solve_lp(model,tol=tol,**options)
-    r.update(model_name=model.name,model_sha256=model.fingerprint(),solver_version=__version__,
-             elapsed_seconds=time.perf_counter()-start,backend=backend,
-             variables=len(model.c),rows=len(model.A),nonzeros=int((model.A!=0).sum()),
-             machine=dict(system=platform.system(),architecture=platform.machine(),python=platform.python_version()))
+    from datetime import datetime, timezone
+    r.pop('dual_exact_fraction', None)
+    gpu_done = bool(r.get('gpu_executed', False))
+    r.update(model_name=model.name, model_sha256=model.fingerprint(), solver_version=__version__,
+             elapsed_seconds=time.perf_counter()-start, backend=backend, gpu_executed=gpu_done,
+             timestamp_utc=datetime.now(timezone.utc).isoformat(),
+             variables=len(model.c), rows=len(model.A), nonzeros=int((model.A!=0).sum()),
+             machine=dict(system=platform.system(), architecture=platform.machine(), python=platform.python_version()))
     # Record objective sense for clarity
     if model.maximize:
-        r['objective_sense']='maximize'
-    if model.obj_offset!=0.0:
-        r['obj_offset']=model.obj_offset
+        r['objective_sense'] = 'maximize'
+    if model.obj_offset != 0.0:
+        r['obj_offset'] = model.obj_offset
     return r

@@ -145,6 +145,19 @@ def downward_float(value):
         f = float(np.nextafter(f, -np.inf))
     return f
 
+def upward_float(value):
+    """Convert an exact Fraction to float rounded conservatively upward."""
+    if value is None:
+        return None
+    if value == -math.inf:
+        return -math.inf
+    if value == math.inf:
+        return math.inf
+    f = float(value)
+    if F(f) < value:
+        f = float(np.nextafter(f, np.inf))
+    return f
+
 def exact_farkas(model, z):
     """Verify exact binary-rational Farkas certificate G^T z == 0, h^T z < 0, z >= 0."""
     G, h, _ = model.inequalities()

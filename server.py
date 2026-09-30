@@ -37,11 +37,13 @@ class Handler(BaseHTTPRequestHandler):
                 env=dict(os.environ,OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1')
                 run=subprocess.run([sys.executable,'-m','sovopt',str(p),'--backend',backend],cwd=ROOT,env=env,capture_output=True,text=True,timeout=35)
                 try:r=json.loads(run.stdout)
-                except ValueError:r={'status':'NUMERICAL_FAILURE','message':'Worker failed; inspect local server logs'}
+                except ValueError:r={'status':'NUMERICAL_FAILURE','message':f'Worker failed (code {run.returncode}): {run.stderr[:200].strip()}','gpu_executed':False}
+                r.setdefault('gpu_executed',False)
                 r['model_sha256']=model.fingerprint()
                 r['model_name']=model.name
+                r['backend']=backend
                 self.send(200,r)
-        except subprocess.TimeoutExpired:self.send(200,{'status':'LIMIT_REACHED','message':'35-second web worker deadline reached'})
+        except subprocess.TimeoutExpired:self.send(200,{'status':'LIMIT_REACHED','message':'35-second web worker deadline reached','gpu_executed':False,'model_sha256':model.fingerprint(),'model_name':model.name,'backend':backend})
         finally:SLOTS.release()
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--host',default='127.0.0.1');p.add_argument('--port',type=int,default=int(os.environ.get('PORT',8000)));a=p.parse_args()

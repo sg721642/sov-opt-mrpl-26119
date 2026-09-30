@@ -140,25 +140,25 @@ For arbitrary infeasible models, certificate reconstruction may fail. The implem
 
 ## Step 12 — Run the experimental first-order path
 
-Select the refinery **LP**, then **Experimental PDHG · CPU**. Solve and compare objective/residuals. Do not select MILP or QP with this route; the API rejects those combinations explicitly. On small cases this method can be slower than simplex. That is an informative result.
+Select the authentic **AVGAS** blending LP, then **Experimental PDHG · CPU**. Solve and compare objective/residuals. Do not select MILP or QP with this route; the API rejects those combinations explicitly. On small cases this method can be slower than simplex. That is an informative result.
 
 The CPU and CUDA PDHG paths share the algorithm but have distinct SpMV implementations. Apple Silicon GPUs do not run this CUDA backend. The supplied CUDA experiment is for an NVIDIA Linux machine; follow `docs/05_GPU_AND_DEPLOYMENT.md`.
 
 ## Step 13 — Use the CLI and Python API
 
 ```bash
-python -m sovopt examples/refinery_lp.json --output reports/my_lp.json
-python -m sovopt examples/refinery_milp.json --output reports/my_milp.json
-python -m sovopt examples/refinery_qp.json --output reports/my_qp.json
-python -m sovopt examples/tiny.mps
-python -m sovopt examples/refinery_lp.json --backend pdhg-cpu
+python -m sovopt examples/avgas.json --output reports/local_validation/avgas.json
+python -m sovopt examples/afiro.json --output reports/local_validation/afiro.json
+python -m sovopt examples/blend.json --output reports/local_validation/blend.json
+python -m sovopt examples/flugpl.json --output reports/local_validation/flugpl.json
+python -m sovopt examples/avgas.json --backend pdhg-cpu
 ```
 
 In Python, run from this project folder:
 
 ```python
 from sovopt import load, solve
-model = load('examples/refinery_lp.json')
+model = load('examples/avgas.json')
 result = solve(model, tol=1e-7)
 print(result['status'], result.get('objective'))
 ```
@@ -166,7 +166,7 @@ print(result['status'], result.get('objective'))
 To recheck an exported browser audit (replace the example path with your downloaded file):
 
 ```bash
-python scripts/validate_audit.py ~/Downloads/sovopt-audit.json
+python scripts/validate_audit.py ~/Downloads/sovopt-avgas-audit.json
 ```
 
 ## Step 14 — Give Antigravity the correct task
@@ -176,9 +176,7 @@ Open `docs/ANTIGRAVITY_PROMPT.md`, copy its instructions into the editor assista
 ## Step 15 — Repeat the benchmarks and preserve evidence
 
 ```bash
-python scripts/benchmark.py
-python scripts/freeze_manifest.py examples/refinery_lp.json examples/refinery_milp.json examples/refinery_qp.json examples/infeasible.json examples/tiny.mps
-python scripts/run_manifest.py reports/manifest.json
+python scripts/generate_reports.py
 ```
 
 Reports are written under `reports/`. Copy experiment results into dated subfolders before rerunning, because these commands overwrite their named report files. Read `docs/06_BENCHMARKS.md` before presenting comparisons.

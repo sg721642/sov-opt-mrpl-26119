@@ -80,9 +80,32 @@ def parse_mps_standalone(path):
         'lower': var_l, 'upper': var_u, 'integer': int_indices, 'names': cnames
     }
 
-if __name__ == '__main__':
+def run_highspy(target):
+    import highspy
+    h = highspy.Highs()
+    h.setOptionValue("output_flag", False)
+    t0 = time.perf_counter()
+    status = h.readModel(str(target))
+    if status != highspy.HighsStatus.kOk:
+        return {'backend': 'highspy (C++ core)', 'status': 'READ_ERROR', 'objective': None}
+    h.run()
+    elapsed = time.perf_counter() - t0
+    info = h.getInfo()
+    model_status = str(h.getModelStatus())
+    obj = float(info.objective_function_value) if info.primal_solution_status == 2 else None
+    return {
+        'backend': 'highspy 1.15.1 (native C++ HiGHS)',
+        'input_source': str(target),
+        'model_status': model_status,
+        'success': 'kOptimal' in model_status,
+        'objective': obj,
+        'simplex_iterations': info.simplex_iteration_count,
+        'ipm_iterations': info.ipm_iteration_count,
+        'seconds': elapsed
+    }
+
+def run_scipy(target):
     from scipy.optimize import linprog, milp, Bounds, LinearConstraint
-    target = Path(sys.argv[1])
     start = time.perf_counter()
     if target.suffix == '.mps':
         d = parse_mps_standalone(target)
@@ -110,11 +133,21 @@ if __name__ == '__main__':
         r = linprog(c, A_ub=G or None, b_ub=h or None,
                     bounds=list(zip(d['lower'], d['upper'])), method='highs')
 
-    print(json.dumps(dict(
+    return dict(
         backend='external SciPy/HiGHS process',
         input_source=str(target),
         success=bool(r.success),
         objective=None if r.fun is None else float(r.fun),
         seconds=time.perf_counter() - start,
         message=r.message
-    )))
+    )
+
+if __name__ == '__main__':
+    target = Path(sys.argv[1])
+    try:
+        import highspy
+        res = run_highspy(target)
+    except ImportError:
+        res = run_scipy(target)
+    print(json.dumps(res, indent=2))
+

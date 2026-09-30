@@ -3,6 +3,20 @@
 Variable bounds may be infinite (unbounded variables are supported).
 Row bounds may be +/-inf (one-sided constraints are supported).
 Objective sense may be MIN (default) or MAX (stored as negated c with maximize=True).
+
+JSON Representation:
+- name: string, model identifier.
+- names: list of n unique strings for variable identifiers.
+- c: list of n floats, linear objective coefficients.
+- A: list of m rows, each row being a list of n floats (dense constraint matrix).
+- row_lower: list of m floats or nulls (null = -inf), lower bounds on A[i] @ x.
+- row_upper: list of m floats or nulls (null = +inf), upper bounds on A[i] @ x.
+- lower: list of n floats or nulls (null = 0.0 by default in from_dict, or -inf if specified).
+- upper: list of n floats or nulls (null = +inf by default in from_dict).
+- integer: list of 0-based integer variable indices.
+- Q: optional list of n rows, each a list of n floats, representing 0.5 * x^T * Q * x.
+- maximize: optional boolean (default false); if true, original problem is maximization.
+- obj_offset: optional float constant offset added to the objective value.
 """
 from dataclasses import dataclass, field
 import json, hashlib
@@ -54,12 +68,14 @@ class Model:
         if any(v.shape!=(m,) for v in [self.row_lower,self.row_upper]): raise ValueError('Invalid row bound dimensions')
         # c and A must be finite; variable bounds may be infinite
         if not (np.isfinite(self.c).all() and np.isfinite(self.A).all()): raise ValueError('Objective coefficients and constraint matrix must be finite')
+        if not np.isfinite(self.obj_offset): raise ValueError('obj_offset must be finite')
         if np.isnan(self.lower).any() or np.isnan(self.upper).any(): raise ValueError('NaN variable bounds')
         if np.isnan(self.row_lower).any() or np.isnan(self.row_upper).any(): raise ValueError('NaN row bounds')
         if (self.lower>self.upper).any() or (self.row_lower>self.row_upper).any(): raise ValueError('Contradictory bounds')
+        if np.isposinf(self.lower).any() or np.isneginf(self.upper).any(): raise ValueError('Invalid variable infinity')
         if np.isposinf(self.row_lower).any() or np.isneginf(self.row_upper).any(): raise ValueError('Invalid row infinity')
         if any(type(i) is not int or not 0<=i<n for i in self.integer) or len(set(self.integer))!=len(self.integer): raise ValueError('Invalid integer indices')
-        if len(self.names)!=n: raise ValueError('Invalid names')
+        if len(self.names)!=n or len(set(self.names))!=n: raise ValueError('Variable names must be unique and match dimension n')
         if self.Q is not None:
             if self.Q.shape!=(n,n) or not np.isfinite(self.Q).all() or not np.array_equal(self.Q,self.Q.T): raise ValueError('Q must be finite and exactly symmetric')
             if self.integer: raise ValueError('MIQP is not supported')

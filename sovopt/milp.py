@@ -13,7 +13,7 @@ from fractions import Fraction as F
 import heapq, math, time
 import numpy as np
 from .simplex import solve_lp
-from .verify import verify, safe_lower_bound, downward_float
+from .verify import verify, safe_lower_bound, downward_float, upward_float
 
 def exact_objective(model, x):
     """Compute exact objective in internal minimization space.
@@ -71,13 +71,14 @@ def solve_milp(model, tol=1e-7, max_nodes=1000, time_limit=30., **kwargs):
     inc = None
     incval = None
     history = []
-    terminal = []
+    pruned_by_bound = []
+    tolerance_closed = []
     failure = None
 
     while heap and nodes < max_nodes and time.perf_counter() - start < time_limit:
         inherited, _, l_node, u_node = heapq.heappop(heap)
         if incval is not None and inherited != -math.inf and inherited >= incval:
-            terminal.append(inherited)
+            pruned_by_bound.append(inherited)
             continue
 
         node = replace(model, lower=l_node, upper=u_node, integer=())
@@ -91,14 +92,15 @@ def solve_milp(model, tol=1e-7, max_nodes=1000, time_limit=30., **kwargs):
             failure = 'Unresolved LP relaxation: ' + res.get('message', res['status'])
             break
 
-        slb = safe_lower_bound(node, res['dual'])
+        dual_to_use = res.get('dual_exact_fraction', res['dual'])
+        slb = safe_lower_bound(node, dual_to_use)
         if slb is not None:
             bound = slb if inherited == -math.inf else max(inherited, slb)
         else:
             bound = inherited
 
         if incval is not None and bound != -math.inf and bound >= incval:
-            terminal.append(bound)
+            pruned_by_bound.append(bound)
             continue
 
         x = np.array(res['x'])
@@ -115,7 +117,7 @@ def solve_milp(model, tol=1e-7, max_nodes=1000, time_limit=30., **kwargs):
                 incval = val
             # Close node only with verified feasibility and exact rational gap
             if vr['feasible'] and bound != -math.inf and (val - bound) <= tol * (1 + abs(val)):
-                terminal.append(bound)
+                tolerance_closed.append(bound)
             else:
                 heapq.heappush(heap, (bound, serial + 1, l_node, u_node))
                 failure = 'Near-integral node could not be closed safely'
@@ -137,31 +139,38 @@ def solve_milp(model, tol=1e-7, max_nodes=1000, time_limit=30., **kwargs):
                             incumbent=None if incval is None else float(incval),
                             node_bound=downward_float(bound) if bound != -math.inf else None))
 
-    # Compute global lower bound over all active frontier leaves and terminal evidence
-    active_bounds = [t[0] for t in heap]
-    if active_bounds:
-        frontier_lb = min(active_bounds)
-        if frontier_lb == -math.inf:
+    # Exhaustive accounting of all tree regions:
+    # 1. Open / unresolved leaves in heap
+    open_bounds = [t[0] for t in heap]
+    # 2. Leaves closed within tolerance
+    tolerance_bounds = [b for b in tolerance_closed]
+
+    if incval is not None:
+        candidates = open_bounds + tolerance_bounds + [incval]
+        if any(c == -math.inf for c in candidates):
             global_lower = -math.inf
-        elif incval is not None:
-            global_lower = min(frontier_lb, incval)
         else:
-            global_lower = frontier_lb
-    elif incval is not None:
-        global_lower = incval
+            global_lower = min(candidates)
     else:
-        # Heap is empty and no incumbent exists: every branch was certified infeasible
-        global_lower = None
+        if open_bounds:
+            global_lower = -math.inf if any(b == -math.inf for b in open_bounds) else min(open_bounds)
+        elif tolerance_bounds:
+            global_lower = -math.inf if any(b == -math.inf for b in tolerance_bounds) else min(tolerance_bounds)
+        else:
+            # Heap is empty and no incumbent exists: every branch was certified infeasible
+            global_lower = None
 
     result = dict(
         algorithm='rational-bound branch-and-bound',
         nodes=nodes,
         history=history,
         bound_kind='exact rational Lagrangian bounds of binary64 input',
-        open_nodes=len(heap)
+        open_nodes=len(heap),
+        tolerance_closed_nodes=len(tolerance_closed),
+        pruned_nodes=len(pruned_by_bound)
     )
 
-    offset_F = F(str(model.obj_offset)) if model.obj_offset != 0.0 else F(0)
+    offset_F = F(float(model.obj_offset)) if model.obj_offset != 0.0 else F(0)
 
     # Map bounds, objectives, and gaps according to objective sense (min vs max)
     if not model.maximize:
@@ -178,20 +187,34 @@ def solve_milp(model, tol=1e-7, max_nodes=1000, time_limit=30., **kwargs):
         if inc is not None:
             reported_obj = float(incval + offset_F)
             if global_lower is not None and global_lower != -math.inf:
-                gap = max(0.0, float(incval - global_lower)) / (1.0 + abs(float(incval)))
+                gap = max(0.0, float(incval - global_lower)) / (1.0 + abs(reported_obj))
             else:
                 gap = float('inf')
             vr = verify(model, inc, tol=tol)
             result.update(x=inc.tolist(), objective=reported_obj, verification=vr, relative_gap=gap)
-            result['status'] = 'OPTIMAL_VERIFIED' if not heap and not failure and gap <= tol else 'NUMERICAL_FAILURE' if failure else 'LIMIT_REACHED'
-            result['verification']['optimality_basis'] = 'finite B&B tree with exact rational lower bounds and Farkas certificates; incumbent feasibility verified numerically to tol'
+            if not heap and not failure and gap <= tol:
+                result['status'] = 'OPTIMAL_VERIFIED'
+                if gap == 0.0:
+                    result['verification']['optimality_basis'] = (
+                        'finite B&B tree with exact rational lower bounds and Farkas certificates; exact integer optimum verified'
+                    )
+                else:
+                    result['verification']['optimality_basis'] = (
+                        f'finite B&B tree with exact rational lower bounds; incumbent feasibility verified numerically to tol; tolerance-closed with relative gap {gap:.2e} <= {tol:.2e}'
+                    )
+            elif failure:
+                result['status'] = 'NUMERICAL_FAILURE'
+                result['verification']['optimality_basis'] = 'B&B search halted on unresolved LP node; conservative lower bound preserved from open search tree'
+            else:
+                result['status'] = 'LIMIT_REACHED'
+                result['verification']['optimality_basis'] = 'B&B search halted at limit; conservative lower bound from exhaustive open frontier and terminal leaves'
         else:
             result['status'] = 'NUMERICAL_FAILURE' if failure else 'LIMIT_REACHED' if heap else 'INFEASIBLE_CERTIFIED'
     else:
         # Maximization: internal objective is negated (-c @ x - offset)
         # Global lower bound on internal problem becomes UPPER bound on original maximization
         if global_lower is not None and global_lower != -math.inf:
-            reported_upper = -downward_float(global_lower - offset_F)
+            reported_upper = upward_float(-global_lower + offset_F)
         elif global_lower == -math.inf:
             reported_upper = math.inf
         else:
@@ -201,13 +224,27 @@ def solve_milp(model, tol=1e-7, max_nodes=1000, time_limit=30., **kwargs):
         if inc is not None:
             reported_obj = float(-incval + offset_F)
             if global_lower is not None and global_lower != -math.inf:
-                gap = max(0.0, float(incval - global_lower)) / (1.0 + abs(float(incval)))
+                gap = max(0.0, float(incval - global_lower)) / (1.0 + abs(reported_obj))
             else:
                 gap = float('inf')
             vr = verify(model, inc, tol=tol)
             result.update(x=inc.tolist(), objective=reported_obj, verification=vr, relative_gap=gap)
-            result['status'] = 'OPTIMAL_VERIFIED' if not heap and not failure and gap <= tol else 'NUMERICAL_FAILURE' if failure else 'LIMIT_REACHED'
-            result['verification']['optimality_basis'] = 'finite B&B tree with exact rational bounds and Farkas certificates; incumbent feasibility verified numerically to tol'
+            if not heap and not failure and gap <= tol:
+                result['status'] = 'OPTIMAL_VERIFIED'
+                if gap == 0.0:
+                    result['verification']['optimality_basis'] = (
+                        'finite B&B tree with exact rational bounds and Farkas certificates; exact integer optimum verified'
+                    )
+                else:
+                    result['verification']['optimality_basis'] = (
+                        f'finite B&B tree with exact rational bounds; incumbent feasibility verified numerically to tol; tolerance-closed with relative gap {gap:.2e} <= {tol:.2e}'
+                    )
+            elif failure:
+                result['status'] = 'NUMERICAL_FAILURE'
+                result['verification']['optimality_basis'] = 'B&B search halted on unresolved LP node; conservative bound preserved from open search tree'
+            else:
+                result['status'] = 'LIMIT_REACHED'
+                result['verification']['optimality_basis'] = 'B&B search halted at limit; conservative bound from exhaustive open frontier and terminal leaves'
         else:
             result['status'] = 'NUMERICAL_FAILURE' if failure else 'LIMIT_REACHED' if heap else 'INFEASIBLE_CERTIFIED'
 

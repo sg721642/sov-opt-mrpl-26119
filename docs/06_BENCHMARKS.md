@@ -24,7 +24,7 @@ The benchmark's solver time excludes interpreter process startup. External impor
 ## Freeze a manifest
 
 ```bash
-python scripts/freeze_manifest.py examples/refinery_lp.json examples/refinery_milp.json --output reports/manifest.json
+python scripts/freeze_manifest.py examples/avgas.json examples/afiro.json examples/blend.json examples/flugpl.json --output reports/manifest.json
 python scripts/run_manifest.py reports/manifest.json
 ```
 

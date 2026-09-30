@@ -17,7 +17,7 @@
 | **Gate 2** | Build real sparse numerical infrastructure | *NOT IMPLEMENTED* | Solver core remains dense LU factorization with iterative refinement. Dense size limits (250 variables / 1000 rows) are strictly enforced. Instances exceeding limits report honest `LIMIT_REACHED` or `NUMERICAL_FAILURE`. |
 | **Gate 3** | Implement robust dual simplex | *NOT IMPLEMENTED* | Primal revised simplex remains the implemented algorithm. No dual simplex or Devex pricing has been claimed. |
 | **Gate 4** | Add reversible presolve and scaling | **SATISFIED (Variable Transforms)** | Reversible variable transformations (`sovopt/transforms.py`) handling box, lower, upper-only, free, and fixed variables with exact primal and dual recovery. Tested via invertible affine change of variables ( = D 	ilde{x} + s$) on AFIRO to machine precision (.22 	imes 10^{-16}$ primal, .11 	imes 10^{-17}$ dual). |
-| **Gate 5** | Improve MILP without weakening bounds | **SATISFIED** | Conservative rational Lagrangian bounds implemented; exact rational Phase I basis solves and exact Farkas certificate generation. Clean branch-and-bound exploration of MIPLIB FLUGPL to `LIMIT_REACHED` with safe lower bound 769500.0 without numerical failure. |
+| **Gate 5** | Improve MILP without weakening bounds | **SATISFIED** | Conservative rational Lagrangian bounds implemented with exact rational basis dual calculations; exact rational Phase I basis solves and exact Farkas certificate generation. Clean branch-and-bound exploration of MIPLIB FLUGPL to `LIMIT_REACHED` advancing safe lower bound from root to 1173645.0 at 50 nodes without numerical failure. |
 | **Gate 6** | Harden convex QP | *PARTIAL* | Infeasible-start Mehrotra predictor-corrector QP verified on PSD quadratic objectives with general  \succ 0$. Numerical eigenvalue inspection documented as floating-point check. Toy model excluded from active benchmarks pending genuine industrial QP data. |
 | **Gate 7** | Validate actual GPU execution | *UNAVAILABLE ON MAC* | Apple Silicon hardware has no NVIDIA CUDA capability. `gpu_executed: false` is reported on all CPU runs; no GPU speedup is claimed. |
 
@@ -32,7 +32,7 @@
 | **SC50A** | LP | Netlib Staircase Model | `OPTIMAL_VERIFIED` | **-64.575077** | -64.575077058 | < 1e-11 |
 | **SC50B** | LP | Netlib Staircase Model | `OPTIMAL_VERIFIED` | **-70.000000** | -70.000000000 | 0.0 |
 | **BLEND** | LP | Netlib Blending LP | `OPTIMAL_VERIFIED` | **-30.812150** | -30.812149846 | +1.72e-10 |
-| **FLUGPL** | MILP | MIPLIB 1.0 (Wagner / Cray) | `LIMIT_REACHED` | Bound: **769500.0** | 1201500 | N/A (Node limit: 50) |
+| **FLUGPL** | MILP | MIPLIB 1.0 (Wagner / Cray) | `LIMIT_REACHED` | Bound: **1173645.0** | 1201500 | N/A (Node limit: 50) |
 
 ---
 

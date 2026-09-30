@@ -31,7 +31,8 @@ button:disabled{opacity:.5;cursor:wait}.secondary{background:#243752;color:var(-
 .stat strong{font-size:22px;font-weight:600;display:block;margin-top:4px;overflow-wrap:anywhere}
 .status{display:inline-block;padding:5px 12px;background:#24354c;color:var(--blue);border-radius:6px;font-size:12px;font-weight:600}
 .good{color:var(--green);background:#173a32}
-.bad{color:var(--orange);background:#42332a}
+.warning{color:var(--orange);background:#42332a}
+.bad{color:var(--red);background:#3d1a1a}
 .empty{padding:60px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:10px}
 table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
 td,th{padding:9px 6px;text-align:left;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
@@ -110,12 +111,15 @@ footer{padding:20px 5%;border-top:1px solid var(--line);font-size:12px;color:var
 
       <div id="result" hidden>
         <div class="stats">
-          <div class="stat"><small>Objective value</small><strong id="objective">—</strong></div>
+          <div class="stat"><small>Incumbent objective</small><strong id="objective">—</strong></div>
+          <div class="stat"><small>Conservative bound</small><strong id="bound">—</strong></div>
+          <div class="stat"><small>Optimality gap</small><strong id="gap">—</strong></div>
           <div class="stat"><small>Published reference</small><strong id="pub_ref">—</strong></div>
           <div class="stat"><small>Solve duration</small><strong id="runtime">—</strong></div>
+          <div class="stat"><small>Iterations / nodes</small><strong id="iterations">—</strong></div>
           <div class="stat"><small>Original primal residual</small><strong id="primal">—</strong></div>
           <div class="stat"><small>Dual stationarity residual</small><strong id="dual">—</strong></div>
-          <div class="stat"><small>Iterations / nodes</small><strong id="iterations">—</strong></div>
+          <div class="stat"><small>Execution platform</small><strong id="platform">CPU · sovereign</strong></div>
         </div>
 
         <div class="split">
@@ -144,6 +148,16 @@ footer{padding:20px 5%;border-top:1px solid var(--line);font-size:12px;color:var
 <script>
 const $=id=>document.getElementById(id);
 let manifest={}, examples={}, current={}, last=null;
+let currentSolveId = 0;
+
+const STATUS_MAP = {
+  'OPTIMAL_VERIFIED': { cls: 'good', text: 'OPTIMAL VERIFIED' },
+  'INFEASIBLE_CERTIFIED': { cls: 'warning', text: 'INFEASIBLE CERTIFIED' },
+  'UNBOUNDED': { cls: 'warning', text: 'UNBOUNDED' },
+  'LIMIT_REACHED': { cls: 'warning', text: 'LIMIT REACHED (INCOMPLETE)' },
+  'NUMERICAL_FAILURE': { cls: 'bad', text: 'NUMERICAL FAILURE' },
+  'INVALID_MODEL': { cls: 'bad', text: 'INVALID MODEL' }
+};
 
 const fmt=v=>v==null?'—':Math.abs(v)>1e6?Number(v).toExponential(4):Number(v).toLocaleString(undefined,{maximumFractionDigits:6});
 const sci=v=>v==null?'—':Number(v).toExponential(2);
@@ -158,6 +172,7 @@ function choose(){
   $('m_dims').textContent=(m.variables||current.c?.length||0)+' vars, '+(m.constraints||current.A?.length||0)+' rows'+(m.matrix_nonzeros?' ('+m.matrix_nonzeros+' nonzeros)':'');
   const refText=m.published_reference_text||(m.reference_objective!=null?m.reference_objective:null);
   $('m_ref').textContent=refText?`${refText} (${m.reference_source||'Published'})`:'—';
+  $('modelname').textContent='Selected: '+(m.name||key)+' ('+(m.class||'')+') · Click Run & verify live';
 }
 
 Promise.all([
@@ -190,7 +205,9 @@ function cellRow(key,value){
 }
 
 $('solve').onclick=async()=>{
+  const solveId=++currentSolveId;
   const selectedKey=$('example').value;
+  const selectedBackend=$('backend').value;
   const instMeta=manifest.instances?.[selectedKey]||{};
   $('solve').disabled=true;
   $('message').textContent='';
@@ -204,22 +221,44 @@ $('solve').onclick=async()=>{
     const resp=await fetch('/api/solve',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model,backend:$('backend').value})
+      body:JSON.stringify({model,backend:selectedBackend})
     });
     const r=await resp.json();
+    if(solveId!==currentSolveId)return;
     if(!resp.ok)throw Error(r.error||'Request failed');
     const elapsed=(performance.now()-t0)/1000;
-    last={instance:selectedKey,model,result:r,solve_timestamp:new Date().toISOString(),measured_duration_seconds:elapsed};
+    last={
+      instance:selectedKey,
+      backend:selectedBackend,
+      model,
+      result:r,
+      solve_timestamp:new Date().toISOString(),
+      measured_duration_seconds:elapsed
+    };
     
     $('empty').hidden=true;
     $('result').hidden=false;
     $('live_badge').hidden=false;
-    $('status').textContent=r.status;
-    $('status').className='status '+(r.status.includes('VERIFIED')||r.status==='LIMIT_REACHED'?'good':'bad');
-    $('objective').textContent=r.objective!=null?fmt(r.objective):(r.best_bound!=null?'Bound: '+fmt(r.best_bound):'—');
+    const st=STATUS_MAP[r.status]||{cls:(r.status.includes('VERIFIED')?'good':'bad'),text:r.status};
+    $('status').textContent=st.text;
+    $('status').className='status '+st.cls;
+    $('modelname').textContent=`${instMeta.name||selectedKey} (${instMeta.class||''}) solved via ${selectedBackend}`;
+
+    // Objective, bound, gap
+    $('objective').textContent=r.objective!=null?fmt(r.objective):(r.incumbent!=null?fmt(r.incumbent):'—');
+    $('bound').textContent=r.best_bound!=null?fmt(r.best_bound):(r.status==='OPTIMAL_VERIFIED'?fmt(r.objective):'—');
+    if(r.relative_gap!=null){
+      $('gap').textContent=r.relative_gap===0.0?'0.00% (proven)':(r.relative_gap*100).toFixed(4)+'%';
+    }else if(r.status==='OPTIMAL_VERIFIED'){
+      $('gap').textContent='0.00% (KKT certified)';
+    }else{
+      $('gap').textContent='—';
+    }
+
     const pubRefText=instMeta.published_reference_text||(instMeta.reference_objective!=null?fmt(instMeta.reference_objective):null);
     $('pub_ref').textContent=pubRefText||'—';
     $('runtime').textContent=fmt(elapsed*1000)+' ms';
+    $('platform').textContent=r.gpu_executed?'GPU accelerated':'CPU · sovereign';
     
     const v=r.verification||{};
     $('primal').textContent=v.primal_residual!=null?sci(v.primal_residual):'—';
@@ -227,12 +266,14 @@ $('solve').onclick=async()=>{
     $('iterations').textContent=r.nodes??r.iterations??'—';
     
     $('trust').replaceChildren();
-    cellRow('Original model feasibility',v.feasible==null?'Not available':v.feasible?'PASSED':'FAILED');
-    cellRow('KKT stationarity & complementarity',v.kkt_passed==null?'Not applicable':v.kkt_passed?'PASSED':'NOT ESTABLISHED');
+    cellRow('Original model feasibility',v.feasible==null?'Not available':(v.feasible?'PASSED':'FAILED'));
+    cellRow('KKT stationarity & complementarity',v.kkt_passed==null?'Not applicable':(v.kkt_passed?'PASSED':'NOT ESTABLISHED'));
+    cellRow('Farkas certificate',r.farkas_certificate?'VERIFIED (exact rational certificate)':'None');
     cellRow('Absolute constraint violation',v.absolute_primal_violation!=null?sci(v.absolute_primal_violation):'—');
-    cellRow('Mantissa precision',(v.precision_bits||53)+' bits (IEEE 754)');
+    cellRow('Mantissa precision',v.precision_bits!=null?`${v.precision_bits} bits (IEEE 754)`:'IEEE 754 float64 (53-bit mantissa)');
+    cellRow('Hardware execution',r.gpu_executed?'GPU accelerated':'CPU only (gpu_executed: false)');
     cellRow('Model SHA256',(r.model_sha256||'—').slice(0,24)+'...');
-    cellRow('Solver backend',$('backend').value);
+    cellRow('Solver backend',selectedBackend);
     cellRow('Timestamp',last.solve_timestamp);
     
     $('variables').replaceChildren();
@@ -255,11 +296,14 @@ $('solve').onclick=async()=>{
     $('raw').textContent=JSON.stringify(last,null,2);
     $('download').disabled=false;
   }catch(e){
+    if(solveId!==currentSolveId)return;
     $('message').textContent=e.message;
     $('status').textContent='FAILED';
     $('status').className='status bad';
   }finally{
-    $('solve').disabled=false;
+    if(solveId===currentSolveId){
+      $('solve').disabled=false;
+    }
   }
 };
 

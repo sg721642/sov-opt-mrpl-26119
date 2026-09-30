@@ -224,6 +224,24 @@ def postsolve_primal(t, trans_model):
             x[j] = t[spec['trans_indices'][0]] - t[spec['trans_indices'][1]]
     return x
 
+def postsolve_ray(d_t, trans_model):
+    """Recover original ray direction d from transformed direction d_t using the linear transformation.
+    Avoids subtracting shifted primal points to prevent catastrophic cancellation.
+    """
+    d = np.zeros(trans_model.n_orig, dtype=float)
+    for spec in trans_model.var_specs:
+        j = spec['orig_idx']
+        vtype = spec['type']
+        if vtype == 'FIXED':
+            d[j] = 0.0
+        elif vtype in ('LOWER', 'BOX'):
+            d[j] = d_t[spec['trans_indices'][0]]
+        elif vtype == 'UPPER_ONLY':
+            d[j] = -d_t[spec['trans_indices'][0]]
+        elif vtype == 'FREE':
+            d[j] = d_t[spec['trans_indices'][0]] - d_t[spec['trans_indices'][1]]
+    return d
+
 def postsolve_dual(original_model, x, y_eq, y_le, trans_model, farkas=False):
     """Recover original model inequality dual multipliers z corresponding to original_model.inequalities().
     If farkas=True, objective gradient is zero (KKT stationarity condition G^T z == 0).

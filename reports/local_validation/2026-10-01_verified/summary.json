@@ -7,7 +7,7 @@
     "primal_residual": 5.551115123125783e-17,
     "dual_residual": 2.880578658486892e-17,
     "kkt_passed": true,
-    "seconds": 0.008466708999549155
+    "seconds": 0.010704499998610117
   },
   "afiro": {
     "status": "OPTIMAL_VERIFIED",
@@ -17,7 +17,7 @@
     "primal_residual": 1.4210854715201802e-14,
     "dual_residual": 1.7193502857276608e-17,
     "kkt_passed": true,
-    "seconds": 0.018134500000087428
+    "seconds": 0.024095916998703615
   },
   "sc50a": {
     "status": "OPTIMAL_VERIFIED",
@@ -27,7 +27,7 @@
     "primal_residual": 5.367434915118819e-16,
     "dual_residual": 4.0893641093287975e-17,
     "kkt_passed": true,
-    "seconds": 0.033494167000753805
+    "seconds": 0.05051808300049743
   },
   "sc50b": {
     "status": "OPTIMAL_VERIFIED",
@@ -37,7 +37,7 @@
     "primal_residual": 2.493132406175791e-16,
     "dual_residual": 3.9650822308041306e-17,
     "kkt_passed": true,
-    "seconds": 0.029462917000273592
+    "seconds": 0.04781491699941398
   },
   "blend": {
     "status": "OPTIMAL_VERIFIED",
@@ -47,17 +47,17 @@
     "primal_residual": 1.7763568394002473e-15,
     "dual_residual": 1.227694079519073e-16,
     "kkt_passed": true,
-    "seconds": 0.8272287079998932
+    "seconds": 0.9206329580010788
   },
   "flugpl": {
     "status": "LIMIT_REACHED",
     "objective": null,
-    "best_bound": 769500.0,
+    "best_bound": 1173644.9999999998,
     "iterations": 50,
     "primal_residual": null,
     "dual_residual": null,
     "kkt_passed": null,
-    "seconds": 0.8773105000000214
+    "seconds": 1.0898799579990737
   },
   "avgas_pdhg": {
     "status": "OPTIMAL_VERIFIED",
@@ -66,6 +66,6 @@
     "primal_residual": 1.3064950580199562e-08,
     "dual_residual": 1.901111838150597e-09,
     "kkt_passed": true,
-    "seconds": 0.0035945420004281914
+    "seconds": 0.003959083000154351
   }
 }

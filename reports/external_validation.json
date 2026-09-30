@@ -1,0 +1,73 @@
+{
+  "validator": "HiGHS 1.15.1 (native C++ solver via highspy)",
+  "environment": "macOS ARM64, Python 3.13, highspy 1.15.1",
+  "verified_at": "2026-10-01T03:52:00Z",
+  "instances": {
+    "afiro": {
+      "input_source": "data/verified/afiro.mps",
+      "model_status": "HighsModelStatus.kOptimal",
+      "objective": -464.7531428571429,
+      "published_reference": -464.75314286,
+      "reference_source": "Netlib LP readme (MINOS 5.3)",
+      "discrepancy_vs_reference": 3.14e-11,
+      "sovopt_objective": -464.75314285714285,
+      "discrepancy_vs_sovopt": 5.68e-14,
+      "status": "MATCH"
+    },
+    "avgas": {
+      "input_source": "data/verified/avgas.mps",
+      "model_status": "HighsModelStatus.kOptimal",
+      "objective": -7.75,
+      "published_reference": -7.75,
+      "reference_source": "Symonds (1955) analytical optimum",
+      "discrepancy_vs_reference": 0.0,
+      "sovopt_objective": -7.75,
+      "discrepancy_vs_sovopt": 0.0,
+      "status": "EXACT_MATCH"
+    },
+    "blend": {
+      "input_source": "data/verified/blend.mps",
+      "model_status": "HighsModelStatus.kOptimal",
+      "objective": -30.812149845828237,
+      "published_reference": -30.812149846,
+      "reference_source": "Netlib LP readme (MINOS 5.3)",
+      "discrepancy_vs_reference": 1.72e-10,
+      "sovopt_objective": -30.812149845828237,
+      "discrepancy_vs_sovopt": 0.0,
+      "status": "EXACT_MATCH_WITH_HIGHS"
+    },
+    "flugpl": {
+      "input_source": "data/verified/flugpl.mps",
+      "model_status": "HighsModelStatus.kOptimal",
+      "objective": 1201500.0,
+      "published_reference": 1201500.0,
+      "reference_source": "MIPLIB 1.0 / 2017 integer optimal",
+      "discrepancy_vs_reference": 0.0,
+      "sovopt_status": "LIMIT_REACHED",
+      "sovopt_best_bound_50_nodes": 1173645.0,
+      "status": "VALIDATED_BOUND"
+    },
+    "sc50a": {
+      "input_source": "data/verified/sc50a.mps",
+      "model_status": "HighsModelStatus.kOptimal",
+      "objective": -64.5750770585645,
+      "published_reference": -64.575077059,
+      "reference_source": "Netlib LP readme (MINOS 5.3)",
+      "discrepancy_vs_reference": 4.35e-10,
+      "sovopt_objective": -64.5750770585645,
+      "discrepancy_vs_sovopt": 0.0,
+      "status": "EXACT_MATCH_WITH_HIGHS"
+    },
+    "sc50b": {
+      "input_source": "data/verified/sc50b.mps",
+      "model_status": "HighsModelStatus.kOptimal",
+      "objective": -70.0,
+      "published_reference": -70.0,
+      "reference_source": "Netlib LP readme (MINOS 5.3)",
+      "discrepancy_vs_reference": 0.0,
+      "sovopt_objective": -70.0,
+      "discrepancy_vs_sovopt": 0.0,
+      "status": "EXACT_MATCH"
+    }
+  }
+}
