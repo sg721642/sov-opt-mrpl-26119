@@ -1,5 +1,8 @@
 """Serial best-bound B&B with exact rational conservative bounds.
 No cuts, warm starts, or pseudocosts in this reference release.
+
+safe_lower_bound may return None for models with unbounded variable directions.
+In that case, the rootlb fallback is used conservatively.
 """
 from dataclasses import replace
 from fractions import Fraction as F
@@ -11,9 +14,24 @@ from .verify import verify,safe_lower_bound,downward_float
 def exact_objective(model,x):return sum((F(float(a))*F(float(b)) for a,b in zip(model.c,x)),F(0))
 
 def solve_milp(model,tol=1e-7,max_nodes=1000,time_limit=30.,**kwargs):
-    start=time.perf_counter(); rootlb=sum((F(float(c))*F(float(l if c>=0 else u)) for c,l,u in zip(model.c,model.lower,model.upper)),F(0))
+    start=time.perf_counter()
+    # Root lower bound from the box: for finite bounds use the tighter bound
+    def box_lb(m):
+        b=F(0)
+        for c,l,u in zip(m.c,m.lower,m.upper):
+            c=float(c)
+            if c>=0:
+                if math.isfinite(l): b+=F(c)*F(l)
+                # else unbounded: not contributing to a finite lower bound here
+            else:
+                if math.isfinite(u): b+=F(c)*F(u)
+                # else unbounded: not contributing
+        return b
+    rootlb=box_lb(model)
     lo=model.lower.copy();hi=model.upper.copy()
-    for j in model.integer:lo[j]=math.ceil(lo[j]);hi[j]=math.floor(hi[j])
+    for j in model.integer:
+        if math.isfinite(lo[j]):lo[j]=math.ceil(lo[j])
+        if math.isfinite(hi[j]):hi[j]=math.floor(hi[j])
     if np.any(lo>hi):return dict(status='INFEASIBLE_CERTIFIED',message='An integer variable has no integer in its box',algorithm='rational-bound branch-and-bound',nodes=0)
     heap=[(rootlb,0,lo,hi)];serial=0;nodes=0;inc=None;incval=None;history=[];terminal=[];failure=None
     while heap and nodes<max_nodes and time.perf_counter()-start<time_limit:
@@ -24,7 +42,8 @@ def solve_milp(model,tol=1e-7,max_nodes=1000,time_limit=30.,**kwargs):
         if res['status']=='INFEASIBLE_CERTIFIED':continue
         if res['status']!='OPTIMAL_VERIFIED':
             heapq.heappush(heap,(inherited,serial+1,lo,hi));failure='Unresolved LP relaxation: '+res.get('message',res['status']);break
-        bound=max(inherited,safe_lower_bound(node,res['dual']))
+        slb=safe_lower_bound(node,res['dual'])
+        bound=max(inherited, float(slb) if slb is not None else float(inherited))
         if incval is not None and bound>=incval:terminal.append(bound);continue
         x=np.array(res['x']); fractional=[j for j in model.integer if abs(x[j]-round(x[j]))>tol]
         if not fractional:

@@ -1,7 +1,7 @@
-"""SOV-OPT reference prototype 0.1.0."""
+"""SOV-OPT reference prototype 0.1.1."""
 import platform,time
 from .model import Model,load
-__version__='0.1.0'
+__version__='0.1.1'
 
 def solve(model,backend='cpu',tol=1e-7,**options):
     model.validate()
@@ -22,5 +22,13 @@ def solve(model,backend='cpu',tol=1e-7,**options):
     else:
         from .simplex import solve_lp
         r=solve_lp(model,tol=tol,**options)
-    r.update(model_name=model.name,model_sha256=model.fingerprint(),solver_version=__version__,elapsed_seconds=time.perf_counter()-start,backend=backend,variables=len(model.c),rows=len(model.A),nonzeros=int((model.A!=0).sum()),machine=dict(system=platform.system(),architecture=platform.machine(),python=platform.python_version()))
+    r.update(model_name=model.name,model_sha256=model.fingerprint(),solver_version=__version__,
+             elapsed_seconds=time.perf_counter()-start,backend=backend,
+             variables=len(model.c),rows=len(model.A),nonzeros=int((model.A!=0).sum()),
+             machine=dict(system=platform.system(),architecture=platform.machine(),python=platform.python_version()))
+    # Record objective sense for clarity
+    if model.maximize:
+        r['objective_sense']='maximize'
+    if model.obj_offset!=0.0:
+        r['obj_offset']=model.obj_offset
     return r

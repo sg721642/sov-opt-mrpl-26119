@@ -1,0 +1,72 @@
+{
+  "avgas": {
+    "status": "OPTIMAL_VERIFIED",
+    "objective": -7.75,
+    "iterations": 9,
+    "elapsed_seconds": 0.004573166999762179,
+    "primal_residual": 6.055761952500853e-17,
+    "dual_residual": 0.0,
+    "kkt_passed": true,
+    "message": ""
+  },
+  "afiro": {
+    "status": "OPTIMAL_VERIFIED",
+    "objective": -464.75314285714285,
+    "iterations": 20,
+    "elapsed_seconds": 0.019694874999913736,
+    "primal_residual": 5.6843418860804784e-14,
+    "dual_residual": 1.9244802657236576e-17,
+    "kkt_passed": true,
+    "message": ""
+  },
+  "sc50a": {
+    "status": "OPTIMAL_VERIFIED",
+    "objective": -64.5750770585645,
+    "iterations": 56,
+    "elapsed_seconds": 0.12362420899989957,
+    "primal_residual": 1.2251010153804595e-16,
+    "dual_residual": 2.833563258301563e-17,
+    "kkt_passed": true,
+    "message": ""
+  },
+  "sc50b": {
+    "status": "OPTIMAL_VERIFIED",
+    "objective": -70.0,
+    "iterations": 54,
+    "elapsed_seconds": 0.11876883399963845,
+    "primal_residual": 2.493132406175791e-16,
+    "dual_residual": 1.699863004210766e-17,
+    "kkt_passed": true,
+    "message": ""
+  },
+  "qp_example": {
+    "status": "OPTIMAL_VERIFIED",
+    "objective": 8.371875003656603,
+    "iterations": 6,
+    "elapsed_seconds": 0.0007344579998971312,
+    "primal_residual": 0.0,
+    "dual_residual": 1.6982452273287954e-10,
+    "kkt_passed": true,
+    "message": ""
+  },
+  "flugpl": {
+    "status": "NUMERICAL_FAILURE",
+    "objective": null,
+    "iterations": 30,
+    "elapsed_seconds": 0.44494283399944834,
+    "primal_residual": null,
+    "dual_residual": null,
+    "kkt_passed": null,
+    "message": "Unresolved LP relaxation: Phase I infeasibility; exact binary-rational certificate could not be established"
+  },
+  "blend": {
+    "status": "NUMERICAL_FAILURE",
+    "objective": null,
+    "iterations": null,
+    "elapsed_seconds": 1.5967704170006982,
+    "primal_residual": null,
+    "dual_residual": null,
+    "kkt_passed": null,
+    "message": "Singular or unsafe pivot"
+  }
+}

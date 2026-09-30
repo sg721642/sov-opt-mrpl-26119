@@ -1,0 +1,110 @@
+{
+  "status": "OPTIMAL_VERIFIED",
+  "x": [
+    0.0,
+    1.0,
+    0.75,
+    0.25,
+    0.5000000000000001,
+    0.25000000000000006,
+    0.75,
+    0.0
+  ],
+  "dual": [
+    3.3333333333333335,
+    1.6666666666666665,
+    -0.0,
+    -0.0,
+    1.3750000000000002,
+    -0.0,
+    1.4166666666666665,
+    0.20833333333333331,
+    1.3333333333333335,
+    -0.0,
+    -0.0,
+    0.8333333333333344,
+    -0.0,
+    0.0,
+    -0.0,
+    4.440892098500626e-16,
+    -0.0,
+    0.0,
+    -0.0,
+    0.0,
+    -0.0,
+    0.0,
+    -0.0,
+    4.440892098500626e-16,
+    -0.0,
+    1.6666666666666679
+  ],
+  "verification": {
+    "feasible": true,
+    "objective": -7.75,
+    "primal_residual": 6.055761952500853e-17,
+    "absolute_primal_violation": 3.3306690738754696e-16,
+    "integrality_residual": 0.0,
+    "kkt_passed": true,
+    "precision_bits": 53,
+    "certification": "floating-point residual checks",
+    "dual_residual": 0.0,
+    "dual_sign_violation": 0.0,
+    "complementarity": 3.8064789415719653e-17,
+    "relative_duality_gap": 4.282288809268461e-17
+  },
+  "objective": -7.75,
+  "iterations": 9,
+  "algorithm": "two-phase primal revised simplex",
+  "history": [
+    {
+      "iteration": 0,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 1,
+      "objective_transformed": -2.0
+    },
+    {
+      "iteration": 2,
+      "objective_transformed": -3.0
+    },
+    {
+      "iteration": 3,
+      "objective_transformed": -5.0
+    },
+    {
+      "iteration": 4,
+      "objective_transformed": -5.0
+    },
+    {
+      "iteration": 5,
+      "objective_transformed": -5.0
+    },
+    {
+      "iteration": 6,
+      "objective_transformed": -5.5
+    },
+    {
+      "iteration": 7,
+      "objective_transformed": -6.0
+    },
+    {
+      "iteration": 8,
+      "objective_transformed": -7.1428571428571415
+    }
+  ],
+  "model_name": "AVGAS",
+  "model_sha256": "42e4186dfe26d2e46321e8a253d2af05f85d2cefc3404de7fa2c36c47279b965",
+  "solver_version": "0.1.1",
+  "elapsed_seconds": 0.004573166999762179,
+  "backend": "cpu",
+  "variables": 8,
+  "rows": 10,
+  "nonzeros": 30,
+  "machine": {
+    "system": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11.16"
+  },
+  "benchmark_wall_seconds": 0.004607625000062399
+}

@@ -18,10 +18,13 @@ class ServerTests(unittest.TestCase):
         return json.load(urllib.request.urlopen(req,timeout=40))
     def test_http_page_and_examples(self):
         with urllib.request.urlopen(self.url) as r:self.assertIn(b'SOV',r.read())
-        with urllib.request.urlopen(self.url+'/api/examples') as r:self.assertIn('refinery_lp',json.load(r))
+        with urllib.request.urlopen(self.url+'/api/examples') as r:
+            data=json.load(r)
+            self.assertIn('avgas',data)
+            self.assertIn('afiro',data)
     def test_http_solve(self):
-        m=json.loads((ROOT/'examples/refinery_lp.json').read_text());r=self.post({'model':m})
-        self.assertEqual(r['status'],'OPTIMAL_VERIFIED');self.assertEqual(r['objective'],4865)
+        m=json.loads((ROOT/'examples/avgas.json').read_text());r=self.post({'model':m})
+        self.assertEqual(r['status'],'OPTIMAL_VERIFIED');self.assertAlmostEqual(r['objective'],-7.75,places=4)
     def test_http_invalid(self):
         with self.assertRaises(urllib.error.HTTPError) as c:self.post({'model':{}})
         self.assertEqual(c.exception.code,400)

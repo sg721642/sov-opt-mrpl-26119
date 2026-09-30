@@ -1,0 +1,219 @@
+{
+  "status": "OPTIMAL_VERIFIED",
+  "x": [
+    80.0,
+    25.5,
+    54.5,
+    84.80000000000001,
+    18.214285714285715,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    18.214285714285715,
+    0.0,
+    19.30714285714288,
+    500.0,
+    475.92,
+    24.079999999999984,
+    0.0,
+    215.0,
+    0.0,
+    0.0,
+    0.0,
+    5.684341886080802e-14,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    339.9428571428572,
+    383.9428571428571,
+    0.0,
+    0.0
+  ],
+  "dual": [
+    0.6285714285714286,
+    -0.0,
+    -0.0,
+    -5.2369010595526246e-17,
+    0.3447714285714287,
+    0.2285714285714286,
+    0.0,
+    -0.0,
+    -0.0,
+    0.0,
+    -0.0,
+    -0.0,
+    -0.0,
+    0.0,
+    0.9428571428571428,
+    -0.0,
+    -0.0,
+    0.0,
+    0.8743428571428571,
+    0.34285714285714286,
+    -0.0,
+    -0.0,
+    -0.0,
+    -0.0,
+    -0.0,
+    -0.0,
+    -0.0,
+    -0.0,
+    -0.0,
+    0.6285714285714286,
+    -0.0,
+    0.9428571428571428,
+    -0.0,
+    -0.0,
+    -0.0,
+    5.551115123125783e-17,
+    -5.551115123125783e-17,
+    0.0,
+    5.2369010595526246e-17,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    -4.163336342344337e-17,
+    0.0,
+    0.0,
+    0.9428571428571428,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    10.0
+  ],
+  "verification": {
+    "feasible": true,
+    "objective": -464.75314285714285,
+    "primal_residual": 5.6843418860804784e-14,
+    "absolute_primal_violation": 5.684341886080802e-14,
+    "integrality_residual": 0.0,
+    "kkt_passed": true,
+    "precision_bits": 53,
+    "certification": "floating-point residual checks",
+    "dual_residual": 1.9244802657236576e-17,
+    "dual_sign_violation": 5.551115123125783e-17,
+    "complementarity": 4.469466718790696e-17,
+    "relative_duality_gap": 5.999149547666971e-17
+  },
+  "objective": -464.75314285714285,
+  "iterations": 20,
+  "algorithm": "two-phase primal revised simplex",
+  "history": [
+    {
+      "iteration": 0,
+      "objective_transformed": 44.0
+    },
+    {
+      "iteration": 1,
+      "objective_transformed": 43.99999999999994
+    },
+    {
+      "iteration": 2,
+      "objective_transformed": 44.0
+    },
+    {
+      "iteration": 3,
+      "objective_transformed": 44.0
+    },
+    {
+      "iteration": 4,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 5,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 6,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 7,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 8,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 9,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 10,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 11,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 12,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 13,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 14,
+      "objective_transformed": -3.0039724068017603e-14
+    },
+    {
+      "iteration": 15,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 16,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 17,
+      "objective_transformed": 0.0
+    },
+    {
+      "iteration": 18,
+      "objective_transformed": -48.63589028571431
+    },
+    {
+      "iteration": 19,
+      "objective_transformed": -301.58057142857143
+    }
+  ],
+  "model_name": "AFIRO",
+  "model_sha256": "1f08328913d4bdf2204f2e1e6cd6e5c224f1ea237ab78f95cb5da2f74165154e",
+  "solver_version": "0.1.1",
+  "elapsed_seconds": 0.019694874999913736,
+  "backend": "cpu",
+  "variables": 32,
+  "rows": 27,
+  "nonzeros": 83,
+  "machine": {
+    "system": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11.16"
+  },
+  "benchmark_wall_seconds": 0.019716666999556764
+}

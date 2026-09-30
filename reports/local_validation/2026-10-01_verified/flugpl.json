@@ -1,0 +1,181 @@
+{
+  "algorithm": "rational-bound branch-and-bound",
+  "nodes": 30,
+  "history": [
+    {
+      "nodes": 1,
+      "open_nodes": 2,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 2,
+      "open_nodes": 3,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 3,
+      "open_nodes": 4,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 5,
+      "open_nodes": 4,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 6,
+      "open_nodes": 5,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 7,
+      "open_nodes": 6,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 8,
+      "open_nodes": 7,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 9,
+      "open_nodes": 8,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 10,
+      "open_nodes": 9,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 11,
+      "open_nodes": 10,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 12,
+      "open_nodes": 11,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 13,
+      "open_nodes": 12,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 14,
+      "open_nodes": 13,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 15,
+      "open_nodes": 14,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 16,
+      "open_nodes": 15,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 17,
+      "open_nodes": 16,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 18,
+      "open_nodes": 17,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 19,
+      "open_nodes": 18,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 21,
+      "open_nodes": 18,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 22,
+      "open_nodes": 19,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 23,
+      "open_nodes": 20,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 25,
+      "open_nodes": 20,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 26,
+      "open_nodes": 21,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 27,
+      "open_nodes": 22,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 28,
+      "open_nodes": 23,
+      "incumbent": null,
+      "node_bound": 769500.0
+    },
+    {
+      "nodes": 29,
+      "open_nodes": 24,
+      "incumbent": null,
+      "node_bound": 1175762.7777777778
+    }
+  ],
+  "best_bound": 769500.0,
+  "bound_kind": "exact rational Lagrangian bounds of binary64 input",
+  "open_nodes": 24,
+  "status": "NUMERICAL_FAILURE",
+  "message": "Unresolved LP relaxation: Phase I infeasibility; exact binary-rational certificate could not be established",
+  "model_name": "flugpl",
+  "model_sha256": "8ac7f0195eb38f3ff192e669609da587f33d5c8a8744e62e1f2b809074eb7cb6",
+  "solver_version": "0.1.1",
+  "elapsed_seconds": 0.44494283399944834,
+  "backend": "cpu",
+  "variables": 18,
+  "rows": 18,
+  "nonzeros": 46,
+  "machine": {
+    "system": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11.16"
+  },
+  "benchmark_wall_seconds": 0.44496458300000086
+}

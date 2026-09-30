@@ -1,13 +1,270 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SOV-OPT · Numerical Evidence Lab</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SOV-OPT · Verified Numerical Evidence Lab</title>
 <style>
-:root{--bg:#0c1421;--panel:#131f30;--line:#26364c;--text:#e6edf8;--muted:#9bacc3;--green:#75e1b6;--blue:#8caeff;--orange:#ffc885}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,sans-serif}header{padding:22px 5%;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.brand{font-size:22px;font-weight:800;letter-spacing:1px}.brand span{color:var(--green)}.tag{border:1px solid var(--line);border-radius:99px;padding:5px 12px;color:var(--muted);font-size:12px}main{max-width:1400px;margin:auto;padding:36px 5%}.eyebrow{color:var(--green);font-size:12px;letter-spacing:2px}h1{font-size:clamp(28px,4vw,46px);line-height:1.14;margin:10px 0 18px;font-weight:650;max-width:900px}p{color:var(--muted)}.intro{max-width:850px}.grid{display:grid;grid-template-columns:340px 1fr;gap:22px;margin-top:30px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;min-width:0}h2{font-size:19px;margin:0 0 18px}label{display:block;color:var(--muted);margin:16px 0 7px;font-size:13px}select,input,textarea{width:100%;background:#0d1726;color:var(--text);border:1px solid #3b506d;border-radius:8px;padding:12px;font:inherit}textarea{font:12px/1.5 ui-monospace,monospace;min-height:220px;resize:vertical}button{border:0;border-radius:8px;background:var(--green);color:#08231b;padding:13px 17px;font-weight:750;cursor:pointer;width:100%;margin-top:16px}button:disabled{opacity:.5;cursor:wait}.secondary{background:#243752;color:var(--text)}.note{font-size:12px;color:var(--muted);border-left:2px solid var(--orange);padding-left:12px;margin-top:22px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}.stat{padding:16px;border:1px solid var(--line);border-radius:9px}.stat small{color:var(--muted);display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px}.stat strong{font-size:24px;font-weight:600;display:block;margin-top:6px;overflow-wrap:anywhere}.status{display:inline-block;padding:5px 10px;background:#24354c;color:var(--blue);border-radius:6px;font-size:12px;overflow-wrap:anywhere}.good{color:var(--green);background:#173a32}.bad{color:var(--orange);background:#42332a}.empty{padding:65px 10px;text-align:center;color:var(--muted)}table{width:100%;border-collapse:collapse;margin-top:15px;font-size:13px}td,th{padding:10px 5px;text-align:left;border-bottom:1px solid var(--line);overflow-wrap:anywhere}th{color:var(--muted);font-weight:500}.bar{height:8px;border-radius:9px;background:#26364c;margin:5px 0 12px}.bar>i{display:block;height:100%;background:var(--blue);border-radius:9px}.split{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px}.tiny{font-size:12px;color:var(--muted);overflow-wrap:anywhere}details{margin-top:20px}summary{cursor:pointer;color:var(--blue)}pre{max-height:350px;overflow:auto;font:12px/1.5 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}footer{padding:20px 5%;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}svg{width:100%;height:140px}#message{white-space:pre-wrap;color:var(--orange)}@media(max-width:950px){.grid{grid-template-columns:1fr}.split{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}header{gap:12px;flex-wrap:wrap}}
-</style></head><body><header><div class="brand">SOV<span>—</span>OPT</div><div class="tag">MRPL PS 26119 · Research prototype 0.1</div></header><main><div class="eyebrow">ORIGINAL SOLVER CORE / TRANSPARENT NUMERICS</div><h1>Every solution comes<br>with numerical evidence.</h1><p class="intro">Explore a synthetic refinery planning family across LP, MILP, and convex QP. Solve locally, inspect original-model residuals, and export the complete audit report.</p><div class="grid"><section class="panel"><h2>Configure an experiment</h2><label for="example">Model</label><select id="example"></select><label for="backend">Algorithm route</label><select id="backend"><option value="cpu">CPU reference solver</option><option value="pdhg-cpu">Experimental PDHG · CPU</option></select><label for="cost">Feed cost multiplier</label><input id="cost" type="number" min="0.1" max="10" step="0.1" value="1"><p class="tiny">Changes the four continuous feed costs in refinery examples. Synthetic units; these are not MRPL operating costs.</p><button id="solve">Run & verify</button><button class="secondary" id="download" disabled>Download audit JSON</button><details><summary>Edit model JSON</summary><textarea id="editor" spellcheck="false" aria-label="Model JSON"></textarea><button class="secondary" id="apply">Use edited model</button></details><p class="note">Working scope: small finite-bound models. Numerical optimality checks are tolerance-based. CUDA code is included in the ZIP but has not been hardware-validated in this delivery.</p><div id="message" role="alert"></div></section><section class="panel"><div style="display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap"><h2>Solution evidence</h2><span id="status" class="status">READY TO RUN</span></div><p id="modelname" class="tiny">Select a model and start an experiment.</p><div id="empty" class="empty">The dashboard displays live solver output.<br>No prefilled performance or accuracy claims.</div><div id="result" hidden><div class="stats"><div class="stat"><small>Objective · cost units</small><strong id="objective">—</strong></div><div class="stat"><small>End-to-end solve</small><strong id="runtime">—</strong></div><div class="stat"><small>Original primal residual</small><strong id="primal">—</strong></div><div class="stat"><small>Stationarity residual</small><strong id="dual">—</strong></div><div class="stat"><small>Integer search gap</small><strong id="gap">—</strong></div><div class="stat"><small>Iterations / nodes</small><strong id="iterations">—</strong></div></div><div class="split"><div><h2>Decision variables</h2><div id="variables"></div></div><div><h2>Trust report</h2><table id="trust"></table><p class="tiny">Residuals are recomputed against the original model. “Verified” means the declared numerical tolerance passed; it is not a guarantee on arbitrary instances.</p></div></div><div id="chartwrap" hidden><h2 style="margin-top:24px">Primal residual history</h2><svg id="chart" viewBox="0 0 600 140" role="img" aria-label="Logarithmic primal residual over iterations"></svg><p class="tiny">Vertical: log₁₀ normalized primal residual. Horizontal: sampled solver iterations.</p></div><details><summary>Full reproducibility record</summary><pre id="raw"></pre></details></div></section></div><p class="tiny" style="margin-top:24px">Implemented: original dense primal revised simplex, predictor-corrector QP, rational-bound branch-and-bound, experimental CSR PDHG. Roadmap: sparse dual simplex, reversible presolve, cuts, warm starts, recognized benchmark suites, and measured GPU acceleration.</p></main><footer>Offline-capable after installation · No telemetry · No external solver inside the core · Synthetic refinery data</footer><script>
-const $=id=>document.getElementById(id);let examples={},current={},last=null;
-const fmt=v=>v==null?'—':Math.abs(v)>1e6?Number(v).toExponential(3):Number(v).toLocaleString(undefined,{maximumFractionDigits:5});const sci=v=>v==null?'—':Number(v).toExponential(2);
-function choose(){current=structuredClone(examples[$('example').value]);$('editor').value=JSON.stringify(current,null,2);$('cost').value=1;}
-fetch('/api/examples').then(r=>r.json()).then(data=>{examples=data;for(const [key,m] of Object.entries(data)){const o=document.createElement('option');o.value=key;o.textContent=m.name;$('example').append(o);} $('example').value='refinery_lp';choose();}).catch(e=>$('message').textContent=e.message);
-$('example').onchange=choose;$('apply').onclick=()=>{try{current=JSON.parse($('editor').value);$('message').textContent='Edited model selected.';}catch(e){$('message').textContent=e.message;}};
-function cellRow(key,value){const tr=document.createElement('tr');for(const text of [key,value]){const td=document.createElement('td');td.textContent=text;tr.append(td)}$('trust').append(tr)}
-$('solve').onclick=async()=>{$('solve').disabled=true;$('message').textContent='';$('status').textContent='SOLVING';$('status').className='status';$('download').disabled=true;try{const model=structuredClone(current);const multiplier=Number($('cost').value);if(!Number.isFinite(multiplier)||multiplier<.1||multiplier>10)throw Error('Choose a multiplier from 0.1 to 10');if((model.name||'').includes('refinery'))model.c=model.c.map((v,i)=>i<4?v*multiplier:v);const resp=await fetch('/api/solve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model,backend:$('backend').value})});const r=await resp.json();if(!resp.ok)throw Error(r.error||'Request failed');last={model,result:r};$('empty').hidden=true;$('result').hidden=false;$('status').textContent=r.status;$('status').className='status '+(r.status.includes('VERIFIED')||r.status==='INFEASIBLE_CERTIFIED'?'good':'bad');$('modelname').textContent=(r.model_name||model.name)+' · '+(r.algorithm||'No result');$('objective').textContent=fmt(r.objective);$('runtime').textContent=r.elapsed_seconds==null?'—':fmt(r.elapsed_seconds*1000)+' ms';const v=r.verification||{};$('primal').textContent=sci(v.primal_residual);$('dual').textContent=sci(v.dual_residual);$('gap').textContent=r.relative_gap==null?'—':sci(r.relative_gap);$('iterations').textContent=r.nodes??r.iterations??'—';$('trust').replaceChildren();cellRow('Original feasibility',v.feasible==null?'Not available':v.feasible?'Passed':'Failed');cellRow('Continuous KKT',r.nodes!=null?'Not used for MILP':v.kkt_passed==null?'Not available':v.kkt_passed?'Passed':'Not established');cellRow('Absolute violation',sci(v.absolute_primal_violation));cellRow('Verification mantissa',(v.precision_bits||'—')+' bits');cellRow('Conservative MIP bound',fmt(r.best_bound));cellRow('Model fingerprint',(r.model_sha256||'—').slice(0,20));$('variables').replaceChildren();if(r.x){let max=Math.max(1,...r.x.map(Math.abs));r.x.forEach((x,i)=>{let line=document.createElement('div');line.className='tiny';line.textContent=(model.names?.[i]||'x'+i)+' = '+fmt(x);let bar=document.createElement('div');bar.className='bar';let inner=document.createElement('i');inner.style.width=(100*Math.abs(x)/max)+'%';bar.append(inner);$('variables').append(line,bar);});}else $('variables').textContent='No feasible solution returned.';$('raw').textContent=JSON.stringify(r,null,2);$('message').textContent=r.message||'';$('download').disabled=false;const h=(r.history||[]).filter(x=>Number.isFinite(x.primal_residual));$('chartwrap').hidden=h.length<2;$('chart').replaceChildren();if(h.length>1){let ys=h.map(x=>Math.log10(Math.max(1e-16,x.primal_residual))),min=Math.min(...ys),max=Math.max(...ys);let points=ys.map((y,i)=>(20+560*i/(ys.length-1))+','+(120-100*(y-min)/Math.max(1,max-min))).join(' ');let poly=document.createElementNS('http://www.w3.org/2000/svg','polyline');poly.setAttribute('points',points);poly.setAttribute('fill','none');poly.setAttribute('stroke','#75e1b6');poly.setAttribute('stroke-width','2');$('chart').append(poly);}}catch(e){$('message').textContent=e.message;$('status').textContent='REQUEST FAILED';$('status').className='status bad';}finally{$('solve').disabled=false;}};
-$('download').onclick=()=>{const blob=new Blob([JSON.stringify(last,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='sovopt-audit.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-</script></body></html>
+:root{--bg:#0c1421;--panel:#131f30;--line:#26364c;--text:#e6edf8;--muted:#9bacc3;--green:#75e1b6;--blue:#8caeff;--orange:#ffc885;--red:#ff8585}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,sans-serif}
+header{padding:20px 5%;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:22px;font-weight:800;letter-spacing:1px}.brand span{color:var(--green)}
+.tag{border:1px solid var(--line);border-radius:99px;padding:5px 12px;color:var(--muted);font-size:12px}
+main{max-width:1400px;margin:auto;padding:32px 5%}
+.eyebrow{color:var(--green);font-size:12px;letter-spacing:2px;font-weight:700}
+h1{font-size:clamp(26px,3.5vw,42px);line-height:1.15;margin:8px 0 14px;font-weight:650;max-width:900px}
+p{color:var(--muted)}.intro{max-width:850px;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:360px 1fr;gap:24px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;min-width:0}
+h2{font-size:18px;margin:0 0 16px}
+label{display:block;color:var(--muted);margin:14px 0 6px;font-size:13px;font-weight:500}
+select,input,textarea{width:100%;background:#0d1726;color:var(--text);border:1px solid #3b506d;border-radius:8px;padding:11px;font:inherit}
+textarea{font:12px/1.5 ui-monospace,monospace;min-height:180px;resize:vertical}
+button{border:0;border-radius:8px;background:var(--green);color:#08231b;padding:12px 16px;font-weight:750;cursor:pointer;width:100%;margin-top:14px}
+button:disabled{opacity:.5;cursor:wait}.secondary{background:#243752;color:var(--text)}
+.provenance-card{background:#0d1726;border:1px solid #2a3d58;border-radius:8px;padding:14px;margin-top:14px;font-size:12px}
+.provenance-card div{margin-bottom:6px}.provenance-card strong{color:var(--text)}.provenance-card span{color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.stat{padding:14px;border:1px solid var(--line);border-radius:9px;background:#0d1726}
+.stat small{color:var(--muted);display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.stat strong{font-size:22px;font-weight:600;display:block;margin-top:4px;overflow-wrap:anywhere}
+.status{display:inline-block;padding:5px 12px;background:#24354c;color:var(--blue);border-radius:6px;font-size:12px;font-weight:600}
+.good{color:var(--green);background:#173a32}
+.bad{color:var(--orange);background:#42332a}
+.empty{padding:60px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+td,th{padding:9px 6px;text-align:left;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+th{color:var(--muted);font-weight:500}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
+.tiny{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+details{margin-top:16px}summary{cursor:pointer;color:var(--blue)}
+pre{max-height:300px;overflow:auto;font:12px/1.5 ui-monospace,monospace;white-space:pre-wrap;background:#080e18;padding:12px;border-radius:8px}
+footer{padding:20px 5%;border-top:1px solid var(--line);font-size:12px;color:var(--muted);margin-top:40px}
+#message{white-space:pre-wrap;color:var(--orange);font-size:13px;margin-top:10px}
+.live-badge{display:inline-block;font-size:11px;background:#173a32;color:var(--green);padding:3px 8px;border-radius:4px;margin-left:8px}
+@media(max-width:950px){.grid{grid-template-columns:1fr}.split{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">SOV<span>—</span>OPT</div>
+  <div class="tag">MRPL PS 26119 · Sovereign Optimizer 0.1.1</div>
+</header>
+<main>
+  <div class="eyebrow">VERIFIED DATASET SUITE · ORIGINAL SOLVER CORE</div>
+  <h1>Source-Backed Optimization<br>Evidence & Verification Lab</h1>
+  <p class="intro">
+    All models shown are from authoritative public sources (Netlib, MIPLIB, published industrial literature).
+    No synthetic models, fictional refinery parameters, or fabricated benchmark results.
+  </p>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>Select verified dataset</h2>
+      <label for="example">Instance</label>
+      <select id="example"></select>
+
+      <div id="meta" class="provenance-card">
+        <div><strong>Application:</strong> <span id="m_app">—</span></div>
+        <div><strong>Source:</strong> <span id="m_source">—</span></div>
+        <div><strong>Dimensions:</strong> <span id="m_dims">—</span></div>
+        <div><strong>Published ref:</strong> <span id="m_ref">—</span></div>
+      </div>
+
+      <label for="backend">Algorithm route</label>
+      <select id="backend">
+        <option value="cpu">CPU reference solver (Primal Simplex / IPM QP / B&amp;B)</option>
+        <option value="pdhg-cpu">Experimental PDHG · CPU (continuous LP)</option>
+      </select>
+
+      <button id="solve">Run &amp; verify live</button>
+      <button class="secondary" id="download" disabled>Download audit JSON</button>
+
+      <details>
+        <summary>Inspect model JSON</summary>
+        <textarea id="editor" spellcheck="false" aria-label="Model JSON"></textarea>
+      </details>
+      <div id="message" role="alert"></div>
+    </section>
+
+    <section class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <h2>Solution evidence <span id="live_badge" class="live-badge" hidden>LIVE SOLVE</span></h2>
+        <span id="status" class="status">AWAITING EXECUTION</span>
+      </div>
+      <p id="modelname" class="tiny">Choose a verified dataset and run a solve.</p>
+
+      <div id="empty" class="empty">
+        No prefilled or synthetic results are displayed.<br>
+        Select an authentic instance and click <strong>Run &amp; verify live</strong> to measure performance on this machine.
+      </div>
+
+      <div id="result" hidden>
+        <div class="stats">
+          <div class="stat"><small>Objective value</small><strong id="objective">—</strong></div>
+          <div class="stat"><small>Published reference</small><strong id="pub_ref">—</strong></div>
+          <div class="stat"><small>Solve duration</small><strong id="runtime">—</strong></div>
+          <div class="stat"><small>Original primal residual</small><strong id="primal">—</strong></div>
+          <div class="stat"><small>Dual stationarity residual</small><strong id="dual">—</strong></div>
+          <div class="stat"><small>Iterations / nodes</small><strong id="iterations">—</strong></div>
+        </div>
+
+        <div class="split">
+          <div>
+            <h2>Trust &amp; Verification Report</h2>
+            <table id="trust"></table>
+          </div>
+          <div>
+            <h2>Solution summary</h2>
+            <div id="variables" style="max-height:260px;overflow:auto"></div>
+          </div>
+        </div>
+
+        <details>
+          <summary>Full reproducibility record (audit JSON)</summary>
+          <pre id="raw"></pre>
+        </details>
+      </div>
+    </section>
+  </div>
+</main>
+<footer>
+  Sovereign Optimization Core · Independent from foreign optimizers · Netlib / MIPLIB verified datasets · No synthetic refinery claims
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+let examples={}, current={}, last=null;
+
+const META = {
+  avgas: {app:'Aviation Gasoline Refinery Blending LP', source:'Symonds (1955) / Charnes et al. (1952)', ref:'-7.75 (exact)'},
+  afiro: {app:'Industrial Production & Resource Allocation', source:'Netlib LP / Stanford Systems Optimization Lab (Saunders)', ref:'-464.753142857 (MINOS 5.3)'},
+  sc50a: {app:'Staircase Dynamic Production LP', source:'Netlib LP / Academic Benchmark', ref:'-64.575077058 (MINOS 5.3)'},
+  sc50b: {app:'Staircase Dynamic Production LP', source:'Netlib LP / Academic Benchmark', ref:'-70.0 (MINOS 5.3)'},
+  qp_example: {app:'Convex Quadratic Program with QUADOBJ', source:'Standard QPS benchmark test suite', ref:'8.371875 (analytical optimum)'},
+  flugpl: {app:'Airline Fleet Allocation MILP', source:'MIPLIB 1.0 / 2017 (Harvey Wagner, Cray Research)', ref:'1201500 (optimum)'},
+  blend: {app:'Blending Problem LP (Dense Singular Test)', source:'Netlib LP (Bruce Murtagh)', ref:'-30.81215 (MINOS 5.3)'}
+};
+
+const fmt=v=>v==null?'—':Math.abs(v)>1e6?Number(v).toExponential(4):Number(v).toLocaleString(undefined,{maximumFractionDigits:6});
+const sci=v=>v==null?'—':Number(v).toExponential(2);
+
+function choose(){
+  const key=$('example').value;
+  current=structuredClone(examples[key]||{});
+  $('editor').value=JSON.stringify(current,null,2);
+  const m=META[key]||{app:'Documented instance',source:'Verified dataset',ref:'—'};
+  $('m_app').textContent=m.app;
+  $('m_source').textContent=m.source;
+  $('m_dims').textContent=(current.c?.length||0)+' vars, '+(current.A?.length||0)+' rows';
+  $('m_ref').textContent=m.ref;
+}
+
+fetch('/api/examples').then(r=>r.json()).then(data=>{
+  examples=data;
+  $('example').replaceChildren();
+  for(const key of Object.keys(data)){
+    const o=document.createElement('option');
+    o.value=key;
+    const label=META[key]?.app ? `${key.toUpperCase()} — ${META[key].app}` : (data[key].name||key);
+    o.textContent=label;
+    $('example').append(o);
+  }
+  if(data['avgas'])$('example').value='avgas';
+  choose();
+}).catch(e=>$('message').textContent='Failed to load examples: '+e.message);
+
+$('example').onchange=choose;
+
+function cellRow(key,value){
+  const tr=document.createElement('tr');
+  const td1=document.createElement('td'); td1.textContent=key;
+  const td2=document.createElement('td'); td2.textContent=value;
+  tr.append(td1,td2);
+  $('trust').append(tr);
+}
+
+$('solve').onclick=async()=>{
+  $('solve').disabled=true;
+  $('message').textContent='';
+  $('status').textContent='SOLVING LIVE...';
+  $('status').className='status';
+  $('live_badge').hidden=true;
+  $('download').disabled=true;
+  try{
+    const model=structuredClone(current);
+    const t0=performance.now();
+    const resp=await fetch('/api/solve',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model,backend:$('backend').value})
+    });
+    const r=await resp.json();
+    if(!resp.ok)throw Error(r.error||'Request failed');
+    last={model,result:r,solve_timestamp:new Date().toISOString()};
+    
+    $('empty').hidden=true;
+    $('result').hidden=false;
+    $('live_badge').hidden=false;
+    $('status').textContent=r.status;
+    $('status').className='status '+(r.status.includes('VERIFIED')||r.status==='INFEASIBLE_CERTIFIED'?'good':'bad');
+    $('modelname').textContent=(model.name||$('example').value)+' · '+(r.algorithm||'No result');
+    $('objective').textContent=fmt(r.objective);
+    $('pub_ref').textContent=META[$('example').value]?.ref||'—';
+    $('runtime').textContent=r.elapsed_seconds==null?'—':fmt(r.elapsed_seconds*1000)+' ms';
+    
+    const v=r.verification||{};
+    $('primal').textContent=sci(v.primal_residual);
+    $('dual').textContent=sci(v.dual_residual);
+    $('iterations').textContent=r.nodes??r.iterations??'—';
+    
+    $('trust').replaceChildren();
+    cellRow('Original model feasibility',v.feasible==null?'Not available':v.feasible?'PASSED':'FAILED');
+    cellRow('KKT stationarity & complementarity',v.kkt_passed==null?'Not applicable':v.kkt_passed?'PASSED':'NOT ESTABLISHED');
+    cellRow('Absolute constraint violation',sci(v.absolute_primal_violation));
+    cellRow('Mantissa precision',(v.precision_bits||53)+' bits (IEEE 754)');
+    cellRow('Model SHA256',(r.model_sha256||'—').slice(0,24)+'...');
+    cellRow('Solver backend',r.backend||'cpu');
+    cellRow('Timestamp',last.solve_timestamp);
+    
+    $('variables').replaceChildren();
+    if(r.x){
+      r.x.slice(0,25).forEach((x,i)=>{
+        const line=document.createElement('div');
+        line.className='tiny';
+        line.textContent=(model.names?.[i]||'x'+i)+' = '+fmt(x);
+        $('variables').append(line);
+      });
+      if(r.x.length>25){
+        const more=document.createElement('div');
+        more.className='tiny';
+        more.textContent=`... and ${r.x.length-25} more variables`;
+        $('variables').append(more);
+      }
+    }else{
+      $('variables').textContent=r.message||'No feasible primal solution vector.';
+    }
+    $('raw').textContent=JSON.stringify(last,null,2);
+    $('download').disabled=false;
+  }catch(e){
+    $('message').textContent=e.message;
+    $('status').textContent='FAILED';
+    $('status').className='status bad';
+  }finally{
+    $('solve').disabled=false;
+  }
+};
+
+$('download').onclick=()=>{
+  const blob=new Blob([JSON.stringify(last,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`sovopt-${$('example').value}-audit.json`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+</script>
+</body>
+</html>

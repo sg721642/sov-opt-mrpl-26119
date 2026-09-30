@@ -1,4 +1,6 @@
-"""Infeasible-start primal-dual Mehrotra predictor-corrector for convex QP."""
+"""Infeasible-start primal-dual Mehrotra predictor-corrector for convex QP.
+Supports finite or infinite variable bounds.
+"""
 import numpy as np
 from .linalg import LU,NumericalError
 from .verify import verify
@@ -9,15 +11,20 @@ def step(v,d,fraction=1.):
 
 def solve_qp(model,tol=1e-7,max_iter=150,scaling=True):
     G0,h0,_=model.inequalities(); n=len(model.c); m=len(h0)
-    scale=np.maximum(np.max(abs(G0),axis=1),1e-30) if scaling else np.ones(m)
+    scale=np.maximum(np.max(abs(G0),axis=1),1e-30) if (scaling and m>0) else np.ones(max(m,1))
     G=G0/scale[:,None];h=h0/scale;Q=model.Q
-    x=(model.lower+model.upper)/2; s=np.maximum(1.,h-G@x);z=np.ones(m);history=[]
+    # Initial point: midpoint for finite box, or lower+1 / upper-1 / 0 for infinite bounds
+    x = np.where(np.isfinite(model.upper) & np.isfinite(model.lower),
+                 (model.lower+model.upper)/2,
+                 np.where(np.isfinite(model.lower), model.lower+1.0,
+                          np.where(np.isfinite(model.upper), model.upper-1.0, 0.0))).astype(float)
+    s=np.maximum(1.,h-G@x);z=np.ones(m);history=[]
     try:
         for k in range(max_iter):
             report=verify(model,x,z/scale,tol)
-            if report['kkt_passed']:return dict(status='OPTIMAL_VERIFIED',algorithm='primal-dual predictor-corrector QP',x=x.tolist(),dual=(z/scale).tolist(),objective=report['objective'],verification=report,iterations=k,history=history)
+            if report.get('kkt_passed'):return dict(status='OPTIMAL_VERIFIED',algorithm='primal-dual predictor-corrector QP',x=x.tolist(),dual=(z/scale).tolist(),objective=report['objective'],verification=report,iterations=k,history=history)
             rd=Q@x+model.c+G.T@z;rp=G@x+s-h;mu=float(s@z/m)
-            history.append(dict(iteration=k,primal_residual=report['primal_residual'],dual_residual=report['dual_residual'],complementarity=mu))
+            history.append(dict(iteration=k,primal_residual=report.get('primal_residual',float('nan')),dual_residual=report.get('dual_residual',float('nan')),complementarity=mu))
             K=Q+G.T@((z/s)[:,None]*G)
             # Regularization stabilizes Newton directions; final acceptance remains unregularized.
             reg=1e-11*max(1.,float(np.max(abs(np.diag(K)))))

@@ -12,23 +12,22 @@ class Handler(BaseHTTPRequestHandler):
         if kind=='application/json':data=json.dumps(data,allow_nan=False).encode()
         self.send_response(status);self.send_header('Content-Type',kind);self.send_header('Content-Length',str(len(data)));self.send_header('X-Content-Type-Options','nosniff');self.send_header('Cache-Control','no-store');self.end_headers();self.wfile.write(data)
     def do_GET(self):
-        if self.path=='/health':return self.send(200,{'status':'ok','version':'0.1.0'})
+        if self.path=='/health':return self.send(200,{'status':'ok','version':'0.1.1'})
         if self.path=='/api/examples':return self.send(200,{k:json.loads(p.read_text()) for k,p in EXAMPLES.items()})
         if self.path in ('/','/index.html'):return self.send(200,(ROOT/'web/index.html').read_bytes(),'text/html; charset=utf-8')
         self.send(404,{'error':'Not found'})
     def do_POST(self):
         if self.path!='/api/solve':return self.send(404,{'error':'Not found'})
-        # Deny cross-origin browser POSTs; public authentication remains a deployment concern.
         origin=self.headers.get('Origin')
         if origin and origin not in ('http://'+self.headers.get('Host',''),'https://'+self.headers.get('Host','')):return self.send(403,{'error':'Origin not allowed'})
         try:
             length=int(self.headers.get('Content-Length','0'))
-            if not 0<length<=200000:raise ValueError('Request must be 1..200000 bytes')
+            if not 0<length<=300000:raise ValueError('Request must be 1..300000 bytes')
             payload=json.loads(self.rfile.read(length));backend=payload.get('backend','cpu')
             if backend not in ('cpu','pdhg-cpu'):raise ValueError('Web demo supports CPU or CPU PDHG; use CLI for CUDA')
             from sovopt import Model
             model=Model.from_dict(payload['model'])
-            if len(model.c)>30 or len(model.A)>80:raise ValueError('Web demo cap is 30 variables / 80 rows. Use CLI for larger tests.')
+            if len(model.c)>100 or len(model.A)>150:raise ValueError('Web demo cap is 100 variables / 150 rows. Use CLI for larger tests.')
         except (ValueError,TypeError,KeyError,OverflowError) as e:return self.send(400,{'error':str(e)})
         if not SLOTS.acquire(blocking=False):return self.send(429,{'error':'Two solves already running; retry shortly'})
         try:
