@@ -1,0 +1,103 @@
+{
+  "name": "Synthetic refinery activation MILP",
+  "names": [
+    "low_to_premium",
+    "high_to_premium",
+    "low_to_regular",
+    "high_to_regular",
+    "high_feed_enabled"
+  ],
+  "c": [
+    52,
+    34,
+    52,
+    34,
+    120
+  ],
+  "lower": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "upper": [
+    100,
+    100,
+    100,
+    100,
+    1
+  ],
+  "A": [
+    [
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      1,
+      0
+    ],
+    [
+      1,
+      0,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    [
+      -0.5,
+      1.5,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      -1.3,
+      0.7,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      1,
+      -100
+    ]
+  ],
+  "row_lower": [
+    60,
+    50,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  "row_upper": [
+    60,
+    50,
+    85,
+    100,
+    0,
+    0,
+    0
+  ],
+  "integer": [
+    4
+  ]
+}

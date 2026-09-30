@@ -1,0 +1,612 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SOV-OPT Complete Implementation Guide</title><style>*{box-sizing:border-box}body{margin:0;font:16px/1.75 system-ui,sans-serif;color:#1b2b40;background:#f3f6fa}aside{position:fixed;top:0;bottom:0;width:270px;padding:26px;background:#122238;color:#fff;overflow:auto}aside b{font-size:24px}aside p{font-size:13px;color:#c3d0e0}aside a{display:block;color:#d9e6f7;text-decoration:none;padding:9px 0;border-bottom:1px solid #33445a;font-size:13px;overflow-wrap:anywhere}main{margin-left:270px;max-width:1250px;padding:35px 55px}article{background:white;padding:35px;margin-bottom:24px;border:1px solid #dce4ef;border-radius:12px;scroll-margin-top:20px}h1{font-size:32px;line-height:1.2;color:#123659}h2{font-size:23px;margin-top:32px}h3{font-size:19px}a{color:#005a91}pre{overflow:auto;background:#102138;color:#eaf2ff;padding:20px;border-radius:8px;font-size:13px;line-height:1.6}code{font-family:ui-monospace,monospace;font-size:.9em}table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow:auto}th,td{border:1px solid #d9e2ef;padding:10px;text-align:left;vertical-align:top}th{background:#e9eff7}li{margin:6px 0}@media(max-width:800px){aside{position:static;width:100%}main{margin:0;padding:15px}article{padding:22px}h1{font-size:27px}}@media print{aside{display:none}main{margin:0;padding:0}article{border:0;break-before:page}pre{white-space:pre-wrap;background:#edf0f4;color:#111}}</style></head><body><aside><b>SOV—OPT</b><p>MRPL PS 26119<br>Code and implementation guide<br>Reference prototype 0.1.0</p><a href="#chapter0">README</a><a href="#chapter1">01 SETUP</a><a href="#chapter2">02 ARCHITECTURE AND MATH</a><a href="#chapter3">03 MODEL AND REFINERY</a><a href="#chapter4">04 IMPLEMENTATION PLAN</a><a href="#chapter5">05 GPU AND DEPLOYMENT</a><a href="#chapter6">06 BENCHMARKS</a><a href="#chapter7">07 REFERENCES</a><a href="#chapter8">ANTIGRAVITY PROMPT</a><a href="#chapter9">reports/VALIDATION</a></aside><main><article id="chapter0"><h1>SOV-OPT reference prototype for MRPL PS 26119</h1>
+<p>Start with <strong>START_HERE.html</strong> or <strong>docs/01_SETUP.md</strong>. This folder contains runnable source, not pseudocode: an original optimization core, a local dashboard, a CLI/API, synthetic refinery examples, tests, and measured reports.</p>
+<p><strong>Scope:</strong> a small, finite-bound research prototype. It does not implement the full industrial solver in the attached research blueprint. In particular, it uses dense primal revised simplex rather than sparse dual simplex. CUDA PDHG source is included but was not executed on GPU hardware during delivery. There is no claim of industrial-scale capacity, commercial-solver superiority, or universal accuracy.</p>
+<h2>Run</h2>
+<p>Use Python 3.12 (3.11+ supported by project metadata). In a terminal opened in this folder:</p>
+<pre><code class="language-bash">python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m unittest discover -s tests -v
+python server.py
+</code></pre>
+<p>Open <strong><a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a></strong>. For Windows use <code>start_windows.bat</code> with Python 3.12 installed, or follow the manual commands in the setup guide.</p>
+<pre><code class="language-bash">python -m sovopt examples/refinery_lp.json --output reports/my_lp.json
+python -m sovopt examples/refinery_milp.json --output reports/my_milp.json
+python -m sovopt examples/refinery_qp.json --output reports/my_qp.json
+</code></pre>
+<h2>What is included</h2>
+<table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>sovopt/</code></td>
+<td>Original LU, simplex, predictor-corrector QP, B&amp;B, verifier, MPS subset and CSR PDHG</td>
+</tr>
+<tr>
+<td><code>server.py</code>, <code>web/</code></td>
+<td>Local demo, live solve API, result and audit export</td>
+</tr>
+<tr>
+<td><code>examples/</code></td>
+<td>LP, MILP, QP, certified-infeasible example, tiny free-format MPS</td>
+</tr>
+<tr>
+<td><code>tests/</code></td>
+<td>Numerical regression tests, known-optimum cases, exhaustive MILP checks, HTTP integration</td>
+</tr>
+<tr>
+<td><code>scripts/</code></td>
+<td>Benchmarks, external baseline worker, manifest freezing, GPU comparison, audit checks</td>
+</tr>
+<tr>
+<td><code>docs/</code></td>
+<td>Setup, mathematics, data format, development plan, deployment, validation and references</td>
+</tr>
+<tr>
+<td><code>reports/</code></td>
+<td>Actual delivery-time test log, solver outputs and synthetic comparison results</td>
+</tr>
+</tbody></table>
+<p>The core imports NumPy for arrays/vector operations, not an existing optimization package. LU, optimization algorithms, CSR SpMV and verification are implemented here. Optional SciPy/HiGHS exists only in a separate benchmark worker process. The strongest sovereignty design in your PDF also requires custom sparse infrastructure, which this release does not yet provide.</p>
+<h2>Measured example results</h2>
+<table>
+<thead>
+<tr>
+<th>Example</th>
+<th>Result</th>
+<th align="right">Objective</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Synthetic refinery LP</td>
+<td>Numerically verified optimum</td>
+<td align="right">4865</td>
+</tr>
+<tr>
+<td>Synthetic refinery MILP</td>
+<td>Verified incumbent and numerical gap closure</td>
+<td align="right">4985</td>
+</tr>
+<tr>
+<td>Synthetic refinery convex QP</td>
+<td>Numerically verified KKT conditions</td>
+<td align="right">approximately 5009.500002</td>
+</tr>
+<tr>
+<td>Contradictory production</td>
+<td>Exact rational Farkas certificate</td>
+<td align="right">Not applicable</td>
+</tr>
+</tbody></table>
+<p>These are cost units on synthetic data, not rupees or validated MRPL economics. See <code>reports/VALIDATION.md</code> for the distinction between numerical checks and formal certificates.</p>
+</article><article id="chapter1"><h1>Step by step setup and first demonstration</h1>
+<p>This guide gets the supplied code running before you change it. You do not need training data, an AI model, an API key, a commercial solver licence, Node.js, or a GPU for the CPU demo. Optimization accuracy here means feasibility, stationarity, complementarity and an optimality gap, rather than a machine-learning accuracy percentage.</p>
+<h2>Step 1 — Extract the ZIP</h2>
+<ol>
+<li>Download <code>SOV-OPT-MRPL-26119-Prototype.zip</code>.</li>
+<li>On macOS, double-click the ZIP in Finder.</li>
+<li>Move the extracted <code>sov-opt</code> folder to a stable location such as <code>Documents</code>.</li>
+<li>Open that folder. You should see <code>README.md</code>, <code>server.py</code>, <code>requirements.txt</code>, <code>sovopt</code>, <code>docs</code>, and <code>examples</code>.</li>
+<li>Double-click <code>START_HERE.html</code> for an offline guide. This is a guide, not the running dashboard.</li>
+</ol>
+<p>Do not run Python from inside an unextracted ZIP.</p>
+<h2>Step 2 — Install or check Python</h2>
+<ol>
+<li>Open Terminal (Spotlight: Command+Space, type Terminal, press Return).</li>
+<li>Run <code>python3 --version</code>.</li>
+<li>If Python is absent or older than 3.11, download the Python 3.12 macOS installer from <a href="https://www.python.org/downloads/macos/">https://www.python.org/downloads/macos/</a> and complete its installer. Reopen Terminal afterwards.</li>
+<li>Run <code>python3 --version</code> again.</li>
+</ol>
+<p>The delivery was tested with Python 3.12.14 and NumPy 2.3.5 on Linux x86-64. The CPU code is portable, but this package was not executed on your Mac. On Apple Silicon, use a native ARM Python installation. Long-double precision varies by platform; the verifier reports the actual mantissa precision rather than assuming 80-bit arithmetic everywhere.</p>
+<h2>Step 3 — Open the source in Antigravity</h2>
+<ol>
+<li>Launch Antigravity.</li>
+<li>Use its folder-opening command (commonly File → Open Folder).</li>
+<li>Select the extracted <code>sov-opt</code> directory, not the ZIP.</li>
+<li>Trust this project only after you have reviewed the source as you would any downloaded project.</li>
+<li>Open <code>README.md</code> in the editor.</li>
+<li>Open an integrated terminal using the editor&#39;s terminal command. Menu wording may vary with the installed release; macOS Terminal works equally well.</li>
+<li>Run <code>pwd</code> and <code>ls</code>. <code>ls</code> should list <code>server.py</code> and <code>requirements.txt</code>. If it does not, navigate to the project folder first.</li>
+</ol>
+<p>For a folder placed in Documents:</p>
+<pre><code class="language-bash">cd ~/Documents/sov-opt
+</code></pre>
+<p>If the path contains spaces, enclose the complete path in double quotes. You can also type <code>cd </code> and drag the folder from Finder into Terminal, then press Return.</p>
+<h2>Step 4 — Create the isolated environment</h2>
+<p>Run these commands one at a time from the project folder:</p>
+<pre><code class="language-bash">python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+</code></pre>
+<p>The initial installation needs internet access. Afterwards the CPU solver and dashboard work offline. Keep the <code>.venv</code> local; it is not included in the ZIP. The pinned NumPy version makes the array-library dependency reproducible; Python, OS and BLAS differences can still affect floating-point results.</p>
+<p>If the editor asks you to select a Python interpreter, choose <code>.venv/bin/python</code> inside this folder. This is optional for terminal execution but helpful for code completion and debugging.</p>
+<h2>Step 5 — Run the validation suite</h2>
+<pre><code class="language-bash">python -m unittest discover -s tests -v
+</code></pre>
+<p>Expected result: <strong>17 tests, OK</strong>. Several tests loop over multiple cases: 50 constructed LP optima, 25 integer models checked against exhaustive enumeration, and 20 convex QPs with known KKT solutions. Other tests exercise degeneracy, scaling, fixed variables, lower bounds, Farkas certificates, invalid candidates, MPS input, limits and the HTTP API.</p>
+<p>If a test fails, keep the full output and fix that failure before describing your copy as validated. Do not delete tests or loosen tolerances solely to make a green output.</p>
+<h2>Step 6 — Start the dashboard</h2>
+<pre><code class="language-bash">python server.py
+</code></pre>
+<p>Expected message:</p>
+<pre><code class="language-text">SOV-OPT demo at http://127.0.0.1:8000
+</code></pre>
+<p>Keep this terminal open. Open Chrome or Safari and enter <code>http://127.0.0.1:8000</code> in the address bar. Double-clicking <code>web/index.html</code> is not sufficient because the page needs the local solve API.</p>
+<p>To stop the server, return to Terminal and press Control+C. To use another port:</p>
+<pre><code class="language-bash">python server.py --port 8001
+</code></pre>
+<p>Then open <code>http://127.0.0.1:8001</code>.</p>
+<h2>Step 7 — Run the LP demonstration</h2>
+<ol>
+<li>Select <strong>Synthetic refinery blending LP</strong>.</li>
+<li>Leave algorithm route at <strong>CPU reference solver</strong>.</li>
+<li>Leave feed cost multiplier at <strong>1</strong>.</li>
+<li>Click <strong>Run &amp; verify</strong>.</li>
+<li>Confirm <code>OPTIMAL_VERIFIED</code> and objective <strong>4865</strong>.</li>
+<li>Inspect the four feed allocations: <strong>45, 15, 17.5, 32.5</strong>.</li>
+<li>Read the primal residual, stationarity residual and full reproducibility record.</li>
+<li>Click <strong>Download audit JSON</strong>. The export includes the exact model you solved and its result.</li>
+</ol>
+<p>There is no prefilled dashboard result. Every click calls the real local solver.</p>
+<h2>Step 8 — Show decisions changing with the model</h2>
+<ol>
+<li>Change feed cost multiplier to <strong>1.2</strong>.</li>
+<li>Solve again. On the LP, all feed costs scale equally, so allocations should stay the same and the objective becomes <strong>5838</strong>.</li>
+<li>To change allocations instead, open <strong>Edit model JSON</strong>, change the second feed cost from 34 to 60, click <strong>Use edited model</strong>, reset multiplier to 1, and solve.</li>
+<li>A fresh model fingerprint must appear because the input changed.</li>
+<li>Re-select the original model to restore the shipped input.</li>
+</ol>
+<p>For a more meaningful scenario, change quality bounds or crude availability. Preserve units and document every change. Do not change the model silently between solver comparisons.</p>
+<h2>Step 9 — Demonstrate MILP</h2>
+<ol>
+<li>Select <strong>Synthetic refinery activation MILP</strong>.</li>
+<li>Choose CPU and multiplier 1.</li>
+<li>Solve. Expected objective: <strong>4985</strong>; the binary <code>high_feed_enabled</code> variable is <strong>1</strong>.</li>
+<li>Show the conservative bound, search gap and node count.</li>
+<li>Explain that the fixed activation cost is 120 synthetic cost units, and the LP relaxation can use fractional activation whereas the MILP cannot.</li>
+</ol>
+<p>The MILP badge is based on the tree and gap closure, not continuous KKT checks. The dashboard correctly displays continuous KKT as not used for MILP. Final export verifies the incumbent; it is not a standalone, replayable formal proof of the entire branch-and-bound tree.</p>
+<h2>Step 10 — Demonstrate convex QP</h2>
+<ol>
+<li>Select <strong>Synthetic refinery smooth blending QP</strong>.</li>
+<li>Choose CPU and multiplier 1.</li>
+<li>Solve. Expect objective near <strong>5009.5</strong> with small original-model residuals.</li>
+<li>Show the convergence trace and complementarity in the JSON record.</li>
+<li>Explain that the added objective is <code>0.04 * sum(x_j^2)</code> because the model convention is <code>0.5*x^T*Q*x</code> and <code>Q = 0.08*I</code>.</li>
+</ol>
+<p>The QP is convex. This does not solve nonconvex pooling or nonlinear refinery physics.</p>
+<h2>Step 11 — Show an infeasibility certificate</h2>
+<ol>
+<li>Select <strong>Contradictory production requirements</strong>.</li>
+<li>Solve on CPU.</li>
+<li>Observe <code>INFEASIBLE_CERTIFIED</code> and no fake decision vector.</li>
+<li>Explain the conflict: the same variable must be at least 8 and at most 3.</li>
+<li>Expand the record to show the certificate. It is checked using exact rational arithmetic on the binary64 input values.</li>
+</ol>
+<p>For arbitrary infeasible models, certificate reconstruction may fail. The implementation then reports <code>NUMERICAL_FAILURE</code>; do not relabel it as certified infeasibility.</p>
+<h2>Step 12 — Run the experimental first-order path</h2>
+<p>Select the refinery <strong>LP</strong>, then <strong>Experimental PDHG · CPU</strong>. Solve and compare objective/residuals. Do not select MILP or QP with this route; the API rejects those combinations explicitly. On small cases this method can be slower than simplex. That is an informative result.</p>
+<p>The CPU and CUDA PDHG paths share the algorithm but have distinct SpMV implementations. Apple Silicon GPUs do not run this CUDA backend. The supplied CUDA experiment is for an NVIDIA Linux machine; follow <code>docs/05_GPU_AND_DEPLOYMENT.md</code>.</p>
+<h2>Step 13 — Use the CLI and Python API</h2>
+<pre><code class="language-bash">python -m sovopt examples/refinery_lp.json --output reports/my_lp.json
+python -m sovopt examples/refinery_milp.json --output reports/my_milp.json
+python -m sovopt examples/refinery_qp.json --output reports/my_qp.json
+python -m sovopt examples/tiny.mps
+python -m sovopt examples/refinery_lp.json --backend pdhg-cpu
+</code></pre>
+<p>In Python, run from this project folder:</p>
+<pre><code class="language-python">from sovopt import load, solve
+model = load(&#39;examples/refinery_lp.json&#39;)
+result = solve(model, tol=1e-7)
+print(result[&#39;status&#39;], result.get(&#39;objective&#39;))
+</code></pre>
+<p>To recheck an exported browser audit (replace the example path with your downloaded file):</p>
+<pre><code class="language-bash">python scripts/validate_audit.py ~/Downloads/sovopt-audit.json
+</code></pre>
+<h2>Step 14 — Give Antigravity the correct task</h2>
+<p>Open <code>docs/ANTIGRAVITY_PROMPT.md</code>, copy its instructions into the editor assistant, and ask for one development gate at a time. The code already runs; the first task should be validation and inspection, not rebuilding the whole project. Review all changes with a diff before keeping them.</p>
+<h2>Step 15 — Repeat the benchmarks and preserve evidence</h2>
+<pre><code class="language-bash">python scripts/benchmark.py
+python scripts/freeze_manifest.py examples/refinery_lp.json examples/refinery_milp.json examples/refinery_qp.json examples/infeasible.json examples/tiny.mps
+python scripts/run_manifest.py reports/manifest.json
+</code></pre>
+<p>Reports are written under <code>reports/</code>. Copy experiment results into dated subfolders before rerunning, because these commands overwrite their named report files. Read <code>docs/06_BENCHMARKS.md</code> before presenting comparisons.</p>
+<h2>Windows equivalent</h2>
+<p>Install Python 3.12 from python.org, extract the ZIP, open the project in your editor, and open Command Prompt in that folder:</p>
+<pre><code class="language-bat">py -3.12 -m venv .venv
+.venv\Scripts\activate.bat
+python -m pip install -r requirements.txt
+python -m unittest discover -s tests -v
+python server.py
+</code></pre>
+<p>The <code>start_windows.bat</code> launcher automates these commands. In PowerShell you can avoid activation-policy changes by calling <code>.venv\Scripts\python.exe</code> directly.</p>
+<h2>Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>No module named numpy</code></td>
+<td>Activate the project environment and run <code>python -m pip install -r requirements.txt</code></td>
+</tr>
+<tr>
+<td><code>No module named sovopt</code></td>
+<td>Open the terminal in the folder containing <code>sovopt/</code> and <code>server.py</code></td>
+</tr>
+<tr>
+<td>Port already in use</td>
+<td>Stop the earlier server or use <code>--port 8001</code></td>
+</tr>
+<tr>
+<td>Browser shows no results</td>
+<td>Start <code>server.py</code>; use its HTTP address, not a file URL</td>
+</tr>
+<tr>
+<td><code>INVALID_MODEL</code></td>
+<td>Read the error; check finite variable bounds, dimensions, symmetry and supported features</td>
+</tr>
+<tr>
+<td><code>NUMERICAL_FAILURE</code></td>
+<td>Preserve the model/report and inspect conditioning; never change the badge manually</td>
+</tr>
+<tr>
+<td><code>LIMIT_REACHED</code></td>
+<td>Inspect any returned candidate and its verification; this is not an optimum claim</td>
+</tr>
+<tr>
+<td>CUDA unavailable</td>
+<td>Use CPU locally or move the GPU experiment to a supported NVIDIA machine</td>
+</tr>
+<tr>
+<td>Too many web requests</td>
+<td>Wait for a worker to finish; there are two concurrent slots</td>
+</tr>
+<tr>
+<td>macOS refuses the launcher</td>
+<td>Use the manual Terminal commands; no need to bypass system security</td>
+</tr>
+</tbody></table>
+</article><article id="chapter2"><h1>Implemented architecture and mathematics</h1>
+<h2>Canonical model</h2>
+<p>The minimization problem is <code>0.5*x^T*Q*x + c^T*x</code>, subject to <code>row_lower &lt;= A*x &lt;= row_upper</code>, finite <code>lower &lt;= x &lt;= upper</code>, and selected integer variables. LP/MILP omit Q. QP forbids integer variables and requires a symmetric matrix passing a conservative pivoted PSD check. This release does not accept infinite variable bounds, MIQP, general NLP, indicators, SOS or quadratic constraints.</p>
+<p>The representation is dense NumPy arrays. CPU limits are 250 variables and 1,000 input rows; the web cap is 30 variables and 80 rows. These are rejection limits, not performance guarantees. A dense simplex basis may become expensive well below the caps. PDHG converts dense input to CSR internally; consequently the entire input path is not sparse-scalable yet.</p>
+<h2>Original linear algebra</h2>
+<p><code>linalg.py</code> computes dense LU with partial pivoting and a relative unsafe-pivot threshold. Solves use forward/back substitution and up to two iterative-refinement corrections. Residuals use NumPy long double where it provides additional precision. All basis factorizations are recomputed; there are no eta updates, sparse Markowitz pivots or Forrest–Tomlin updates. <code>numpy.linalg.solve</code> and existing factorization packages are not used by the core.</p>
+<h2>LP route</h2>
+<ol>
+<li>Convert finite row sides and variable bounds into <code>G*x &lt;= h</code>.</li>
+<li>Shift <code>x = lower + t</code>, with <code>t &gt;= 0</code>.</li>
+<li>Optionally divide every inequality by its largest absolute coefficient.</li>
+<li>Normalize RHS signs and introduce slack/surplus/artificial variables.</li>
+<li>Minimize the sum of artificial variables in Phase I.</li>
+<li>If infeasibility is suspected, reconstruct a Farkas multiplier and accept the status only if the exact rational check succeeds.</li>
+<li>Remove artificial variables from the basis.</li>
+<li>Optimize the original linear objective using primal revised simplex and Bland-style entering/tie choices.</li>
+<li>Recover the original x and inequality multipliers. Recompute KKT conditions against the original model.</li>
+</ol>
+<p>This is <strong>primal revised simplex</strong>, not dual simplex, not Devex, and not a Harris ratio implementation. The scale transformation is undone in the multipliers. No general presolve transformation is performed, so there is no unimplemented postsolve stack hidden behind the verification.</p>
+<h2>Convex QP route</h2>
+<p>For <code>G*x + s = h</code>, <code>s &gt;= 0</code>, <code>z &gt;= 0</code>, the KKT equations are:</p>
+<ul>
+<li>stationarity: <code>Q*x + c + G^T*z = 0</code>;</li>
+<li>primal equation: <code>G*x + s - h = 0</code>;</li>
+<li>complementarity: <code>s_i*z_i = 0</code>.</li>
+</ul>
+<p>The solver starts with positive slack and dual estimates and does not require a feasible x. It computes an affine predictor, a centering parameter from the predicted complementarity, and a corrector including the affine product term. Eliminating slack and dual directions gives a dense normal-equation matrix <code>Q + G^T*diag(z/s)*G</code>, regularized for the Newton solve. A 0.995 fraction-to-boundary rule preserves positivity. Only the <strong>unregularized original KKT residuals</strong> determine acceptance.</p>
+<p>Normal equations can amplify conditioning problems. Sparse augmented KKT systems and better regularization are roadmap work. There is no homogeneous self-dual embedding, so arbitrary infeasible QPs may hit limits or numerical failure without an infeasibility proof.</p>
+<h2>Branch and bound</h2>
+<p><code>milp.py</code> uses a best-bound heap, most-fractional branching and fresh LP solves at each node. It rounds a near-integral candidate and checks it against the original model. There are no cuts, pseudocosts, warm-start bases or parallel tree search.</p>
+<p>For every nonnegative inequality multiplier z and any feasible x:</p>
+<p><code>c^T*x &gt;= -h^T*z + sum_j min_{lower_j &lt;= x_j &lt;= upper_j} (c + G^T*z)_j*x_j</code>.</p>
+<p>The minimum uses the lower bound for a nonnegative coefficient and the upper bound otherwise. <code>Fraction</code> evaluates this lower bound exactly for the supplied binary64 coefficients and multipliers. Bounds printed as floats are rounded downward where needed. Thus a dual estimate need not have exactly zero stationarity residual to yield a valid lower bound over a finite box.</p>
+<p>Incumbent feasibility remains tolerance-based. The package does not claim a formal exact MILP solution proof. Near-integral nodes close only when the conservative lower bound and checked candidate satisfy the requested numerical gap. Unresolved node LPs stop the proof attempt instead of being discarded.</p>
+<h2>Farkas certificate</h2>
+<p>For inequalities <code>G*x &lt;= h</code>, a nonnegative z with <code>G^T*z = 0</code> and <code>h^T*z &lt; 0</code> proves infeasibility. These relations are checked exactly as rational operations on the input float values. A bounded-denominator rational reconstruction may propose integer-scaled multipliers; reconstruction itself is not proof. Only the exact checker can grant <code>INFEASIBLE_CERTIFIED</code>. Integer boxes containing no integer can also establish simple infeasibility directly.</p>
+<h2>Experimental PDHG</h2>
+<p>Using only row inequalities and projecting x to its box, the iterations are:</p>
+<p><code>y_next = max(0, y + sigma*(G*x_bar - h))</code></p>
+<p><code>x_next = clip(x - tau*(c + G^T*y_next), lower, upper)</code></p>
+<p><code>x_bar = 2*x_next - x</code>.</p>
+<p>Diagonal step sizes use inverse absolute row/column sums with a 0.99 safety factor. The unscaled alternative uses a bound on the spectral norm from maximum row and column sums. A periodic average restart is available. This is a modest PDHG implementation, not a full reproduction of PDLP adaptive heuristics or the research paper&#39;s convergence engineering.</p>
+<p>CPU SpMV uses the original CSR structure with NumPy accumulation. CUDA SpMV uses the supplied <code>RawKernel</code> source. CuPy supplies device allocation, kernel compilation and vector operations. CPU verification is included in end-to-end timing. Final bound multipliers are reconstructed from box activity before KKT checks.</p>
+<h2>Numerical trust semantics</h2>
+<ul>
+<li><code>OPTIMAL_VERIFIED</code>: numerical LP/QP KKT checks passed, or a checked MILP incumbent closed the finite tree within the reported gap.</li>
+<li><code>INFEASIBLE_CERTIFIED</code>: exact Farkas proof, elementary integer-box proof, or a tree whose leaves were safely resolved as infeasible.</li>
+<li><code>LIMIT_REACHED</code>: budget ended; a feasible candidate may or may not be present.</li>
+<li><code>NUMERICAL_FAILURE</code>: a trustworthy conclusion could not be established.</li>
+<li><code>INVALID_MODEL</code>: CLI rejected an input or unsupported feature.</li>
+</ul>
+<p>LP iteration exhaustion currently returns <code>NUMERICAL_FAILURE</code> with an explicit iteration-limit message. QP, PDHG, MILP and external worker deadlines return <code>LIMIT_REACHED</code>.</p>
+<p>The primal metric is <code>max_i max(G_i*x-h_i,0)/(1+abs(h_i)+abs(G_i)*abs(x))</code>. The checker also prints the largest absolute violation. Stationarity is normalized componentwise by <code>1+abs(gradient)+abs(G^T)*abs(z)</code>. Complementarity and the aggregate relative duality gap are checked separately. Integrality is an absolute distance to the nearest integer.</p>
+<p>A residual tolerance of 1e-7 is a numerical criterion, not a percentage accuracy, guaranteed digit count, or theorem covering all ill-conditioned data. Scale units sensibly, inspect absolute violations, and use validation cases relevant to the application.</p>
+</article><article id="chapter3"><h1>Model format and refinery interpretation</h1>
+<h2>Native JSON</h2>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;Small production LP&quot;,
+  &quot;names&quot;: [&quot;product_a&quot;, &quot;product_b&quot;],
+  &quot;c&quot;: [-3, -2],
+  &quot;A&quot;: [[1, 1]],
+  &quot;row_lower&quot;: [null],
+  &quot;row_upper&quot;: [4],
+  &quot;lower&quot;: [0, 0],
+  &quot;upper&quot;: [3, 3],
+  &quot;integer&quot;: []
+}
+</code></pre>
+<p>All models minimize. Negate profit coefficients to maximize profit, and explain the sign when reporting it. Each A row has exactly n columns. <code>null</code> is permitted in row bounds only: it means no lower or no upper row side, respectively. Every variable needs finite bounds. Do not add an arbitrary big-M merely to make a model accepted: that changes the problem.</p>
+<p>Optional Q uses the convention <code>0.5*x^T*Q*x</code>. The full symmetric matrix must be provided, not just one triangle. Optional <code>integer</code> contains zero-based variable indices. Bounds <code>[0,1]</code> plus an integer index define a binary variable. Variable names are display labels. The API supports Python <code>Model</code> objects with validation and JSON/MPS file loading.</p>
+<h2>Supported MPS subset</h2>
+<p>The parser accepts explicit free-format <code>NAME</code>, <code>ROWS</code>, <code>COLUMNS</code>, <code>RHS</code>, <code>BOUNDS</code>, <code>ENDATA</code>, and <code>OBJSENSE MIN</code>. Row types are N/L/G/E. Supported bounds are LO/UP/FX/BV/LI/UI. INTORG/INTEND markers are handled. Repeated column coefficients are added. There must be a single objective, RHS set and bound set. Nonzero objective offsets, infinite variable bounds, multiple N rows, RANGES, SOS, quadratic MPS sections, fixed-format continuation shorthand and unrecognized dialects are not supported.</p>
+<p>This is not a full Netlib/MIPLIB parser. Rejection is safer than silently interpreting an unsupported file. QPLIB input is not implemented; use the native QP format for this release.</p>
+<h2>Refinery family</h2>
+<p>The examples are deliberately small, synthetic blending models, inspired by refinery planning rather than calibrated to MRPL operations. Two feed types serve two product specifications. All volumes use a common arbitrary volume unit; costs use arbitrary cost units per volume. Sulfur is a linear weighted quality attribute.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>low_to_premium</code></td>
+<td>Low-sulfur feed allocated to premium product</td>
+</tr>
+<tr>
+<td><code>high_to_premium</code></td>
+<td>High-sulfur feed allocated to premium product</td>
+</tr>
+<tr>
+<td><code>low_to_regular</code></td>
+<td>Low-sulfur feed allocated to regular product</td>
+</tr>
+<tr>
+<td><code>high_to_regular</code></td>
+<td>High-sulfur feed allocated to regular product</td>
+</tr>
+<tr>
+<td><code>high_feed_enabled</code></td>
+<td>MILP only: whether high-sulfur feed supply is activated</td>
+</tr>
+</tbody></table>
+<p>Premium demand is 60; regular demand is 50. Low-sulfur supply is capped at 85 and high-sulfur at 100. Feed costs are 52 and 34. Low-feed sulfur is 0.5 and high-feed sulfur is 2.5, using consistent quality units. Premium sulfur limit is 1.0, giving <code>-0.5*x_low + 1.5*x_high &lt;= 0</code>. Regular limit is 1.8, giving <code>-1.3*x_low + 0.7*x_high &lt;= 0</code>.</p>
+<p>The LP optimum uses <code>[45,15,17.5,32.5]</code>. Low feed totals 62.5; high feed totals 47.5. Therefore <code>52*62.5 + 34*47.5 = 4865</code>.</p>
+<p>The MILP adds <code>high_to_premium + high_to_regular &lt;= 100*high_feed_enabled</code> and a fixed activation cost of 120. The binary solution activates supply, giving <code>4865+120 = 4985</code>. The number 100 is the actual declared high-feed capacity, not an invented unbounded big-M. Low-feed capacity 85 means that completely disabling high feed cannot meet total demand 110.</p>
+<p>The QP adds a diagonal <code>Q=0.08*I</code>. At the LP allocation its penalty is <code>0.04*(45²+15²+17.5²+32.5²)=144.5</code>, giving 5009.5. The included KKT check establishes the numerical QP result rather than relying on this evaluation alone.</p>
+<h2>Real data needed next</h2>
+<p>Before industrial claims, obtain authorized feed specifications, product demands, unit capacities, compatibility constraints, inventory balances, blending equations, operating costs, units and time horizon from the problem owner or a cited public case. Preserve source provenance and anonymize confidential data before sharing. Actual nonlinear pooling cannot be validated with this linear blending model.</p>
+<p>For time-indexed planning, create variables per feed/product/period, inventory equations across periods and physically justified bounds. First verify a one-period hand-solvable instance, then expand dimensions and measure memory/runtime. Expanding the data generator alone does not establish solver scalability.</p>
+</article><article id="chapter4"><h1>Implementation plan from runnable prototype to research submission</h1>
+<p>The runnable code covers an early reference milestone. The attached PDF describes a much larger solver engineering project. Do not mark its entire competition-critical list completed simply because this demo runs. Work in the following dependency order, and keep the reference solver available for differential tests.</p>
+<h2>Gate 0 — Establish a reproducible starting point</h2>
+<p><strong>Do now:</strong> follow the setup guide, run all tests, solve each example, and retain the result JSON files. Initialize your own Git repository only after reviewing the package, commit the baseline, and record the commit hash in future benchmark metadata. Keep generated virtual environments and proprietary datasets out of Git.</p>
+<p><strong>Pass:</strong> all 17 tests pass on the development machine; example hashes and outcomes match; no solver import brings in HiGHS/SCIP/CBC/cuOpt; the editor can run the server and CLI.</p>
+<h2>Gate 1 — Broaden mathematical coverage</h2>
+<p><strong>Next tasks:</strong> add model support for free variables and one-sided infinite bounds using reversible transformations. Add full fixed/free MPS parsing, objective offsets and RANGES with parser fixtures. Implement a QPLIB parser only for continuous convex QP with linear constraints. Reject all other QPLIB classes.</p>
+<p><strong>Files:</strong> extend <code>model.py</code>, <code>mps.py</code>, add <code>transforms.py</code>, <code>qplib.py</code>, parser fixture directories and round-trip tests.</p>
+<p><strong>Pass:</strong> solve tiny analytical examples for every transformation; verify recovered primal and dual solutions against the original model; prove unsupported inputs are rejected. Do not remove current finite-bound restrictions before the relevant algorithms and safe-bound logic handle infinity correctly.</p>
+<h2>Gate 2 — Build real sparse numerical infrastructure</h2>
+<p><strong>Tasks:</strong> introduce CSR/CSC canonical storage without dense materialization. Implement sparse LU with threshold/Markowitz pivoting; test FTRAN/BTRAN, singular detection and iterative refinement. Add product-form eta updates and refactorization triggers. Keep full refactorization as a trusted fallback.</p>
+<p><strong>Files:</strong> add <code>sparse_matrix</code>, <code>sparse_lu</code>, <code>basis</code>, and a focused numerical test suite. A C++17 or Rust core becomes appropriate when performance profiling justifies the rewrite; this Python release has no C ABI.</p>
+<p><strong>Pass:</strong> residual checks across sparse matrices with row permutations, near-singular pivots and controlled scaling; measured memory remains proportional to sparse factors rather than a dense basis; randomized comparisons against the reference algebra occur outside the sovereign optimization boundary when using external libraries.</p>
+<h2>Gate 3 — Implement robust dual simplex</h2>
+<p><strong>Tasks:</strong> bounded-variable revised dual simplex, dual Phase I, Devex pricing, two-pass Harris ratio tests, bound flips, degeneracy handling and numerical recovery. Add warm-startable basis objects. Do not rename the existing primal method to satisfy the roadmap.</p>
+<p><strong>Pass:</strong> primal/dual objective agreement and original-model residual checks on a frozen small LP suite; warm starts yield the same answer as cold starts; failure paths preserve honest statuses.</p>
+<h2>Gate 4 — Add reversible presolve and scaling</h2>
+<p><strong>Tasks:</strong> fixed-variable elimination, empty rows, singleton rows, safe bound tightening and explicit transformations. Keep a postsolve stack restoring variables and multipliers in reverse order. Add column scaling only with correct objective/Q/bound transformations.</p>
+<p><strong>Pass:</strong> every reduction has primal/dual recovery tests; scaling and presolve on/off agree on objectives; original-model checks pass, including when presolve proves infeasibility. The current release has only row scaling and variable shifting.</p>
+<h2>Gate 5 — Improve MILP without weakening bounds</h2>
+<p><strong>Tasks:</strong> reuse dual-simplex bases, pseudocost branching, limited strong-branching initialization, rounding/repair/diving heuristics and a checked tree log. Replace expensive Fraction loops with rigorously outward-rounded interval bounds only after validating them against the rational reference.</p>
+<p><strong>Pass:</strong> exhaustive small integer cases; valid lower bounds for arbitrary dual estimates; interruption preserves all unresolved nodes; incumbent rounding never implies optimality by itself. Add a replayable proof artifact if you want to claim independently reproducible tree certification.</p>
+<h2>Gate 6 — Harden convex QP</h2>
+<p><strong>Tasks:</strong> sparse augmented KKT systems, regularization safeguards and inertia/convexity handling; robust equality elimination; infeasibility mechanisms. Validate more than diagonal Q matrices, including PSD matrices with rank deficiency and near-dependent equalities.</p>
+<p><strong>Pass:</strong> original KKT residuals and reference objectives on a frozen supported QPLIB subset, with unsupported/nonconvex problems separately counted. Do not turn a small negative eigenvalue into a PSD claim merely by using a loose tolerance.</p>
+<h2>Gate 7 — Validate actual GPU execution</h2>
+<p><strong>Tasks:</strong> run the included CUDA CSR kernels on an NVIDIA machine; check CPU/GPU SpMV elementwise and final residuals; add device/memory/error handling. Move canonical input to sparse storage. Improve restart policies, step adaptation and dispatch only after profiling.</p>
+<p><strong>Pass:</strong> identical input hashes, comparable accepted accuracy, cold/warm timing separation, CPU verification and transfer costs included, repeated medians, and failure records. Only then state a measured speedup on the tested suite. A small GPU slowdown is an acceptable observation.</p>
+<h2>Gate 8 — Introduce cuts cautiously</h2>
+<p><strong>Tasks:</strong> GMI/MIR generation, coefficient-growth filters, exact/interval validity checks and provenance per cut. Retain a cut-free baseline.</p>
+<p><strong>Pass:</strong> no valid integer points removed in exhaustive small tests; no false infeasibility or improved-but-invalid optimum; cut-on/off comparisons and numerical safeguards recorded. Cuts are absent from this release.</p>
+<h2>Gate 9 — Freeze benchmark evidence</h2>
+<p><strong>Tasks:</strong> record instance hashes and official provenance, supported feature filter, reference solution versions, seeds, time limits, machine, compiler/Python, dependency versions, solver commit, thread counts and all failures. Split development/held-out problems before tuning. Compare with an external baseline at matched accuracy.</p>
+<p><strong>Pass:</strong> a judge can reproduce results from source and manifest. Do not promise 95% Netlib success, 2× GPU acceleration or million-variable solves until measured.</p>
+<h2>Gate 10 — Deliver the competition story</h2>
+<p><strong>Tasks:</strong> connect the verified core to a realistic cited refinery model family; keep the UI secondary; package an offline CLI, API, model provenance, audit records and a concise demo video. Show a valid solve, an infeasible model, an integer gap and a numerical stress case.</p>
+<p><strong>Pass:</strong> every slide claim maps to source code or a saved experiment. Clearly separate implemented, tested on hardware, and planned features.</p>
+<h2>Suggested sixteen-week sequence</h2>
+<table>
+<thead>
+<tr>
+<th>Weeks</th>
+<th>Focus</th>
+<th>Review evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1–2</td>
+<td>Reproducible reference, canonical model and parsers</td>
+<td>Fixtures and original-model verifier</td>
+</tr>
+<tr>
+<td>3–4</td>
+<td>Sparse algebra and basis updates</td>
+<td>Linear-system residual and memory tests</td>
+</tr>
+<tr>
+<td>5–6</td>
+<td>Dual simplex and numerical recovery</td>
+<td>Frozen LP correctness suite</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Presolve/postsolve and scaling</td>
+<td>Transformation round trips and ablations</td>
+</tr>
+<tr>
+<td>8–9</td>
+<td>MILP warm starts, branching, heuristics</td>
+<td>Exhaustive small problems and valid bounds</td>
+</tr>
+<tr>
+<td>10</td>
+<td>QP hardening</td>
+<td>Supported convex-QP suite</td>
+</tr>
+<tr>
+<td>11–12</td>
+<td>GPU sparse PDHG and dispatch</td>
+<td>Hardware-tested end-to-end comparisons</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Safe cuts if prior gates pass</td>
+<td>Validity checks and cut ablation</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Refinery case and API</td>
+<td>Provenance and industrial-model review</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Frozen public benchmarks</td>
+<td>Complete results including failures</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Hardening, packaging, demo</td>
+<td>Reproduction on a second machine</td>
+</tr>
+</tbody></table>
+<p>This is an engineering schedule, not a guarantee. If time is short, demonstrate the tested subset and remove feature claims; do not remove verification to preserve them.</p>
+</article><article id="chapter5"><h1>GPU validation and deployment</h1>
+<h2>Mac development</h2>
+<p>Run CPU LP/MILP/QP and CPU PDHG on the Mac. The included device backend is CUDA, which requires a compatible NVIDIA GPU/runtime. It is not a Metal/MPS implementation and will not accelerate on an Apple Silicon GPU. Do not install CUDA wheels on the Mac hoping they will use Apple graphics.</p>
+<h2>NVIDIA Linux experiment</h2>
+<p>Use an institution workstation or a GPU host you already have permission to use. This package does not rent hardware or create accounts. Before installing packages, confirm the machine has a supported NVIDIA driver and CUDA setup following NVIDIA&#39;s official Linux installation guide.</p>
+<pre><code class="language-bash">nvidia-smi
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+</code></pre>
+<p>Install the CuPy build matching the available CUDA family, as documented at <a href="https://docs.cupy.dev/en/stable/install.html">https://docs.cupy.dev/en/stable/install.html</a>. For an appropriately configured CUDA 12.x environment, the wheel family is:</p>
+<pre><code class="language-bash">python -m pip install cupy-cuda12x
+python -c &quot;import cupy; print(cupy.__version__); print(cupy.cuda.runtime.getDeviceCount())&quot;
+</code></pre>
+<p>Do not install several CuPy wheel variants together. The optional GPU dependency is not pinned in the CPU requirements because the correct binary package depends on the machine. Record the resolved version and CUDA/driver versions in your experiment. This package&#39;s CUDA path was not executed on delivery hardware and may require compatibility fixes.</p>
+<pre><code class="language-bash">python -m sovopt examples/refinery_lp.json --backend pdhg-cuda --output reports/cuda_lp.json
+python scripts/compare_gpu.py examples/refinery_lp.json
+python -m pip freeze &gt; reports/gpu_environment.txt
+nvidia-smi &gt; reports/nvidia_smi.txt
+</code></pre>
+<p><code>compare_gpu.py</code> executes both CPU and CUDA PDHG: one cold result and five repeat results per backend. It only computes a speedup if every run passes its numerical gate. The measured total includes setup, transfers, synchronization and CPU verification; it is not a kernel-only time. A small example will likely be overhead-dominated. The script is a hardware gate, not evidence of large-scale speedup.</p>
+<p>The current dense input/caps prevent a serious million-variable GPU benchmark. Implement sparse input and scaling gates in the development plan first. No GPU result or acceleration number is pre-populated in this delivery.</p>
+<h2>Local network demonstration</h2>
+<p>Default host is <code>127.0.0.1</code>, so only the same computer can connect. For a trusted local network:</p>
+<pre><code class="language-bash">python server.py --host 0.0.0.0 --port 8000
+</code></pre>
+<p>Open the host computer&#39;s local-network IP address with port 8000 from another machine on that network. Your firewall/network must permit this. This does not create a public internet URL.</p>
+<h2>Container deployment</h2>
+<p>Docker is optional. If installed:</p>
+<pre><code class="language-bash">docker build -t sovopt-demo .
+docker run --rm -p 8000:8000 sovopt-demo
+</code></pre>
+<p>Open <code>http://127.0.0.1:8000</code>. The container includes a CPU runtime, not a CUDA stack. Port configuration is read from the <code>PORT</code> environment variable. No source or image has been published on your behalf.</p>
+<p>To obtain a public link later, deploy this Dockerfile to a container host supporting a persistent HTTP process, port environment variable and sufficient worker memory. Use <code>/health</code> as the health-check path. Provider plans and interfaces change, so follow that provider&#39;s current container-deployment documentation rather than assuming a particular free tier exists.</p>
+<p>Before sharing a public endpoint, add TLS and authentication/rate limits at the proxy, enforce process/container memory and CPU limits, and keep the demo&#39;s request-size, model-size and timeout restrictions. The Python standard-library server is a local prototype service, not a production web stack. It has two worker slots, 200 KB requests, a 30-variable/80-row web cap, a 35-second subprocess deadline, same-origin checks and no file-upload/path-execution API. These restrictions reduce accidental resource use but do not replace production isolation. There is no server-side user-account system, database or persistent experiment store.</p>
+<h2>What to share with a judge</h2>
+<p>Share a running URL only after testing it from a second device. Also preserve the offline source ZIP and an audit JSON in case hosting fails. Never claim the local address <code>127.0.0.1</code> is a public link. Do not put confidential refinery inputs on a public demo server.</p>
+</article><article id="chapter6"><h1>Benchmarking and evidence</h1>
+<h2>Included measurements</h2>
+<p><code>reports/tests.txt</code> records the delivered test run. <code>reports/benchmark.json</code> contains repeated runs on synthetic examples, including scaling on/off and external LP/MILP comparisons. These are not Netlib/MIPLIB/QPLIB performance results. Timing values depend on the Linux delivery environment and are not predictions for your Mac.</p>
+<p>The external worker imports SciPy/HiGHS in a separate process. The core never imports it. There is no measured commercial solver comparison, no downloaded public benchmark collection, and no measured GPU result. The convex QP is checked by constructed KKT cases and analytic demo values, not by an external QP solver in this package.</p>
+<h2>Reproduce the isolated baseline</h2>
+<p>Keep benchmark dependencies out of the core environment when reproducing:</p>
+<pre><code class="language-bash">python3 -m venv .venv-benchmark
+.venv-benchmark/bin/python -m pip install numpy==2.3.5 scipy==1.17.0
+source .venv/bin/activate
+python scripts/benchmark.py --external-python .venv-benchmark/bin/python --repeats 3
+</code></pre>
+<p>Windows equivalent uses <code>.venv-benchmark\Scripts\python.exe</code>. The adapter handles native JSON LP/MILP and uses SciPy&#39;s interface to HiGHS. Its LP/MIP solver defaults are not matched to our internal tolerances, so interpret the current comparison as an objective sanity check, not a publication-quality speed race. Before a performance claim, fix equivalent feasibility/optimality criteria, thread counts and all external options.</p>
+<p>The benchmark&#39;s solver time excludes interpreter process startup. External imports occur before its timer, but JSON loading is included there; our timing starts after model creation. This small asymmetry makes the current time columns descriptive only. A publication harness must apply consistent timing boundaries to both engines.</p>
+<h2>Freeze a manifest</h2>
+<pre><code class="language-bash">python scripts/freeze_manifest.py examples/refinery_lp.json examples/refinery_milp.json --output reports/manifest.json
+python scripts/run_manifest.py reports/manifest.json
+</code></pre>
+<p>The manifest stores hashes and relative paths. Fill in official provenance and any verified reference objective before publishing it. <code>run_manifest.py</code> refuses changed files and retains invalid/unsupported inputs and external timeouts as results. Do not remove failures from denominators after seeing them.</p>
+<p>For additional files, use the same workflow with authorized local JSON/MPS files. Standard dataset files must first be in a supported, decompressed format; the parser does not read <code>.mps.gz</code> directly. Never convert unsupported/free variables by adding arbitrary bounds solely to improve a benchmark score.</p>
+<h2>Public benchmark progression</h2>
+<ol>
+<li>Obtain documented instances from the official Netlib, MIPLIB or QPLIB repositories (links in <code>07_REFERENCES.md</code>). Respect dataset terms.</li>
+<li>Expand parser and model support before claiming suite coverage. Most industrial instances exceed this release&#39;s finite-box/dense restrictions.</li>
+<li>Define a supported-feature filter in advance. Save rejected names and reasons.</li>
+<li>Split a deterministic development and held-out subset before tuning.</li>
+<li>Record source URLs, download/freeze date, file hash, reference solution provenance, dimensions/nonzeros, model type, tolerances, solver commit, machine and memory limits.</li>
+<li>Run every frozen case with a subprocess deadline and memory limit.</li>
+<li>Report objective error and original primal/dual residuals for LP; stationarity/complementarity for QP; incumbent, valid bound, gap and nodes for MILP.</li>
+<li>Compare at matched accepted accuracy. Use multiple repeats for short problems. Include cold versus warm device costs.</li>
+<li>Use a predefined timeout policy for summaries; report solved, failed, unsupported and timed-out counts separately. If using shifted geometric mean, publish the shift and timeout penalty.</li>
+<li>Publish largest actually solved dimensions and memory rather than intended capacity.</li>
+</ol>
+<h2>Accuracy targets</h2>
+<p>The default numerical tolerance is 1e-7. A stronger number is not automatically more accurate if the model is ill-conditioned. Test original absolute violations in physical units, normalized residuals, objective error against a reference and sensitivity to coefficient scaling. Residual verification is necessary but does not prove universal reliability.</p>
+<p>The internal test suite has 50 constructed LP optima, 25 tiny integer models exhaustively enumerated, and 20 constructed diagonal convex-QP optima, plus focused numerical and interface tests. These are valuable regression checks and too small/easy to establish industrial robustness.</p>
+<h2>Allowed presentation language</h2>
+<p>“Original reference solver passes the supplied regression suite; synthetic refinery LP and MILP objectives agree with an external HiGHS process.”</p>
+<p>“Every reported continuous optimum is checked against the original-model KKT conditions; exact rational bounds support finite-box MILP pruning.”</p>
+<p>“Experimental CUDA PDHG source is included; GPU performance validation is pending.”</p>
+<p>Do not say “99.9% accuracy,” “CPLEX replacement,” “certified exact optimality for all outputs,” “million-variable capability,” “2× faster on GPU,” “full research blueprint implemented,” or “MRPL-validated refinery model” based on this delivery.</p>
+</article><article id="chapter7"><h1>Inputs and implementation references</h1>
+<h2>User-provided inputs</h2>
+<ul>
+<li><code>description(2).docx</code>: MRPL PS 26119, indigenous GPU-accelerated optimization core, with LP/MILP/QP, numerical robustness and benchmarking requirements.</li>
+<li><code>Final Deep-Research Solution for MRPL PS 26119_ A Verified Sovereign GPU-Accelerated LP_MILP_QP Solv(1)(2).pdf</code>: architectural and sixteen-week research blueprint.</li>
+</ul>
+<p>The requirements were read from these files. Their proposed features are not evidence that those features have been implemented. Copies of the attachments are not duplicated in this source ZIP. The source mapping and hashes are in <code>reports/source_inputs.json</code>.</p>
+<h2>Primary references</h2>
+<ul>
+<li>PDHG/PDLP foundations: <a href="https://arxiv.org/abs/2106.04756">https://arxiv.org/abs/2106.04756</a></li>
+<li>Mehrotra, On the Implementation of a Primal-Dual Interior Point Method: <a href="https://doi.org/10.1137/0802028">https://doi.org/10.1137/0802028</a></li>
+<li>Koberstein, The Dual Simplex Method, Techniques for a Fast and Stable Implementation: <a href="https://digital.ub.uni-paderborn.de/hsmig/content/titleinfo/3885">https://digital.ub.uni-paderborn.de/hsmig/content/titleinfo/3885</a></li>
+<li>Neumaier and Shcherbina, Safe bounds in linear and mixed-integer linear programming: <a href="https://doi.org/10.1007/s10107-003-0433-3">https://doi.org/10.1007/s10107-003-0433-3</a></li>
+<li>Python virtual environments: <a href="https://docs.python.org/3/tutorial/venv.html">https://docs.python.org/3/tutorial/venv.html</a></li>
+<li>CuPy installation: <a href="https://docs.cupy.dev/en/stable/install.html">https://docs.cupy.dev/en/stable/install.html</a></li>
+<li>NVIDIA Linux CUDA installation: <a href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html">https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html</a></li>
+<li>Official MIPLIB downloads: <a href="https://miplib.zib.de/download.html">https://miplib.zib.de/download.html</a></li>
+<li>Official Netlib LP data: <a href="https://www.netlib.org/lp/data/">https://www.netlib.org/lp/data/</a></li>
+<li>Official QPLIB: <a href="https://qplib.zib.de/">https://qplib.zib.de/</a></li>
+</ul>
+<p>The references establish mathematical background and future work; the code is not a full reproduction of any cited industrial algorithm. The PDHG, installation and benchmark repository links were checked while preparing this package. No current commercial-solver feature or comparative superiority claim is needed for this release.</p>
+<h2>Dependency boundary</h2>
+<p>Core: Python standard library and NumPy 2.3.5. NumPy supplies arrays, vector operations and platform arithmetic; the core does not call NumPy optimization functions or linear-system solvers. Optional CUDA: CuPy/runtime, with original CSR kernel source. External benchmark: SciPy 1.17.0/HiGHS in a separate process. Web: Python standard library plus HTML/CSS/JavaScript with no CDN assets, external fonts or analytics.</p>
+<p>This is software-algorithm sovereignty at the prototype level, not independence from foreign hardware, compilers, operating systems or all numerical dependencies. Review licences and choose your own project distribution licence before publishing a repository; this ZIP does not bundle third-party dependency source or dataset archives.</p>
+</article><article id="chapter8"><h1>Instructions to paste into Antigravity</h1>
+<p>I am developing MRPL SIH PS 26119. This folder is a runnable reference prototype, not a complete industrial solver. Read README.md, docs/02_ARCHITECTURE_AND_MATH.md, docs/04_IMPLEMENTATION_PLAN.md and reports/VALIDATION.md before editing.</p>
+<p>First inspect the actual code, create the Python environment, run <code>python -m unittest discover -s tests -v</code>, run all shipped examples, and start the dashboard with <code>python server.py</code>. Report any failure with a reproducible model. Do not replace the optimizer with scipy.optimize, HiGHS, SCIP, CBC, OR-Tools, CVXPY, PuLP, Gurobi, CPLEX or cuOpt. Existing solvers may only run in isolated external benchmark processes.</p>
+<p>Preserve independent original-model verification, honest statuses, input fingerprints, exact rational bounds, and all failure records. Never fabricate accuracy, speedups, benchmark results, commercial-level scale or completed roadmap features. Do not rename primal simplex as dual simplex or label the CPU route GPU-accelerated. The refinery examples are synthetic. CUDA remains unvalidated until a real device run passes.</p>
+<p>Work on one gate at a time in docs/04_IMPLEMENTATION_PLAN.md. Before changing an algorithm, state its mathematical invariants and acceptance tests. Add tests that can detect wrong objectives, unsafe pruning, lost nodes, invalid certificates and inaccurate postsolve recovery. Keep unsupported input rejection until the whole relevant path is implemented.</p>
+<p>For the first development increment after baseline validation, propose a reversible canonical transformation design for infinite/free variable bounds and full MPS coverage, with tests. Explain how the finite-box safe-bound implementation changes when bounds become infinite. Do not simply replace infinity with a large constant.</p>
+<p>Keep the dashboard connected to real solver outputs. Do not remove verification, hardcode green badges, or prefill fake benchmark charts. Keep Python dependencies minimal and benchmark-only imports outside sovopt/. Preserve offline operation and no telemetry. At each gate report exactly what changed, what passed, remaining limitations, and which claims are now justified.</p>
+</article><article id="chapter9"><h1>Delivery validation record</h1>
+<p>The package was exercised in the delivery environment on Linux x86-64, Python 3.12.14, NumPy 2.3.5. See tests.txt for the captured test output and benchmark.json for raw repeated results.</p>
+<ul>
+<li>17 automated test methods passed.</li>
+<li>Included parameter loops: 50 LP problems with constructed optimal KKT solutions, 25 small all-integer problems checked against exhaustive enumeration, and 20 positive-diagonal convex QPs with constructed KKT solutions.</li>
+<li>Other checks: pivoted LU residuals, fixed/negative variable bounds, degenerate duplicated constraints with row scaling from 1e-8 to 1e8, exact rational bound validity, certificate rejection/acceptance, corrupted candidates, unsupported nonconvex/MIQP input, solver limits, MPS parsing, CPU PDHG, HTTP page/examples/solve and invalid-input handling.</li>
+<li>The synthetic refinery LP objective was 4865. The synthetic refinery MILP objective was 4985. An external SciPy/HiGHS process returned the same objectives.</li>
+<li>The synthetic QP objective was approximately 5009.500002 with default scaling; accepted original-model KKT residuals were recorded. Scaling off also passed, with a slightly different tolerance-level objective approximation.</li>
+<li>The contradictory-production example returned a Farkas certificate checked exactly using rational arithmetic on the binary64 input model.</li>
+<li>The frozen five-example manifest was executed, including tiny.mps with optimum -11.</li>
+</ul>
+<h2>What these checks do not establish</h2>
+<p>No CUDA device was available for this delivery, so GPU compilation, correctness and speedup remain untested. The package was not run on the user&#39;s Mac. No Netlib/MIPLIB/QPLIB performance suite, industrial MRPL dataset, million-variable problem or commercial solver was run. Docker source is supplied but no container build/deployment was executed. HTTP routes were integration-tested; cross-browser visual compatibility has not been comprehensively certified.</p>
+<p><code>OPTIMAL_VERIFIED</code> is a declared numerical tolerance result, not a formal proof of exact optimality. MILP lower bounds and accepted Farkas witnesses use exact rational checks, but primal feasibility is numerical. The final audit alone cannot replay the entire MILP tree. There is no guarantee of error-free behavior on arbitrary models.</p>
+<p>The supplied blueprint&#39;s sparse dual simplex, custom sparse LU/eta updates, general presolve/postsolve, Devex/Harris engineering, cuts, pseudocosts, basis warm starts, full MPS/QPLIB, C ABI and industrial-scale validation remain development work. See the implementation plan for their dependencies and acceptance gates.</p>
+</article></main></body></html>

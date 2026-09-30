@@ -1,0 +1,22 @@
+test_http_invalid (test_server.ServerTests.test_http_invalid) ... ok
+test_http_page_and_examples (test_server.ServerTests.test_http_page_and_examples) ... ok
+test_http_solve (test_server.ServerTests.test_http_solve) ... ok
+test_bad_candidate (test_solver.SolverTests.test_bad_candidate) ... ok
+test_box_and_fixed (test_solver.SolverTests.test_box_and_fixed) ... ok
+test_degenerate_scaled (test_solver.SolverTests.test_degenerate_scaled) ... ok
+test_fraction_bound_for_any_multiplier (test_solver.SolverTests.test_fraction_bound_for_any_multiplier) ... ok
+test_infeasible_certificate (test_solver.SolverTests.test_infeasible_certificate) ... ok
+test_known_random_lp_kkt (test_solver.SolverTests.test_known_random_lp_kkt) ... ok
+test_limits (test_solver.SolverTests.test_limits) ... ok
+test_lu_pivot_refinement (test_solver.SolverTests.test_lu_pivot_refinement) ... ok
+test_mps (test_solver.SolverTests.test_mps) ... ok
+test_nonconvex_and_miqp_rejected (test_solver.SolverTests.test_nonconvex_and_miqp_rejected) ... ok
+test_pdhg (test_solver.SolverTests.test_pdhg) ... ok
+test_random_integer_exhaustive (test_solver.SolverTests.test_random_integer_exhaustive) ... ok
+test_random_qp_known_kkt (test_solver.SolverTests.test_random_qp_known_kkt) ... ok
+test_refinery (test_solver.SolverTests.test_refinery) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.598s
+
+OK

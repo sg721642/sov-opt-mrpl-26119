@@ -1,0 +1,380 @@
+[
+  {
+    "instance": {
+      "path": "../examples/refinery_lp.json",
+      "sha256": "3b030ee41296642bb5d60766a480f0fdcbb94a3d44e0737095600bc238908935",
+      "known_objective": null,
+      "source": "fill official source URL before publication"
+    },
+    "result": {
+      "status": "OPTIMAL_VERIFIED",
+      "x": [
+        45.0,
+        15.0,
+        17.5,
+        32.5
+      ],
+      "dual": [
+        -0.0,
+        47.5,
+        -0.0,
+        40.3,
+        -0.0,
+        -0.0,
+        9.0,
+        9.0,
+        -0.0,
+        0.0,
+        -0.0,
+        0.0,
+        -0.0,
+        0.0,
+        -0.0,
+        0.0
+      ],
+      "verification": {
+        "feasible": true,
+        "objective": 4865.0,
+        "primal_residual": 0.0,
+        "absolute_primal_violation": 0.0,
+        "integrality_residual": 0.0,
+        "kkt_passed": true,
+        "precision_bits": 64,
+        "certification": "floating-point residual checks",
+        "dual_residual": 2.993248350705079e-17,
+        "dual_sign_violation": 0.0,
+        "complementarity": 4.106866922164574e-18,
+        "relative_duality_gap": 4.106866922164574e-18
+      },
+      "objective": 4865.0,
+      "iterations": 5,
+      "algorithm": "two-phase primal revised simplex",
+      "history": [
+        {
+          "iteration": 0,
+          "objective_transformed": 110.0
+        },
+        {
+          "iteration": 1,
+          "objective_transformed": 50.0
+        },
+        {
+          "iteration": 2,
+          "objective_transformed": 25.0
+        },
+        {
+          "iteration": 3,
+          "objective_transformed": 10.0
+        },
+        {
+          "iteration": 4,
+          "objective_transformed": 5270.0
+        }
+      ],
+      "model_name": "Synthetic refinery blending LP",
+      "model_sha256": "34f74dbcaaa6d784c3c632a35c63fe72f819661c04c1f44dbff46ef2b45c566a",
+      "solver_version": "0.1.0",
+      "elapsed_seconds": 0.006868702000019766,
+      "backend": "cpu",
+      "variables": 4,
+      "rows": 6,
+      "nonzeros": 12,
+      "machine": {
+        "system": "Linux",
+        "architecture": "x86_64",
+        "python": "3.12.14"
+      }
+    }
+  },
+  {
+    "instance": {
+      "path": "../examples/refinery_milp.json",
+      "sha256": "b0e54a2eeabb4efa56e5610c183120dca68af0c3e5ebe3b25c01eab195fd4423",
+      "known_objective": null,
+      "source": "fill official source URL before publication"
+    },
+    "result": {
+      "algorithm": "rational-bound branch-and-bound",
+      "nodes": 3,
+      "history": [
+        {
+          "nodes": 1,
+          "open_nodes": 2,
+          "incumbent": null,
+          "node_bound": 4921.999999999999
+        },
+        {
+          "nodes": 3,
+          "open_nodes": 0,
+          "incumbent": 4985.0,
+          "node_bound": 4984.999999999999
+        }
+      ],
+      "best_bound": 4984.999999999999,
+      "bound_kind": "exact rational Lagrangian bounds of binary64 input",
+      "open_nodes": 0,
+      "x": [
+        45.0,
+        15.0,
+        17.5,
+        32.5,
+        1.0
+      ],
+      "objective": 4985.0,
+      "verification": {
+        "feasible": true,
+        "objective": 4985.0,
+        "primal_residual": 0.0,
+        "absolute_primal_violation": 0.0,
+        "integrality_residual": 0.0,
+        "kkt_passed": false,
+        "precision_bits": 64,
+        "certification": "floating-point residual checks",
+        "optimality_basis": "finite B&B tree and rational lower bounds; feasibility is numerical"
+      },
+      "relative_gap": 2.8501513668676304e-17,
+      "status": "OPTIMAL_VERIFIED",
+      "model_name": "Synthetic refinery activation MILP",
+      "model_sha256": "b92c465284e3d08009178fb87e1f578a6524bfee3a1c8e23c3322e7cbc4cada1",
+      "solver_version": "0.1.0",
+      "elapsed_seconds": 0.016507862000025852,
+      "backend": "cpu",
+      "variables": 5,
+      "rows": 7,
+      "nonzeros": 15,
+      "machine": {
+        "system": "Linux",
+        "architecture": "x86_64",
+        "python": "3.12.14"
+      }
+    }
+  },
+  {
+    "instance": {
+      "path": "../examples/refinery_qp.json",
+      "sha256": "da2267c10721020f4a9558d8e1a2749347fc6865804efa75bfeb0e58bf2b8176",
+      "known_objective": null,
+      "source": "fill official source URL before publication"
+    },
+    "result": {
+      "status": "OPTIMAL_VERIFIED",
+      "algorithm": "primal-dual predictor-corrector QP",
+      "x": [
+        44.9999999968695,
+        15.000000036300365,
+        17.500000019477117,
+        32.500000003375725
+      ],
+      "dual": [
+        6.815888423899967,
+        57.31588844930227,
+        5.801914325551439,
+        48.28191428284314,
+        4.165373661315429e-08,
+        9.675056702622118e-09,
+        10.200000026812637,
+        8.400000027006783,
+        9.891641341246031e-09,
+        1.0144593394969764e-08,
+        5.555184343682617e-09,
+        3.35877804454556e-08,
+        4.814917726733249e-09,
+        4.269162117164998e-08,
+        5.621886402377687e-09,
+        8.953017399753019e-08
+      ],
+      "objective": 5009.500002267347,
+      "verification": {
+        "feasible": true,
+        "objective": 5009.500002267347,
+        "primal_residual": 1.2177347618673487e-09,
+        "absolute_primal_violation": 5.60157991102983e-08,
+        "integrality_residual": 0.0,
+        "kkt_passed": true,
+        "precision_bits": 64,
+        "certification": "floating-point residual checks",
+        "dual_residual": 1.265850855097061e-10,
+        "dual_sign_violation": 0.0,
+        "complementarity": 5.807266049107378e-10,
+        "relative_duality_gap": 2.020275918659964e-09
+      },
+      "iterations": 10,
+      "history": [
+        {
+          "iteration": 0,
+          "primal_residual": 0.49504950495049505,
+          "dual_residual": 0.9090909090909091,
+          "complementarity": 32.37980769230769
+        },
+        {
+          "iteration": 1,
+          "primal_residual": 0.6559463071403214,
+          "dual_residual": 0.9041012588982758,
+          "complementarity": 36.00677278904852
+        },
+        {
+          "iteration": 2,
+          "primal_residual": 0.38751700116756227,
+          "dual_residual": 0.8129561720582685,
+          "complementarity": 52.417179331023476
+        },
+        {
+          "iteration": 3,
+          "primal_residual": 0.39657292820782947,
+          "dual_residual": 0.8775936808753704,
+          "complementarity": 58.7714861533991
+        },
+        {
+          "iteration": 4,
+          "primal_residual": 0.35273281683369256,
+          "dual_residual": 0.6652148129845942,
+          "complementarity": 85.22850357444393
+        },
+        {
+          "iteration": 5,
+          "primal_residual": 0.4011484935559342,
+          "dual_residual": 0.6233535677957347,
+          "complementarity": 78.4718029574522
+        },
+        {
+          "iteration": 6,
+          "primal_residual": 0.010714481103068892,
+          "dual_residual": 0.18202458575093491,
+          "complementarity": 75.20483142154428
+        },
+        {
+          "iteration": 7,
+          "primal_residual": 0.016130086101272194,
+          "dual_residual": 0.000979013933832776,
+          "complementarity": 7.400914718998168
+        },
+        {
+          "iteration": 8,
+          "primal_residual": 4.870819022025063e-05,
+          "dual_residual": 5.101355043799321e-06,
+          "complementarity": 0.038986685745240085
+        },
+        {
+          "iteration": 9,
+          "primal_residual": 2.435468875397707e-07,
+          "dual_residual": 2.550677845993315e-08,
+          "complementarity": 0.00019492890606927292
+        }
+      ],
+      "model_name": "Synthetic refinery smooth blending QP",
+      "model_sha256": "08dd20698652a8b505e7241b5604270e18db5d8730581eef347f346de420bc28",
+      "solver_version": "0.1.0",
+      "elapsed_seconds": 0.006195654999942235,
+      "backend": "cpu",
+      "variables": 4,
+      "rows": 6,
+      "nonzeros": 12,
+      "machine": {
+        "system": "Linux",
+        "architecture": "x86_64",
+        "python": "3.12.14"
+      }
+    }
+  },
+  {
+    "instance": {
+      "path": "../examples/infeasible.json",
+      "sha256": "6dc01928b021dfc0af3bac4506bd5bf8cbce7ac537ec495ae0478a971ace9b01",
+      "known_objective": null,
+      "source": "fill official source URL before publication"
+    },
+    "result": {
+      "status": "INFEASIBLE_CERTIFIED",
+      "message": "Phase I infeasibility; exact binary-rational certificate passed",
+      "certificate": [
+        1.0,
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "algorithm": "two-phase primal revised simplex",
+      "iterations": 1,
+      "history": [
+        {
+          "iteration": 0,
+          "objective_transformed": 8.0
+        }
+      ],
+      "model_name": "Contradictory production requirements",
+      "model_sha256": "ab2f39669ca5de57675104d3bac98cd514f2f00315265313d02f53b59897fb50",
+      "solver_version": "0.1.0",
+      "elapsed_seconds": 0.0024484200000642886,
+      "backend": "cpu",
+      "variables": 1,
+      "rows": 2,
+      "nonzeros": 2,
+      "machine": {
+        "system": "Linux",
+        "architecture": "x86_64",
+        "python": "3.12.14"
+      }
+    }
+  },
+  {
+    "instance": {
+      "path": "../examples/tiny.mps",
+      "sha256": "98aca9c16622a59ded391364db1ab3be9e7b3d13c8438534acf7cc25c4237501",
+      "known_objective": null,
+      "source": "fill official source URL before publication"
+    },
+    "result": {
+      "status": "OPTIMAL_VERIFIED",
+      "x": [
+        3.0,
+        1.0
+      ],
+      "dual": [
+        2.0,
+        1.0,
+        0.0,
+        -0.0,
+        0.0
+      ],
+      "verification": {
+        "feasible": true,
+        "objective": -11.0,
+        "primal_residual": 0.0,
+        "absolute_primal_violation": 0.0,
+        "integrality_residual": 0.0,
+        "kkt_passed": true,
+        "precision_bits": 64,
+        "certification": "floating-point residual checks",
+        "dual_residual": 0.0,
+        "dual_sign_violation": 0.0,
+        "complementarity": 0.0,
+        "relative_duality_gap": 0.0
+      },
+      "objective": -11.0,
+      "iterations": 2,
+      "algorithm": "two-phase primal revised simplex",
+      "history": [
+        {
+          "iteration": 0,
+          "objective_transformed": 0.0
+        },
+        {
+          "iteration": 1,
+          "objective_transformed": -9.0
+        }
+      ],
+      "model_name": "TINY",
+      "model_sha256": "cd414a571e2e86104e90ca23edeecb374ac9e8f9c032745f470d779f67592482",
+      "solver_version": "0.1.0",
+      "elapsed_seconds": 0.0027503370000658833,
+      "backend": "cpu",
+      "variables": 2,
+      "rows": 1,
+      "nonzeros": 2,
+      "machine": {
+        "system": "Linux",
+        "architecture": "x86_64",
+        "python": "3.12.14"
+      }
+    }
+  }
+]

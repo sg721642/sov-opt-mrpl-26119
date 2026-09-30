@@ -1,0 +1,35 @@
+{
+  "seed": 26119,
+  "instances": [
+    {
+      "path": "../examples/refinery_lp.json",
+      "sha256": "3b030ee41296642bb5d60766a480f0fdcbb94a3d44e0737095600bc238908935",
+      "known_objective": null,
+      "source": "fill official source URL before publication"
+    },
+    {
+      "path": "../examples/refinery_milp.json",
+      "sha256": "b0e54a2eeabb4efa56e5610c183120dca68af0c3e5ebe3b25c01eab195fd4423",
+      "known_objective": null,
+      "source": "fill official source URL before publication"
+    },
+    {
+      "path": "../examples/refinery_qp.json",
+      "sha256": "da2267c10721020f4a9558d8e1a2749347fc6865804efa75bfeb0e58bf2b8176",
+      "known_objective": null,
+      "source": "fill official source URL before publication"
+    },
+    {
+      "path": "../examples/infeasible.json",
+      "sha256": "6dc01928b021dfc0af3bac4506bd5bf8cbce7ac537ec495ae0478a971ace9b01",
+      "known_objective": null,
+      "source": "fill official source URL before publication"
+    },
+    {
+      "path": "../examples/tiny.mps",
+      "sha256": "98aca9c16622a59ded391364db1ab3be9e7b3d13c8438534acf7cc25c4237501",
+      "known_objective": null,
+      "source": "fill official source URL before publication"
+    }
+  ]
+}
