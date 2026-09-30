@@ -1,415 +1,388 @@
 {
-  "instance": "afiro",
-  "model_name": "AFIRO",
-  "metadata": {
-    "name": "AFIRO",
-    "class": "LP",
-    "category": "Documented application benchmark",
-    "domain": "Industrial production & resource allocation (Stanford SOL / Michael Saunders)",
-    "source_url": "https://www.netlib.org/lp/data/",
-    "file_url": "https://www.netlib.org/lp/data/afiro",
-    "retrieval_date": "2026-10-01",
-    "mps_file": "data/verified/afiro.mps",
-    "json_file": "examples/afiro.json",
-    "objective_sense": "MINIMIZE",
-    "objective_offset": 0.0,
-    "reference_objective": -464.75314285714285,
-    "reference_source": "Netlib LP / MINOS 5.3",
-    "total_mps_nonzeros": 88,
-    "expected_status": "OPTIMAL_VERIFIED",
-    "sha256": "fd3562804ff19382a9cd8bcb22ec81bffd24a4143a2290783831d8c64516a24b",
-    "variables": 32,
-    "constraints": 27,
-    "integers": 0,
-    "matrix_nonzeros": 83
-  },
-  "result": {
-    "status": "OPTIMAL_VERIFIED",
-    "x": [
-      80.0,
-      25.5,
-      54.5,
-      84.79999999999998,
-      80.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      18.214285714285715,
-      61.785714285714285,
-      84.80000000000007,
-      500.0,
-      475.92,
-      24.08,
-      -1.4210854715202004e-14,
-      215.0,
-      359.8628571428572,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      339.9428571428572,
-      24.08,
-      154.7410285714286,
-      0.0
-    ],
-    "dual": [
-      0.6285714285714286,
-      0.0,
-      0.0,
-      0.0,
-      0.34477142857142856,
-      0.2285714285714286,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      2.249657142857143,
-      0.0,
-      2.2901999999999996,
-      0.9428571428571427,
-      0.0,
-      0.0,
-      0.0,
-      0.874342857142857,
-      0.34285714285714286,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.9428571428571427,
-      0.6285714285714286,
-      0.0,
-      0.9428571428571428,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      2.249657142857143,
-      0.0,
-      2.2901999999999996,
-      2.228914285714285,
-      0.0,
-      2.2703999999999995,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      2.0657999999999994,
-      2.0921999999999996,
-      2.120485714285714,
-      2.148771428571428,
-      0.0,
-      0.0,
-      0.0,
-      10.0
-    ],
-    "verification": {
-      "feasible": true,
-      "objective": -464.75314285714285,
-      "primal_residual": 1.4210854715201802e-14,
-      "absolute_primal_violation": 5.684341886080802e-14,
-      "integrality_residual": 0.0,
-      "kkt_passed": true,
-      "precision_bits": 53,
-      "certification": "floating-point residual checks",
-      "dual_residual": 1.7193502857276608e-17,
-      "dual_sign_violation": 0.0,
-      "complementarity": 1.483934128975387e-17,
-      "relative_duality_gap": 3.1327315586825374e-17
-    },
+  "status": "OPTIMAL_VERIFIED",
+  "x": [
+    80.0,
+    25.5,
+    54.5,
+    84.79999999999998,
+    80.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    18.214285714285715,
+    61.785714285714285,
+    84.80000000000007,
+    500.0,
+    475.92,
+    24.08,
+    -1.4210854715202004e-14,
+    215.0,
+    359.8628571428572,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    339.9428571428572,
+    24.08,
+    154.7410285714286,
+    0.0
+  ],
+  "dual": [
+    0.6285714285714286,
+    0.0,
+    0.0,
+    0.0,
+    0.34477142857142856,
+    0.2285714285714286,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    2.249657142857143,
+    0.0,
+    2.2901999999999996,
+    0.9428571428571427,
+    0.0,
+    0.0,
+    0.0,
+    0.874342857142857,
+    0.34285714285714286,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.9428571428571427,
+    0.6285714285714286,
+    0.0,
+    0.9428571428571428,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    2.249657142857143,
+    0.0,
+    2.2901999999999996,
+    2.228914285714285,
+    0.0,
+    2.2703999999999995,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    2.0657999999999994,
+    2.0921999999999996,
+    2.120485714285714,
+    2.148771428571428,
+    0.0,
+    0.0,
+    0.0,
+    10.0
+  ],
+  "verification": {
+    "feasible": true,
     "objective": -464.75314285714285,
-    "iterations": 55,
-    "basis": [
-      13,
-      3,
-      12,
-      14,
-      2,
-      19,
-      30,
-      18,
-      15,
-      11,
-      46,
-      17,
-      6,
-      20,
-      16,
-      28,
-      40,
-      41,
-      42,
-      29,
-      9,
-      1,
-      43,
-      0,
-      4,
-      49,
-      50
-    ],
-    "algorithm": "two-phase primal revised simplex",
-    "history": [
-      {
-        "iteration": 0,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 1,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 2,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 3,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 4,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 5,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 6,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 7,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 8,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 9,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 10,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 11,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 12,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 13,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 14,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 15,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 16,
-        "objective_transformed": 1814.0
-      },
-      {
-        "iteration": 17,
-        "objective_transformed": 1712.8496800000003
-      },
-      {
-        "iteration": 18,
-        "objective_transformed": 1585.6324825030879
-      },
-      {
-        "iteration": 19,
-        "objective_transformed": 1155.6324825030877
-      },
-      {
-        "iteration": 20,
-        "objective_transformed": 1155.6324825030877
-      },
-      {
-        "iteration": 21,
-        "objective_transformed": 1155.6324825030877
-      },
-      {
-        "iteration": 22,
-        "objective_transformed": 1155.6324825030877
-      },
-      {
-        "iteration": 23,
-        "objective_transformed": 1155.6324825030877
-      },
-      {
-        "iteration": 24,
-        "objective_transformed": 1155.6324825030877
-      },
-      {
-        "iteration": 25,
-        "objective_transformed": 1155.6324825030877
-      },
-      {
-        "iteration": 26,
-        "objective_transformed": 1087.128553931659
-      },
-      {
-        "iteration": 27,
-        "objective_transformed": 1018.9795398278898
-      },
-      {
-        "iteration": 28,
-        "objective_transformed": 1018.9795398278898
-      },
-      {
-        "iteration": 29,
-        "objective_transformed": 1018.9795398278898
-      },
-      {
-        "iteration": 30,
-        "objective_transformed": 561.5290053768758
-      },
-      {
-        "iteration": 31,
-        "objective_transformed": 246.3924146395205
-      },
-      {
-        "iteration": 32,
-        "objective_transformed": 224.54843104028492
-      },
-      {
-        "iteration": 33,
-        "objective_transformed": 224.54843104028492
-      },
-      {
-        "iteration": 34,
-        "objective_transformed": 224.54843104028492
-      },
-      {
-        "iteration": 35,
-        "objective_transformed": 224.54843104028492
-      },
-      {
-        "iteration": 36,
-        "objective_transformed": 224.54843104028492
-      },
-      {
-        "iteration": 37,
-        "objective_transformed": 224.54843104028492
-      },
-      {
-        "iteration": 38,
-        "objective_transformed": 224.54843104028492
-      },
-      {
-        "iteration": 39,
-        "objective_transformed": 90.986327246512
-      },
-      {
-        "iteration": 40,
-        "objective_transformed": 90.986327246512
-      },
-      {
-        "iteration": 41,
-        "objective_transformed": 90.986327246512
-      },
-      {
-        "iteration": 42,
-        "objective_transformed": 90.986327246512
-      },
-      {
-        "iteration": 43,
-        "objective_transformed": 90.986327246512
-      },
-      {
-        "iteration": 44,
-        "objective_transformed": 70.6589714285714
-      },
-      {
-        "iteration": 45,
-        "objective_transformed": 70.6589714285714
-      },
-      {
-        "iteration": 46,
-        "objective_transformed": 70.6589714285714
-      },
-      {
-        "iteration": 47,
-        "objective_transformed": 70.6589714285714
-      },
-      {
-        "iteration": 48,
-        "objective_transformed": 33.67296618079983
-      },
-      {
-        "iteration": 49,
-        "objective_transformed": 23.472966180799816
-      },
-      {
-        "iteration": 50,
-        "objective_transformed": 20.55201048323394
-      },
-      {
-        "iteration": 51,
-        "objective_transformed": -46.66554263660515
-      },
-      {
-        "iteration": 52,
-        "objective_transformed": -61.59925168993426
-      },
-      {
-        "iteration": 53,
-        "objective_transformed": -63.43763197669126
-      },
-      {
-        "iteration": 54,
-        "objective_transformed": -64.87060262008735
-      }
-    ],
-    "model_name": "AFIRO",
-    "model_sha256": "1f08328913d4bdf2204f2e1e6cd6e5c224f1ea237ab78f95cb5da2f74165154e",
-    "solver_version": "0.1.1",
-    "elapsed_seconds": 0.03154908400028944,
-    "backend": "cpu",
-    "variables": 32,
-    "rows": 27,
-    "nonzeros": 83,
-    "machine": {
-      "system": "Darwin",
-      "architecture": "arm64",
-      "python": "3.11.16"
-    },
-    "input_mps_sha256": "fd3562804ff19382a9cd8bcb22ec81bffd24a4143a2290783831d8c64516a24b"
+    "primal_residual": 1.4210854715201802e-14,
+    "absolute_primal_violation": 5.684341886080802e-14,
+    "integrality_residual": 0.0,
+    "kkt_passed": true,
+    "precision_bits": 53,
+    "certification": "floating-point residual checks",
+    "dual_residual": 1.7193502857276608e-17,
+    "dual_sign_violation": 0.0,
+    "complementarity": 1.483934128975387e-17,
+    "relative_duality_gap": 1.5680491272169245e-17
   },
-  "solve_timestamp": "2026-09-30T22:00:51Z"
+  "objective": -464.75314285714285,
+  "iterations": 55,
+  "basis": [
+    13,
+    3,
+    12,
+    14,
+    2,
+    19,
+    30,
+    18,
+    15,
+    11,
+    46,
+    17,
+    6,
+    20,
+    16,
+    28,
+    40,
+    41,
+    42,
+    29,
+    9,
+    1,
+    43,
+    0,
+    4,
+    49,
+    50
+  ],
+  "algorithm": "two-phase primal revised simplex",
+  "history": [
+    {
+      "iteration": 0,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 1,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 2,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 3,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 4,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 5,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 6,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 7,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 8,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 9,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 10,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 11,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 12,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 13,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 14,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 15,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 16,
+      "objective_transformed": 1814.0
+    },
+    {
+      "iteration": 17,
+      "objective_transformed": 1712.8496800000003
+    },
+    {
+      "iteration": 18,
+      "objective_transformed": 1585.6324825030879
+    },
+    {
+      "iteration": 19,
+      "objective_transformed": 1155.6324825030877
+    },
+    {
+      "iteration": 20,
+      "objective_transformed": 1155.6324825030877
+    },
+    {
+      "iteration": 21,
+      "objective_transformed": 1155.6324825030877
+    },
+    {
+      "iteration": 22,
+      "objective_transformed": 1155.6324825030877
+    },
+    {
+      "iteration": 23,
+      "objective_transformed": 1155.6324825030877
+    },
+    {
+      "iteration": 24,
+      "objective_transformed": 1155.6324825030877
+    },
+    {
+      "iteration": 25,
+      "objective_transformed": 1155.6324825030877
+    },
+    {
+      "iteration": 26,
+      "objective_transformed": 1087.128553931659
+    },
+    {
+      "iteration": 27,
+      "objective_transformed": 1018.9795398278898
+    },
+    {
+      "iteration": 28,
+      "objective_transformed": 1018.9795398278898
+    },
+    {
+      "iteration": 29,
+      "objective_transformed": 1018.9795398278898
+    },
+    {
+      "iteration": 30,
+      "objective_transformed": 561.5290053768758
+    },
+    {
+      "iteration": 31,
+      "objective_transformed": 246.3924146395205
+    },
+    {
+      "iteration": 32,
+      "objective_transformed": 224.54843104028492
+    },
+    {
+      "iteration": 33,
+      "objective_transformed": 224.54843104028492
+    },
+    {
+      "iteration": 34,
+      "objective_transformed": 224.54843104028492
+    },
+    {
+      "iteration": 35,
+      "objective_transformed": 224.54843104028492
+    },
+    {
+      "iteration": 36,
+      "objective_transformed": 224.54843104028492
+    },
+    {
+      "iteration": 37,
+      "objective_transformed": 224.54843104028492
+    },
+    {
+      "iteration": 38,
+      "objective_transformed": 224.54843104028492
+    },
+    {
+      "iteration": 39,
+      "objective_transformed": 90.986327246512
+    },
+    {
+      "iteration": 40,
+      "objective_transformed": 90.986327246512
+    },
+    {
+      "iteration": 41,
+      "objective_transformed": 90.986327246512
+    },
+    {
+      "iteration": 42,
+      "objective_transformed": 90.986327246512
+    },
+    {
+      "iteration": 43,
+      "objective_transformed": 90.986327246512
+    },
+    {
+      "iteration": 44,
+      "objective_transformed": 70.6589714285714
+    },
+    {
+      "iteration": 45,
+      "objective_transformed": 70.6589714285714
+    },
+    {
+      "iteration": 46,
+      "objective_transformed": 70.6589714285714
+    },
+    {
+      "iteration": 47,
+      "objective_transformed": 70.6589714285714
+    },
+    {
+      "iteration": 48,
+      "objective_transformed": 33.67296618079983
+    },
+    {
+      "iteration": 49,
+      "objective_transformed": 23.472966180799816
+    },
+    {
+      "iteration": 50,
+      "objective_transformed": 20.55201048323394
+    },
+    {
+      "iteration": 51,
+      "objective_transformed": -46.66554263660515
+    },
+    {
+      "iteration": 52,
+      "objective_transformed": -61.59925168993426
+    },
+    {
+      "iteration": 53,
+      "objective_transformed": -63.43763197669126
+    },
+    {
+      "iteration": 54,
+      "objective_transformed": -64.87060262008735
+    }
+  ],
+  "model_name": "AFIRO",
+  "model_sha256": "1f08328913d4bdf2204f2e1e6cd6e5c224f1ea237ab78f95cb5da2f74165154e",
+  "solver_version": "0.1.2",
+  "elapsed_seconds": 0.018117375000656466,
+  "backend": "cpu",
+  "variables": 32,
+  "rows": 27,
+  "nonzeros": 83,
+  "machine": {
+    "system": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11.16"
+  },
+  "wall_clock_seconds": 0.018134500000087428
 }

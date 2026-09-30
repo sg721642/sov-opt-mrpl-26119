@@ -193,9 +193,13 @@ def transform_model(model):
             A_le_rows.append(row_t)
             b_le_rows.append(spec['range'])
 
-    A_eq = np.array(A_eq_rows, dtype=float).reshape((-1, n_trans)) if A_eq_rows else np.zeros((0, n_trans), dtype=float)
+    if n_trans == 0:
+        A_eq = np.zeros((len(A_eq_rows), 0), dtype=float)
+        A_le = np.zeros((len(A_le_rows), 0), dtype=float)
+    else:
+        A_eq = np.array(A_eq_rows, dtype=float).reshape((len(A_eq_rows), n_trans)) if A_eq_rows else np.zeros((0, n_trans), dtype=float)
+        A_le = np.array(A_le_rows, dtype=float).reshape((len(A_le_rows), n_trans)) if A_le_rows else np.zeros((0, n_trans), dtype=float)
     b_eq = np.array(b_eq_rows, dtype=float) if b_eq_rows else np.zeros(0, dtype=float)
-    A_le = np.array(A_le_rows, dtype=float).reshape((-1, n_trans)) if A_le_rows else np.zeros((0, n_trans), dtype=float)
     b_le = np.array(b_le_rows, dtype=float) if b_le_rows else np.zeros(0, dtype=float)
 
     return TransformedModel(

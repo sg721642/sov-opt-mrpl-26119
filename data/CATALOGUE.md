@@ -17,7 +17,7 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
 | **Academic Solver Benchmark LP** | Verified | AVGAS | Symonds (1955) aviation gasoline blending LP formulation |
 | **Documented Application Benchmark LP** | Verified | AFIRO, SC50A, SC50B, BLEND | Authoritative Netlib benchmark instances |
 | **Documented Application Benchmark MILP** | Verified | FLUGPL | MIPLIB airline fleet allocation problem |
-| **Proprietary MRPL Refinery Production LP** | **Empty State** | *None* | Proprietary internal MRPL production matrices are confidential and not public. Fictional refinery parameters are prohibited. |
+| **Proprietary MRPL Refinery Production LP** | **Empty State** | *None* | No authorized MRPL dataset is available in this project. Fictional refinery parameters are prohibited. |
 | **Industrial Convex Quadratic Program (QP)** | **Empty State** | *None* | No verified real-world industrial QP benchmark is currently active. Synthetic toy QP instances (e.g. `qp_example.qps` from QPSReader test suite) are excluded. |
 
 ---
@@ -161,10 +161,10 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
 - **Integer Variables:** 0.
 - **Objective Sense:** MINIMIZE (cost row `R00`).
 - **Objective Offset:** 0.0.
-- **Published Reference Objective:** `-3.0812149846E+01` (MINOS 5.3, Netlib README).
+- **Published Reference Objective:** `-3.0812149846E+01` (MINOS 5.3, Netlib README, 11 significant digits).
 - **SOV-OPT Measured Result:**
   - Status: `OPTIMAL_VERIFIED`
-  - Objective: `-30.812149845828237` (matches published reference `-30.81215` to machine precision)
+  - Objective: `-30.812149845828237` (differs from 11-digit published reference `-30.812149846` by approximately 1.72e-10)
   - Iterations: 555 (two-phase primal revised simplex)
   - Primal residual: `1.78e-15`
   - Dual residual: `1.23e-16`
@@ -193,10 +193,10 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
 - **Objective Sense:** MINIMIZE (cost row `KOSTEN`).
 - **Published Reference Objective:** `1201500` (optimal integer solution); LP relaxation root bound = 769500.0 (with published variable bounds).
 - **SOV-OPT Measured Result:**
-  - Status: `LIMIT_REACHED` (at configured node limit, e.g. 50 or 500 nodes)
+  - Status: `LIMIT_REACHED` (at configured node limit, e.g. 50 nodes)
   - Conservative Rational Lower Bound: `769500.0`
   - Open Nodes: Explored cleanly without numerical divergence.
-  - Architectural Note: Infeasible branch relaxations are rigorously verified with exact binary-rational Farkas certificates (^T z = 0, h^T z < 0, z \ge 0$), permitting safe branch-and-bound pruning.
+  - Architectural Note: Infeasible branch relaxations are rigorously verified with exact binary-rational Farkas certificates ($G^T z = 0, h^T z < 0, z \ge 0$), permitting safe branch-and-bound pruning.
 
 ---
 
@@ -206,7 +206,7 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
 
 MRPL (Mangalore Refinery and Petrochemicals Limited) production linear programming models:
 - Operational crude assay data, blend fraction limits, tray yields, and economic transfer prices are proprietary internal refinery trade secrets.
-- No authorized public release of MRPL operational LP matrices exists in public domains.
+- No authorized MRPL dataset is available in this project.
 - Synthetically invented refinery parameters (e.g. made-up distillation yields or fabricated business constraints) are strictly prohibited by SOV-OPT repository integrity guidelines.
 - Instead, the repository provides the documented historical petroleum industry LP benchmark `AVGAS` (Symonds 1955 / Charnes et al. 1952) and the Netlib refinery benchmark `BLEND` (Murtagh).
 
@@ -214,4 +214,4 @@ MRPL (Mangalore Refinery and Petrochemicals Limited) production linear programmi
 
 - A previous version included `qp_example.qps` from the `QPSReader.jl` unit test repository (a 2-variable toy example with quadratic objective).
 - In accordance with instructions to exclude synthetic or toy test instances from real-world verification claims, `qp_example.qps` has been removed from the active suite.
-- The quadratic programming engine (`sovopt/qp.py`) implements a Mehrotra predictor-corrector interior point method with exact positive-semidefiniteness validation ( \succeq 0$) and unconstrained separable box support. Real-world industrial QP benchmarks will be admitted once authentic public datasets meeting all provenance criteria are verified.
+- The quadratic programming engine (`sovopt/qp.py`) implements a Mehrotra predictor-corrector interior point method with floating-point numerical positive-semidefiniteness inspection (not an exact rational PSD certificate) and unconstrained separable box support. Real-world industrial QP benchmarks will be admitted once authentic public datasets meeting all provenance criteria are verified.

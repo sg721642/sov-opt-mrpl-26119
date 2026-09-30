@@ -15,22 +15,19 @@ def solve_qp(model, tol=1e-7, max_iter=150, scaling=True):
     if model.Q is None:
         raise ValueError('solve_qp requires quadratic objective matrix Q')
 
-    # Internal objective coefficients
-    if model.maximize:
-        # Maximize c^T x + 1/2 x^T Q x <=> Minimize -c^T x - 1/2 x^T Q x
-        c_use = -model.c
-        Q_use = -np.asarray(model.Q, dtype=float)
-    else:
-        c_use = model.c.copy()
-        Q_use = np.asarray(model.Q, dtype=float).copy()
+    # Internal objective coefficients:
+    # Model convention: c and Q are always stored in canonical internal minimization form.
+    # If the original model had maximize=True, c and Q are already negated for internal minimization.
+    c_use = model.c.copy()
+    Q_use = np.asarray(model.Q, dtype=float).copy()
 
     # Symmetrize Q
     Q_use = 0.5 * (Q_use + Q_use.T)
 
-    # Check positive semidefiniteness
+    # Numerical eigenvalue inspection (floating-point check, not an exact rational PSD certificate)
     eigvals = np.linalg.eigvalsh(Q_use)
     if np.min(eigvals) < -1e-10:
-        raise ValueError('Nonconvex QP rejected: objective Hessian is not positive semidefinite')
+        raise ValueError('Nonconvex QP rejected: objective Hessian is not numerically positive semidefinite')
 
     G0, h0, _ = model.inequalities()
     m = len(h0)

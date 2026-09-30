@@ -1,92 +1,71 @@
-[
-  {
-    "instance": "AVGAS",
-    "class": "LP",
-    "dims": "10 x 8",
+{
+  "avgas": {
     "status": "OPTIMAL_VERIFIED",
     "objective": -7.75,
-    "reference": -7.75,
-    "ref_source": "Symonds (1955) analytical optimum",
-    "primal_res": 5.551115123125783e-17,
-    "dual_res": 2.880578658486892e-17,
-    "elapsed": 0.008761749999393942,
-    "nodes": null,
+    "best_bound": null,
     "iterations": 31,
-    "best_bound": null
+    "primal_residual": 5.551115123125783e-17,
+    "dual_residual": 2.880578658486892e-17,
+    "kkt_passed": true,
+    "seconds": 0.008466708999549155
   },
-  {
-    "instance": "AFIRO",
-    "class": "LP",
-    "dims": "27 x 32",
+  "afiro": {
     "status": "OPTIMAL_VERIFIED",
     "objective": -464.75314285714285,
-    "reference": -464.75314285714285,
-    "ref_source": "Netlib LP / MINOS 5.3",
-    "primal_res": 1.4210854715201802e-14,
-    "dual_res": 1.7193502857276608e-17,
-    "elapsed": 0.03154908400028944,
-    "nodes": null,
+    "best_bound": null,
     "iterations": 55,
-    "best_bound": null
+    "primal_residual": 1.4210854715201802e-14,
+    "dual_residual": 1.7193502857276608e-17,
+    "kkt_passed": true,
+    "seconds": 0.018134500000087428
   },
-  {
-    "instance": "SC50A",
-    "class": "LP",
-    "dims": "50 x 48",
+  "sc50a": {
     "status": "OPTIMAL_VERIFIED",
     "objective": -64.5750770585645,
-    "reference": -64.5750770585645,
-    "ref_source": "Netlib LP / MINOS 5.3",
-    "primal_res": 5.367434915118819e-16,
-    "dual_res": 4.0893641093287975e-17,
-    "elapsed": 0.03565841599993291,
-    "nodes": null,
+    "best_bound": null,
     "iterations": 56,
-    "best_bound": null
+    "primal_residual": 5.367434915118819e-16,
+    "dual_residual": 4.0893641093287975e-17,
+    "kkt_passed": true,
+    "seconds": 0.033494167000753805
   },
-  {
-    "instance": "SC50B",
-    "class": "LP",
-    "dims": "50 x 48",
+  "sc50b": {
     "status": "OPTIMAL_VERIFIED",
     "objective": -70.0,
-    "reference": -70.0,
-    "ref_source": "Netlib LP / MINOS 5.3",
-    "primal_res": 2.493132406175791e-16,
-    "dual_res": 3.9650822308041306e-17,
-    "elapsed": 0.030857916000968544,
-    "nodes": null,
+    "best_bound": null,
     "iterations": 50,
-    "best_bound": null
+    "primal_residual": 2.493132406175791e-16,
+    "dual_residual": 3.9650822308041306e-17,
+    "kkt_passed": true,
+    "seconds": 0.029462917000273592
   },
-  {
-    "instance": "BLEND",
-    "class": "LP",
-    "dims": "74 x 83",
+  "blend": {
     "status": "OPTIMAL_VERIFIED",
     "objective": -30.812149845828237,
-    "reference": -30.812149845828237,
-    "ref_source": "Netlib LP / MINOS 5.3 (-30.81215)",
-    "primal_res": 1.7763568394002473e-15,
-    "dual_res": 1.227694079519073e-16,
-    "elapsed": 0.8282021249997342,
-    "nodes": null,
+    "best_bound": null,
     "iterations": 555,
-    "best_bound": null
+    "primal_residual": 1.7763568394002473e-15,
+    "dual_residual": 1.227694079519073e-16,
+    "kkt_passed": true,
+    "seconds": 0.8272287079998932
   },
-  {
-    "instance": "FLUGPL",
-    "class": "MILP",
-    "dims": "18 x 18",
+  "flugpl": {
     "status": "LIMIT_REACHED",
     "objective": null,
-    "reference": 1201500.0,
-    "ref_source": "MIPLIB 1.0 / 2017 optimal integer objective",
-    "primal_res": null,
-    "dual_res": null,
-    "elapsed": 0.8815789999989647,
-    "nodes": 50,
-    "iterations": null,
-    "best_bound": 769500.0
+    "best_bound": 769500.0,
+    "iterations": 50,
+    "primal_residual": null,
+    "dual_residual": null,
+    "kkt_passed": null,
+    "seconds": 0.8773105000000214
+  },
+  "avgas_pdhg": {
+    "status": "OPTIMAL_VERIFIED",
+    "objective": -7.749999888911532,
+    "iterations": 500,
+    "primal_residual": 1.3064950580199562e-08,
+    "dual_residual": 1.901111838150597e-09,
+    "kkt_passed": true,
+    "seconds": 0.0035945420004281914
   }
-]
+}

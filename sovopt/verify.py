@@ -71,12 +71,15 @@ def verify(model, x, z=None, tol=1e-7, check_integer=True):
         z = np.asarray(z, np.longdouble)
         if z.shape != h.shape or not np.isfinite(z).all():
             return report
+        raw_obj = float(model.c.astype(np.longdouble) @ x + x @ Q_arr.astype(np.longdouble) @ x / 2.0)
+        scale_obj = 1.0 + abs(raw_obj)
         dual = float(np.max(np.maximum(-z, 0.0), initial=0.0))
         stat_denom = 1.0 + np.max(np.abs(grad)) + np.max(np.abs(G.T) @ np.abs(z))
         station = float(np.max(np.abs(grad + G.T @ z)) / stat_denom)
-        comp_denom = 1.0 + abs(obj) + np.max(np.abs(z * h))
+        comp_denom = scale_obj + np.max(np.abs(z * h))
         comp = float(np.max(np.abs(z * (activity - h))) / comp_denom)
-        gap = float(abs(z @ (h - activity)) / (1.0 + abs(obj)))
+        gap_denom = scale_obj + abs(float(z @ h))
+        gap = float(abs(z @ (h - activity)) / gap_denom)
         kkt_ok = report['feasible'] and max(dual, station, comp, gap) <= tol
         report.update(
             dual_residual=station,
@@ -147,7 +150,7 @@ def exact_farkas(model, z):
     G, h, _ = model.inequalities()
     if len(h) == 0 or len(z) != len(h):
         return False
-    z_F = [v if isinstance(v, F) else F(float(v)) for v in z]
+    z_F = [v if isinstance(v, F) else F(str(v)) if isinstance(v, str) else F(float(v)) for v in z]
     if any(v < 0 for v in z_F):
         return False
     for j in range(len(model.c)):

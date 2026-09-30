@@ -30,7 +30,8 @@ class LU:
         return x
 
 def positive_semidefinite(Q):
-    # Pivoted Schur complements. Conservative: no negative pivot is accepted.
+    # Pivoted Schur complements (floating-point numerical heuristic; not an exact rational PSD certificate).
+    # Conservative: no negative pivot is accepted.
     a=Q.copy(); n=len(a)
     for k in range(n):
         p=k+int(np.argmax(np.diag(a)[k:])); a[[p,k],:]=a[[k,p],:]; a[:,[p,k]]=a[:,[k,p]]

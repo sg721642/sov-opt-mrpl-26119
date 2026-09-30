@@ -133,6 +133,8 @@ def read_mps(path):
             i, j = names.index(c1), names.index(c2)
             Q[i, j] += val
             if i != j: Q[j, i] += val
+        if maximize:
+            Q = -Q
 
     return Model.from_dict(dict(
         name=name, names=names,

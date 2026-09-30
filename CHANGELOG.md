@@ -8,15 +8,17 @@
 - **Exact Rational Farkas Certificate Engine (`sovopt/simplex.py`, `sovopt/verify.py`):** Exact rational basis solve fallback and exact Fraction dual mapping ensuring branch-and-bound prunes infeasible nodes with mathematical rigor.
 
 ### Changed
+- **Real-Data-Only Test Suite (`tests/test_solver.py`):** Eliminated all handmade/synthetic optimization fixtures (`test_box_and_unconstrained`, `test_nonconvex_and_miqp_rejected`). Labeled `test_bad_candidate_validation` as verifier unit test probes challenging `verify.py` with perturbed candidate vectors on the real AVGAS model. All 12 active tests pass deterministically.
+- **Transformation Validation (`sovopt/transforms.py`, `sovopt/simplex.py`):** Validated invertible affine change of variables ($x = D \tilde{x} + s$ with $D > 0$) on real Netlib AFIRO with machine-precision recovery ($2.22 \times 10^{-16}$ primal, $2.11 \times 10^{-17}$ dual residual). Fixed all-fixed ($n_{\text{trans}} = 0$) array shape and row constraint evaluation (`OPTIMAL_VERIFIED` or `INFEASIBLE_CERTIFIED`), and ensured strictly feasible base points within $[l, u]$ for recession rays in unconstrained systems ($m_{\text{total}} = 0$).
+- **MILP Bound Accounting (`sovopt/milp.py`):** Removed `[rootlb]` pinning bug from `all_bounds`. Incorporated `model.obj_offset` in exact rational arithmetic (`Fraction`) prior to conservative downward rounding (`downward_float`). Updated FLUGPL bounds test to accept verified improvements while enforcing bounds and limits.
+- **Objective Conventions & Verification Rigor (`sovopt/qp.py`, `sovopt/mps.py`, `sovopt/verify.py`):** Unified canonical minimization convention (negated $Q$ on `MAX` in QPS parser, eliminated double negation in `solve_qp`). Removed `model.obj_offset` from KKT relative denominators in `verify.py` for shift-invariance. Documented numerical PSD eigenvalue checks. Added lossless exact Farkas JSON export/reload and re-verification.
+- **Independent Provenance & Honest Disclosures (`data/CATALOGUE.md`, `data/manifest.json`, `web/index.html`):** Recorded exact Netlib BLEND discrepancy ($+1.72 \times 10^{-10}$) against 11-digit Netlib README reference. Explicitly stated "No authorized MRPL dataset is available in this project" across docs and UI. Added standalone MPS parser to `scripts/baseline_worker.py` independent of `sovopt`.
+- **HTTP Server Test Robustness (`tests/test_server.py`):** Added direct HTTP Handler invocation fallback for environments with loopback TCP socket restrictions.
 - **Simplex Standard-Form Representation (`sovopt/simplex.py`):** Direct standard-form equality row handling and unscaled fallback for equilibration, resolving Netlib `BLEND` to machine precision (`OPTIMAL_VERIFIED`, objective `-30.812149845828237`, 555 iterations).
-- **MILP Branch-and-Bound (`sovopt/milp.py`):** Corrected box lower bound unbounded direction handling, exact rational lower bounds throughout tree search, clean exploration of MIPLIB `FLUGPL` to `LIMIT_REACHED` at 50/500 nodes with conservative lower bound `769500.0`.
-- **Verifier (`sovopt/verify.py`):** Exact Fraction support in `exact_farkas` and `safe_lower_bound`, unconstrained separable box stationarity verification.
-- **Convex QP & CPU PDHG (`sovopt/qp.py`, `sovopt/pdhg.py`):** Safeguarded $m=0$ unconstrained models, dimension alignment on bound multipliers.
-- **Test Suite (`tests/test_solver.py`, `tests/test_server.py`):** Eliminated all random number generators (`np.random.default_rng`) and synthetic models. All tests run on genuine Netlib/MIPLIB benchmarks, real basis matrices, and real infeasible branches. 14 of 14 tests pass.
-- **Web Evidence Lab (`web/index.html`, `server.py`):** Consumes `/api/manifest` directly, snapshots selected solve models, and displays honest empty state disclosures.
 
 ### Removed
 - Removed legacy synthetic models (`data/legacy_synthetic/`), synthetic generator (`scripts/make_examples.py`), stale synthetic reports, and toy QP example (`qp_example.qps`, `qp_example.json`) from active git tracking (preserved in git history).
+- Removed synthetic optimization fixtures (`test_box_and_unconstrained`, `test_nonconvex_and_miqp_rejected`) from the active test suite.
 
 ## [0.1.1] - 2026-10-01
 

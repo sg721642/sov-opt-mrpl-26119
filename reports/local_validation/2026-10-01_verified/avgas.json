@@ -1,245 +1,218 @@
 {
-  "instance": "avgas",
-  "model_name": "AVGAS",
-  "metadata": {
-    "name": "AVGAS",
-    "class": "LP",
-    "category": "Academic solver benchmark",
-    "domain": "Aviation gasoline blending formulation (Symonds 1955 / Charnes et al. 1952)",
-    "source_url": "https://github.com/ERGO-Code/HiGHS/blob/master/check/instances/avgas.mps",
-    "file_url": "https://raw.githubusercontent.com/ERGO-Code/HiGHS/master/check/instances/avgas.mps",
-    "retrieval_date": "2026-10-01",
-    "mps_file": "data/verified/avgas.mps",
-    "json_file": "examples/avgas.json",
-    "objective_sense": "MINIMIZE",
-    "objective_offset": 0.0,
-    "reference_objective": -7.75,
-    "reference_source": "Symonds (1955) analytical optimum",
-    "total_mps_nonzeros": 38,
-    "expected_status": "OPTIMAL_VERIFIED",
-    "sha256": "10d0e68381321ee9b6a22a53a33d07f7740070b0a077a78ef742a9e88eca8213",
-    "variables": 8,
-    "constraints": 10,
-    "integers": 0,
-    "matrix_nonzeros": 30
-  },
-  "result": {
-    "status": "OPTIMAL_VERIFIED",
-    "x": [
-      0.0,
-      1.0,
-      0.75,
-      0.25,
-      0.4999999999999999,
-      0.25000000000000006,
-      0.75,
-      0.0
-    ],
-    "dual": [
-      3.3333333333333335,
-      1.6666666666666665,
-      0.0,
-      0.0,
-      1.3750000000000002,
-      0.0,
-      1.4166666666666665,
-      0.20833333333333331,
-      1.3333333333333335,
-      0.0,
-      0.0,
-      0.8333333333333344,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      1.6666666666666679
-    ],
-    "verification": {
-      "feasible": true,
-      "objective": -7.75,
-      "primal_residual": 5.551115123125783e-17,
-      "absolute_primal_violation": 1.6653345369377348e-16,
-      "integrality_residual": 0.0,
-      "kkt_passed": true,
-      "precision_bits": 53,
-      "certification": "floating-point residual checks",
-      "dual_residual": 2.880578658486892e-17,
-      "dual_sign_violation": 0.0,
-      "complementarity": 1.8376105235175005e-17,
-      "relative_duality_gap": 1.7446361815538177e-17
-    },
+  "status": "OPTIMAL_VERIFIED",
+  "x": [
+    0.0,
+    1.0,
+    0.75,
+    0.25,
+    0.4999999999999999,
+    0.25000000000000006,
+    0.75,
+    0.0
+  ],
+  "dual": [
+    3.3333333333333335,
+    1.6666666666666665,
+    0.0,
+    0.0,
+    1.3750000000000002,
+    0.0,
+    1.4166666666666665,
+    0.20833333333333331,
+    1.3333333333333335,
+    0.0,
+    0.0,
+    0.8333333333333344,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.6666666666666679
+  ],
+  "verification": {
+    "feasible": true,
     "objective": -7.75,
-    "iterations": 31,
-    "basis": [
-      1,
-      3,
-      2,
-      11,
-      6,
-      13,
-      10,
-      4,
-      5,
-      17,
-      18,
-      19,
-      20,
-      21,
-      22,
-      23,
-      24,
-      25
-    ],
-    "algorithm": "two-phase primal revised simplex",
-    "history": [
-      {
-        "iteration": 0,
-        "objective_transformed": 16.0
-      },
-      {
-        "iteration": 1,
-        "objective_transformed": 15.0
-      },
-      {
-        "iteration": 2,
-        "objective_transformed": 13.533333333333333
-      },
-      {
-        "iteration": 3,
-        "objective_transformed": 11.633333333333333
-      },
-      {
-        "iteration": 4,
-        "objective_transformed": 10.333333333333332
-      },
-      {
-        "iteration": 5,
-        "objective_transformed": 10.333333333333332
-      },
-      {
-        "iteration": 6,
-        "objective_transformed": 10.333333333333334
-      },
-      {
-        "iteration": 7,
-        "objective_transformed": 7.770833333333334
-      },
-      {
-        "iteration": 8,
-        "objective_transformed": 7.458333333333334
-      },
-      {
-        "iteration": 9,
-        "objective_transformed": 5.976190476190474
-      },
-      {
-        "iteration": 10,
-        "objective_transformed": 5.333333333333333
-      },
-      {
-        "iteration": 11,
-        "objective_transformed": 5.083333333333333
-      },
-      {
-        "iteration": 12,
-        "objective_transformed": 4.583333333333333
-      },
-      {
-        "iteration": 13,
-        "objective_transformed": 4.5
-      },
-      {
-        "iteration": 14,
-        "objective_transformed": 3.5
-      },
-      {
-        "iteration": 15,
-        "objective_transformed": 3.5
-      },
-      {
-        "iteration": 16,
-        "objective_transformed": 3.25
-      },
-      {
-        "iteration": 17,
-        "objective_transformed": 2.9
-      },
-      {
-        "iteration": 18,
-        "objective_transformed": 2.6
-      },
-      {
-        "iteration": 19,
-        "objective_transformed": 2.5
-      },
-      {
-        "iteration": 20,
-        "objective_transformed": 2.416666666666667
-      },
-      {
-        "iteration": 21,
-        "objective_transformed": 2.3333333333333335
-      },
-      {
-        "iteration": 22,
-        "objective_transformed": 1.8333333333333335
-      },
-      {
-        "iteration": 23,
-        "objective_transformed": 1.8333333333333335
-      },
-      {
-        "iteration": 24,
-        "objective_transformed": 1.6666666666666667
-      },
-      {
-        "iteration": 25,
-        "objective_transformed": 1.0
-      },
-      {
-        "iteration": 26,
-        "objective_transformed": 1.0
-      },
-      {
-        "iteration": 27,
-        "objective_transformed": 0.8
-      },
-      {
-        "iteration": 28,
-        "objective_transformed": -7.0
-      },
-      {
-        "iteration": 29,
-        "objective_transformed": -7.333333333333333
-      },
-      {
-        "iteration": 30,
-        "objective_transformed": -7.5
-      }
-    ],
-    "model_name": "AVGAS",
-    "model_sha256": "42e4186dfe26d2e46321e8a253d2af05f85d2cefc3404de7fa2c36c47279b965",
-    "solver_version": "0.1.1",
-    "elapsed_seconds": 0.008761749999393942,
-    "backend": "cpu",
-    "variables": 8,
-    "rows": 10,
-    "nonzeros": 30,
-    "machine": {
-      "system": "Darwin",
-      "architecture": "arm64",
-      "python": "3.11.16"
-    },
-    "input_mps_sha256": "10d0e68381321ee9b6a22a53a33d07f7740070b0a077a78ef742a9e88eca8213"
+    "primal_residual": 5.551115123125783e-17,
+    "absolute_primal_violation": 1.6653345369377348e-16,
+    "integrality_residual": 0.0,
+    "kkt_passed": true,
+    "precision_bits": 53,
+    "certification": "floating-point residual checks",
+    "dual_residual": 2.880578658486892e-17,
+    "dual_sign_violation": 0.0,
+    "complementarity": 1.8376105235175005e-17,
+    "relative_duality_gap": 9.251858538542972e-18
   },
-  "solve_timestamp": "2026-09-30T22:00:51Z"
+  "objective": -7.75,
+  "iterations": 31,
+  "basis": [
+    1,
+    3,
+    2,
+    11,
+    6,
+    13,
+    10,
+    4,
+    5,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25
+  ],
+  "algorithm": "two-phase primal revised simplex",
+  "history": [
+    {
+      "iteration": 0,
+      "objective_transformed": 16.0
+    },
+    {
+      "iteration": 1,
+      "objective_transformed": 15.0
+    },
+    {
+      "iteration": 2,
+      "objective_transformed": 13.533333333333333
+    },
+    {
+      "iteration": 3,
+      "objective_transformed": 11.633333333333333
+    },
+    {
+      "iteration": 4,
+      "objective_transformed": 10.333333333333332
+    },
+    {
+      "iteration": 5,
+      "objective_transformed": 10.333333333333332
+    },
+    {
+      "iteration": 6,
+      "objective_transformed": 10.333333333333334
+    },
+    {
+      "iteration": 7,
+      "objective_transformed": 7.770833333333334
+    },
+    {
+      "iteration": 8,
+      "objective_transformed": 7.458333333333334
+    },
+    {
+      "iteration": 9,
+      "objective_transformed": 5.976190476190474
+    },
+    {
+      "iteration": 10,
+      "objective_transformed": 5.333333333333333
+    },
+    {
+      "iteration": 11,
+      "objective_transformed": 5.083333333333333
+    },
+    {
+      "iteration": 12,
+      "objective_transformed": 4.583333333333333
+    },
+    {
+      "iteration": 13,
+      "objective_transformed": 4.5
+    },
+    {
+      "iteration": 14,
+      "objective_transformed": 3.5
+    },
+    {
+      "iteration": 15,
+      "objective_transformed": 3.5
+    },
+    {
+      "iteration": 16,
+      "objective_transformed": 3.25
+    },
+    {
+      "iteration": 17,
+      "objective_transformed": 2.9
+    },
+    {
+      "iteration": 18,
+      "objective_transformed": 2.6
+    },
+    {
+      "iteration": 19,
+      "objective_transformed": 2.5
+    },
+    {
+      "iteration": 20,
+      "objective_transformed": 2.416666666666667
+    },
+    {
+      "iteration": 21,
+      "objective_transformed": 2.3333333333333335
+    },
+    {
+      "iteration": 22,
+      "objective_transformed": 1.8333333333333335
+    },
+    {
+      "iteration": 23,
+      "objective_transformed": 1.8333333333333335
+    },
+    {
+      "iteration": 24,
+      "objective_transformed": 1.6666666666666667
+    },
+    {
+      "iteration": 25,
+      "objective_transformed": 1.0
+    },
+    {
+      "iteration": 26,
+      "objective_transformed": 1.0
+    },
+    {
+      "iteration": 27,
+      "objective_transformed": 0.8
+    },
+    {
+      "iteration": 28,
+      "objective_transformed": -7.0
+    },
+    {
+      "iteration": 29,
+      "objective_transformed": -7.333333333333333
+    },
+    {
+      "iteration": 30,
+      "objective_transformed": -7.5
+    }
+  ],
+  "model_name": "AVGAS",
+  "model_sha256": "42e4186dfe26d2e46321e8a253d2af05f85d2cefc3404de7fa2c36c47279b965",
+  "solver_version": "0.1.2",
+  "elapsed_seconds": 0.008428375000221422,
+  "backend": "cpu",
+  "variables": 8,
+  "rows": 10,
+  "nonzeros": 30,
+  "machine": {
+    "system": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11.16"
+  },
+  "wall_clock_seconds": 0.008466708999549155
 }

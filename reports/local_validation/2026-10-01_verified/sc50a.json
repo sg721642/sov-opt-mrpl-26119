@@ -1,509 +1,482 @@
 {
-  "instance": "sc50a",
-  "model_name": "SC50A",
-  "metadata": {
-    "name": "SC50A",
-    "class": "LP",
-    "category": "Documented application benchmark",
-    "domain": "Staircase dynamic multi-period production model",
-    "source_url": "https://www.netlib.org/lp/data/",
-    "file_url": "https://www.netlib.org/lp/data/sc50a",
-    "retrieval_date": "2026-10-01",
-    "mps_file": "data/verified/sc50a.mps",
-    "json_file": "examples/sc50a.json",
-    "objective_sense": "MINIMIZE",
-    "objective_offset": 0.0,
-    "reference_objective": -64.5750770585645,
-    "reference_source": "Netlib LP / MINOS 5.3",
-    "total_mps_nonzeros": 131,
-    "expected_status": "OPTIMAL_VERIFIED",
-    "sha256": "c4571004af37a0c7d49099f8fcc513885401784d32f712bf44e014e40348c521",
-    "variables": 48,
-    "constraints": 50,
-    "integers": 0,
-    "matrix_nonzeros": 130
-  },
-  "result": {
-    "status": "OPTIMAL_VERIFIED",
-    "x": [
-      0.0,
-      16.568692206076612,
-      64.57507705856452,
-      64.5750770585645,
-      64.5750770585645,
-      0.0,
-      16.568692206076623,
-      64.57507705856452,
-      0.0,
-      16.568692206076623,
-      64.57507705856452,
-      0.0,
-      20.009907529722568,
-      71.03258476442099,
-      71.03258476442096,
-      135.60766182298548,
-      0.0,
-      36.57859973579919,
-      135.6076618229855,
-      0.0,
-      36.578599735799195,
-      135.6076618229855,
-      14.177344782034353,
-      17.598745046235138,
-      78.13584324086304,
-      78.13584324086307,
-      213.74350506384854,
-      14.177344782034353,
-      54.177344782034325,
-      213.74350506384854,
-      14.177344782034353,
-      54.17734478203433,
-      213.74350506384854,
-      18.417734478203432,
-      18.41773447820343,
-      85.94942756494936,
-      85.94942756494936,
-      299.6929326287979,
-      32.59507926023778,
-      72.59507926023775,
-      299.6929326287979,
-      32.59507926023782,
-      72.59507926023775,
-      299.6929326287979,
-      20.25950792602377,
-      20.259507926023772,
-      94.5443703214443,
-      94.5443703214443
-    ],
-    "dual": [
-      0.0,
-      0.13870541611624831,
-      0.0,
-      0.20805812417437253,
-      0.0,
-      0.061646851607221484,
-      0.0,
-      0.27741083223249663,
-      0.0,
-      0.2080581241743725,
-      0.0,
-      0.0,
-      0.09247027741083222,
-      0.06935270805812416,
-      0.0,
-      0.09247027741083222,
-      0.06935270805812416,
-      0.7199471598414795,
-      0.0,
-      0.13870541611624837,
-      0.0,
-      0.061646851607221484,
-      0.0,
-      0.18494055482166444,
-      0.0,
-      0.13870541611624834,
-      0.0,
-      0.0,
-      0.06164685160722148,
-      0.04623513870541612,
-      3.469446951953614e-18,
-      0.06164685160722148,
-      0.04623513870541612,
-      0.5284015852047554,
-      0.0,
-      0.09247027741083223,
-      0.0,
-      0.061646851607221484,
-      0.0,
-      0.12329370321444297,
-      0.0,
-      0.09247027741083222,
-      0.0,
-      0.007705856450902694,
-      0.03852928225451343,
-      0.023117569352708076,
-      0.00770585645090268,
-      0.03852928225451343,
-      0.023117569352708076,
-      0.39630118890356664,
-      0.0,
-      0.06935270805812414,
-      0.0,
-      0.05394099515631879,
-      0.0,
-      0.08476442095992953,
-      0.0,
-      0.06935270805812414,
-      0.0,
-      0.05394099515631879,
-      0.08476442095992953,
-      0.06935270805812414,
-      0.05394099515631878,
-      0.08476442095992957,
-      0.06935270805812414,
-      0.297225891677675,
-      0.0,
-      0.28010176623122457,
-      0.31435001712412547,
-      0.29722589167767505,
-      0.07705856450902683,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.030823425803610735,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0
-    ],
-    "verification": {
-      "feasible": true,
-      "objective": -64.5750770585645,
-      "primal_residual": 5.367434915118819e-16,
-      "absolute_primal_violation": 3.552713678800501e-14,
-      "integrality_residual": 0.0,
-      "kkt_passed": true,
-      "precision_bits": 53,
-      "certification": "floating-point residual checks",
-      "dual_residual": 4.0893641093287975e-17,
-      "dual_sign_violation": 0.0,
-      "complementarity": 6.736030907132632e-17,
-      "relative_duality_gap": 1.0683954203032177e-16
-    },
+  "status": "OPTIMAL_VERIFIED",
+  "x": [
+    0.0,
+    16.568692206076612,
+    64.57507705856452,
+    64.5750770585645,
+    64.5750770585645,
+    0.0,
+    16.568692206076623,
+    64.57507705856452,
+    0.0,
+    16.568692206076623,
+    64.57507705856452,
+    0.0,
+    20.009907529722568,
+    71.03258476442099,
+    71.03258476442096,
+    135.60766182298548,
+    0.0,
+    36.57859973579919,
+    135.6076618229855,
+    0.0,
+    36.578599735799195,
+    135.6076618229855,
+    14.177344782034353,
+    17.598745046235138,
+    78.13584324086304,
+    78.13584324086307,
+    213.74350506384854,
+    14.177344782034353,
+    54.177344782034325,
+    213.74350506384854,
+    14.177344782034353,
+    54.17734478203433,
+    213.74350506384854,
+    18.417734478203432,
+    18.41773447820343,
+    85.94942756494936,
+    85.94942756494936,
+    299.6929326287979,
+    32.59507926023778,
+    72.59507926023775,
+    299.6929326287979,
+    32.59507926023782,
+    72.59507926023775,
+    299.6929326287979,
+    20.25950792602377,
+    20.259507926023772,
+    94.5443703214443,
+    94.5443703214443
+  ],
+  "dual": [
+    0.0,
+    0.13870541611624831,
+    0.0,
+    0.20805812417437253,
+    0.0,
+    0.061646851607221484,
+    0.0,
+    0.27741083223249663,
+    0.0,
+    0.2080581241743725,
+    0.0,
+    0.0,
+    0.09247027741083222,
+    0.06935270805812416,
+    0.0,
+    0.09247027741083222,
+    0.06935270805812416,
+    0.7199471598414795,
+    0.0,
+    0.13870541611624837,
+    0.0,
+    0.061646851607221484,
+    0.0,
+    0.18494055482166444,
+    0.0,
+    0.13870541611624834,
+    0.0,
+    0.0,
+    0.06164685160722148,
+    0.04623513870541612,
+    3.469446951953614e-18,
+    0.06164685160722148,
+    0.04623513870541612,
+    0.5284015852047554,
+    0.0,
+    0.09247027741083223,
+    0.0,
+    0.061646851607221484,
+    0.0,
+    0.12329370321444297,
+    0.0,
+    0.09247027741083222,
+    0.0,
+    0.007705856450902694,
+    0.03852928225451343,
+    0.023117569352708076,
+    0.00770585645090268,
+    0.03852928225451343,
+    0.023117569352708076,
+    0.39630118890356664,
+    0.0,
+    0.06935270805812414,
+    0.0,
+    0.05394099515631879,
+    0.0,
+    0.08476442095992953,
+    0.0,
+    0.06935270805812414,
+    0.0,
+    0.05394099515631879,
+    0.08476442095992953,
+    0.06935270805812414,
+    0.05394099515631878,
+    0.08476442095992957,
+    0.06935270805812414,
+    0.297225891677675,
+    0.0,
+    0.28010176623122457,
+    0.31435001712412547,
+    0.29722589167767505,
+    0.07705856450902683,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.030823425803610735,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "verification": {
+    "feasible": true,
     "objective": -64.5750770585645,
-    "iterations": 56,
-    "basis": [
-      3,
-      5,
-      46,
-      7,
-      4,
-      14,
-      17,
-      34,
-      18,
-      15,
-      25,
-      27,
-      28,
-      29,
-      26,
-      36,
-      38,
-      39,
-      40,
-      37,
-      48,
-      1,
-      50,
-      51,
-      9,
-      10,
-      54,
-      12,
-      47,
-      57,
-      20,
-      21,
-      22,
-      23,
-      2,
-      30,
-      31,
-      32,
-      33,
-      16,
-      13,
-      41,
-      42,
-      43,
-      6,
-      45,
-      24,
-      60,
-      44,
-      35
-    ],
-    "algorithm": "two-phase primal revised simplex",
-    "history": [
-      {
-        "iteration": 0,
-        "objective_transformed": 750.0
-      },
-      {
-        "iteration": 1,
-        "objective_transformed": 707.5
-      },
-      {
-        "iteration": 2,
-        "objective_transformed": 700.0
-      },
-      {
-        "iteration": 3,
-        "objective_transformed": 700.0
-      },
-      {
-        "iteration": 4,
-        "objective_transformed": 700.0
-      },
-      {
-        "iteration": 5,
-        "objective_transformed": 700.0
-      },
-      {
-        "iteration": 6,
-        "objective_transformed": 700.0
-      },
-      {
-        "iteration": 7,
-        "objective_transformed": 657.5
-      },
-      {
-        "iteration": 8,
-        "objective_transformed": 650.0
-      },
-      {
-        "iteration": 9,
-        "objective_transformed": 650.0
-      },
-      {
-        "iteration": 10,
-        "objective_transformed": 650.0
-      },
-      {
-        "iteration": 11,
-        "objective_transformed": 650.0
-      },
-      {
-        "iteration": 12,
-        "objective_transformed": 650.0
-      },
-      {
-        "iteration": 13,
-        "objective_transformed": 607.5
-      },
-      {
-        "iteration": 14,
-        "objective_transformed": 600.0
-      },
-      {
-        "iteration": 15,
-        "objective_transformed": 600.0
-      },
-      {
-        "iteration": 16,
-        "objective_transformed": 600.0
-      },
-      {
-        "iteration": 17,
-        "objective_transformed": 600.0
-      },
-      {
-        "iteration": 18,
-        "objective_transformed": 600.0
-      },
-      {
-        "iteration": 19,
-        "objective_transformed": 557.5
-      },
-      {
-        "iteration": 20,
-        "objective_transformed": 550.0
-      },
-      {
-        "iteration": 21,
-        "objective_transformed": 550.0
-      },
-      {
-        "iteration": 22,
-        "objective_transformed": 550.0
-      },
-      {
-        "iteration": 23,
-        "objective_transformed": 550.0
-      },
-      {
-        "iteration": 24,
-        "objective_transformed": 515.0
-      },
-      {
-        "iteration": 25,
-        "objective_transformed": 480.0
-      },
-      {
-        "iteration": 26,
-        "objective_transformed": 474.0
-      },
-      {
-        "iteration": 27,
-        "objective_transformed": 472.1428571428571
-      },
-      {
-        "iteration": 28,
-        "objective_transformed": 472.1428571428571
-      },
-      {
-        "iteration": 29,
-        "objective_transformed": 462.85714285714283
-      },
-      {
-        "iteration": 30,
-        "objective_transformed": 456.3636363636364
-      },
-      {
-        "iteration": 31,
-        "objective_transformed": 455.55555555555554
-      },
-      {
-        "iteration": 32,
-        "objective_transformed": 455.55555555555554
-      },
-      {
-        "iteration": 33,
-        "objective_transformed": 345.55555555555554
-      },
-      {
-        "iteration": 34,
-        "objective_transformed": 302.547770700637
-      },
-      {
-        "iteration": 35,
-        "objective_transformed": 293.0163447251115
-      },
-      {
-        "iteration": 36,
-        "objective_transformed": 270.51851851851853
-      },
-      {
-        "iteration": 37,
-        "objective_transformed": 270.51851851851853
-      },
-      {
-        "iteration": 38,
-        "objective_transformed": 270.51851851851853
-      },
-      {
-        "iteration": 39,
-        "objective_transformed": 270.51851851851853
-      },
-      {
-        "iteration": 40,
-        "objective_transformed": 270.51851851851853
-      },
-      {
-        "iteration": 41,
-        "objective_transformed": 270.51851851851853
-      },
-      {
-        "iteration": 42,
-        "objective_transformed": 270.5185185185185
-      },
-      {
-        "iteration": 43,
-        "objective_transformed": 270.51851851851853
-      },
-      {
-        "iteration": 44,
-        "objective_transformed": 270.51851851851853
-      },
-      {
-        "iteration": 45,
-        "objective_transformed": 270.51851851851853
-      },
-      {
-        "iteration": 46,
-        "objective_transformed": 270.51851851851853
-      },
-      {
-        "iteration": 47,
-        "objective_transformed": 270.51851851851853
-      },
-      {
-        "iteration": 48,
-        "objective_transformed": 270.51851851851853
-      },
-      {
-        "iteration": 49,
-        "objective_transformed": 228.17974105102817
-      },
-      {
-        "iteration": 50,
-        "objective_transformed": 81.05540897097619
-      },
-      {
-        "iteration": 51,
-        "objective_transformed": 81.05540897097619
-      },
-      {
-        "iteration": 52,
-        "objective_transformed": 81.05540897097619
-      },
-      {
-        "iteration": 53,
-        "objective_transformed": 5.1903807615230875
-      },
-      {
-        "iteration": 54,
-        "objective_transformed": 5.190380761523048
-      },
-      {
-        "iteration": 55,
-        "objective_transformed": 5.190380761523048
-      }
-    ],
-    "model_name": "SC50A",
-    "model_sha256": "a22e7a93dd11db1ed0d239e0ca4bf7d1a0a99b58845ad438f62cb0a7d5642dc0",
-    "solver_version": "0.1.1",
-    "elapsed_seconds": 0.03565841599993291,
-    "backend": "cpu",
-    "variables": 48,
-    "rows": 50,
-    "nonzeros": 130,
-    "machine": {
-      "system": "Darwin",
-      "architecture": "arm64",
-      "python": "3.11.16"
-    },
-    "input_mps_sha256": "c4571004af37a0c7d49099f8fcc513885401784d32f712bf44e014e40348c521"
+    "primal_residual": 5.367434915118819e-16,
+    "absolute_primal_violation": 3.552713678800501e-14,
+    "integrality_residual": 0.0,
+    "kkt_passed": true,
+    "precision_bits": 53,
+    "certification": "floating-point residual checks",
+    "dual_residual": 4.0893641093287975e-17,
+    "dual_sign_violation": 0.0,
+    "complementarity": 6.736030907132632e-17,
+    "relative_duality_gap": 5.383021825110565e-17
   },
-  "solve_timestamp": "2026-09-30T22:00:51Z"
+  "objective": -64.5750770585645,
+  "iterations": 56,
+  "basis": [
+    3,
+    5,
+    46,
+    7,
+    4,
+    14,
+    17,
+    34,
+    18,
+    15,
+    25,
+    27,
+    28,
+    29,
+    26,
+    36,
+    38,
+    39,
+    40,
+    37,
+    48,
+    1,
+    50,
+    51,
+    9,
+    10,
+    54,
+    12,
+    47,
+    57,
+    20,
+    21,
+    22,
+    23,
+    2,
+    30,
+    31,
+    32,
+    33,
+    16,
+    13,
+    41,
+    42,
+    43,
+    6,
+    45,
+    24,
+    60,
+    44,
+    35
+  ],
+  "algorithm": "two-phase primal revised simplex",
+  "history": [
+    {
+      "iteration": 0,
+      "objective_transformed": 750.0
+    },
+    {
+      "iteration": 1,
+      "objective_transformed": 707.5
+    },
+    {
+      "iteration": 2,
+      "objective_transformed": 700.0
+    },
+    {
+      "iteration": 3,
+      "objective_transformed": 700.0
+    },
+    {
+      "iteration": 4,
+      "objective_transformed": 700.0
+    },
+    {
+      "iteration": 5,
+      "objective_transformed": 700.0
+    },
+    {
+      "iteration": 6,
+      "objective_transformed": 700.0
+    },
+    {
+      "iteration": 7,
+      "objective_transformed": 657.5
+    },
+    {
+      "iteration": 8,
+      "objective_transformed": 650.0
+    },
+    {
+      "iteration": 9,
+      "objective_transformed": 650.0
+    },
+    {
+      "iteration": 10,
+      "objective_transformed": 650.0
+    },
+    {
+      "iteration": 11,
+      "objective_transformed": 650.0
+    },
+    {
+      "iteration": 12,
+      "objective_transformed": 650.0
+    },
+    {
+      "iteration": 13,
+      "objective_transformed": 607.5
+    },
+    {
+      "iteration": 14,
+      "objective_transformed": 600.0
+    },
+    {
+      "iteration": 15,
+      "objective_transformed": 600.0
+    },
+    {
+      "iteration": 16,
+      "objective_transformed": 600.0
+    },
+    {
+      "iteration": 17,
+      "objective_transformed": 600.0
+    },
+    {
+      "iteration": 18,
+      "objective_transformed": 600.0
+    },
+    {
+      "iteration": 19,
+      "objective_transformed": 557.5
+    },
+    {
+      "iteration": 20,
+      "objective_transformed": 550.0
+    },
+    {
+      "iteration": 21,
+      "objective_transformed": 550.0
+    },
+    {
+      "iteration": 22,
+      "objective_transformed": 550.0
+    },
+    {
+      "iteration": 23,
+      "objective_transformed": 550.0
+    },
+    {
+      "iteration": 24,
+      "objective_transformed": 515.0
+    },
+    {
+      "iteration": 25,
+      "objective_transformed": 480.0
+    },
+    {
+      "iteration": 26,
+      "objective_transformed": 474.0
+    },
+    {
+      "iteration": 27,
+      "objective_transformed": 472.1428571428571
+    },
+    {
+      "iteration": 28,
+      "objective_transformed": 472.1428571428571
+    },
+    {
+      "iteration": 29,
+      "objective_transformed": 462.85714285714283
+    },
+    {
+      "iteration": 30,
+      "objective_transformed": 456.3636363636364
+    },
+    {
+      "iteration": 31,
+      "objective_transformed": 455.55555555555554
+    },
+    {
+      "iteration": 32,
+      "objective_transformed": 455.55555555555554
+    },
+    {
+      "iteration": 33,
+      "objective_transformed": 345.55555555555554
+    },
+    {
+      "iteration": 34,
+      "objective_transformed": 302.547770700637
+    },
+    {
+      "iteration": 35,
+      "objective_transformed": 293.0163447251115
+    },
+    {
+      "iteration": 36,
+      "objective_transformed": 270.51851851851853
+    },
+    {
+      "iteration": 37,
+      "objective_transformed": 270.51851851851853
+    },
+    {
+      "iteration": 38,
+      "objective_transformed": 270.51851851851853
+    },
+    {
+      "iteration": 39,
+      "objective_transformed": 270.51851851851853
+    },
+    {
+      "iteration": 40,
+      "objective_transformed": 270.51851851851853
+    },
+    {
+      "iteration": 41,
+      "objective_transformed": 270.51851851851853
+    },
+    {
+      "iteration": 42,
+      "objective_transformed": 270.5185185185185
+    },
+    {
+      "iteration": 43,
+      "objective_transformed": 270.51851851851853
+    },
+    {
+      "iteration": 44,
+      "objective_transformed": 270.51851851851853
+    },
+    {
+      "iteration": 45,
+      "objective_transformed": 270.51851851851853
+    },
+    {
+      "iteration": 46,
+      "objective_transformed": 270.51851851851853
+    },
+    {
+      "iteration": 47,
+      "objective_transformed": 270.51851851851853
+    },
+    {
+      "iteration": 48,
+      "objective_transformed": 270.51851851851853
+    },
+    {
+      "iteration": 49,
+      "objective_transformed": 228.17974105102817
+    },
+    {
+      "iteration": 50,
+      "objective_transformed": 81.05540897097619
+    },
+    {
+      "iteration": 51,
+      "objective_transformed": 81.05540897097619
+    },
+    {
+      "iteration": 52,
+      "objective_transformed": 81.05540897097619
+    },
+    {
+      "iteration": 53,
+      "objective_transformed": 5.1903807615230875
+    },
+    {
+      "iteration": 54,
+      "objective_transformed": 5.190380761523048
+    },
+    {
+      "iteration": 55,
+      "objective_transformed": 5.190380761523048
+    }
+  ],
+  "model_name": "SC50A",
+  "model_sha256": "a22e7a93dd11db1ed0d239e0ca4bf7d1a0a99b58845ad438f62cb0a7d5642dc0",
+  "solver_version": "0.1.2",
+  "elapsed_seconds": 0.03347508300066693,
+  "backend": "cpu",
+  "variables": 48,
+  "rows": 50,
+  "nonzeros": 130,
+  "machine": {
+    "system": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11.16"
+  },
+  "wall_clock_seconds": 0.033494167000753805
 }

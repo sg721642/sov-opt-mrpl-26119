@@ -137,12 +137,21 @@ def solve_milp(model, tol=1e-7, max_nodes=1000, time_limit=30., **kwargs):
                             incumbent=None if incval is None else float(incval),
                             node_bound=downward_float(bound) if bound != -math.inf else None))
 
-    # Compute global lower bound over all leaves and closed terminal nodes
-    all_bounds = [t[0] for t in heap] + terminal + ([incval] if incval is not None else [rootlb])
-    if any(b == -math.inf for b in all_bounds):
-        global_lower = -math.inf
+    # Compute global lower bound over all active frontier leaves and terminal evidence
+    active_bounds = [t[0] for t in heap]
+    if active_bounds:
+        frontier_lb = min(active_bounds)
+        if frontier_lb == -math.inf:
+            global_lower = -math.inf
+        elif incval is not None:
+            global_lower = min(frontier_lb, incval)
+        else:
+            global_lower = frontier_lb
+    elif incval is not None:
+        global_lower = incval
     else:
-        global_lower = min(all_bounds)
+        # Heap is empty and no incumbent exists: every branch was certified infeasible
+        global_lower = None
 
     result = dict(
         algorithm='rational-bound branch-and-bound',
@@ -152,44 +161,53 @@ def solve_milp(model, tol=1e-7, max_nodes=1000, time_limit=30., **kwargs):
         open_nodes=len(heap)
     )
 
+    offset_F = F(str(model.obj_offset)) if model.obj_offset != 0.0 else F(0)
+
     # Map bounds, objectives, and gaps according to objective sense (min vs max)
     if not model.maximize:
         # Standard minimization
-        reported_lower = downward_float(global_lower) if global_lower != -math.inf else None
-        if reported_lower is not None:
-            reported_lower += model.obj_offset
+        # Add objective offset in exact rational arithmetic BEFORE downward rounding
+        if global_lower is not None and global_lower != -math.inf:
+            reported_lower = downward_float(global_lower + offset_F)
+        elif global_lower == -math.inf:
+            reported_lower = -math.inf
+        else:
+            reported_lower = None
         result['best_bound'] = reported_lower
 
         if inc is not None:
-            reported_obj = float(incval) + model.obj_offset
-            if global_lower != -math.inf:
+            reported_obj = float(incval + offset_F)
+            if global_lower is not None and global_lower != -math.inf:
                 gap = max(0.0, float(incval - global_lower)) / (1.0 + abs(float(incval)))
             else:
                 gap = float('inf')
             vr = verify(model, inc, tol=tol)
             result.update(x=inc.tolist(), objective=reported_obj, verification=vr, relative_gap=gap)
             result['status'] = 'OPTIMAL_VERIFIED' if not heap and not failure and gap <= tol else 'NUMERICAL_FAILURE' if failure else 'LIMIT_REACHED'
-            result['verification']['optimality_basis'] = 'finite B&B tree and rational lower bounds; feasibility is numerical'
+            result['verification']['optimality_basis'] = 'finite B&B tree with exact rational lower bounds and Farkas certificates; incumbent feasibility verified numerically to tol'
         else:
             result['status'] = 'NUMERICAL_FAILURE' if failure else 'LIMIT_REACHED' if heap else 'INFEASIBLE_CERTIFIED'
     else:
-        # Maximization: internal objective is negated (-c @ x)
+        # Maximization: internal objective is negated (-c @ x - offset)
         # Global lower bound on internal problem becomes UPPER bound on original maximization
-        reported_upper = -downward_float(global_lower) if global_lower != -math.inf else None
-        if reported_upper is not None:
-            reported_upper += model.obj_offset
+        if global_lower is not None and global_lower != -math.inf:
+            reported_upper = -downward_float(global_lower - offset_F)
+        elif global_lower == -math.inf:
+            reported_upper = math.inf
+        else:
+            reported_upper = None
         result['best_bound'] = reported_upper
 
         if inc is not None:
-            reported_obj = -float(incval) + model.obj_offset
-            if global_lower != -math.inf:
+            reported_obj = float(-incval + offset_F)
+            if global_lower is not None and global_lower != -math.inf:
                 gap = max(0.0, float(incval - global_lower)) / (1.0 + abs(float(incval)))
             else:
                 gap = float('inf')
             vr = verify(model, inc, tol=tol)
             result.update(x=inc.tolist(), objective=reported_obj, verification=vr, relative_gap=gap)
             result['status'] = 'OPTIMAL_VERIFIED' if not heap and not failure and gap <= tol else 'NUMERICAL_FAILURE' if failure else 'LIMIT_REACHED'
-            result['verification']['optimality_basis'] = 'finite B&B tree and rational bounds; feasibility is numerical'
+            result['verification']['optimality_basis'] = 'finite B&B tree with exact rational bounds and Farkas certificates; incumbent feasibility verified numerically to tol'
         else:
             result['status'] = 'NUMERICAL_FAILURE' if failure else 'LIMIT_REACHED' if heap else 'INFEASIBLE_CERTIFIED'
 

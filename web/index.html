@@ -49,7 +49,7 @@ footer{padding:20px 5%;border-top:1px solid var(--line);font-size:12px;color:var
 <body>
 <header>
   <div class="brand">SOV<span>—</span>OPT</div>
-  <div class="tag">MRPL PS 26119 · Sovereign Optimizer 0.1.1</div>
+  <div class="tag">MRPL PS 26119 · Sovereign Optimizer 0.1.2</div>
 </header>
 <main>
   <div class="eyebrow">VERIFIED DATASET SUITE · ORIGINAL SOLVER CORE</div>
@@ -84,8 +84,8 @@ footer{padding:20px 5%;border-top:1px solid var(--line);font-size:12px;color:var
       <details style="margin-top:14px">
         <summary>Empty states &amp; disclosures</summary>
         <div class="provenance-card" style="margin-top:8px">
-          <div><strong>Proprietary MRPL Data:</strong> <span>Proprietary internal MRPL production matrices are confidential and not public. Fictional refinery parameters are strictly prohibited; genuine historical benchmarks are provided.</span></div>
-          <div style="margin-top:6px"><strong>Industrial Convex QP:</strong> <span>No authentic public industrial convex QP benchmark is currently verified in the active suite. Toy synthetic QP instances are excluded.</span></div>
+          <div><strong>Proprietary MRPL Data:</strong> <span>No authorized MRPL dataset is available in this project. Fictional refinery parameters are strictly prohibited; authentic historical LP/MILP benchmarks are provided instead.</span></div>
+          <div style="margin-top:6px"><strong>Industrial Convex QP:</strong> <span>No authentic public industrial convex QP benchmark is currently verified in the active suite. Numerical eigenvalue checks are floating-point checks, not exact rational PSD certificates.</span></div>
         </div>
       </details>
 
@@ -156,7 +156,8 @@ function choose(){
   $('m_app').textContent=m.domain||'—';
   $('m_source').textContent=m.reference_source||'—';
   $('m_dims').textContent=(m.variables||current.c?.length||0)+' vars, '+(m.constraints||current.A?.length||0)+' rows'+(m.matrix_nonzeros?' ('+m.matrix_nonzeros+' nonzeros)':'');
-  $('m_ref').textContent=m.reference_objective!=null?`${m.reference_objective} (${m.reference_source})`:'—';
+  const refText=m.published_reference_text||(m.reference_objective!=null?m.reference_objective:null);
+  $('m_ref').textContent=refText?`${refText} (${m.reference_source||'Published'})`:'—';
 }
 
 Promise.all([
@@ -215,9 +216,9 @@ $('solve').onclick=async()=>{
     $('live_badge').hidden=false;
     $('status').textContent=r.status;
     $('status').className='status '+(r.status.includes('VERIFIED')||r.status==='LIMIT_REACHED'?'good':'bad');
-    $('modelname').textContent=(instMeta.name||model.name||selectedKey)+' · '+(r.algorithm||'Simplex');
-    $('objective').textContent=fmt(r.objective);
-    $('pub_ref').textContent=instMeta.reference_objective!=null?fmt(instMeta.reference_objective):'—';
+    $('objective').textContent=r.objective!=null?fmt(r.objective):(r.best_bound!=null?'Bound: '+fmt(r.best_bound):'—');
+    const pubRefText=instMeta.published_reference_text||(instMeta.reference_objective!=null?fmt(instMeta.reference_objective):null);
+    $('pub_ref').textContent=pubRefText||'—';
     $('runtime').textContent=fmt(elapsed*1000)+' ms';
     
     const v=r.verification||{};

@@ -191,28 +191,38 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
         if np.any(model.lower > model.upper):
             return dict(status='INFEASIBLE_CERTIFIED', message='Box lower bound exceeds upper bound',
                         algorithm='separable box analysis', iterations=0, history=history)
+        # Construct guaranteed feasible base point x (l <= x <= u)
         x = np.zeros(n, dtype=float)
+        for j in range(n):
+            lj, uj = model.lower[j], model.upper[j]
+            if np.isfinite(lj) and np.isfinite(uj):
+                x[j] = np.clip(0.0, lj, uj)
+            elif np.isfinite(lj):
+                x[j] = max(0.0, lj)
+            elif np.isfinite(uj):
+                x[j] = min(0.0, uj)
+            else:
+                x[j] = 0.0
+
         unbounded_rays = []
         for j in range(n):
             c_j = model.c[j]
-            l_j = model.lower[j]
-            u_j = model.upper[j]
+            lj, uj = model.lower[j], model.upper[j]
             if c_j > 0:
-                if np.isneginf(l_j):
+                if np.isneginf(lj):
                     ray = np.zeros(n); ray[j] = -1.0; unbounded_rays.append(ray)
                 else:
-                    x[j] = l_j
+                    x[j] = lj
             elif c_j < 0:
-                if np.isposinf(u_j):
+                if np.isposinf(uj):
                     ray = np.zeros(n); ray[j] = 1.0; unbounded_rays.append(ray)
                 else:
-                    x[j] = u_j
-            else:
-                x[j] = np.clip(0.0, l_j, u_j)
+                    x[j] = uj
 
         if unbounded_rays:
+            ray = unbounded_rays[0]
             return dict(status='UNBOUNDED_CERTIFIED', message='LP is unbounded in box direction',
-                        ray=unbounded_rays[0].tolist(), x=x.tolist(),
+                        ray=ray.tolist(), base_point=x.tolist(), x=x.tolist(),
                         algorithm='separable box analysis', iterations=0, history=history)
 
         report = verify(model, x, None, tol, check_integer=False)
@@ -227,9 +237,41 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
     m_le = len(trans.b_le)
     m_total = m_eq + m_le
 
+    # 2a. All variables are fixed: n_trans == 0
+    if n_trans == 0:
+        x_fixed = np.array([spec['val'] for spec in trans.var_specs], dtype=float)
+        # Check all row constraints on fixed variables
+        for i in range(m_rows):
+            val = float(model.A[i] @ x_fixed)
+            if val < model.row_lower[i] - tol or val > model.row_upper[i] + tol:
+                return dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed variables violate constraint row {i}',
+                            algorithm='fixed variable evaluation', iterations=0, history=history)
+        report = verify(model, x_fixed, None, tol, check_integer=False)
+        return dict(status='OPTIMAL_VERIFIED' if report['feasible'] else 'NUMERICAL_FAILURE',
+                    x=x_fixed.tolist(), dual=[], verification=report, objective=report['objective'],
+                    iterations=0, algorithm='fixed variable evaluation', history=history)
+
+    # 2b. Transformed system has zero effective rows: m_total == 0
     if m_total == 0:
-        # All original constraints were empty or fixed
-        pass
+        x_base = postsolve_primal(np.zeros(n_trans), trans)
+        for i in range(m_rows):
+            val = float(model.A[i] @ x_base)
+            if val < model.row_lower[i] - tol or val > model.row_upper[i] + tol:
+                return dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed rows infeasible at base point for row {i}',
+                            algorithm='transformed unconstrained analysis', iterations=0, history=history)
+        # Check for unconstrained negative cost on non-negative variables
+        neg_c = [k for k in range(n_trans) if trans.c[k] < -1e-12]
+        if neg_c:
+            k = neg_c[0]
+            t_ray = np.zeros(n_trans); t_ray[k] = 1.0
+            ray = postsolve_primal(t_ray, trans) - x_base
+            return dict(status='UNBOUNDED_CERTIFIED', message='LP is unbounded in transformed direction',
+                        ray=ray.tolist(), base_point=x_base.tolist(), x=x_base.tolist(),
+                        algorithm='transformed unconstrained analysis', iterations=0, history=history)
+        report = verify(model, x_base, None, tol, check_integer=False)
+        return dict(status='OPTIMAL_VERIFIED' if report['feasible'] else 'NUMERICAL_FAILURE',
+                    x=x_base.tolist(), dual=[], verification=report, objective=report['objective'],
+                    iterations=0, algorithm='transformed unconstrained analysis', history=history)
 
     # Stack rows: equality rows first, then LE rows
     if m_eq > 0 and m_le > 0:

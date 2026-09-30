@@ -2,34 +2,40 @@
   "seed": 26119,
   "instances": [
     {
-      "path": "../examples/refinery_lp.json",
-      "sha256": "3b030ee41296642bb5d60766a480f0fdcbb94a3d44e0737095600bc238908935",
-      "known_objective": null,
-      "source": "fill official source URL before publication"
+      "path": "data/verified/avgas.mps",
+      "sha256": "10d0e68381321ee9b6a22a53a33d07f7740070b0a077a78ef742a9e88eca8213",
+      "known_objective": -7.75,
+      "source": "https://github.com/ERGO-Code/HiGHS/blob/master/check/instances/avgas.mps"
     },
     {
-      "path": "../examples/refinery_milp.json",
-      "sha256": "b0e54a2eeabb4efa56e5610c183120dca68af0c3e5ebe3b25c01eab195fd4423",
-      "known_objective": null,
-      "source": "fill official source URL before publication"
+      "path": "data/verified/afiro.mps",
+      "sha256": "fd3562804ff19382a9cd8bcb22ec81bffd24a4143a2290783831d8c64516a24b",
+      "known_objective": -464.75314286,
+      "source": "https://www.netlib.org/lp/data/"
     },
     {
-      "path": "../examples/refinery_qp.json",
-      "sha256": "da2267c10721020f4a9558d8e1a2749347fc6865804efa75bfeb0e58bf2b8176",
-      "known_objective": null,
-      "source": "fill official source URL before publication"
+      "path": "data/verified/sc50a.mps",
+      "sha256": "c4571004af37a0c7d49099f8fcc513885401784d32f712bf44e014e40348c521",
+      "known_objective": -64.575077059,
+      "source": "https://www.netlib.org/lp/data/"
     },
     {
-      "path": "../examples/infeasible.json",
-      "sha256": "6dc01928b021dfc0af3bac4506bd5bf8cbce7ac537ec495ae0478a971ace9b01",
-      "known_objective": null,
-      "source": "fill official source URL before publication"
+      "path": "data/verified/sc50b.mps",
+      "sha256": "15c9d96e1d518dddc197e8e107febce590d0ae94594c676ff0d135b5642c1be5",
+      "known_objective": -70.0,
+      "source": "https://www.netlib.org/lp/data/"
     },
     {
-      "path": "../examples/tiny.mps",
-      "sha256": "98aca9c16622a59ded391364db1ab3be9e7b3d13c8438534acf7cc25c4237501",
-      "known_objective": null,
-      "source": "fill official source URL before publication"
+      "path": "data/verified/blend.mps",
+      "sha256": "c8bb193f8af5dcff735a3b8db62077db93625e93cfb26e2b01f83ca3039cbf7d",
+      "known_objective": -30.812149846,
+      "source": "https://www.netlib.org/lp/data/"
+    },
+    {
+      "path": "data/verified/flugpl.mps",
+      "sha256": "a1f0cb79a95639450dd984473a00efca24365457153d7fcb859c6581ddab4c2c",
+      "known_objective": 1201500.0,
+      "source": "https://miplib.zib.de/instance_details_flugpl.html"
     }
   ]
 }
