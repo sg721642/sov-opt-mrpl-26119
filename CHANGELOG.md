@@ -1,6 +1,16 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
-## [0.1.2] - 2026-10-01
+## [0.1.3] - 2026-10-01
+
+### Fixed
+- **`scripts/generate_reports.py`:** Replaced hardcoded `EXTERNAL_HIGHS_RESULTS` dict with a real subprocess invocation of `baseline_worker.py`. Tries multiple Python interpreters (system, conda, venv). Records `NOT_RUN` or `FAILED` with actual error when highspy/scipy is unavailable; never manufactures a successful comparison. Removes instance-specific hardcoded discrepancies.
+- **`sovopt/milp.py`:** Removed misleading "exact integer optimum verified" language from `gap == 0.0` path. A floating-point gap of exactly 0.0 is not an exact rational optimality certificate; the new message explicitly acknowledges the floating-point nature of the gap check and that feasibility is verified numerically only.
+- **`web/index.html`:** Removed `includes('VERIFIED')` fallback from status rendering — unknown statuses now display as red `UNKNOWN: <raw_status>` instead of silently green. Added `UNBOUNDED_CERTIFIED` to `STATUS_MAP`. Added `clearResult()` function called on dataset/backend change to invalidate stale results. Fixed `gap === 0.0` display from "0.00% (proven)" to "0.00% (float)".
+- **`docs/01_SETUP.md`:** Steps 7–10 no longer reference synthetic results (4865, 4985, 5009.5) or synthetic refinery model names. Updated to describe actual real-source instances (AVGAS, AFIRO, FLUGPL) with correct expected statuses and objective values.
+- **`START_HERE.html`:** Steps 7–9 updated to reference authentic verified datasets. FLUGPL description corrected: bound is `1173644.9999999998`, no incumbent found in 50 nodes, status is `LIMIT_REACHED`.
+- **`data/CATALOGUE.md` / `reports/FINAL_AUDIT.md` / `reports/VERIFIED_BENCHMARKS.md`:** FLUGPL bound corrected from `1173645.0` to `1173644.9999999998` (exact floating-point display). BLEND truncation-as-sole-cause assertion removed — agreement between SOV-OPT and HiGHS is documented without claiming it proves the cause of the README discrepancy. AVGAS historical attribution marked as plausible-unverified against primary sources.
+- **`tests/test_solver.py`:** Added `test_milp_optimality_basis_language` (regression for corrected MILP gap language) and `test_flugpl_honest_metadata` (regression for FLUGPL LIMIT_REACHED status, correct bound range, and no spurious OPTIMAL_VERIFIED). Total tests: 14 (all pass).
+
 
 ### Added
 - **Reversible Variable Transformations (`sovopt/transforms.py`):** Canonical standard-form transformations handling lower-bounded, box-bounded, upper-only, free, and fixed variables with mathematically rigorous primal and dual postsolve recovery.

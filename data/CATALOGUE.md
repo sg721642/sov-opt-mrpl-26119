@@ -30,7 +30,7 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
 - **Problem Class:** Continuous Linear Program (LP)
 - **Category:** Academic solver benchmark
 - **Application / Domain:** Historical petroleum refinery aviation gasoline blending formulation. Blending alkylate, catalytic cracked gasoline, straight run gasoline, and isopentane into aviation gasoline subject to octane number and vapor pressure specifications.
-- **Provenance Evidence:** Published academic formulation from Charnes, Cooper, and Mellon (1952), "Blending Aviation Gasolines — A Study in Programming Interdependent Activities", *Econometrica* 20(2): 135–159; and Symonds (1955), *Linear Programming in the Petroleum Industry*, F. J. Maingot.
+- **Provenance Evidence:** The MPS file is sourced from the HiGHS public test suite (verified by SHA-256 hash). The file is attributed in literature to Charnes, Cooper, and Mellon (1952), "Blending Aviation Gasolines — A Study in Programming Interdependent Activities", *Econometrica* 20(2): 135–159; and Symonds (1955), *Linear Programming in the Petroleum Industry*, F. J. Maingot. **Note:** This historical attribution has not been independently verified against the primary sources in this session. Treat as plausible but unverified against primary literature. The file source (HiGHS repository) and hash are confirmed.
 - **Original Source URL:** https://github.com/ERGO-Code/HiGHS/blob/master/check/instances/avgas.mps
 - **Direct File URL:** https://raw.githubusercontent.com/ERGO-Code/HiGHS/master/check/instances/avgas.mps
 - **Retrieval Date:** 2026-10-01 (ISO 8601)
@@ -194,9 +194,10 @@ fabricated refinery parameters, or invented benchmarks are included in the activ
 - **Published Reference Objective:** `1201500` (optimal integer solution); LP relaxation root bound = 769500.0 (with published variable bounds).
 - **SOV-OPT Measured Result:**
   - Status: `LIMIT_REACHED` (at configured node limit, e.g. 50 nodes)
-  - Conservative Rational Lower Bound: `1173645.0` (exact rational basis duals advance bound from LP relaxation root 769500.0)
+  - Conservative Rational Lower Bound: `1173644.9999999998` (floating-point display of exact rational bound computed from exact rational basis duals; the difference from 1173645.0 is IEEE 754 rounding of the exact rational value)
+  - Incumbent (feasible integer solution): None found within 50 nodes.
   - Open Nodes: Explored cleanly without numerical divergence.
-  - Architectural Note: Infeasible branch relaxations are rigorously verified with exact binary-rational Farkas certificates ($G^T z = 0, h^T z < 0, z \ge 0$), permitting safe branch-and-bound pruning.
+  - Architectural Note: Infeasible branch relaxations are rigorously verified with exact binary-rational Farkas certificates, permitting safe branch-and-bound pruning.
 
 ---
 

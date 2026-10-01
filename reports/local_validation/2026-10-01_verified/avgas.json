@@ -232,10 +232,10 @@
   "model_name": "AVGAS",
   "model_sha256": "42e4186dfe26d2e46321e8a253d2af05f85d2cefc3404de7fa2c36c47279b965",
   "solver_version": "0.1.2",
-  "elapsed_seconds": 0.010667874999853666,
+  "elapsed_seconds": 0.010055500000134998,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-09-30T22:46:24.786524+00:00",
+  "timestamp_utc": "2026-10-01T13:01:43.897295+00:00",
   "variables": 8,
   "rows": 10,
   "nonzeros": 30,
@@ -244,7 +244,7 @@
     "architecture": "arm64",
     "python": "3.11.16"
   },
-  "measured_duration_seconds": 0.010704499998610117,
-  "git_revision": "bb3acc72ea7edd836bc938f40f06402eb0c512b4",
+  "measured_duration_seconds": 0.010086374999900727,
+  "git_revision": "531bc7c198eae6918e2336dc0d0e10d9ce118da6+dirty",
   "input_mps_sha256": "10d0e68381321ee9b6a22a53a33d07f7740070b0a077a78ef742a9e88eca8213"
 }

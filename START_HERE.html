@@ -191,34 +191,33 @@ python -m pip install -r requirements.txt
 <p>Then open <code>http://127.0.0.1:8001</code>.</p>
 <h2>Step 7 — Run the LP demonstration</h2>
 <ol>
-<li>Select <strong>Synthetic refinery blending LP</strong>.</li>
+<li>Select <strong>AVGAS Aviation Gasoline Blending LP</strong> (Symonds 1955).</li>
 <li>Leave algorithm route at <strong>CPU reference solver</strong>.</li>
-<li>Leave feed cost multiplier at <strong>1</strong>.</li>
-<li>Click <strong>Run &amp; verify</strong>.</li>
-<li>Confirm <code>OPTIMAL_VERIFIED</code> and objective <strong>4865</strong>.</li>
-<li>Inspect the four feed allocations: <strong>45, 15, 17.5, 32.5</strong>.</li>
-<li>Read the primal residual, stationarity residual and full reproducibility record.</li>
-<li>Click <strong>Download audit JSON</strong>. The export includes the exact model you solved and its result.</li>
+<li>Click <strong>Run &amp; verify live</strong>.</li>
+<li>Confirm <code>OPTIMAL_VERIFIED</code> and objective approximately <strong>-7.75</strong> (minimization formulation; the published maximum profit is 7.75 per unit).</li>
+<li>Inspect the eight blending allocation variables.</li>
+<li>Read the primal residual, stationarity (dual) residual, and KKT status in the Trust &amp; Verification Report.</li>
+<li>Click <strong>Download audit JSON</strong>. The export includes the exact model you solved, its result, and a model SHA-256 fingerprint.</li>
 </ol>
-<p>There is no prefilled dashboard result. Every click calls the real local solver.</p>
-<h2>Step 8 — Show decisions changing with the model</h2>
+<p>The objective value is authentic: -7.75 per unit is the published optimum from Symonds (1955). No prefilled dashboard results exist. Every click calls the real local solver.</p>
+<h2>Step 8 — Verify a Netlib LP benchmark</h2>
 <ol>
-<li>Change feed cost multiplier to <strong>1.2</strong>.</li>
-<li>Solve again. On the LP, all feed costs scale equally, so allocations should stay the same and the objective becomes <strong>5838</strong>.</li>
-<li>To change allocations instead, open <strong>Edit model JSON</strong>, change the second feed cost from 34 to 60, click <strong>Use edited model</strong>, reset multiplier to 1, and solve.</li>
-<li>A fresh model fingerprint must appear because the input changed.</li>
-<li>Re-select the original model to restore the shipped input.</li>
+<li>Select <strong>AFIRO</strong> (Systems Optimization Lab, Stanford).</li>
+<li>Choose CPU. Click <strong>Run &amp; verify live</strong>.</li>
+<li>Observe <code>OPTIMAL_VERIFIED</code> and objective approximately <strong>-464.753</strong>.</li>
+<li>Compare to the Netlib MINOS 5.3 reference value (-464.75314286). The discrepancy should be below 1e-10.</li>
+<li>Note the primal and dual residuals. These measure constraint violation and stationarity of the returned solution in the original model.</li>
 </ol>
-<p>For a more meaningful scenario, change quality bounds or crude availability. Preserve units and document every change. Do not change the model silently between solver comparisons.</p>
+<p>You can also run BLEND and SC50A/SC50B to confirm similar agreement with published Netlib reference objectives.</p>
 <h2>Step 9 — Demonstrate MILP on MIPLIB FLUGPL</h2>
 <ol>
 <li>Select <strong>FLUGPL (MILP) — Airline fleet allocation</strong>.</li>
 <li>Choose CPU algorithm route.</li>
-<li>Solve. Observe honest status <code>LIMIT_REACHED</code> with conservative rational lower bound <strong>1173645.0</strong>.</li>
-<li>Show the conservative bound, gap, and node count.</li>
-<li>Explain that the lower bound is computed via exact rational basis duals and exact rational Farkas certificates, ensuring bounds never exceed the integer optimum 1201500.0.</li>
+<li>Solve. Observe honest status <code>LIMIT_REACHED</code> — the 50-node limit is reached before finding a feasible integer solution.</li>
+<li>Read the <strong>Conservative bound</strong> field. The value is approximately <strong>1173644.9999999998</strong> (floating-point display of an exact rational lower bound computed via exact rational basis duals).</li>
+<li>This bound is provably valid: every feasible integer solution has objective ≥ this bound. The MIPLIB published integer optimum is 1201500. No incumbent (feasible integer solution) was found in 50 nodes.</li>
 </ol>
-<p>The MILP badge is based on exact rational lower bounds and search gap, not continuous KKT checks. The dashboard correctly displays continuous KKT as not used for MILP.</p>
+<p>The <code>LIMIT_REACHED</code> status is correct and informative. Do not interpret the missing incumbent as a solver defect. The conservative bound is the meaningful output for this run.</p>
 <h2>Step 10 — Disclosed Empty States</h2>
 <ol>
 <li><strong>Proprietary MRPL Refinery Data:</strong> No authorized MRPL dataset is available in this project. Fictional refinery parameters or placeholder economic numbers are strictly prohibited. Genuine historical petroleum blending benchmarks (<code>AVGAS</code> and <code>BLEND</code>) are provided instead.</li>

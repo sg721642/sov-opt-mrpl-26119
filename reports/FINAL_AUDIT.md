@@ -77,9 +77,11 @@ All 6 genuine instances were solved using the native C++ HiGHS 1.15.1 solver via
 | **SC50A** | `data/verified/sc50a.mps` | `HighsModelStatus.kOptimal` | -64.575077 | -64.575077 | 0.0 | `EXACT_MATCH` |
 | **SC50B** | `data/verified/sc50b.mps` | `HighsModelStatus.kOptimal` | -70.000000 | -70.000000 | 0.0 | `EXACT_MATCH` |
 | **BLEND** | `data/verified/blend.mps` | `HighsModelStatus.kOptimal` | -30.812150 | -30.812150 | 0.0 | `EXACT_MATCH` |
-| **FLUGPL** | `data/verified/flugpl.mps` | `HighsModelStatus.kOptimal` | 1201500.000000 | Bound: 1173645.0 | Safe lower bound <= 1201500 | `VALIDATED_BOUND` |
+| **FLUGPL** | `data/verified/flugpl.mps` | `HighsModelStatus.kOptimal` | 1201500.000000 | Bound: 1173644.9999999998 | Conservative bound <= 1201500; no incumbent found in 50 nodes | `VALIDATED_BOUND` |
 
-Key takeaway: Netlib BLEND objective `-30.812149845828237` matches native C++ HiGHS 1.15.1 to machine precision ($0.0$ difference at double precision), proving that the discrepancy against the 1988 Netlib README (`-3.0812149846E+01`) is due entirely to 11-digit text truncation in historical MINOS 5.3 output, not a solver defect.
+Note (BLEND): SOV-OPT and HiGHS both return `-30.812149845828237` for `blend.mps`. This confirms the two solvers agree on this file. The Netlib README value `-3.0812149846E+01` (11 significant digits) differs by approximately 1.72e-10. The specific cause of the README discrepancy (text truncation in historical output, or other factor) has not been independently confirmed here.
+
+Note (FLUGPL): Status is `LIMIT_REACHED`. No feasible integer solution (incumbent) was found in 50 nodes. The bound `1173644.9999999998` is the floating-point display of an exact rational value computed from exact rational basis duals.
 
 ---
 
@@ -106,10 +108,11 @@ Key takeaway: Netlib BLEND objective `-30.812149845828237` matches native C++ Hi
 - **Resolution:**
   - Removed `[rootlb]` pinning. The lower bound is computed as the minimum of open branch nodes and valid terminal leaves.
   - Implemented `_exact_dual_from_basis` using `_exact_solve_BT` in exact rational arithmetic (`Fraction`), ensuring reduced costs on basic variables are mathematically zero ($0/1$).
-  - With exact rational duals, `safe_lower_bound` evaluates reliably on every branch node, advancing the conservative lower bound on MIPLIB FLUGPL from $769500.0$ to **$1173645.0$** at 50 nodes (and $1176210.0$ at 150 nodes).
+  - With exact rational duals, `safe_lower_bound` evaluates reliably on every branch node, advancing the conservative lower bound on MIPLIB FLUGPL from $769500.0$ to **$1173644.9999999998$** at 50 nodes (floating-point display of exact rational value). No incumbent found within 50 nodes. Status: `LIMIT_REACHED`.
+  - Corrected `optimality_basis` language in `milp.py`: removed misleading "exact integer optimum verified" from `gap == 0.0` path; added explicit acknowledgment that this is a floating-point equality, not an exact rational optimality certificate.
   - Added `model.obj_offset` in exact rational arithmetic (`Fraction`) prior to conservative downward rounding via `downward_float(global_lower + offset_F)`.
   - Updated FLUGPL bounds test to accept verified improvements while verifying bounds remain strictly $\le 1201500.0$.
-- **Verification:** `test_milib_flugpl_solve_and_lower_bound` passes, verifying valid bounds and honest `LIMIT_REACHED` status.
+- **Verification:** `test_milib_flugpl_solve_and_lower_bound`, `test_flugpl_honest_metadata`, and `test_milp_optimality_basis_language` pass.
 
 ### Area 4: Objective Conventions & Verification Rigor
 - **Issue:** `solve_qp` negated $ and $ upon entry and then negated $ again, creating confusing double-negation. `verify.py` included `model.obj_offset` in KKT denominator scaling. Farkas certificate export was lossy.
@@ -121,13 +124,14 @@ Key takeaway: Netlib BLEND objective `-30.812149845828237` matches native C++ Hi
 - **Verification:** `test_infeasible_farkas_certificate_genuine` verifies exact Farkas export, reload, and mathematical re-verification.
 
 ### Area 5: Independent References & Provenance Tracking
-- **Issue:** Solver outputs and reference values were blended in earlier summaries. Netlib BLEND discrepancy was rounded off without explanation.
+- **Issue:** Solver outputs and reference values were blended in earlier summaries. Netlib BLEND discrepancy was rounded off without explanation. A causation claim was made (truncation as sole cause) that goes beyond what the evidence supports.
 - **Resolution:**
-  - Separate published references, literature citations, and reporting precision.
-  - Detailed BLEND discrepancy: published reference is `-3.0812149846E+01` (11 digits, MINOS 5.3 1988), SOV-OPT calculates `-30.812149845828237`. The difference is 0.71763 \times 10^{-10}$, caused by 11-digit truncation in the historical Netlib documentation.
+  - Separated published references, literature citations, and reporting precision.
+  - BLEND discrepancy: SOV-OPT and HiGHS agree to machine precision on `blend.mps`. The Netlib README reference is `-3.0812149846E+01` (11 significant digits), difference is approximately 1.72e-10. The specific cause of the README discrepancy has not been independently confirmed; agreement between two solvers shows they agree with each other, not that the historical reference was truncated.
+  - AVGAS historical attribution (Charnes et al. 1952 / Symonds 1955) marked as plausible-unverified against primary sources; file source (HiGHS repository) and SHA-256 are confirmed.
   - Explicitly added "No authorized MRPL dataset is available in this project" to all documentation and the web dashboard.
   - Standalone MPS parser implemented in `scripts/baseline_worker.py`.
-- **Verification:** All benchmark and catalogue files updated with exact discrepancy analysis.
+- **Verification:** All benchmark and catalogue files updated with corrected discrepancy analysis.
 
 ### Area 6: Evidence Regeneration & Git Cleanup
 - **Issue:** Reports and results needed programmatic regeneration with accurate UTC timestamps and synchronized versions.

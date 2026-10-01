@@ -87,46 +87,46 @@ Then open `http://127.0.0.1:8001`.
 
 ## Step 7 — Run the LP demonstration
 
-1. Select **Synthetic refinery blending LP**.
+1. Select **AVGAS Aviation Gasoline Blending LP** (Symonds 1955).
 2. Leave algorithm route at **CPU reference solver**.
-3. Leave feed cost multiplier at **1**.
-4. Click **Run & verify**.
-5. Confirm `OPTIMAL_VERIFIED` and objective **4865**.
-6. Inspect the four feed allocations: **45, 15, 17.5, 32.5**.
-7. Read the primal residual, stationarity residual and full reproducibility record.
-8. Click **Download audit JSON**. The export includes the exact model you solved and its result.
+3. Click **Run & verify live**.
+4. Confirm `OPTIMAL_VERIFIED` and objective approximately **-7.75** (minimization formulation of maximize 7.75 profit).
+5. Inspect the eight blending allocation variables.
+6. Read the primal residual, stationarity (dual) residual, and KKT status in the Trust & Verification Report.
+7. Click **Download audit JSON**. The export includes the exact model you solved and its result, with a model SHA-256 fingerprint.
 
-There is no prefilled dashboard result. Every click calls the real local solver.
+The objective value is authentic: -7.75 per unit is the published optimum from Symonds (1955). No prefilled dashboard results exist. Every click calls the real local solver.
 
-## Step 8 — Show decisions changing with the model
+## Step 8 — Verify a Netlib LP benchmark
 
-1. Change feed cost multiplier to **1.2**.
-2. Solve again. On the LP, all feed costs scale equally, so allocations should stay the same and the objective becomes **5838**.
-3. To change allocations instead, open **Edit model JSON**, change the second feed cost from 34 to 60, click **Use edited model**, reset multiplier to 1, and solve.
-4. A fresh model fingerprint must appear because the input changed.
-5. Re-select the original model to restore the shipped input.
+1. Select **AFIRO** (Systems Optimization Lab, Stanford).
+2. Choose CPU. Click **Run & verify live**.
+3. Observe `OPTIMAL_VERIFIED` and objective approximately **-464.753**.
+4. Compare to the Netlib MINOS 5.3 reference value (-464.75314286). The discrepancy should be below 1e-10.
+5. Note the primal and dual residuals. These measure constraint violation and stationarity of the returned solution in the original model.
 
-For a more meaningful scenario, change quality bounds or crude availability. Preserve units and document every change. Do not change the model silently between solver comparisons.
+You can also run BLEND and SC50A/SC50B to confirm similar agreement with published Netlib reference objectives.
 
-## Step 9 — Demonstrate MILP
+## Step 9 — Demonstrate MILP on MIPLIB FLUGPL
 
-1. Select **Synthetic refinery activation MILP**.
-2. Choose CPU and multiplier 1.
-3. Solve. Expected objective: **4985**; the binary `high_feed_enabled` variable is **1**.
-4. Show the conservative bound, search gap and node count.
-5. Explain that the fixed activation cost is 120 synthetic cost units, and the LP relaxation can use fractional activation whereas the MILP cannot.
+1. Select **FLUGPL** (MIPLIB, airline fleet allocation MILP).
+2. Choose CPU. Click **Run & verify live**.
+3. Observe `LIMIT_REACHED` — this instance is hard: the default 50-node limit is reached before finding a feasible integer solution.
+4. Read the **Conservative bound** field. It should display a lower bound close to 1173645 (exact value depends on floating-point rounding of rational duals: `1173644.9999999998`). This bound was computed using exact rational basis dual arithmetic.
+5. The bound is provably valid: every feasible integer solution has objective ≥ this bound. The MIPLIB published integer optimum is 1201500.
+6. Note: no incumbent (feasible integer solution) was found within 50 nodes. The dashboard correctly shows no objective value, only the conservative bound.
 
-The MILP badge is based on the tree and gap closure, not continuous KKT checks. The dashboard correctly displays continuous KKT as not used for MILP. Final export verifies the incumbent; it is not a standalone, replayable formal proof of the entire branch-and-bound tree.
+The `LIMIT_REACHED` status is correct and informative. Do not interpret the missing incumbent as a solver defect.
 
-## Step 10 — Demonstrate convex QP
+## Step 10 — Disclosed empty states
 
-1. Select **Synthetic refinery smooth blending QP**.
-2. Choose CPU and multiplier 1.
-3. Solve. Expect objective near **5009.5** with small original-model residuals.
-4. Show the convergence trace and complementarity in the JSON record.
-5. Explain that the added objective is `0.04 * sum(x_j^2)` because the model convention is `0.5*x^T*Q*x` and `Q = 0.08*I`.
+The dashboard intentionally has no entries for the following because no suitable verified data is available:
 
-The QP is convex. This does not solve nonconvex pooling or nonlinear refinery physics.
+- **Proprietary MRPL refinery data:** No authorized MRPL dataset is in this project. Fictional refinery parameters are strictly prohibited.
+- **Industrial convex QP benchmark:** No authentic public industrial convex QP benchmark is currently in the verified suite. The QP interior-point solver (`sovopt/qp.py`) is mathematically verified on KKT-constructed cases, not a real-world dataset.
+
+These empty states are honest, not omissions. `AVGAS` and `BLEND` are historical petroleum industry LPs that serve as genuine — though academic — blending benchmark surrogates.
+
 
 ## Step 11 — Show an infeasibility certificate
 

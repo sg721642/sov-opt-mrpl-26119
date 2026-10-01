@@ -588,10 +588,10 @@
   "model_name": "SC50A",
   "model_sha256": "a22e7a93dd11db1ed0d239e0ca4bf7d1a0a99b58845ad438f62cb0a7d5642dc0",
   "solver_version": "0.1.2",
-  "elapsed_seconds": 0.05048620900015521,
+  "elapsed_seconds": 0.04994299999998475,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-09-30T22:46:24.864887+00:00",
+  "timestamp_utc": "2026-10-01T13:01:43.971012+00:00",
   "variables": 48,
   "rows": 50,
   "nonzeros": 130,
@@ -600,7 +600,7 @@
     "architecture": "arm64",
     "python": "3.11.16"
   },
-  "measured_duration_seconds": 0.05051808300049743,
-  "git_revision": "bb3acc72ea7edd836bc938f40f06402eb0c512b4",
+  "measured_duration_seconds": 0.049974875000089014,
+  "git_revision": "531bc7c198eae6918e2336dc0d0e10d9ce118da6+dirty",
   "input_mps_sha256": "c4571004af37a0c7d49099f8fcc513885401784d32f712bf44e014e40348c521"
 }

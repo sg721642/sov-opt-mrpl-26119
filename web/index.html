@@ -154,6 +154,7 @@ const STATUS_MAP = {
   'OPTIMAL_VERIFIED': { cls: 'good', text: 'OPTIMAL VERIFIED' },
   'INFEASIBLE_CERTIFIED': { cls: 'warning', text: 'INFEASIBLE CERTIFIED' },
   'UNBOUNDED': { cls: 'warning', text: 'UNBOUNDED' },
+  'UNBOUNDED_CERTIFIED': { cls: 'warning', text: 'UNBOUNDED CERTIFIED' },
   'LIMIT_REACHED': { cls: 'warning', text: 'LIMIT REACHED (INCOMPLETE)' },
   'NUMERICAL_FAILURE': { cls: 'bad', text: 'NUMERICAL FAILURE' },
   'INVALID_MODEL': { cls: 'bad', text: 'INVALID MODEL' }
@@ -161,6 +162,16 @@ const STATUS_MAP = {
 
 const fmt=v=>v==null?'—':Math.abs(v)>1e6?Number(v).toExponential(4):Number(v).toLocaleString(undefined,{maximumFractionDigits:6});
 const sci=v=>v==null?'—':Number(v).toExponential(2);
+
+function clearResult(){
+  $('result').hidden=true;
+  $('empty').hidden=false;
+  $('status').textContent='AWAITING EXECUTION';
+  $('status').className='status';
+  $('live_badge').hidden=true;
+  $('download').disabled=true;
+  last=null;
+}
 
 function choose(){
   const key=$('example').value;
@@ -173,6 +184,7 @@ function choose(){
   const refText=m.published_reference_text||(m.reference_objective!=null?m.reference_objective:null);
   $('m_ref').textContent=refText?`${refText} (${m.reference_source||'Published'})`:'—';
   $('modelname').textContent='Selected: '+(m.name||key)+' ('+(m.class||'')+') · Click Run & verify live';
+  clearResult();
 }
 
 Promise.all([
@@ -195,6 +207,7 @@ Promise.all([
 }).catch(e=>$('message').textContent='Failed to load manifest or examples: '+e.message);
 
 $('example').onchange=choose;
+$('backend').onchange=clearResult;
 
 function cellRow(key,value){
   const tr=document.createElement('tr');
@@ -239,7 +252,8 @@ $('solve').onclick=async()=>{
     $('empty').hidden=true;
     $('result').hidden=false;
     $('live_badge').hidden=false;
-    const st=STATUS_MAP[r.status]||{cls:(r.status.includes('VERIFIED')?'good':'bad'),text:r.status};
+    // Never fall back to includes('VERIFIED') — unknown statuses show as bad (red) with raw status text
+    const st=STATUS_MAP[r.status]||{cls:'bad',text:'UNKNOWN: '+r.status};
     $('status').textContent=st.text;
     $('status').className='status '+st.cls;
     $('modelname').textContent=`${instMeta.name||selectedKey} (${instMeta.class||''}) solved via ${selectedBackend}`;
@@ -248,7 +262,8 @@ $('solve').onclick=async()=>{
     $('objective').textContent=r.objective!=null?fmt(r.objective):(r.incumbent!=null?fmt(r.incumbent):'—');
     $('bound').textContent=r.best_bound!=null?fmt(r.best_bound):(r.status==='OPTIMAL_VERIFIED'?fmt(r.objective):'—');
     if(r.relative_gap!=null){
-      $('gap').textContent=r.relative_gap===0.0?'0.00% (proven)':(r.relative_gap*100).toFixed(4)+'%';
+      // gap===0.0 is floating-point equality, not a proven exact result; label it accordingly
+      $('gap').textContent=r.relative_gap===0.0?'0.00% (float)':(r.relative_gap*100).toFixed(4)+'%';
     }else if(r.status==='OPTIMAL_VERIFIED'){
       $('gap').textContent='0.00% (KKT certified)';
     }else{

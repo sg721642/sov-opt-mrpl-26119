@@ -194,14 +194,13 @@ def solve_milp(model, tol=1e-7, max_nodes=1000, time_limit=30., **kwargs):
             result.update(x=inc.tolist(), objective=reported_obj, verification=vr, relative_gap=gap)
             if not heap and not failure and gap <= tol:
                 result['status'] = 'OPTIMAL_VERIFIED'
-                if gap == 0.0:
-                    result['verification']['optimality_basis'] = (
-                        'finite B&B tree with exact rational lower bounds and Farkas certificates; exact integer optimum verified'
-                    )
-                else:
-                    result['verification']['optimality_basis'] = (
-                        f'finite B&B tree with exact rational lower bounds; incumbent feasibility verified numerically to tol; tolerance-closed with relative gap {gap:.2e} <= {tol:.2e}'
-                    )
+                # gap == 0.0 is a floating-point equality between incumbent and bound;
+                # it is not an exact rational certificate of optimality. Incumbent feasibility
+                # is checked numerically (verify()), not by exact rational arithmetic.
+                result['verification']['optimality_basis'] = (
+                    f'finite B&B tree with exact rational lower bounds; incumbent feasibility verified numerically; '
+                    f'relative gap {gap:.2e} <= {tol:.2e} (floating-point; not an exact rational optimality certificate)'
+                )
             elif failure:
                 result['status'] = 'NUMERICAL_FAILURE'
                 result['verification']['optimality_basis'] = 'B&B search halted on unresolved LP node; conservative lower bound preserved from open search tree'
@@ -231,14 +230,11 @@ def solve_milp(model, tol=1e-7, max_nodes=1000, time_limit=30., **kwargs):
             result.update(x=inc.tolist(), objective=reported_obj, verification=vr, relative_gap=gap)
             if not heap and not failure and gap <= tol:
                 result['status'] = 'OPTIMAL_VERIFIED'
-                if gap == 0.0:
-                    result['verification']['optimality_basis'] = (
-                        'finite B&B tree with exact rational bounds and Farkas certificates; exact integer optimum verified'
-                    )
-                else:
-                    result['verification']['optimality_basis'] = (
-                        f'finite B&B tree with exact rational bounds; incumbent feasibility verified numerically to tol; tolerance-closed with relative gap {gap:.2e} <= {tol:.2e}'
-                    )
+                # Same caveat: floating-point gap equality is not an exact rational optimality proof
+                result['verification']['optimality_basis'] = (
+                    f'finite B&B tree with exact rational bounds; incumbent feasibility verified numerically; '
+                    f'relative gap {gap:.2e} <= {tol:.2e} (floating-point; not an exact rational optimality certificate)'
+                )
             elif failure:
                 result['status'] = 'NUMERICAL_FAILURE'
                 result['verification']['optimality_basis'] = 'B&B search halted on unresolved LP node; conservative bound preserved from open search tree'

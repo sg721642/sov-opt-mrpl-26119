@@ -1,10 +1,10 @@
 # Verified Benchmark & Differential Validation Report
 
-**Date:** 2026-09-30  
+**Date:** 2026-10-01  
 **Environment:** Darwin arm64, Python 3.11.16  
-**Solver Version:** SOV-OPT 0.1.2 (`bb3acc72`)  
+**Solver Revision:** `531bc7c198eae691` (includes +dirty if uncommitted changes)  
 **Core Dependencies:** NumPy and Python standard library only (strictly sovereign core)  
-**External Validation:** HiGHS 1.15.1 native C++ solver and SciPy HiGHS interface (isolated subprocess only)  
+**External Validation:** via `scripts/baseline_worker.py` isolated subprocess (highspy or scipy fallback)  
 
 ---
 
@@ -15,33 +15,35 @@ No synthetic or fabricated instances are used as performance evidence.
 
 | Instance | Problem Class | Dimensions (m x n) | SOV-OPT Status | SOV-OPT Objective | Published Reference Text | Discrepancy | Primal Residual | Stationarity (Dual) | Runtime |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **AVGAS** | LP | 10 x 8 | `OPTIMAL_VERIFIED` | **-7.750000** | -7.75 | 0.0 | 5.55e-17 | 2.88e-17 | 10.7 ms |
-| **AFIRO** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753143** | -4.6475314286E+02 | 2.86e-09 | 1.42e-14 | 1.72e-17 | 24.1 ms |
-| **SC50A** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-64.575077** | -6.4575077059E+01 | 4.35e-10 | 5.37e-16 | 4.09e-17 | 50.5 ms |
-| **SC50B** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000** | -7.0000000000E+01 | 0.0 | 2.49e-16 | 3.97e-17 | 47.8 ms |
-| **BLEND** | LP | 74 x 83 | `OPTIMAL_VERIFIED` | **-30.812150** | -3.0812149846E+01 | 1.72e-10 | 1.78e-15 | 1.23e-16 | 920.6 ms |
-| **FLUGPL** | MILP | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **1173645.0** | 1201500 (integer optimal); 769500.0 (LP relaxation root bound) | N/A | N/A | N/A | 1089.9 ms |
+| **AVGAS** | LP | 10 x 8 | `OPTIMAL_VERIFIED` | **-7.750000** | -7.75 | 0.0 | 5.55e-17 | 2.88e-17 | 10.1 ms |
+| **AFIRO** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753143** | -4.6475314286E+02 | 2.86e-09 | 1.42e-14 | 1.72e-17 | 22.4 ms |
+| **SC50A** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-64.575077** | -6.4575077059E+01 | 4.35e-10 | 5.37e-16 | 4.09e-17 | 50.0 ms |
+| **SC50B** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000** | -7.0000000000E+01 | 0.0 | 2.49e-16 | 3.97e-17 | 46.3 ms |
+| **BLEND** | LP | 74 x 83 | `OPTIMAL_VERIFIED` | **-30.812150** | -3.0812149846E+01 | 1.72e-10 | 1.78e-15 | 1.23e-16 | 908.6 ms |
+| **FLUGPL** | MILP | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **1173645** | 1201500 (integer optimal); 769500.0 (LP relaxation root bound) | N/A | N/A | N/A | 1022.0 ms |
 | **AVGAS (PDHG-CPU)** | LP | 10 x 8 | `OPTIMAL_VERIFIED` | **-7.750000** | -7.75 (Symonds 1955) | 1.1e-07 | 1.31e-08 | 1.90e-09 | 4.0 ms |
 
 ---
 
-## 2. Independent Differential Verification (Native HiGHS 1.15.1)
+## 2. Independent Differential Verification (External Subprocess)
 
-To provide rigorous independent verification, all 6 genuine instances were solved using the native C++ HiGHS 1.15.1 solver via `highspy` in an isolated external process (completely separated from the sovereign solver core):
+External validation is performed by invoking `scripts/baseline_worker.py` in a separate interpreter process.
+The worker tries `highspy` (native C++ HiGHS) first; if unavailable, falls back to `scipy.optimize.linprog/milp`.
+If neither is available, status is `NOT_RUN` or `FAILED` with the actual error recorded.
 
-| Instance | Input MPS File | HiGHS C++ Status | HiGHS Objective | SOV-OPT Objective / Bound | Discrepancy (SOV-OPT vs HiGHS) | Match Status |
+| Instance | Input MPS File | External Status | External Objective | SOV-OPT Objective / Bound | Discrepancy | Comparison |
 |:---|:---|:---:|:---:|:---:|:---:|:---:|
-| **AVGAS** | `data/verified/avgas.mps` | `HighsModelStatus.kOptimal` | -7.750000 | -7.750000 | 0.0 | `EXACT_MATCH` |
-| **AFIRO** | `data/verified/afiro.mps` | `HighsModelStatus.kOptimal` | -464.753143 | -464.753143 | 5.68e-14 | `MATCH (< 1e-12)` |
-| **SC50A** | `data/verified/sc50a.mps` | `HighsModelStatus.kOptimal` | -64.575077 | -64.575077 | 0.0 | `EXACT_MATCH` |
-| **SC50B** | `data/verified/sc50b.mps` | `HighsModelStatus.kOptimal` | -70.000000 | -70.000000 | 0.0 | `EXACT_MATCH` |
-| **BLEND** | `data/verified/blend.mps` | `HighsModelStatus.kOptimal` | -30.812150 | -30.812150 | 0.0 | `EXACT_MATCH` |
-| **FLUGPL** | `data/verified/flugpl.mps` | `HighsModelStatus.kOptimal` | 1201500.000000 | Bound: 1173645.0 | Safe lower bound <= 1201500 | `VALIDATED_BOUND` |
+| **AVGAS** | `data/verified/avgas.mps` | `FAILED` | — | — | — | `FAILED` |
+| **AFIRO** | `data/verified/afiro.mps` | `FAILED` | — | — | — | `FAILED` |
+| **SC50A** | `data/verified/sc50a.mps` | `FAILED` | — | — | — | `FAILED` |
+| **SC50B** | `data/verified/sc50b.mps` | `FAILED` | — | — | — | `FAILED` |
+| **BLEND** | `data/verified/blend.mps` | `FAILED` | — | — | — | `FAILED` |
+| **FLUGPL** | `data/verified/flugpl.mps` | `FAILED` | — | Bound: 1173644.9999999998 | Bound vs optimum only | `FAILED` |
 
-### Key Findings from Differential Comparison:
-1. **Netlib BLEND Resolution:** Native HiGHS 1.15.1 directly reading `blend.mps` returns **-30.8121498458**, exactly matching SOV-OPT to full precision (`-30.812149845828237`). This independently proves that the discrepancy against the 1988 Netlib README (`-3.0812149846E+01`) is due solely to 11-digit text truncation in historical MINOS 5.3 output, not a solver defect.
-2. **MIPLIB FLUGPL Bound:** MIPLIB integer optimum is verified as 1201500.0 by HiGHS. SOV-OPT explores the branch-and-bound tree with exact rational basis duals and exact rational Farkas certificates, advancing the conservative lower bound from root to 1173645.0 at 50 nodes without numerical instability.
-3. **Netlib Staircase Models (SC50A, SC50B):** Both match HiGHS and Netlib references to machine precision.
+### Notes on External Differential Comparison:
+1. **Netlib BLEND:** Both SOV-OPT and the external solver (if available) read `blend.mps` directly. Agreement between them shows they parse the same file. The Netlib MINOS 5.3 README reference (-3.0812149846E+01, 11 significant digits) differs from the full-precision result; the source of this discrepancy (truncation in historical text, or solver difference) is not independently confirmed here — do not assert a specific cause.
+2. **MIPLIB FLUGPL Bound:** MIPLIB integer optimum is 1201500.0. SOV-OPT produces a conservative lower bound of approximately 1173644.9999999998 (floating-point display) at 50 nodes with no incumbent found. Status: LIMIT_REACHED. This is not a completed MILP solve.
+3. **AVGAS Provenance Note:** The MPS file is sourced from the HiGHS test suite (https://github.com/ERGO-Code/HiGHS). Primary historical attribution to Charnes, Cooper, Mellon (1952) *Econometrica* and Symonds (1955) has not been independently verified against the primary sources in this session. Treat provenance as plausible but unverified against primary literature.
 
 ---
 
