@@ -12,6 +12,7 @@ No successful comparison is ever manufactured.
 """
 import hashlib
 import json
+import math
 import os
 import platform
 import subprocess
@@ -109,6 +110,214 @@ def run_external_validation(mps_path):
         'actual_error': last_error or 'All interpreter candidates failed',
         'objective': None
     }
+
+
+def evaluate_differential_comparison(sovopt_res: dict, ext: dict, meta: dict) -> dict:
+    """Evaluate differential comparison between SOV-OPT and an external reference solve.
+
+    Enforces strict validation criteria:
+    - Verifies native parsed dimensions (variables, constraints, integers) against model metadata.
+    - Requires external exit_code == 0, success == True, and explicit optimal status (kOptimal)
+      before declaring MATCH or validating a bound against an external optimum.
+    - Never describes a feasible external objective from an incomplete/suboptimal solve as the optimum.
+    - If external optimization is incomplete, failed, or lacks a finite objective, reports that honestly
+      and distinguishes internally certified bounds from externally checked bounds.
+    - Validates conservative bound directions for both minimization (lower bound <= z*) and
+      maximization (upper bound >= z*).
+    - Distinguishes incomplete solves with incumbents from solves without incumbents.
+    """
+    # 1. Compare native parsed dimensions where available
+    ext_dims = ext.get('parsed_dimensions')
+    dims_match = True
+    if ext_dims:
+        dims_match = (
+            ext_dims.get('variables') == meta.get('variables') and
+            ext_dims.get('constraints') == meta.get('constraints') and
+            ext_dims.get('integers', 0) == meta.get('integers', 0)
+        )
+        ext['dimensions_match'] = dims_match
+
+    # 2. Check external solver termination and optimality
+    ext_status_raw = str(ext.get('model_status', ext.get('status', '')))
+    ext_exit_code = ext.get('exit_code', ext.get('_worker_returncode'))
+    ext_success = ext.get('success', False)
+    ext_msg = str(ext.get('message', '')).lower()
+
+    ext_optimal = (
+        ext_exit_code == 0 and
+        ext_success is True and
+        ('kOptimal' in ext_status_raw or 'Optimal' in ext_status_raw or 'optimal' in ext_msg)
+    )
+    ext['ext_optimal'] = ext_optimal
+
+    # 3. Check SOV-OPT solver status and KKT verification
+    sovopt_status = sovopt_res.get('status')
+    sovopt_kkt = sovopt_res.get('verification', {}).get('kkt_passed', False)
+    sovopt_verified = (sovopt_status == 'OPTIMAL_VERIFIED' and sovopt_kkt is True)
+
+    h_obj = ext.get('objective')
+    h_has_finite_obj = (h_obj is not None and isinstance(h_obj, (int, float)) and math.isfinite(h_obj))
+
+    s_obj = sovopt_res.get('objective')
+    s_has_finite_obj = (s_obj is not None and isinstance(s_obj, (int, float)) and math.isfinite(s_obj))
+
+    s_bound = sovopt_res.get('best_bound')
+    s_has_finite_bound = (s_bound is not None and isinstance(s_bound, (int, float)) and math.isfinite(s_bound))
+
+    sense = meta.get('objective_sense', 'MINIMIZE').upper()
+    bound_type = "lower bound" if sense == 'MINIMIZE' else "upper bound"
+
+    # Case 1: External solve was not run or failed
+    if ext.get('status') in ('NOT_RUN', 'FAILED'):
+        ext['sovopt_status'] = sovopt_status
+        if s_has_finite_bound:
+            ext['sovopt_best_bound'] = s_bound
+            has_incumbent = s_has_finite_obj
+            inc_note = f"with incumbent objective {s_obj}" if has_incumbent else "without discovering an incumbent solution"
+            ext['comparison_status'] = 'BOUND_INTERNALLY_CERTIFIED'
+            reason = ext.get('actual_error') or ext.get('status')
+            ext['comparison_note'] = (
+                f"Conservative {bound_type} {s_bound} is internally certified via exact rational arithmetic ({inc_note}); "
+                f"external solver {ext.get('status').lower()} ({reason}). Bound is not externally checked."
+            )
+        else:
+            ext['comparison_status'] = ext.get('status')
+            ext['comparison_note'] = f"External validation {ext.get('status').lower()}: {ext.get('actual_error', 'no output')}"
+        return ext
+
+    # Case 2: Dimension mismatch between parsers
+    if not dims_match:
+        ext['comparison_status'] = 'DIMENSION_MISMATCH'
+        ext['comparison_note'] = (
+            f"Parsed dimensions mismatch: SOV-OPT has {meta.get('constraints')}x{meta.get('variables')} "
+            f"({meta.get('integers', 0)} int), external parser reported "
+            f"{ext_dims.get('constraints')}x{ext_dims.get('variables')} ({ext_dims.get('integers', 0)} int)."
+        )
+        return ext
+
+    # Case 3: SOV-OPT reports a bound from an incomplete solve (e.g. MILP limit reached, with or without incumbent)
+    if s_has_finite_bound and not sovopt_verified:
+        ext['sovopt_status'] = sovopt_status
+        ext['sovopt_best_bound'] = s_bound
+        has_incumbent = s_has_finite_obj
+        inc_note = f"with incumbent objective {s_obj}" if has_incumbent else "without discovering an incumbent solution"
+
+        if not h_has_finite_obj:
+            # External solve produced no finite objective
+            ext['comparison_status'] = 'BOUND_INTERNALLY_CERTIFIED'
+            ext['comparison_note'] = (
+                f"Conservative {bound_type} {s_bound} is internally certified via exact rational arithmetic ({inc_note}); "
+                f"external solver produced no finite objective (status: {ext.get('model_status', ext.get('status', 'unknown'))}). "
+                "Bound is not externally checked."
+            )
+            return ext
+
+        if not ext_optimal:
+            # External solve produced an objective, but did NOT prove optimality!
+            # Never describe a feasible external objective as the optimum!
+            ext['comparison_status'] = 'EXTERNAL_NOT_OPTIMAL'
+            ext['comparison_note'] = (
+                f"External solver did not prove optimality (status: {ext.get('model_status', ext.get('status', 'unknown'))}); "
+                f"external objective {h_obj} is a feasible objective, not an external optimum. "
+                "Bound cannot be validated against external optimum."
+            )
+            return ext
+
+        # External solve IS optimal and h_obj IS finite:
+        # Validate bound direction:
+        # For MINIMIZE: lower bound must satisfy s_bound <= h_obj + 1e-6
+        # For MAXIMIZE: upper bound must satisfy s_bound >= h_obj - 1e-6
+        if sense == 'MINIMIZE':
+            valid_bound = (s_bound <= h_obj + 1e-6)
+        else:
+            valid_bound = (s_bound >= h_obj - 1e-6)
+        ext['bound_direction_valid'] = valid_bound
+
+        if not valid_bound:
+            ext['comparison_status'] = 'INVALID_BOUND'
+            ext['comparison_note'] = (
+                f"Conservative {bound_type} {s_bound} violates external optimum {h_obj} (direction invalid for {sense}, {inc_note})."
+            )
+        else:
+            ext['comparison_status'] = 'BOUND_ONLY'
+            ext['comparison_note'] = (
+                f"BOUND_ONLY represents incomplete SOV-OPT evidence: valid conservative {bound_type} {s_bound} "
+                f"validated against external optimum {h_obj} ({sense}), {inc_note}."
+            )
+        return ext
+
+    # Case 4: SOV-OPT verified optimal solution compared with external solve
+    if sovopt_verified and s_has_finite_obj:
+        if not h_has_finite_obj:
+            ext['comparison_status'] = 'NO_EXTERNAL_OBJECTIVE'
+            ext['comparison_note'] = (
+                f"External solver produced no finite objective (status: {ext.get('model_status', ext.get('status', 'unknown'))})."
+            )
+            return ext
+        if not ext_optimal:
+            ext['comparison_status'] = 'EXTERNAL_NOT_OPTIMAL'
+            ext['comparison_note'] = (
+                f"External solver did not prove optimality (status: {ext.get('model_status', ext.get('status', 'unknown'))}); "
+                f"external objective {h_obj} is a feasible solution, not an external optimum. Comparison not possible."
+            )
+            return ext
+        disc = abs(h_obj - s_obj)
+        ext['discrepancy_vs_sovopt'] = disc
+        if disc < 1e-6:
+            ext['comparison_status'] = 'MATCH'
+            ext['comparison_note'] = (
+                f"External optimum {h_obj} matches SOV-OPT verified objective {s_obj} within numerical tolerance (diff: {disc:.2e})."
+            )
+        else:
+            ext['comparison_status'] = 'MISMATCH'
+            ext['comparison_note'] = (
+                f"External optimum {h_obj} differs from SOV-OPT verified objective {s_obj} (diff: {disc:.2e})."
+            )
+        return ext
+
+    # Case 5: SOV-OPT produced an incumbent objective, but status was not verified optimal and no bound
+    if s_has_finite_obj:
+        ext['comparison_status'] = 'SOVOPT_NOT_VERIFIED'
+        ext['comparison_note'] = (
+            f"SOV-OPT status is {sovopt_status} (KKT passed: {sovopt_kkt}); solution not certified optimal."
+        )
+        return ext
+
+    # Case 6: SOV-OPT reports a bound from a verified solve or bound certificate without incumbent
+    if s_has_finite_bound:
+        ext['sovopt_status'] = sovopt_status
+        ext['sovopt_best_bound'] = s_bound
+        if not h_has_finite_obj:
+            ext['comparison_status'] = 'BOUND_INTERNALLY_CERTIFIED'
+            ext['comparison_note'] = (
+                f"Conservative {bound_type} {s_bound} is internally certified via exact rational arithmetic; "
+                f"external solver produced no finite objective. Bound is not externally checked."
+            )
+            return ext
+        if not ext_optimal:
+            ext['comparison_status'] = 'EXTERNAL_NOT_OPTIMAL'
+            ext['comparison_note'] = (
+                f"External solver did not prove optimality (status: {ext.get('model_status', ext.get('status', 'unknown'))}); "
+                f"external objective {h_obj} is a feasible objective, not an external optimum. "
+                "Bound cannot be validated against external optimum."
+            )
+            return ext
+        valid_bound = (s_bound <= h_obj + 1e-6) if sense == 'MINIMIZE' else (s_bound >= h_obj - 1e-6)
+        ext['bound_direction_valid'] = valid_bound
+        if not valid_bound:
+            ext['comparison_status'] = 'INVALID_BOUND'
+            ext['comparison_note'] = f"Conservative {bound_type} {s_bound} violates external optimum {h_obj} ({sense})."
+        else:
+            ext['comparison_status'] = 'BOUND_ONLY'
+            ext['comparison_note'] = (
+                f"Conservative {bound_type} {s_bound} validated against external optimum {h_obj} ({sense})."
+            )
+        return ext
+
+    # Case 7: Neither objective nor bound from SOV-OPT
+    ext['comparison_status'] = 'COMPARISON_NOT_POSSIBLE'
+    ext['comparison_note'] = f"SOV-OPT produced neither an incumbent objective nor a bound (status: {sovopt_status})."
+    return ext
 
 
 def main():
@@ -217,72 +426,7 @@ def main():
         # Compare with sovopt result
         sovopt_res = results[k]['result']
         meta = results[k]['meta']
-
-        # Compare native parsed dimensions where available
-        ext_dims = ext.get('parsed_dimensions')
-        dims_match = True
-        if ext_dims:
-            dims_match = (
-                ext_dims.get('variables') == meta.get('variables') and
-                ext_dims.get('constraints') == meta.get('constraints') and
-                ext_dims.get('integers', 0) == meta.get('integers', 0)
-            )
-            ext['dimensions_match'] = dims_match
-
-        ext_status_raw = str(ext.get('model_status', ext.get('status', '')))
-        ext_optimal = (
-            ext.get('exit_code') == 0 and
-            ext.get('success') is True and
-            ('kOptimal' in ext_status_raw or 'Optimal' in ext_status_raw or 'optimal' in str(ext.get('message', '')).lower())
-        )
-        sovopt_verified = (
-            sovopt_res.get('status') == 'OPTIMAL_VERIFIED' and
-            sovopt_res.get('verification', {}).get('kkt_passed') is True
-        )
-
-        h_obj = ext.get('objective')
-        s_obj = sovopt_res.get('objective')
-        s_bound = sovopt_res.get('best_bound')
-
-        if ext.get('status') in ('NOT_RUN', 'FAILED'):
-            ext['comparison_status'] = ext.get('status')
-        elif not dims_match:
-            ext['comparison_status'] = 'DIMENSION_MISMATCH'
-        elif s_obj is not None and h_obj is not None:
-            if not ext_optimal:
-                ext['comparison_status'] = 'EXTERNAL_NOT_OPTIMAL'
-            elif not sovopt_verified:
-                ext['comparison_status'] = 'SOVOPT_NOT_VERIFIED'
-            else:
-                disc = abs(h_obj - s_obj)
-                ext['discrepancy_vs_sovopt'] = disc
-                ext['comparison_status'] = 'MATCH' if disc < 1e-6 else 'MISMATCH'
-        elif s_bound is not None and h_obj is not None:
-            # Bound validation (e.g. MILP limit reached)
-            sense = meta.get('objective_sense', 'MINIMIZE')
-            if sense == 'MINIMIZE':
-                valid_bound = (s_bound <= h_obj + 1e-6)
-            else:
-                valid_bound = (s_bound >= h_obj - 1e-6)
-            ext['bound_direction_valid'] = valid_bound
-            ext['sovopt_status'] = sovopt_res['status']
-            ext['sovopt_best_bound'] = s_bound
-            if not valid_bound:
-                ext['comparison_status'] = 'INVALID_BOUND'
-            else:
-                ext['comparison_status'] = 'BOUND_ONLY'
-                ext['comparison_note'] = (
-                    'BOUND_ONLY represents incomplete SOV-OPT evidence: valid conservative lower bound '
-                    f'{s_bound} established against external optimum {h_obj}, but branch-and-bound search '
-                    'halted at node limit without discovering an incumbent solution.'
-                )
-        elif s_bound is not None:
-            ext['sovopt_status'] = sovopt_res['status']
-            ext['sovopt_best_bound'] = s_bound
-            ext['comparison_status'] = 'BOUND_ONLY'
-            ext['comparison_note'] = 'BOUND_ONLY represents incomplete SOV-OPT evidence (no external reference objective available).'
-        else:
-            ext['comparison_status'] = 'COMPARISON_NOT_POSSIBLE'
+        ext = evaluate_differential_comparison(sovopt_res, ext, meta)
 
         ext_instances[k] = ext
         status_label = ext.get('comparison_status', ext.get('status', '?'))
@@ -393,13 +537,25 @@ def main():
         h_obj_str = f"{e_obj:.6f}" if e_obj is not None else "—"
         s_res = results[k]['result']
 
-        if k == 'flugpl':
-            s_obj_str = f"Bound: {s_res.get('best_bound', '—')!r}"
-            disc_str = "Bound vs optimum only"
-        elif s_res.get('objective') is not None and e_obj is not None:
-            disc = abs(s_res['objective'] - e_obj)
+        s_bound = s_res.get('best_bound')
+        s_obj = s_res.get('objective')
+
+        if s_obj is not None and e_obj is not None and ei.get('comparison_status') in ('MATCH', 'MISMATCH'):
+            disc = abs(s_obj - e_obj)
             disc_str = "0.0" if disc == 0 else f"{disc:.2e}"
-            s_obj_str = f"{s_res['objective']:.6f}"
+            s_obj_str = f"{s_obj:.6f}"
+        elif s_bound is not None:
+            if s_obj is not None:
+                s_obj_str = f"{s_obj:.6f} (Bound: {s_bound:.10g})"
+            else:
+                s_obj_str = f"Bound: {s_bound:.10g}"
+            if e_obj is not None and ei.get('ext_optimal'):
+                disc_str = f"Bound diff: {abs(e_obj - s_bound):.4g}"
+            else:
+                disc_str = "—"
+        elif s_obj is not None:
+            s_obj_str = f"{s_obj:.6f}"
+            disc_str = "—"
         else:
             s_obj_str = "—"
             disc_str = "—"

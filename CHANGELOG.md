@@ -18,9 +18,16 @@
 
 ### Hardened Differential Verification
 - Enforced strict criteria for external solver comparison: required successful termination (`exit_code == 0`), optimal status (`kOptimal`), and verified SOV-OPT status (`OPTIMAL_VERIFIED` with valid KKT) before labelling `MATCH`.
+- Required successful external solve with explicitly optimal terminal status before reporting a bound validated against an external optimum, refusing to describe feasible suboptimal objectives as optimum.
+- Distinguished internally certified bounds (`BOUND_INTERNALLY_CERTIFIED`) from externally checked bounds when external validation was not run, failed, or lacked a finite objective.
+- Distinguished incomplete solves with incumbents from those without, formulating correct comparison notes for both minimization and maximization.
 - Validated native-parsed dimensions (`variables`, `constraints`, `integers`) between SOV-OPT and external solver.
-- Implemented bound direction validation for minimization and maximization: checked that conservative MILP lower bound does not exceed external optimum ($B \le z^* + \epsilon$).
-- Clarified that `BOUND_ONLY` denotes incomplete SOV-OPT evidence (search tree halted at node limit without finding an incumbent solution).
+- Implemented bound direction validation for minimization ($B \le z^* + \epsilon$) and maximization ($B \ge z^* - \epsilon$).
+- Clarified that `BOUND_ONLY` denotes incomplete SOV-OPT evidence (search tree halted at node limit without full tree closure).
+
+### Version Synchronization & Test Suite
+- Synchronized version `0.1.5` across runtime, packaging, server, tests, and documentation (`pyproject.toml`, `sovopt/__init__.py`, `server.py`, `tests/test_server.py`, `data/manifest.json`, `web/index.html`, and `START_HERE.html`).
+- Added unit test suite `TestDifferentialComparisonLogic` in `tests/test_solver.py` verifying comparison logic across optimal, non-optimal, failed, missing-objective, and direction-validity cases using real benchmark metadata.
 
 ### Documentation & Catalogue Synchronization
 - Corrected `data/CATALOGUE.md` discrepancy values against published references: AFIRO (`~2.857e-9` vs 11-digit Netlib MINOS 5.3 reference `-464.75314286`) and SC50A (`~4.355e-10` vs 11-digit reference `-64.575077059`), reflecting measured values from run records.

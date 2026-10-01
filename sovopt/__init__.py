@@ -1,7 +1,7 @@
-"""SOV-OPT reference prototype 0.1.2."""
+"""SOV-OPT reference prototype 0.1.5."""
 import platform,time
 from .model import Model,load
-__version__='0.1.2'
+__version__='0.1.5'
 
 def solve(model,backend='cpu',tol=1e-7,**options):
     model.validate()

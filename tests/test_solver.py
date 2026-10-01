@@ -9,6 +9,7 @@ from sovopt.verify import verify, safe_lower_bound, exact_farkas
 from sovopt.simplex import solve_lp
 from sovopt.transforms import transform_model
 from dataclasses import replace
+from scripts.generate_reports import evaluate_differential_comparison
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -253,6 +254,213 @@ class SolverTests(unittest.TestCase):
             self.fail(f"SHA256SUMS.json failed json.loads: {e}")
         self.assertIsInstance(data, dict)
         self.assertNotIn("SHA256SUMS.json", data, "SHA256SUMS.json must not list itself")
+
+
+class TestDifferentialComparisonLogic(unittest.TestCase):
+    """Verify differential comparison logic across solver termination states.
+
+    Tests the evaluator using metadata and recorded external outputs from real
+    benchmarks (Netlib AFIRO, MIPLIB FLUGPL) without creating synthetic optimization
+    instances or fabricated measurements.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        manifest_path = ROOT / 'data/manifest.json'
+        cls.manifest = json.loads(manifest_path.read_text())
+        cls.afiro_meta = cls.manifest['instances']['afiro']
+        cls.flugpl_meta = cls.manifest['instances']['flugpl']
+
+        ext_val_path = ROOT / 'reports/external_validation.json'
+        cls.ext_val = json.loads(ext_val_path.read_text()) if ext_val_path.exists() else {}
+
+    def test_external_optimal_lp_match(self):
+        """LP MATCH requires ext_optimal == True and verified SOV-OPT status."""
+        afiro_ext = dict(self.ext_val.get('instances', {}).get('afiro', {
+            'parsed_dimensions': {'variables': 32, 'constraints': 27, 'integers': 0},
+            'model_status': 'HighsModelStatus.kOptimal',
+            'exit_code': 0,
+            'success': True,
+            'objective': -464.75314285714285,
+        }))
+        sovopt_res = {
+            'status': 'OPTIMAL_VERIFIED',
+            'objective': -464.75314285714285,
+            'verification': {'kkt_passed': True},
+        }
+        res = evaluate_differential_comparison(sovopt_res, afiro_ext, self.afiro_meta)
+        self.assertEqual(res['comparison_status'], 'MATCH')
+        self.assertAlmostEqual(res['discrepancy_vs_sovopt'], 0.0, places=6)
+
+    def test_external_optimal_milp_bound_only_validated(self):
+        """MILP bound-only requires ext_optimal == True and valid conservative bound direction."""
+        flugpl_ext = dict(self.ext_val.get('instances', {}).get('flugpl', {
+            'parsed_dimensions': {'variables': 18, 'constraints': 18, 'integers': 11},
+            'model_status': 'HighsModelStatus.kOptimal',
+            'exit_code': 0,
+            'success': True,
+            'objective': 1201500.0,
+        }))
+        sovopt_res = {
+            'status': 'LIMIT_REACHED',
+            'best_bound': 1173645.0,
+            'objective': None,
+        }
+        res = evaluate_differential_comparison(sovopt_res, flugpl_ext, self.flugpl_meta)
+        self.assertEqual(res['comparison_status'], 'BOUND_ONLY')
+        self.assertTrue(res['bound_direction_valid'])
+        self.assertIn("without discovering an incumbent solution", res['comparison_note'])
+        self.assertIn("validated against external optimum 1201500.0", res['comparison_note'])
+
+    def test_external_non_optimal_feasible_refuses_optimum_claim(self):
+        """Non-optimal external solve must NOT be described as an optimum or used to validate bounds."""
+        flugpl_ext = {
+            'parsed_dimensions': {'variables': 18, 'constraints': 18, 'integers': 11},
+            'model_status': 'HighsModelStatus.kTimeLimit',
+            'exit_code': 0,
+            'success': True,
+            'objective': 1300000.0,
+        }
+        sovopt_res = {
+            'status': 'LIMIT_REACHED',
+            'best_bound': 1173645.0,
+            'objective': None,
+        }
+        res = evaluate_differential_comparison(sovopt_res, flugpl_ext, self.flugpl_meta)
+        self.assertEqual(res['comparison_status'], 'EXTERNAL_NOT_OPTIMAL')
+        self.assertIn("feasible objective, not an external optimum", res['comparison_note'])
+        self.assertIn("Bound cannot be validated against external optimum", res['comparison_note'])
+
+    def test_external_failed_distinguishes_internally_certified_bound(self):
+        """Failed external validation distinguishes internal rational certification from external check."""
+        flugpl_ext = {
+            'status': 'FAILED',
+            'actual_error': 'External process terminated with error',
+        }
+        sovopt_res = {
+            'status': 'LIMIT_REACHED',
+            'best_bound': 1173645.0,
+            'objective': None,
+        }
+        res = evaluate_differential_comparison(sovopt_res, flugpl_ext, self.flugpl_meta)
+        self.assertEqual(res['comparison_status'], 'BOUND_INTERNALLY_CERTIFIED')
+        self.assertIn("internally certified via exact rational arithmetic", res['comparison_note'])
+        self.assertIn("Bound is not externally checked", res['comparison_note'])
+
+    def test_external_not_run_or_missing_objective(self):
+        """Unrun or missing external objective marks bound as internally certified."""
+        flugpl_ext = {
+            'status': 'NOT_RUN',
+            'actual_error': 'highspy not installed in environment',
+        }
+        sovopt_res = {
+            'status': 'LIMIT_REACHED',
+            'best_bound': 1173645.0,
+            'objective': None,
+        }
+        res = evaluate_differential_comparison(sovopt_res, flugpl_ext, self.flugpl_meta)
+        self.assertEqual(res['comparison_status'], 'BOUND_INTERNALLY_CERTIFIED')
+
+        # Also when status is run but objective is None
+        flugpl_ext2 = {
+            'parsed_dimensions': {'variables': 18, 'constraints': 18, 'integers': 11},
+            'model_status': 'HighsModelStatus.kIterationLimit',
+            'exit_code': 0,
+            'success': True,
+            'objective': None,
+        }
+        res2 = evaluate_differential_comparison(sovopt_res, flugpl_ext2, self.flugpl_meta)
+        self.assertEqual(res2['comparison_status'], 'BOUND_INTERNALLY_CERTIFIED')
+
+    def test_bound_direction_validation_min_and_max(self):
+        """Bound validation handles both minimization (lower bound) and maximization (upper bound)."""
+        # Minimization (FLUGPL): lower bound exceeding optimum is invalid
+        flugpl_ext = {
+            'parsed_dimensions': {'variables': 18, 'constraints': 18, 'integers': 11},
+            'model_status': 'HighsModelStatus.kOptimal',
+            'exit_code': 0,
+            'success': True,
+            'objective': 1201500.0,
+        }
+        sovopt_invalid_min = {
+            'status': 'LIMIT_REACHED',
+            'best_bound': 1300000.0,  # Invalid: lower bound cannot exceed minimum
+            'objective': None,
+        }
+        res_min = evaluate_differential_comparison(sovopt_invalid_min, flugpl_ext, self.flugpl_meta)
+        self.assertEqual(res_min['comparison_status'], 'INVALID_BOUND')
+        self.assertFalse(res_min['bound_direction_valid'])
+
+        # Maximization: upper bound direction
+        max_meta = dict(self.flugpl_meta)
+        max_meta['objective_sense'] = 'MAXIMIZE'
+
+        # Valid upper bound: best_bound >= external maximum
+        sovopt_valid_max = {
+            'status': 'LIMIT_REACHED',
+            'best_bound': 1300000.0,
+            'objective': None,
+        }
+        res_max_valid = evaluate_differential_comparison(sovopt_valid_max, flugpl_ext, max_meta)
+        self.assertEqual(res_max_valid['comparison_status'], 'BOUND_ONLY')
+        self.assertTrue(res_max_valid['bound_direction_valid'])
+
+        # Invalid upper bound: best_bound < external maximum
+        sovopt_invalid_max = {
+            'status': 'LIMIT_REACHED',
+            'best_bound': 1100000.0,
+            'objective': None,
+        }
+        res_max_invalid = evaluate_differential_comparison(sovopt_invalid_max, flugpl_ext, max_meta)
+        self.assertEqual(res_max_invalid['comparison_status'], 'INVALID_BOUND')
+        self.assertFalse(res_max_invalid['bound_direction_valid'])
+
+    def test_incomplete_solve_with_incumbent_vs_without(self):
+        """Incomplete solve comparison correctly notes presence or absence of incumbent."""
+        flugpl_ext = {
+            'parsed_dimensions': {'variables': 18, 'constraints': 18, 'integers': 11},
+            'model_status': 'HighsModelStatus.kOptimal',
+            'exit_code': 0,
+            'success': True,
+            'objective': 1201500.0,
+        }
+        # Incomplete with incumbent
+        sovopt_with_inc = {
+            'status': 'LIMIT_REACHED',
+            'best_bound': 1173645.0,
+            'objective': 1250000.0,
+        }
+        res_with = evaluate_differential_comparison(sovopt_with_inc, flugpl_ext, self.flugpl_meta)
+        self.assertEqual(res_with['comparison_status'], 'BOUND_ONLY')
+        self.assertIn("with incumbent objective 1250000.0", res_with['comparison_note'])
+
+        # Incomplete without incumbent
+        sovopt_without_inc = {
+            'status': 'LIMIT_REACHED',
+            'best_bound': 1173645.0,
+            'objective': None,
+        }
+        res_without = evaluate_differential_comparison(sovopt_without_inc, flugpl_ext, self.flugpl_meta)
+        self.assertEqual(res_without['comparison_status'], 'BOUND_ONLY')
+        self.assertIn("without discovering an incumbent solution", res_without['comparison_note'])
+
+    def test_dimension_mismatch_detection(self):
+        """External parser reporting different dimensions triggers DIMENSION_MISMATCH."""
+        afiro_ext_wrong_dims = {
+            'parsed_dimensions': {'variables': 50, 'constraints': 50, 'integers': 0},
+            'model_status': 'HighsModelStatus.kOptimal',
+            'exit_code': 0,
+            'success': True,
+            'objective': -464.75314285714285,
+        }
+        sovopt_res = {
+            'status': 'OPTIMAL_VERIFIED',
+            'objective': -464.75314285714285,
+            'verification': {'kkt_passed': True},
+        }
+        res = evaluate_differential_comparison(sovopt_res, afiro_ext_wrong_dims, self.afiro_meta)
+        self.assertEqual(res['comparison_status'], 'DIMENSION_MISMATCH')
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

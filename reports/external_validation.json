@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-01T13:42:42.805035+00:00",
-  "git_revision": "99ebb231f4ba62b5acc287c6677310167bf7bc1b",
+  "generated_at": "2026-10-01T13:56:07.956921+00:00",
+  "git_revision": "9fd10c6879ee5daa149164e386b4b1d44ad81480+dirty",
   "environment": "Darwin arm64, Python 3.11.16",
   "note": "External validation run by invoking scripts/baseline_worker.py in an isolated subprocess. Comparison results reflect actual subprocess output. If highspy is unavailable in the subprocess Python, baseline_worker falls back to scipy.optimize.linprog/milp. If both fail, status is FAILED with actual_error recorded.",
   "instances": {
@@ -23,20 +23,22 @@
       "has_dual_solution": true,
       "simplex_iterations": 6,
       "ipm_iterations": 0,
-      "seconds": 0.000412917000176094,
+      "seconds": 0.0030392500002562883,
       "command": [
-        ".venv-benchmark/bin/python",
+        "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
         "/Users/satyamgupta/Documents/sov-opt/data/verified/afiro.mps"
       ],
       "exit_code": 0,
-      "_worker_python": ".venv-benchmark/bin/python",
+      "_worker_python": "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
       "_worker_returncode": 0,
       "instance": "afiro",
       "input_sha256": "fd3562804ff19382a9cd8bcb22ec81bffd24a4143a2290783831d8c64516a24b",
       "dimensions_match": true,
+      "ext_optimal": true,
       "discrepancy_vs_sovopt": 0.0,
-      "comparison_status": "MATCH"
+      "comparison_status": "MATCH",
+      "comparison_note": "External optimum -464.75314285714285 matches SOV-OPT verified objective -464.75314285714285 within numerical tolerance (diff: 0.00e+00)."
     },
     "sc50a": {
       "backend": "highspy 1.15.1 (native C++ HiGHS)",
@@ -57,20 +59,22 @@
       "has_dual_solution": true,
       "simplex_iterations": 18,
       "ipm_iterations": 0,
-      "seconds": 0.00047733400015204097,
+      "seconds": 0.0004854580001847353,
       "command": [
-        ".venv-benchmark/bin/python",
+        "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
         "/Users/satyamgupta/Documents/sov-opt/data/verified/sc50a.mps"
       ],
       "exit_code": 0,
-      "_worker_python": ".venv-benchmark/bin/python",
+      "_worker_python": "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
       "_worker_returncode": 0,
       "instance": "sc50a",
       "input_sha256": "c4571004af37a0c7d49099f8fcc513885401784d32f712bf44e014e40348c521",
       "dimensions_match": true,
+      "ext_optimal": true,
       "discrepancy_vs_sovopt": 0.0,
-      "comparison_status": "MATCH"
+      "comparison_status": "MATCH",
+      "comparison_note": "External optimum -64.5750770585645 matches SOV-OPT verified objective -64.5750770585645 within numerical tolerance (diff: 0.00e+00)."
     },
     "sc50b": {
       "backend": "highspy 1.15.1 (native C++ HiGHS)",
@@ -91,20 +95,22 @@
       "has_dual_solution": true,
       "simplex_iterations": 18,
       "ipm_iterations": 0,
-      "seconds": 0.0005078330000287679,
+      "seconds": 0.0005095420001453022,
       "command": [
-        ".venv-benchmark/bin/python",
+        "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
         "/Users/satyamgupta/Documents/sov-opt/data/verified/sc50b.mps"
       ],
       "exit_code": 0,
-      "_worker_python": ".venv-benchmark/bin/python",
+      "_worker_python": "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
       "_worker_returncode": 0,
       "instance": "sc50b",
       "input_sha256": "15c9d96e1d518dddc197e8e107febce590d0ae94594c676ff0d135b5642c1be5",
       "dimensions_match": true,
+      "ext_optimal": true,
       "discrepancy_vs_sovopt": 1.4210854715202004e-14,
-      "comparison_status": "MATCH"
+      "comparison_status": "MATCH",
+      "comparison_note": "External optimum -69.99999999999999 matches SOV-OPT verified objective -70.0 within numerical tolerance (diff: 1.42e-14)."
     },
     "blend": {
       "backend": "highspy 1.15.1 (native C++ HiGHS)",
@@ -125,20 +131,22 @@
       "has_dual_solution": true,
       "simplex_iterations": 80,
       "ipm_iterations": 0,
-      "seconds": 0.0010147500001949084,
+      "seconds": 0.0010110419998454745,
       "command": [
-        ".venv-benchmark/bin/python",
+        "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
         "/Users/satyamgupta/Documents/sov-opt/data/verified/blend.mps"
       ],
       "exit_code": 0,
-      "_worker_python": ".venv-benchmark/bin/python",
+      "_worker_python": "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
       "_worker_returncode": 0,
       "instance": "blend",
       "input_sha256": "c8bb193f8af5dcff735a3b8db62077db93625e93cfb26e2b01f83ca3039cbf7d",
       "dimensions_match": true,
+      "ext_optimal": true,
       "discrepancy_vs_sovopt": 0.0,
-      "comparison_status": "MATCH"
+      "comparison_status": "MATCH",
+      "comparison_note": "External optimum -30.812149845828237 matches SOV-OPT verified objective -30.812149845828237 within numerical tolerance (diff: 0.00e+00)."
     },
     "flugpl": {
       "backend": "highspy 1.15.1 (native C++ HiGHS)",
@@ -159,23 +167,24 @@
       "has_dual_solution": false,
       "simplex_iterations": 858,
       "ipm_iterations": -1,
-      "seconds": 0.038308832999973674,
+      "seconds": 0.04043354199984606,
       "command": [
-        ".venv-benchmark/bin/python",
+        "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
         "/Users/satyamgupta/Documents/sov-opt/data/verified/flugpl.mps"
       ],
       "exit_code": 0,
-      "_worker_python": ".venv-benchmark/bin/python",
+      "_worker_python": "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
       "_worker_returncode": 0,
       "instance": "flugpl",
       "input_sha256": "a1f0cb79a95639450dd984473a00efca24365457153d7fcb859c6581ddab4c2c",
       "dimensions_match": true,
-      "bound_direction_valid": true,
+      "ext_optimal": true,
       "sovopt_status": "LIMIT_REACHED",
       "sovopt_best_bound": 1173644.9999999998,
+      "bound_direction_valid": true,
       "comparison_status": "BOUND_ONLY",
-      "comparison_note": "BOUND_ONLY represents incomplete SOV-OPT evidence: valid conservative lower bound 1173644.9999999998 established against external optimum 1201500.0, but branch-and-bound search halted at node limit without discovering an incumbent solution."
+      "comparison_note": "BOUND_ONLY represents incomplete SOV-OPT evidence: valid conservative lower bound 1173644.9999999998 validated against external optimum 1201500.0 (MINIMIZE), without discovering an incumbent solution."
     }
   }
 }

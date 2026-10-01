@@ -12,7 +12,7 @@ class Handler(BaseHTTPRequestHandler):
         if kind=='application/json':data=json.dumps(data,allow_nan=False).encode()
         self.send_response(status);self.send_header('Content-Type',kind);self.send_header('Content-Length',str(len(data)));self.send_header('X-Content-Type-Options','nosniff');self.send_header('Cache-Control','no-store');self.end_headers();self.wfile.write(data)
     def do_GET(self):
-        if self.path=='/health':return self.send(200,{'status':'ok','version':'0.1.2'})
+        if self.path=='/health':return self.send(200,{'status':'ok','version':'0.1.5'})
         if self.path=='/api/manifest':return self.send(200,json.loads((ROOT/'data/manifest.json').read_text()))
         if self.path=='/api/examples':return self.send(200,{k:json.loads(p.read_text()) for k,p in EXAMPLES.items()})
         if self.path in ('/','/index.html'):return self.send(200,(ROOT/'web/index.html').read_bytes(),'text/html; charset=utf-8')
