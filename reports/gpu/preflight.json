@@ -1,0 +1,25 @@
+{
+  "timestamp_utc": "2026-10-01T22:34:59.230749+00:00",
+  "status": "CUDA_UNAVAILABLE",
+  "cuda_available": false,
+  "gpu_executed": false,
+  "device_info": {
+    "cuda_available": false,
+    "device_count": 0,
+    "device_name": null,
+    "compute_capability": null,
+    "total_memory_bytes": null,
+    "free_memory_bytes": null,
+    "runtime_version": null
+  },
+  "machine_metadata": {
+    "system": "Darwin",
+    "release": "25.6.0",
+    "architecture": "arm64",
+    "processor": "arm",
+    "python": "3.11.16",
+    "numpy": "2.3.5"
+  },
+  "micro_spmv_test": null,
+  "elapsed_seconds": 0.005502707997948164
+}

@@ -1,0 +1,87 @@
+{
+  "timestamp_utc": "2026-10-01T22:39:15.252794+00:00",
+  "backend_requested": "pdhg-cuda",
+  "stratum_requested": "SMALL",
+  "warmups": 3,
+  "repeats": 7,
+  "tolerance": 1e-07,
+  "max_iter": 50000,
+  "machine_metadata": {
+    "system": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11.16"
+  },
+  "device_info": {
+    "cuda_available": false,
+    "device_count": 0,
+    "device_name": null,
+    "compute_capability": null,
+    "total_memory_bytes": null,
+    "free_memory_bytes": null,
+    "runtime_version": null
+  },
+  "summary": {
+    "total_instances": 6,
+    "optimal_verified": 0,
+    "limit_reached": 0,
+    "cuda_unavailable": 6,
+    "numerical_failure": 0
+  },
+  "results": {
+    "afiro": {
+      "instance": "afiro",
+      "stratum": "SMALL",
+      "status": "CUDA_UNAVAILABLE",
+      "gpu_executed": false,
+      "backend": "pdhg-cuda",
+      "message": "NVIDIA CUDA runtime is not available on this host",
+      "reference_objective": -464.75314286
+    },
+    "kb2": {
+      "instance": "kb2",
+      "stratum": "SMALL",
+      "status": "CUDA_UNAVAILABLE",
+      "gpu_executed": false,
+      "backend": "pdhg-cuda",
+      "message": "NVIDIA CUDA runtime is not available on this host",
+      "reference_objective": -1749.9001299
+    },
+    "sc50a": {
+      "instance": "sc50a",
+      "stratum": "SMALL",
+      "status": "CUDA_UNAVAILABLE",
+      "gpu_executed": false,
+      "backend": "pdhg-cuda",
+      "message": "NVIDIA CUDA runtime is not available on this host",
+      "reference_objective": -64.575077059
+    },
+    "sc50b": {
+      "instance": "sc50b",
+      "stratum": "SMALL",
+      "status": "CUDA_UNAVAILABLE",
+      "gpu_executed": false,
+      "backend": "pdhg-cuda",
+      "message": "NVIDIA CUDA runtime is not available on this host",
+      "reference_objective": -70.0
+    },
+    "adlittle": {
+      "instance": "adlittle",
+      "stratum": "SMALL",
+      "status": "CUDA_UNAVAILABLE",
+      "gpu_executed": false,
+      "backend": "pdhg-cuda",
+      "message": "NVIDIA CUDA runtime is not available on this host",
+      "reference_objective": 225494.96316
+    },
+    "blend": {
+      "instance": "blend",
+      "stratum": "SMALL",
+      "status": "CUDA_UNAVAILABLE",
+      "gpu_executed": false,
+      "backend": "pdhg-cuda",
+      "message": "NVIDIA CUDA runtime is not available on this host",
+      "reference_objective": -30.812149846
+    }
+  },
+  "total_elapsed_seconds": 0.002190334002079908
+}

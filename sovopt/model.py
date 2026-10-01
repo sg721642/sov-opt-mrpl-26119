@@ -64,9 +64,9 @@ class Model:
     def validate(self, max_vars=None, max_rows=None):
         n=len(self.c); m=len(self.A)
         if max_vars is None:
-            max_vars = 5000 if (self.Q is not None or hasattr(self, 'qplib_meta')) else (5000 if self.integer else 1000)
+            max_vars = 5000 if (self.Q is not None or hasattr(self, 'qplib_meta')) else (5000 if self.integer else 5000)
         if max_rows is None:
-            max_rows = 15000 if (self.Q is not None or hasattr(self, 'qplib_meta')) else (5000 if self.integer else 3000)
+            max_rows = 15000 if (self.Q is not None or hasattr(self, 'qplib_meta')) else (5000 if self.integer else 5000)
         if not (0 < n <= max_vars and 0 <= m <= max_rows):
             raise ValueError(f'Declared resource limit: 1..{max_vars} variables, <={max_rows} input rows (got {n} vars, {m} rows)')
         if self.A.shape!=(m,n) or any(v.shape!=(n,) for v in [self.lower,self.upper]): raise ValueError('Invalid dimensions')

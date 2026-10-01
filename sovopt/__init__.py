@@ -1,4 +1,4 @@
-"""SOV-OPT reference prototype 0.3.1."""
+"""SOV-OPT reference prototype 0.3.2."""
 import platform, time
 from datetime import datetime, timezone
 from .model import Model, load
@@ -6,7 +6,7 @@ from .dispatcher import auto_dispatch, inspect_model
 from .refinery_twin import build_refinery_twin
 from .qplib import read_qplib, parse_probtype, QPLIBError, UnsupportedQPLIBError, QPLIBFormatError
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 def solve(model, backend='cpu', tol=1e-7, method='auto', presolve=True, scaling=True, **options):
     model.validate()
@@ -23,11 +23,11 @@ def solve(model, backend='cpu', tol=1e-7, method='auto', presolve=True, scaling=
     if effective_backend not in ('cpu', 'pdhg-cpu', 'pdhg-cuda'):
         raise ValueError(f'Unknown backend: {effective_backend}')
 
-    if selected_method in ('pdhg-gpu', 'pdhg-cpu') or effective_backend.startswith('pdhg'):
+    if selected_method in ('pdhg-gpu', 'pdhg-cuda', 'pdhg-cpu') or effective_backend.startswith('pdhg'):
         if model.Q is not None or model.integer:
             raise ValueError('PDHG supports continuous LP only')
         from .pdhg import solve_pdhg
-        device = 'cuda' if selected_method == 'pdhg-gpu' or effective_backend == 'pdhg-cuda' else 'cpu'
+        device = 'cuda' if selected_method in ('pdhg-gpu', 'pdhg-cuda') or effective_backend == 'pdhg-cuda' else 'cpu'
         r = solve_pdhg(model, device=device, tol=tol, **options)
     elif selected_method == 'bb' or model.integer:
         from .milp import solve_milp
@@ -68,8 +68,8 @@ def solve(model, backend='cpu', tol=1e-7, method='auto', presolve=True, scaling=
             r['method_used'] = 'primal-simplex'
         else:
             r['method_used'] = selected_method
-    if 'fallback_reason' not in r:
-        r['fallback_reason'] = None
+    if 'fallback_reason' not in r or r['fallback_reason'] is None:
+        r['fallback_reason'] = disp.get('fallback_reason', None)
     if 'linear_algebra_used' not in r:
         if effective_backend.startswith('pdhg'):
             r['linear_algebra_used'] = 'pdhg'

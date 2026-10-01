@@ -9,7 +9,7 @@ This document records the exact procedures for reproducing all numerical benchma
 All commands below assume execution from the project root with the project-local virtual environment active:
 
 ```bash
-# 1. Run full unit and regression test suite (249 tests: 247 passing, 2 integration tests skipped in restricted sandbox)
+# 1. Run full unit and regression test suite (262 tests: 260 passing, 2 integration tests skipped in restricted sandbox)
 .venv/bin/python -m unittest discover -s tests -v
 
 # 2. Run automated report and benchmark generator
@@ -188,7 +188,7 @@ The active test suite is split into 11 modules (249 tests total, 247 passing, 2 
   17. Independent sovereign solve of `QPLIB_8845` to `OPTIMAL_VERIFIED` with objective matching reference within $1.59 \times 10^{-10}$ relative error.
   18. Verification of zero reference solution leakage: sovereign solve achieves identical `OPTIMAL_VERIFIED` result when `.sol` file is hidden.
 
-### 2.9 Benchmark Evidence Integrity & Semantics (`tests/test_gate7_1.py` — 12 tests)
+### 2.9 Benchmark Evidence Integrity & Semantics (`tests/test_gate7_1.py` — 13 tests)
 - Rigorous validation of benchmark reporting semantics and evidence integrity:
   1. Segregation of reference `.sol` files from sovereign solver executions.
   2. Primal-only verification sets `kkt_evaluated = False` and `kkt_status = 'PRIMAL_FEASIBILITY_ONLY'`.
@@ -196,6 +196,7 @@ The active test suite is split into 11 modules (249 tests total, 247 passing, 2 
   4. Programmatic assertion of Netlib LP candidate counts: 9 `OPTIMAL_VERIFIED` + 7 `NUMERICAL_FAILURE` = 16 instances.
   5. Manifest amendment logging for post-freeze capability reclassifications (`QPLIB_8938`).
   6. Nested wallclock deadline propagation in MILP inner simplex and branching loops.
+  7. Verification of programmatic relative discrepancy consistency against stored full-precision results.
 
 ### 2.10 QP Internal Mathematical Unit Fixtures (`tests/test_qp_internal.py` — 20 tests)
 - 20 dedicated unit fixtures validating the native equality-aware interior-point solver (`sovopt/qp.py`) across all mathematical edge cases (strictly labeled `[INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA]`):
@@ -230,7 +231,22 @@ The active test suite is split into 11 modules (249 tests total, 247 passing, 2 
   6. Strict segregation of quarantined datasets (`AVGAS` strictly excluded from active manifests).
   7. Prohibition of synthetic benchmarks in public manifest collections.
 
-*(Note: Synthetic unit fixtures in `tests/test_presolve.py`, `tests/test_numerical_stress.py`, `tests/test_dual_simplex.py`, `tests/test_milp.py`, and `tests/test_qp_internal.py` are strictly marked `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are excluded from benchmark reports).*
+### 2.12 Restarted GPU PDHG & CUDA Validation Pipeline (`tests/test_gpu_pdhg.py` — 12 tests)
+- Validation of Gate 8 Phase A restarted PDHG solver and GPU tooling:
+  1. Deterministic CPU PDHG convergence on Netlib `AFIRO` with exact KKT certification at $10^{-7}$.
+  2. Deterministic CPU PDHG convergence on Netlib `BLEND` to `OPTIMAL_VERIFIED` ($10^{-5}$).
+  3. Honest `LIMIT_REACHED` status enforcement when first-order iterations are bounded (`SC50A`).
+  4. Pock-Chambolle $\ell_1$ diagonal preconditioning step sizes are strictly positive, finite, and obey convergence condition.
+  5. Scaling ablation demonstrating convergence acceleration with preconditioning over unscaled step sizes.
+  6. Periodic ergodic averaging restart mechanics and unrestarted ablation behavior (`restart=False`).
+  7. Truthful Apple Silicon non-CUDA handling: explicit `backend='pdhg-cuda'` returns `status='CUDA_UNAVAILABLE'` with `gpu_executed=False`.
+  8. Automatic dispatch fallback on non-CUDA host from `auto` to `pdhg-cpu` with structured `fallback_reason='CUDA_UNAVAILABLE'`.
+  9. Rejection of informal and deprecated backend and method aliases (`cuda-pdhg`, `gpu-pdhg`).
+  10. Frozen GPU continuous LP manifest `data/manifests/gpu_pdhg_lp.json` integrity across 18 instances in `SMALL`, `MEDIUM`, and `LARGE` size strata with SHA-256 validation.
+  11. Diagnostics preflight script (`scripts/gpu_preflight.py`) verification.
+  12. Sparse `CSRMatrix` SpMV exact agreement with dense matrix-vector multiplication.
+
+*(Note: Synthetic unit fixtures in `tests/test_presolve.py`, `tests/test_numerical_stress.py`, `tests/test_dual_simplex.py`, `tests/test_milp.py`, `tests/test_qp_internal.py`, and `tests/test_gpu_pdhg.py` are strictly marked `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are excluded from benchmark reports).*
 
 ---
 
@@ -370,9 +386,14 @@ Measured on Apple Silicon ARM64 (Python 3.11.16, NumPy 2.3.5) with maximum node 
    - Therefore: **PUBLIC UNBOUNDED CERTIFICATE BENCHMARK: NOT YET AVAILABLE**.
    - Unit test instances in `tests/test_solver.py` are strictly labeled `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are explicitly excluded from public benchmark counts and performance reports.
 
-7. **CUDA Acceleration (Hardware Unavailable):**
-   - Development is performed on Apple Silicon ARM64, which lacks NVIDIA CUDA hardware.
-   - `gpu_executed` is strictly `false` on all local runs. CUDA kernels in `sovopt/pdhg.py` remain unvalidated until tested on a physical NVIDIA device.
+7. **CUDA Acceleration & Gate 8 Status (Phase A Complete, Physical Validation Pending):**
+   - **Phase A (MacBook preparation):** Fully completed.
+     - Algorithm formulated in `docs/PDHG.md` with Pock-Chambolle $\ell_1$ preconditioning and deterministic periodic ergodic averaging restarts.
+     - Architecture cleanly separates CPU execution (`pdhg-cpu`, sovereign `CSRMatrix`) and CUDA execution (`pdhg-cuda`, optional CuPy + custom `RawKernel`).
+     - Truthful reporting enforced: on Apple Silicon, `is_cuda_available()` returns `False`, `gpu_executed` is strictly `False`, and requests for `pdhg-cuda` return `CUDA_UNAVAILABLE`.
+     - Benchmark suite frozen in `data/manifests/gpu_pdhg_lp.json`: 18 authentic Netlib continuous LP instances across `SMALL` (6), `MEDIUM` (8), and `LARGE` (4) strata with exact SHA-256 digests.
+     - Tooling scripts implemented: `scripts/gpu_preflight.py`, `scripts/run_gpu_validation.py`, `scripts/run_gpu_ablation.py`.
+   - **Phase B (Physical CUDA validation):** Strictly deferred to physical execution on an Acer RTX 5050 Laptop GPU. No speedup or GPU execution claim is made from Apple Silicon. Status: `PHYSICAL CUDA VALIDATION PENDING`.
 
 8. **Dual Simplex B&B Warm-Start Integration (Completed in Gate 6):**
    - Bounded-variable revised dual simplex warm basis reoptimization (`DualBasisState`) is fully integrated into the Branch-and-Bound MILP engine (`sovopt/milp.py`).

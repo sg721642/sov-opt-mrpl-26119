@@ -1,5 +1,34 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.2] - 2026-10-02
+
+### Gate 8 Phase A: Restarted GPU PDHG & Physical CUDA Validation Preparation
+
+- **Restarted Preconditioned PDHG Algorithm & Specification (`docs/PDHG.md`, `sovopt/pdhg.py`):**
+  - Formulated continuous LP saddle-point Chambolle-Pock algorithm with primal extrapolation $\bar{x} = 2 x^{(k+1)} - x^{(k)}$.
+  - Pock-Chambolle $\ell_1$ diagonal preconditioning ($\tau_j, \sigma_i$) guaranteeing convergence for general constraint matrices.
+  - Deterministic periodic ergodic averaging restart mechanism ($K_{\text{restart}} = 1000$) with ablation support (`restart=False`, `scaling=False`).
+  - Strict sovereign CPU verification policy ("GPU accelerates; CPU verifies"): all candidate solutions independently certified by exact KKT verifier (`sovopt.verify.verify`).
+- **Clean Backend Abstraction & Truthful Non-CUDA Reporting (`sovopt/cuda_backend.py`, `sovopt/dispatcher.py`):**
+  - Standardized backend identifiers: `pdhg-cpu` (sovereign pure-NumPy `CSRMatrix` SpMV) and `pdhg-cuda` (CuPy device runtime + persistent device arrays + custom `RawKernel` SpMV).
+  - Explicit rejection of informal/deprecated backend and method aliases (`cuda-pdhg`, `gpu-pdhg`).
+  - Enforced strict non-CUDA truthfulness: on macOS Apple Silicon, `is_cuda_available()` returns `False`, `gpu_executed` is strictly `False`, and requests for `pdhg-cuda` return `status = 'CUDA_UNAVAILABLE'`.
+  - Automatic dispatch fallback: when `backend='auto'` on non-CUDA host, resolves to `pdhg-cpu` with structured `fallback_reason = 'CUDA_UNAVAILABLE'`.
+- **Public Continuous LP Benchmark Manifest (`data/manifests/gpu_pdhg_lp.json`):**
+  - Admitted and froze 18 authentic Netlib continuous LP instances across three predefined size strata:
+    - `SMALL` ($n + m < 200, nnz < 1000$): `AFIRO`, `KB2`, `SC50A`, `SC50B`, `ADLITTLE`, `BLEND` (6 instances).
+    - `MEDIUM` ($200 \le n + m \le 600, 1000 \le nnz \le 5000$): `SC105`, `STOCFOR1`, `SCAGR7`, `RECIPE`, `ISRAEL`, `SC205`, `SHARE1B`, `BRANDY` (8 instances).
+    - `LARGE` ($n + m > 600, nnz > 5000$): `GROW15`, `GROW22`, `SCFXM2`, `SCTAP2` (4 instances).
+  - Recorded exact canonical source URLs, download timestamps, parsed dimensions, reference objectives, and cryptographic SHA-256 hashes.
+- **Validation & Ablation Tooling Scripts:**
+  - `scripts/gpu_preflight.py`: Environment inspection reporting platform architecture, CUDA driver/runtime availability, device memory, and micro SpMV verification.
+  - `scripts/run_gpu_validation.py`: Stratified benchmark runner supporting `warmups` (default 3), `repeats` (default 7), median latency computation, and structured JSON output.
+  - `scripts/run_gpu_ablation.py`: 4-way ablation runner evaluating scaling ON/OFF and restart ON/OFF.
+- **Dedicated Test Matrix (`tests/test_gpu_pdhg.py` — 12 tests):**
+  - 12 comprehensive unit and regression tests covering deterministic CPU PDHG convergence (`AFIRO`, `BLEND`), honest `LIMIT_REACHED` enforcement, preconditioning step size positivity, scaling/restart ablations, Mac `CUDA_UNAVAILABLE` reporting, alias rejection, manifest integrity, preflight diagnostics, and `CSRMatrix` SpMV accuracy.
+  - Test suite expanded to 262 tests (260 passing, 2 integration tests skipped in restricted sandbox).
+- **Gate 8 Phase A Status:** `GATE 8 PHASE A COMPLETE — PHYSICAL CUDA VALIDATION PENDING ON ACER RTX 5050`.
+
 ## [0.3.1] - 2026-10-02
 
 ### Gate 7.2: Equality-Aware Convex QP Interior-Point Hardening

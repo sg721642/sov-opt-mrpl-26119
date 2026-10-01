@@ -225,6 +225,23 @@ class TestGate71Integrity(unittest.TestCase):
         self.assertEqual(r["status"], "LIMIT_REACHED")
         self.assertLess(elapsed, 2.0, f"Heuristic diving exceeded deadline: {elapsed:.2f}s")
 
+    def test_13_reported_relative_discrepancy_matches_full_precision(self):
+        """13. Reported relative discrepancy equals programmatically recomputed discrepancy."""
+        report_p = ROOT / "reports/local_validation/2026-10-01_verified/qplib_QPLIB_8845.json"
+        self.assertTrue(report_p.exists(), "qplib_QPLIB_8845.json must exist")
+        data = json.loads(report_p.read_text())
+        sovopt_obj = data["objective"]
+        ref_obj = data["reference_objective"]
+        reported_disc = data["discrepancy"]
+        reported_rel_disc = data["relative_discrepancy"]
+
+        computed_disc = abs(sovopt_obj - ref_obj)
+        computed_rel_disc = computed_disc / max(1.0, abs(ref_obj))
+
+        self.assertAlmostEqual(reported_disc, computed_disc, places=12)
+        self.assertAlmostEqual(reported_rel_disc, computed_rel_disc, places=15)
+
 
 if __name__ == "__main__":
     unittest.main()
+

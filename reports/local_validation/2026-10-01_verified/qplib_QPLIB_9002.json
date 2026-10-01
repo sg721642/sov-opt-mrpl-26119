@@ -15,7 +15,7 @@
   "reference_solution_used_as_initialization": false,
   "reference_solution_used_in_search": false,
   "sovopt_iterations": 30,
-  "sovopt_runtime": 53.595999707999,
+  "sovopt_runtime": 53.89740924999933,
   "primal_residual": 4.6751022122286226e-08,
   "dual_residual": 3.912755549620172e-12,
   "complementarity_residual": 4.533947700035151e-11,

@@ -58,9 +58,19 @@ def auto_dispatch(model, method='auto', backend='cpu'):
     """
     info = inspect_model(model)
     m = method.lower() if method else 'auto'
+    b = backend.lower() if backend else 'cpu'
+
+    # Reject deprecated informal aliases
+    if b in ('cuda-pdhg', 'gpu-pdhg'):
+        raise ValueError(f"Invalid backend alias '{backend}'. Standard names are 'pdhg-cpu' and 'pdhg-cuda'.")
+    if m in ('cuda-pdhg', 'gpu-pdhg'):
+        raise ValueError(f"Invalid method alias '{method}'. Standard names are 'pdhg-cpu' and 'pdhg-cuda'.")
+
+    if b not in ('cpu', 'pdhg-cpu', 'pdhg-cuda', 'auto'):
+        raise ValueError(f"Unknown backend '{backend}'. Supported: 'cpu', 'pdhg-cpu', 'pdhg-cuda', 'auto'.")
 
     if m not in ('auto', 'simplex', 'dual-simplex', 'ipm', 'bb', 'pdhg-cpu', 'pdhg-gpu', 'pdhg-cuda'):
-        raise ValueError(f"Unknown method '{method}'. Supported: auto, simplex, ipm, bb, pdhg-cpu, pdhg-gpu.")
+        raise ValueError(f"Unknown method '{method}'. Supported: auto, simplex, dual-simplex, ipm, bb, pdhg-cpu, pdhg-cuda.")
 
     # Determine intrinsic problem class
     if info['has_quadratic_objective']:
@@ -70,25 +80,29 @@ def auto_dispatch(model, method='auto', backend='cpu'):
     else:
         problem_class = 'LP'
 
+    fallback_reason = None
+
     # Manual override handling
     if m != 'auto':
-        resolved_method = m
+        resolved_method = 'pdhg-cuda' if m in ('pdhg-gpu', 'pdhg-cuda') else m
         if m in ('pdhg-gpu', 'pdhg-cuda'):
             resolved_backend = 'pdhg-cuda'
-            resolved_method = 'pdhg-gpu'
         elif m == 'pdhg-cpu':
             resolved_backend = 'pdhg-cpu'
         else:
-            resolved_backend = backend
+            resolved_backend = 'pdhg-cuda' if b == 'pdhg-cuda' else ('pdhg-cpu' if b == 'pdhg-cpu' else 'cpu')
 
         rationale = f"User explicitly requested method '{method}' for {problem_class} model."
-        return {
+        out = {
             'method': resolved_method,
             'backend': resolved_backend,
             'problem_class': problem_class,
             'inspection': info,
             'rationale': rationale,
         }
+        if fallback_reason:
+            out['fallback_reason'] = fallback_reason
+        return out
 
     # Automatic selection logic
     if problem_class == 'QP':
@@ -101,19 +115,33 @@ def auto_dispatch(model, method='auto', backend='cpu'):
         rationale = f"Model has {info['integer_variables']} integer variables; dispatched to exact rational-bound Branch-and-Bound solver."
     else:
         # Continuous LP
-        if backend in ('pdhg-cuda', 'pdhg-cpu'):
-            resolved_backend = backend
-            resolved_method = 'pdhg-gpu' if backend == 'pdhg-cuda' else 'pdhg-cpu'
-            rationale = f"Continuous LP executed with first-order PDHG on {backend}."
+        if b in ('pdhg-cuda', 'pdhg-cpu'):
+            resolved_backend = b
+            resolved_method = 'pdhg-cuda' if b == 'pdhg-cuda' else 'pdhg-cpu'
+            rationale = f"Continuous LP executed with first-order PDHG on {b}."
+        elif b == 'auto':
+            from .cuda_backend import is_cuda_available
+            if is_cuda_available():
+                resolved_backend = 'pdhg-cuda'
+                resolved_method = 'pdhg-cuda'
+                rationale = "Continuous LP auto-dispatched to GPU PDHG backend."
+            else:
+                resolved_backend = 'pdhg-cpu'
+                resolved_method = 'pdhg-cpu'
+                rationale = "Continuous LP auto-dispatched to CPU PDHG backend (CUDA unavailable on host)."
+                fallback_reason = 'CUDA_UNAVAILABLE'
         else:
             resolved_method = 'dual-simplex'
             resolved_backend = 'cpu'
             rationale = "Continuous LP dispatched to Bounded-Variable Revised Dual Simplex with sparse LU refactorization, Markowitz pivoting, Devex pricing, and exact KKT certification."
 
-    return {
+    out = {
         'method': resolved_method,
         'backend': resolved_backend,
         'problem_class': problem_class,
         'inspection': info,
         'rationale': rationale,
     }
+    if fallback_reason:
+        out['fallback_reason'] = fallback_reason
+    return out

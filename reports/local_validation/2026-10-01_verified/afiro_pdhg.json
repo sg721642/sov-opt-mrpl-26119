@@ -848,15 +848,15 @@
       "relative_gap": 6.70291125794412e-10
     }
   ],
-  "setup_seconds": 0.00010008399840444326,
-  "iteration_and_verification_seconds": 0.10673429199960083,
+  "setup_seconds": 0.00010254099834128283,
+  "iteration_and_verification_seconds": 0.10717937499794061,
   "gpu_executed": false,
   "model_name": "AFIRO",
   "model_sha256": "1f08328913d4bdf2204f2e1e6cd6e5c224f1ea237ab78f95cb5da2f74165154e",
-  "solver_version": "0.3.1",
-  "elapsed_seconds": 0.10921208299987484,
+  "solver_version": "0.3.2",
+  "elapsed_seconds": 0.10784458399939467,
   "backend": "pdhg-cpu",
-  "timestamp_utc": "2026-10-01T22:05:26.556551+00:00",
+  "timestamp_utc": "2026-10-01T22:35:23.628888+00:00",
   "variables": 32,
   "rows": 27,
   "nonzeros": 83,
@@ -890,6 +890,6 @@
   "linear_algebra_used": "pdhg",
   "presolve_applied": false,
   "scaling_applied": false,
-  "measured_duration_seconds": 0.10926399999880232,
-  "git_revision": "a0ae370dd23cb93ab2b6faeeb38e6d808388993b+dirty"
+  "measured_duration_seconds": 0.10789433299942175,
+  "git_revision": "862ada8b65895fea57d188c15855a29a274f3eb2+dirty"
 }
