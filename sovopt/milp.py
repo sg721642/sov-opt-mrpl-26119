@@ -112,12 +112,14 @@ def solve_milp(model, tol=1e-7, max_nodes=1000, time_limit=30., **kwargs):
                 xr[j] = round(xr[j])
             vr = verify(model, xr, tol=tol)
             val = exact_objective(model, xr)
-            if vr['feasible'] and (incval is None or val < incval):
-                inc = xr
-                incval = val
-            # Close node only with verified feasibility and exact rational gap
-            if vr['feasible'] and bound != -math.inf and (val - bound) <= tol * (1 + abs(val)):
-                tolerance_closed.append(bound)
+            if vr['feasible']:
+                if incval is None or val < incval:
+                    inc = xr
+                    incval = val
+                # Node is fathomed by integrality.
+                # Conservative lower bound on this branch is the relaxation bound or exact objective.
+                leaf_bound = bound if bound != -math.inf else val
+                tolerance_closed.append(leaf_bound)
             else:
                 heapq.heappush(heap, (bound, serial + 1, l_node, u_node))
                 failure = 'Near-integral node could not be closed safely'

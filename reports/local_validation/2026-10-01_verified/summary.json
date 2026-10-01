@@ -7,7 +7,7 @@
     "primal_residual": 1.4210854715201802e-14,
     "dual_residual": 1.7193502857276608e-17,
     "kkt_passed": true,
-    "seconds": 0.02472787500028062
+    "seconds": 0.025087833000725368
   },
   "sc50a": {
     "status": "OPTIMAL_VERIFIED",
@@ -17,7 +17,7 @@
     "primal_residual": 5.367434915118819e-16,
     "dual_residual": 4.0893641093287975e-17,
     "kkt_passed": true,
-    "seconds": 0.05004508299953159
+    "seconds": 0.050849709000431176
   },
   "sc50b": {
     "status": "OPTIMAL_VERIFIED",
@@ -27,7 +27,7 @@
     "primal_residual": 2.493132406175791e-16,
     "dual_residual": 3.9650822308041306e-17,
     "kkt_passed": true,
-    "seconds": 0.047341665999738325
+    "seconds": 0.047741250000399305
   },
   "blend": {
     "status": "OPTIMAL_VERIFIED",
@@ -37,7 +37,7 @@
     "primal_residual": 1.7763568394002473e-15,
     "dual_residual": 1.227694079519073e-16,
     "kkt_passed": true,
-    "seconds": 0.9175977919994693
+    "seconds": 0.915785125000184
   },
   "flugpl": {
     "status": "LIMIT_REACHED",
@@ -47,7 +47,7 @@
     "primal_residual": null,
     "dual_residual": null,
     "kkt_passed": null,
-    "seconds": 1.0410638749999634
+    "seconds": 1.0397071249999499
   },
   "afiro_pdhg": {
     "status": "OPTIMAL_VERIFIED",
@@ -56,6 +56,6 @@
     "primal_residual": 8.069888712327982e-09,
     "dual_residual": 5.931405140274168e-08,
     "kkt_passed": true,
-    "seconds": 0.1140394580006614
+    "seconds": 0.10563587500018912
   }
 }

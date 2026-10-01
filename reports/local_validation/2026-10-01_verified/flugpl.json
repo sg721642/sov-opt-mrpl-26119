@@ -258,19 +258,36 @@
   "model_name": "flugpl",
   "model_sha256": "8ac7f0195eb38f3ff192e669609da587f33d5c8a8744e62e1f2b809074eb7cb6",
   "solver_version": "0.1.5",
-  "elapsed_seconds": 1.0410359999996217,
+  "elapsed_seconds": 1.0396779590000733,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T13:59:19.715879+00:00",
+  "timestamp_utc": "2026-10-01T14:32:40.676250+00:00",
   "variables": 18,
   "rows": 18,
   "nonzeros": 46,
+  "dispatch": {
+    "method": "bb",
+    "backend": "cpu",
+    "problem_class": "MILP",
+    "inspection": {
+      "variables": 18,
+      "constraints": 18,
+      "nonzeros": 46,
+      "density": 0.1419753086419753,
+      "integer_variables": 11,
+      "has_quadratic_objective": false,
+      "min_nonzero_coeff": 0.9,
+      "max_nonzero_coeff": 2700.0,
+      "dynamic_range": 3000.0
+    },
+    "rationale": "Model has 11 integer variables; dispatched to exact rational-bound Branch-and-Bound solver."
+  },
   "machine": {
     "system": "Darwin",
     "architecture": "arm64",
     "python": "3.11.16"
   },
-  "measured_duration_seconds": 1.0410638749999634,
-  "git_revision": "6eb76d652355178cfb342e3f1a0091ab637a944e",
+  "measured_duration_seconds": 1.0397071249999499,
+  "git_revision": "eb8d21f402862f6a939e1ead9dae64b57b14ffa1+dirty",
   "input_mps_sha256": "a1f0cb79a95639450dd984473a00efca24365457153d7fcb859c6581ddab4c2c"
 }

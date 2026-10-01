@@ -2807,19 +2807,36 @@
   "model_name": "BLEND",
   "model_sha256": "b7f520aecdb4384d4516752f266bfc5f3897045a610edb01cc1a94a9cd36f6a2",
   "solver_version": "0.1.5",
-  "elapsed_seconds": 0.917554999999993,
+  "elapsed_seconds": 0.9157437080002637,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T13:59:18.673483+00:00",
+  "timestamp_utc": "2026-10-01T14:32:39.635005+00:00",
   "variables": 83,
   "rows": 74,
   "nonzeros": 491,
+  "dispatch": {
+    "method": "simplex",
+    "backend": "cpu",
+    "problem_class": "LP",
+    "inspection": {
+      "variables": 83,
+      "constraints": 74,
+      "nonzeros": 491,
+      "density": 0.07994138717030283,
+      "integer_variables": 0,
+      "has_quadratic_objective": false,
+      "min_nonzero_coeff": 0.003,
+      "max_nonzero_coeff": 66.0,
+      "dynamic_range": 22000.0
+    },
+    "rationale": "Continuous LP dispatched to dense Primal Simplex with LU refactorization, Markowitz pivoting, and exact KKT/Farkas certification."
+  },
   "machine": {
     "system": "Darwin",
     "architecture": "arm64",
     "python": "3.11.16"
   },
-  "measured_duration_seconds": 0.9175977919994693,
-  "git_revision": "6eb76d652355178cfb342e3f1a0091ab637a944e",
+  "measured_duration_seconds": 0.915785125000184,
+  "git_revision": "eb8d21f402862f6a939e1ead9dae64b57b14ffa1+dirty",
   "input_mps_sha256": "c8bb193f8af5dcff735a3b8db62077db93625e93cfb26e2b01f83ca3039cbf7d"
 }

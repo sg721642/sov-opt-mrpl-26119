@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from fractions import Fraction
 import numpy as np
-from sovopt import Model, load, solve
+from sovopt import Model, load, solve, build_refinery_twin, auto_dispatch, inspect_model
 from sovopt.linalg import LU
 from sovopt.verify import verify, safe_lower_bound, exact_farkas
 from sovopt.simplex import solve_lp
@@ -462,5 +462,108 @@ class TestDifferentialComparisonLogic(unittest.TestCase):
         self.assertEqual(res['comparison_status'], 'DIMENSION_MISMATCH')
 
 
+class TestRefineryPlanningTwin(unittest.TestCase):
+    """Test the unified MRPL Refinery Planning Digital Twin across LP, MILP, QP, and Infeasible modes."""
+
+    def test_refinery_twin_lp_kkt_verified(self):
+        """LP planning twin solves to OPTIMAL_VERIFIED with KKT satisfaction."""
+        m = build_refinery_twin('lp')
+        res = solve(m)
+        self.assertEqual(res['status'], 'OPTIMAL_VERIFIED')
+        self.assertIsNotNone(res['objective'])
+        v = res['verification']
+        self.assertTrue(v['feasible'])
+        self.assertTrue(v['kkt_passed'])
+        self.assertLessEqual(v['primal_residual'], 1e-7)
+        self.assertLessEqual(v['dual_residual'], 1e-7)
+
+    def test_refinery_twin_infeasible_farkas_certified(self):
+        """Infeasible twin variant generates an exact Farkas certificate."""
+        m = build_refinery_twin('infeasible')
+        res = solve(m)
+        self.assertEqual(res['status'], 'INFEASIBLE_CERTIFIED')
+        self.assertTrue(res.get('farkas_certificate'))
+
+    def test_refinery_twin_milp_optimal_verified(self):
+        """MILP twin solves discrete unit commitment to OPTIMAL_VERIFIED with exact conservative bounds."""
+        m = build_refinery_twin('milp')
+        res = solve(m)
+        self.assertEqual(res['status'], 'OPTIMAL_VERIFIED')
+        self.assertIsNotNone(res['objective'])
+        self.assertIsNotNone(res['best_bound'])
+        self.assertLessEqual(res['relative_gap'], 1e-6)
+        v = res['verification']
+        self.assertTrue(v['feasible'])
+        self.assertLessEqual(v['integrality_residual'], 1e-7)
+
+    def test_refinery_twin_qp_kkt_verified(self):
+        """QP twin with smooth throughput penalties converges via IPM with KKT stationarity."""
+        m = build_refinery_twin('qp')
+        res = solve(m)
+        self.assertEqual(res['status'], 'OPTIMAL_VERIFIED')
+        self.assertIsNotNone(res['objective'])
+        v = res['verification']
+        self.assertTrue(v['feasible'])
+        self.assertTrue(v['kkt_passed'])
+        self.assertLessEqual(v['primal_residual'], 1e-7)
+        self.assertLessEqual(v['dual_residual'], 1e-7)
+
+
+class TestAutoDispatcher(unittest.TestCase):
+    """Test automatic algorithm dispatcher model inspection and routing."""
+
+    def test_dispatcher_model_inspection(self):
+        """Model inspection accurately reports dimensions, integrality, and QP structure."""
+        m_lp = build_refinery_twin('lp')
+        info_lp = inspect_model(m_lp)
+        self.assertEqual(info_lp['variables'], 36)
+        self.assertEqual(info_lp['constraints'], 28)
+        self.assertEqual(info_lp['integer_variables'], 0)
+        self.assertFalse(info_lp['has_quadratic_objective'])
+
+        m_milp = build_refinery_twin('milp')
+        info_milp = inspect_model(m_milp)
+        self.assertEqual(info_milp['variables'], 42)
+        self.assertEqual(info_milp['integer_variables'], 6)
+        self.assertFalse(info_milp['has_quadratic_objective'])
+
+        m_qp = build_refinery_twin('qp')
+        info_qp = inspect_model(m_qp)
+        self.assertEqual(info_qp['variables'], 36)
+        self.assertEqual(info_qp['integer_variables'], 0)
+        self.assertTrue(info_qp['has_quadratic_objective'])
+
+    def test_dispatcher_auto_selection(self):
+        """Auto dispatcher routes LP to simplex, MILP to bb, and QP to ipm."""
+        m_lp = build_refinery_twin('lp')
+        disp_lp = auto_dispatch(m_lp)
+        self.assertEqual(disp_lp['problem_class'], 'LP')
+        self.assertEqual(disp_lp['method'], 'simplex')
+        self.assertEqual(disp_lp['backend'], 'cpu')
+
+        m_milp = build_refinery_twin('milp')
+        disp_milp = auto_dispatch(m_milp)
+        self.assertEqual(disp_milp['problem_class'], 'MILP')
+        self.assertEqual(disp_milp['method'], 'bb')
+        self.assertEqual(disp_milp['backend'], 'cpu')
+
+        m_qp = build_refinery_twin('qp')
+        disp_qp = auto_dispatch(m_qp)
+        self.assertEqual(disp_qp['problem_class'], 'QP')
+        self.assertEqual(disp_qp['method'], 'ipm')
+        self.assertEqual(disp_qp['backend'], 'cpu')
+
+    def test_dispatcher_explicit_override_and_errors(self):
+        """Explicit method overrides are respected and invalid methods rejected."""
+        m_lp = build_refinery_twin('lp')
+        disp_override = auto_dispatch(m_lp, method='pdhg-cpu')
+        self.assertEqual(disp_override['method'], 'pdhg-cpu')
+        self.assertEqual(disp_override['backend'], 'pdhg-cpu')
+
+        with self.assertRaises(ValueError):
+            auto_dispatch(m_lp, method='invalid_method')
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
+

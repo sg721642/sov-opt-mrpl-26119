@@ -2,6 +2,22 @@
 
 ## [0.1.5] - 2026-10-01
 
+### MRPL Refinery Planning Digital Twin & Demonstration
+- Implemented parameterised refinery digital twin (`sovopt/refinery_twin.py`) representing MRPL Mangalore operations across 4 operational variants:
+  - `lp`: Continuous multi-period economic planning with crude blending, unit yields, and quality specs.
+  - `milp`: Discrete operational unit commitment binaries ($z \in \{0, 1\}$) and physical minimum turndown limits.
+  - `qp`: Smooth operational dispatch with positive semidefinite quadratic penalties damping throughput swings ($\frac{1}{2} \Delta u^T Q \Delta u$).
+  - `infeasible`: Diagnostic scenario certifying infeasibility via an exact Farkas certificate ($y \ge 0, y^T A \le 0, y^T b > 0$).
+- Added standalone 5-step mathematical verification demonstration script `scripts/demonstrate_refinery_twin.py`.
+- Added provenance disclaimer: engineering formulation based on public refining literature (Gary & Handwerk; Meyers), not proprietary MRPL production telemetry.
+
+### Automatic Algorithm Dispatcher & CLI Numerical Trust Report
+- Implemented `sovopt/dispatcher.py`: inspects dimensions ($m, n$), nonzeros ($nnz$), integrality, dynamic range, and quadratic structure ($Q$) to route models automatically to simplex, branch-and-bound, or interior-point QP.
+- Extended CLI entrypoint (`sovopt/__main__.py`): supports `--method {auto, simplex, ipm, bb, pdhg-cpu, pdhg-gpu}`, `--refinery-twin {lp, milp, qp, infeasible}`, and formatted Numerical Trust Report output (`--report`) displaying $r_p, r_d, r_I$, gap, and certificate status.
+
+### Branch-and-Bound Integer Node Fathoming Hardening
+- Hardened integer leaf fathoming in `sovopt/milp.py`: when all integer variables evaluate to integers, the node is verified for primal feasibility, records new incumbents, and fathoms the branch with conservative lower bounds without halting on inherited bound comparisons.
+
 ### Checksum Generation & Verification Tooling
 - Repaired `SHA256SUMS.json` parsing failure: removed trailing literal backslash-n defect, ensuring valid JSON decoding with standard newline.
 - Created `scripts/verify_checksums.py`: provides CLI verification (`scripts/verify_checksums.py`) and generation (`--update`), excluding the checksum file itself and covering all tracked repository files (including newly added docs, scripts, and quarantined files).
