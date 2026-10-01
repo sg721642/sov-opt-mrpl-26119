@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "generated_at": "2026-09-30T22:15:35Z",
-  "solver_core": "sovopt 0.1.7 (pure sovereign NumPy core, no external solver imports)",
+  "solver_core": "sovopt 0.1.8 (pure sovereign NumPy core, no external solver imports)",
   "disclosures": {
     "proprietary_mrpl_data": "No authorized MRPL dataset is available in this project. Fictional refinery parameters are strictly prohibited; authentic historical LP/MILP benchmarks are provided instead.",
     "real_convex_qp": "No authentic public industrial convex QP instance is currently verified in the active suite. Numerical eigenvalue checks are floating-point checks, not exact rational PSD certificates."

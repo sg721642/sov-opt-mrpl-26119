@@ -1,5 +1,28 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.1.8] - 2026-10-01
+
+### Gate 4: Robust Bounded-Variable Revised Dual Simplex
+
+- **`sovopt/dual_simplex.py` — Sovereign Bounded-Variable Revised Dual Simplex Engine:**
+  - Implemented revised dual simplex operating directly on bounded variables ($l \le x \le u$) with five explicit variable states: `BASIC (0)`, `AT_LOWER (1)`, `AT_UPPER (2)`, `FREE_NONBASIC (3)`, and `FIXED (4)`.
+  - Constructed standard-form working matrix directly in CSC format from coordinate triplets without materializing the full dense $M = \text{np.column\_stack(...)}$.
+  - `DevexPricer`: Implemented steepest-edge approximation with weight updates $\gamma_p^{\text{new}} = \gamma_p / \beta^2$ and $\gamma_i^{\text{new}} = \max(\gamma_i, (d_i / \beta)^2 \gamma_p^{\text{new}})$.
+  - `TwoPassHarrisRatioTest`: Implemented two-pass ratio test with numerical expansion $\delta = 10^{-7}$ in Pass 1 and pivot magnitude maximization in Pass 2 with deterministic tie-breaking and tiny pivot rejection ($\epsilon_{\text{piv}} = 10^{-8}$).
+  - Bound flipping logic: Implemented ratio test bound flips for bounded variables without refactorization or eta updates when $\Delta x_{B, p} < |v_p|$.
+  - Dual Phase I & Fallback Hierarchy: Implemented artificial bound handling for unbounded non-basics with clean fallback recording `requested_method`, `actual_method`, and `fallback_reason`.
+  - `DualBasisState`: Dataclass capturing `basis`, `states`, `nonbasic_values` with `to_dict()` and `from_dict()` for warm reoptimization across bound perturbations.
+- **`sovopt/simplex.py` — Pre-flight A Sparse Storage Hardening:**
+  - Updated `solve_lp` to construct CSC working matrix directly via `_build_sparse_csc_system` from coordinate triplets without allocating dense $M$.
+  - Added telemetry fields: `matrix_storage_used='csc'`, `basis_storage_used='sparse'`, `full_dense_matrix_materialized=False`.
+  - Added `method` routing parameter supporting `'primal-simplex'` and `'dual-simplex'`.
+- **`sovopt/__init__.py` & `sovopt/dispatcher.py` & CLI:**
+  - Connected `method='dual-simplex'` in top-level `solve()`, automatic dispatcher, and `--method dual-simplex` in CLI.
+- **`docs/DUAL_SIMPLEX.md`:**
+  - Complete mathematical specification of bounded-variable dual simplex, primal-dual relations, Devex weight dynamics, two-pass Harris ratio test, and bound flipping transitions.
+- **`tests/test_dual_simplex.py` — 28-Point Test Matrix:**
+  - 28 unit and integration tests covering dual feasible start, already optimal, basic bound violations, boxed/free/fixed non-basics, Devex init/update/reset, Harris pass-1/pass-2/tiny rejection, degenerate pivot tracking, bound flips, sparse FTRAN/BTRAN, eta updates, refactorization triggers, infeasible detection, warm reoptimization after bound perturbation, invalid warm basis rejection, and end-to-end solves on Netlib AFIRO, SC50A, SC50B, and BLEND.
+
 ## [0.1.7] - 2026-10-01
 
 ### Gate 3: Sovereign Sparse Numerical Linear Algebra & Basis Engine

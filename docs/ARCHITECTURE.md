@@ -19,6 +19,7 @@ SOV-OPT is an original numerical optimization research prototype developed for l
 | `sovopt/sparse.py` | Pure NumPy CSRMatrix and CSCMatrix classes supporting matrix-vector and transpose products, column extraction, index sorting, duplicate summing, zero dropping, and coordinate constructors. Zero external dependencies. | NumPy, Python stdlib |
 | `sovopt/sparse_lu.py` | Sovereign sparse LU factorization engine ($P B Q = L U$) with Threshold Markowitz fill-in minimization ($u=0.1$), FTRAN/BTRAN sparse triangular substitution, iterative refinement with platform longdouble precision detection, Product-Form of Inverse (PFI) eta updates, and deterministic refactorization triggers. | NumPy, `dataclasses` |
 | `sovopt/simplex.py` | Two-phase primal revised simplex algorithm supporting both sparse LU (Threshold Markowitz + PFI eta updates) and dense LU backends, iterative refinement, exact rational basis dual solver (`_exact_dual_from_basis`), unbounded recession certificate pairs $(x_0, d)$, and Phase I Farkas ray recovery. | NumPy, Python `fractions.Fraction` |
+| `sovopt/dual_simplex.py` | Bounded-variable revised dual simplex algorithm with Devex pricing, two-pass Harris dual ratio test, bound flips without basis refactorization, sparse basis LU engine (`SparseBasisEngine`, FTRAN/BTRAN, PFI eta updates), dual Phase I, and warm reoptimization interface (`DualBasisState`). | NumPy, `dataclasses` |
 | `sovopt/milp.py` | Branch-and-bound mixed-integer linear programming (MILP). Best-bound search queue, most-fractional branching, exact rational Lagrangian lower bounding via `safe_lower_bound`, safe integer leaf fathoming, and exact Farkas infeasibility pruning. | `heapq`, `math`, NumPy, `fractions.Fraction` |
 | `sovopt/qp.py` | Infeasible-start Mehrotra predictor-corrector primal-dual interior point solver for convex quadratic programs: $\min \frac{1}{2} x^T Q x + c^T x$ subject to $l \le A x \le u$. Floating-point eigenvalue inspection. | NumPy |
 | `sovopt/pdhg.py` | Experimental first-order Primal-Dual Hybrid Gradient (PDHG / Chambolle-Pock) solver for continuous linear programs. Supports diagonal step sizes and periodic restart. Contains CPU SpMV and CUDA RawKernel source. | NumPy (CPU); optional CuPy (CUDA) |
@@ -86,7 +87,28 @@ The dispatcher (`sovopt/dispatcher.py`) analyzes model characteristics:
 - If $Q \neq 0$: routes to Primal-Dual IPM for Convex QP (`ipm`).
 - If $|I| > 0$: routes to exact rational Branch-and-Bound (`bb`).
 - Continuous LP: defaults to dense Primal Simplex with LU refactorization (`simplex`) on CPU, or routes to PDHG if `--backend pdhg-cpu` / `pdhg-cuda` is requested.
-- Inspects variables $n$, constraints $m$, nonzeros $nnz$, density, integrality, and dynamic range $\kappa_{\text{dyn}} = \max(|c|, |A|) / \min_{>0}(|c|, |A|)$.
+### 2.6 Bounded-Variable Revised Dual Simplex
+The sovereign dual simplex engine (`sovopt/dual_simplex.py`) operates directly on linear programs with explicit finite or infinite bounds:
+
+$$\min_{x} c^T x \quad \text{subject to} \quad A x = b, \quad l \le x \le u$$
+
+- **Five Variable States:** Variables are maintained in 5 explicit states:
+  - `BASIC` ($0$): In basis $B$, values computed as $x_B = B^{-1} (b - N x_N)$.
+  - `AT_LOWER` ($1$): Nonbasic variable at finite lower bound ($x_j = l_j$).
+  - `AT_UPPER` ($2$): Nonbasic variable at finite upper bound ($x_j = u_j$).
+  - `FREE_NONBASIC` ($3$): Nonbasic free variable ($l_j = -\infty, u_j = +\infty$), held at $x_j = 0$.
+  - `FIXED` ($4$): Nonbasic fixed variable ($l_j = u_j$).
+- **Dual Feasible Phase I:** When starting reduced costs $d_N$ are not dual-feasible, an auxiliary Phase I objective introduces artificial dual bounds to establish dual feasibility before driving artificial penalties to zero.
+- **Devex Pricing:** Leaving rows $p$ are chosen using dynamic Devex steepest-edge approximations $\gamma_i \approx \|B^{-T} e_i\|_2^2$:
+  $$\text{score}_i = \frac{v_i^2}{\gamma_i}, \qquad p = \arg\max_{i} \text{score}_i$$
+  where $v_i$ is the primal bound violation. Devex weights are updated via the Harris recurrence:
+  $$\gamma_p^{\text{new}} = \frac{\gamma_p}{\beta^2}, \qquad \gamma_i^{\text{new}} = \max\left(\gamma_i, \left(\frac{d_i}{\beta}\right)^2 \gamma_p^{\text{new}}\right)$$
+- **Two-Pass Harris Dual Ratio Test:** Entering column $q$ is chosen via a two-pass ratio test with tolerance $\delta = 10^{-7}$:
+  - *Pass 1:* Computes maximum permissible step $\theta_{\max} = \min_j \frac{\max(0, \text{dist}_j) + \delta}{s_j}$.
+  - *Pass 2:* Selects entering column $q = \arg\max \{ s_j : \frac{\text{dist}_j}{s_j} \le \theta_{\max} \}$ to maximize pivot magnitude. Tiny pivots ($< 10^{-8}$) are rejected.
+- **Bound Flipping:** When entering variable $q$ has finite box width $u_q - l_q$ and the step needed to eliminate violation $|v_p|$ exceeds $s_q (u_q - l_q)$, variable $q$ is flipped from its current bound to its opposite bound, updating $x_B \leftarrow x_B - \Delta x_q d$ without altering the basis or triggering LU refactorization.
+- **Sparse Basis Engine:** Reuses `SparseBasisEngine` with Markowitz threshold pivoting ($u=0.1$), FTRAN/BTRAN sparse triangular solves, and PFI eta updates.
+- **Warm Reoptimization:** `DualBasisState` serializes and restores basis indices, variable states, and nonbasic values, allowing warm-started resolves without re-factorizing from scratch.
 
 ---
 
@@ -113,7 +135,7 @@ Every solve is evaluated by `sovopt/verify.py` against the **original, untransfo
 | **Gate 1** | Mathematical coverage & transformations | **COMPLETED** | Maximization, objective offsets, free variables, box bounds, one-sided bounds, `QUADOBJ` in QPS. Tested via affine transformation recovery to machine precision ($10^{-16}$). |
 | **Gate 2** | Unbounded certificate hardening & provenance consistency | **COMPLETED** | Verified $(x_0, d)$ certificate pairs for unboundedness across all paths; 18-point unit fixture matrix; authoritative Netlib WOODINFE provenance. |
 | **Gate 3** | True sovereign sparse numerical linear algebra | **COMPLETED** | Sovereign pure-NumPy CSR/CSC (`sovopt/sparse.py`), SparseLU with Threshold Markowitz pivoting ($u=0.1$) and FTRAN/BTRAN triangular solves (`sovopt/sparse_lu.py`), PFI eta updates, refactorization triggers, and sparse simplex iteration (`sovopt/simplex.py`). Tested across 28 unit/integration cases in `tests/test_sparse.py` and Netlib benchmarks (AFIRO, SC50A, SC50B, BLEND). |
-| **Gate 4** | Robust dual simplex | *PLANNED* | Current LP solver is two-phase primal revised simplex. Re-optimization in B&B uses cold starts. |
+| **Gate 4** | Robust bounded-variable revised dual simplex | **COMPLETED** | Bounded-variable revised dual simplex (`sovopt/dual_simplex.py`) with 5 explicit variable states, Devex pricing, two-pass Harris dual ratio test, bound flips without basis refactorization, sparse basis LU engine (`SparseBasisEngine`, FTRAN/BTRAN, PFI eta updates), dual Phase I, and warm reoptimization interface (`DualBasisState`). Tested across 28 unit tests in `tests/test_dual_simplex.py` and validated on 4 Netlib benchmark instances (AFIRO, SC50A, SC50B, BLEND) all achieving `OPTIMAL_VERIFIED` with zero KKT violations. |
 | **Gate 5** | Reversible presolve & scaling | **PARTIAL** | Reversible variable transformations (`sovopt/transforms.py`) and geometric row scaling implemented with exact primal/dual postsolve. Full bound tightening and singleton row elimination planned. |
 | **Gate 6** | Conservative MILP bounds | **COMPLETED** | Exact rational basis dual engine (`_exact_dual_from_basis`), exact rational Farkas certificates, and safe leaf node fathoming. Validated on MIPLIB FLUGPL and MRPL Twin MILP. |
 | **Gate 7** | Convex QP hardening | **COMPLETED** | Mehrotra predictor-corrector interior point method implemented and KKT verified on authentic and MRPL operational QP twin models. |

@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-01  
 **Environment:** Darwin arm64, Python 3.11.16  
-**Solver Revision:** `c8c4fe7e14c08272` (includes +dirty if uncommitted changes)  
+**Solver Revision:** `9a19c9224f4a827c` (includes +dirty if uncommitted changes)  
 **Core Dependencies:** NumPy and Python standard library only (strictly sovereign core)  
 **External Validation:** via `scripts/baseline_worker.py` isolated subprocess (highspy or scipy fallback)  
 
@@ -15,12 +15,12 @@ No synthetic or fabricated instances are used as performance evidence.
 
 | Instance | Problem Class | Dimensions (m x n) | SOV-OPT Status | SOV-OPT Objective | Published Reference Text | Discrepancy | Primal Residual | Stationarity (Dual) | Runtime |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **AFIRO** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753143** | -4.6475314286E+02 | 2.86e-09 | 2.84e-14 | 2.64e-18 | 27.8 ms |
-| **SC50A** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-64.575077** | -6.4575077059E+01 | 4.36e-10 | 9.66e-17 | 4.09e-17 | 53.4 ms |
-| **SC50B** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000** | -7.0000000000E+01 | 1.42e-14 | 1.56e-16 | 2.90e-17 | 63.2 ms |
-| **BLEND** | LP | 74 x 83 | `OPTIMAL_VERIFIED` | **-30.812150** | -3.0812149846E+01 | 1.72e-10 | 6.34e-14 | 2.27e-15 | 418.9 ms |
-| **FLUGPL** | MILP | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **1173720** | 1201500 (integer optimal); 769500.0 (LP relaxation root bound) | N/A | N/A | N/A | 1169.7 ms |
-| **AFIRO (PDHG-CPU)** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753142** | -464.75314286 (Netlib) | 6.3e-07 | 8.07e-09 | 5.93e-08 | 102.4 ms |
+| **AFIRO** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753143** | -4.6475314286E+02 | 2.86e-09 | 2.84e-14 | 2.64e-18 | 29.8 ms |
+| **SC50A** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-64.575077** | -6.4575077059E+01 | 4.36e-10 | 9.66e-17 | 4.09e-17 | 57.9 ms |
+| **SC50B** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000** | -7.0000000000E+01 | 1.42e-14 | 1.56e-16 | 2.90e-17 | 62.0 ms |
+| **BLEND** | LP | 74 x 83 | `OPTIMAL_VERIFIED` | **-30.812150** | -3.0812149846E+01 | 1.72e-10 | 6.34e-14 | 2.27e-15 | 434.9 ms |
+| **FLUGPL** | MILP | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **1173720** | 1201500 (integer optimal); 769500.0 (LP relaxation root bound) | N/A | N/A | N/A | 1179.7 ms |
+| **AFIRO (PDHG-CPU)** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753142** | -464.75314286 (Netlib) | 6.3e-07 | 8.07e-09 | 5.93e-08 | 104.5 ms |
 
 ---
 

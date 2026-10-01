@@ -10,7 +10,7 @@ from fractions import Fraction as F
 from math import lcm
 import numpy as np
 from .linalg import LU, NumericalError
-from .sparse import csc_from_dense, CSCMatrix
+from .sparse import csc_from_dense, CSCMatrix, csc_from_triplets
 from .sparse_lu import SparseBasisEngine, SparseLU, PLATFORM_LONGDOUBLE_EXTENDED
 from .transforms import transform_model, postsolve_primal, postsolve_dual, postsolve_ray, postsolve_direction
 from .verify import verify, exact_farkas, verify_unbounded_ray, verify_unbounded_certificate
@@ -97,9 +97,47 @@ def _reconcile_farkas(model, z_float):
 
     return z_float, False
 
-def _exact_farkas_from_basis(model, M, basis, phase_cost, row_signs, row_scale, trans):
+def _get_basis_matrix(mat, basis):
+    """Extract m x m basis matrix from dense ndarray or CSCMatrix."""
+    if hasattr(mat, 'extract_columns'):
+        return mat.extract_columns(basis).to_dense()
+    return mat[:, basis]
+
+
+def _build_sparse_csc_system(A_all: np.ndarray, row_signs: np.ndarray, m_eq: int, m_le: int, m_total: int, n_trans: int, slack_start: int, art_start: int, total_cols: int) -> CSCMatrix:
+    r_nz, c_nz = np.nonzero(A_all)
+    v_nz = A_all[r_nz, c_nz]
+    triplet_rows = [r_nz]
+    triplet_cols = [c_nz]
+    triplet_vals = [v_nz]
+    if m_le > 0:
+        triplet_rows.append(np.arange(m_eq, m_total, dtype=np.int64))
+        triplet_cols.append(np.arange(slack_start, art_start, dtype=np.int64))
+        triplet_vals.append(row_signs[m_eq:m_total])
+    triplet_rows.append(np.arange(m_total, dtype=np.int64))
+    triplet_cols.append(np.arange(art_start, total_cols, dtype=np.int64))
+    triplet_vals.append(np.ones(m_total, dtype=np.float64))
+    all_rows = np.concatenate(triplet_rows)
+    all_cols = np.concatenate(triplet_cols)
+    all_vals = np.concatenate(triplet_vals)
+    return csc_from_triplets(m_total, total_cols, all_rows, all_cols, all_vals)
+
+
+def _build_dense_system(A_all: np.ndarray, row_signs: np.ndarray, m_eq: int, m_le: int, m_total: int, n_trans: int) -> np.ndarray:
+    cols = [A_all]
+    if m_le > 0:
+        slack_mat = np.zeros((m_total, m_le), dtype=float)
+        for k in range(m_le):
+            slack_mat[m_eq + k, k] = row_signs[m_eq + k]
+        cols.append(slack_mat)
+    art_mat = np.eye(m_total, dtype=float)
+    cols.append(art_mat)
+    return np.column_stack(cols)
+
+
+def _exact_farkas_from_basis(model, mat, basis, phase_cost, row_signs, row_scale, trans):
     """Solve basis in exact rational arithmetic and construct exact Farkas certificate."""
-    y_F = _exact_solve_BT(M[:, basis], phase_cost[basis])
+    y_F = _exact_solve_BT(_get_basis_matrix(mat, basis), phase_cost[basis])
     if y_F is None:
         return None, False
 
@@ -168,9 +206,9 @@ def _exact_farkas_from_basis(model, M, basis, phase_cost, row_signs, row_scale, 
         return z_F, True
     return None, False
 
-def _exact_dual_from_basis(model, M, basis, cost, row_signs, row_scale, trans):
+def _exact_dual_from_basis(model, mat, basis, cost, row_signs, row_scale, trans):
     """Solve basis in exact rational arithmetic and construct exact dual solution satisfying stationarity."""
-    y_F = _exact_solve_BT(M[:, basis], cost[basis])
+    y_F = _exact_solve_BT(_get_basis_matrix(mat, basis), cost[basis])
     if y_F is None:
         return None
 
@@ -401,17 +439,20 @@ def _iterate_sparse(M_csc: CSCMatrix, b: np.ndarray, c: np.ndarray, basis: list[
 
 
 def _attach_telemetry(res_dict: dict, requested: str, used: str,
-                      engine: any, M: np.ndarray,
+                      engine: any, mat: any,
                       basis: list[int], iterations: int,
                       fallback_reason: str = None) -> None:
     """Helper to attach uniform linear algebra telemetry to LP result dictionary."""
     if used == 'sparse' and engine is not None:
         t = engine.get_telemetry()
+        matrix_storage = 'csc'
+        basis_storage = 'sparse'
+        full_dense = False
     elif used == 'dense':
         m = len(basis) if basis is not None else 0
         try:
-            if M is not None and basis is not None:
-                B = M[:, basis]
+            if mat is not None and basis is not None:
+                B = _get_basis_matrix(mat, basis)
                 nnz = int((B != 0).sum())
                 density = float(nnz / (m * m)) if (m * m) > 0 else 0.0
             else:
@@ -434,6 +475,9 @@ def _attach_telemetry(res_dict: dict, requested: str, used: str,
             'growth_factor': 1.0,
             'platform_longdouble_extended': PLATFORM_LONGDOUBLE_EXTENDED,
         }
+        matrix_storage = 'dense'
+        basis_storage = 'dense'
+        full_dense = True
     else:
         t = {
             'basis_factorization': 'none',
@@ -449,9 +493,15 @@ def _attach_telemetry(res_dict: dict, requested: str, used: str,
             'growth_factor': 1.0,
             'platform_longdouble_extended': PLATFORM_LONGDOUBLE_EXTENDED,
         }
+        matrix_storage = 'none'
+        basis_storage = 'none'
+        full_dense = False
 
     res_dict['linear_algebra_requested'] = requested
     res_dict['linear_algebra_used'] = used
+    res_dict['matrix_storage_used'] = matrix_storage
+    res_dict['basis_storage_used'] = basis_storage
+    res_dict['full_dense_matrix_materialized'] = full_dense
     res_dict['basis_factorization'] = t['basis_factorization']
     res_dict['sparse_basis_nnz'] = t['sparse_basis_nnz']
     res_dict['sparse_basis_density'] = t['sparse_basis_density']
@@ -465,7 +515,12 @@ def _attach_telemetry(res_dict: dict, requested: str, used: str,
         res_dict['fallback_reason'] = fallback_reason
 
 
-def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto'):
+def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto', method='auto'):
+    if method == 'dual-simplex':
+        from .dual_simplex import solve_dual_simplex
+        return solve_dual_simplex(model, tol=tol, max_iter=max_iter)
+    if method not in ('auto', 'primal-simplex', 'simplex'):
+        raise ValueError(f"Unknown method '{method}' for solve_lp. Supported: 'auto', 'primal-simplex', 'dual-simplex'.")
     if linear_algebra not in ('auto', 'dense', 'sparse'):
         raise ValueError(f"linear_algebra must be 'auto', 'dense', or 'sparse', got {linear_algebra!r}")
     linear_algebra_requested = linear_algebra
@@ -677,25 +732,13 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
     else:
         row_scale = np.ones(max(m_total, 1))
 
-    # Construct standard-form matrix M:
+    # Standard-form dimensions
     # Columns 0..n_trans-1: variables t (cost = trans.c)
     # Columns n_trans..n_trans+m_le-1: slacks for LE rows
     # Columns for artificial variables: one for each row of the system
-    cols = [A_all]
-    if m_le > 0:
-        slack_mat = np.zeros((m_total, m_le), dtype=float)
-        for k in range(m_le):
-            slack_mat[m_eq + k, k] = row_signs[m_eq + k]
-        cols.append(slack_mat)
-
-    # Add artificial variables for all rows (identity matrix)
-    art_mat = np.eye(m_total, dtype=float)
-    cols.append(art_mat)
-
-    M = np.column_stack(cols)
-    total_cols = M.shape[1]
     slack_start = n_trans
     art_start = n_trans + m_le
+    total_cols = n_trans + m_le + m_total
 
     # Initial basis: all artificial variables
     basis = list(range(art_start, art_start + m_total))
@@ -709,6 +752,7 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
 
     engine: any = None
     fallback_reason: str = None
+    M: any = None
     M_csc: any = None
     it1 = 0
     it2 = 0
@@ -716,7 +760,7 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
     try:
         if linear_algebra_used == 'sparse':
             try:
-                M_csc = csc_from_dense(M)
+                M_csc = _build_sparse_csc_system(A_all, row_signs, m_eq, m_le, m_total, n_trans, slack_start, art_start, total_cols)
                 engine = SparseBasisEngine(max_eta_depth=25, pivot_threshold=0.1)
                 engine.initialize(M_csc, basis)
                 xb, y, it1 = _iterate_sparse(M_csc, rhs_all, phase_cost, basis, total_cols, max_iter, history, engine)
@@ -727,12 +771,15 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
                     linear_algebra_used = 'dense'
                     fallback_reason = f"sparse_lu_failure: {e}"
                     engine = None
+                    M_csc = None
+                    M = _build_dense_system(A_all, row_signs, m_eq, m_le, m_total, n_trans)
                     basis = list(range(art_start, art_start + m_total))
                     history.clear()
                     xb, y, it1 = _iterate_dense(M, rhs_all, phase_cost, basis, total_cols, max_iter, history)
                 else:
                     raise
         else:
+            M = _build_dense_system(A_all, row_signs, m_eq, m_le, m_total, n_trans)
             xb, y, it1 = _iterate_dense(M, rhs_all, phase_cost, basis, total_cols, max_iter, history)
 
         sum_art = float(phase_cost[basis] @ xb)
@@ -747,8 +794,9 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
 
             z_cert, cert_ok = _reconcile_farkas(model, z_float)
 
+            mat = M_csc if linear_algebra_used == 'sparse' else M
             if not cert_ok:
-                z_exact, cert_ok = _exact_farkas_from_basis(model, M, basis, phase_cost, row_signs, row_scale, trans)
+                z_exact, cert_ok = _exact_farkas_from_basis(model, mat, basis, phase_cost, row_signs, row_scale, trans)
                 if cert_ok:
                     z_cert = z_exact
 
@@ -761,7 +809,7 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
                        verification=dict(feasible=False, farkas_verified=bool(cert_ok), kkt_passed=False),
                        farkas_certificate=bool(cert_ok),
                        algorithm='two-phase primal revised simplex', iterations=it1, history=history)
-            _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, M, basis, it1, fallback_reason)
+            _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, mat, basis, it1, fallback_reason)
             return res
 
         # Drive out any remaining zero-valued artificials from the basis
@@ -795,6 +843,8 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
                     linear_algebra_used = 'dense'
                     fallback_reason = f"sparse_lu_phase2_failure: {e}"
                     engine = None
+                    if M is None:
+                        M = _build_dense_system(A_all, row_signs, m_eq, m_le, m_total, n_trans)
                     xb, y, it2 = _iterate_dense(M, rhs_all, phase2_cost, basis, art_start, max_iter - it1, history)
                 else:
                     raise
@@ -815,7 +865,8 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
         y_le = y_system[m_eq:]
         z_sol = postsolve_dual(model, x_sol, y_eq, y_le, trans)
 
-        z_exact = _exact_dual_from_basis(model, M, basis, phase2_cost, row_signs, row_scale, trans)
+        mat = M_csc if linear_algebra_used == 'sparse' else M
+        z_exact = _exact_dual_from_basis(model, mat, basis, phase2_cost, row_signs, row_scale, trans)
 
         report = verify(model, x_sol, z_sol, tol, check_integer=False)
         res_dict = dict(status='OPTIMAL_VERIFIED' if report['kkt_passed'] else 'NUMERICAL_FAILURE',
@@ -826,7 +877,7 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
         if z_exact is not None:
             res_dict['dual_exact'] = [f'{v.numerator}/{v.denominator}' if isinstance(v, F) else str(v) for v in z_exact]
             res_dict['dual_exact_fraction'] = z_exact
-        _attach_telemetry(res_dict, linear_algebra_requested, linear_algebra_used, engine, M, basis, it1 + it2, fallback_reason)
+        _attach_telemetry(res_dict, linear_algebra_requested, linear_algebra_used, engine, mat, basis, it1 + it2, fallback_reason)
         return res_dict
 
     except _UnboundedError as ue:
@@ -875,25 +926,28 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
                     algorithm='two-phase primal revised simplex',
                     history=history,
                 )
-            _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, M, basis, len(history), fallback_reason)
+            mat = M_csc if linear_algebra_used == 'sparse' else M
+            _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, mat, basis, len(history), fallback_reason)
             return res
         except Exception as inner:
+            mat = M_csc if linear_algebra_used == 'sparse' else M
             res = dict(status='NUMERICAL_FAILURE',
                         message=f'Unbounded direction detected; ray recovery error: {inner}',
                         algorithm='two-phase primal revised simplex', history=history)
-            _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, M, basis, len(history), fallback_reason)
+            _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, mat, basis, len(history), fallback_reason)
             return res
 
     except (NumericalError, FloatingPointError, OverflowError) as e:
+        mat = M_csc if linear_algebra_used == 'sparse' else M
         if 'iteration limit' in str(e).lower():
             res = dict(status='LIMIT_REACHED', message='Simplex iteration limit reached',
                         algorithm='two-phase primal revised simplex', history=history)
-            _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, M, basis, len(history), fallback_reason)
+            _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, mat, basis, len(history), fallback_reason)
             return res
         if scaling:
             # Fallback to unscaled solve if equilibration caused an unsafe basis pivot
             return solve_lp(model, tol=tol, max_iter=max_iter, scaling=False, linear_algebra=linear_algebra)
         res = dict(status='NUMERICAL_FAILURE', message=str(e),
                     algorithm='two-phase primal revised simplex', history=history)
-        _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, M, basis, len(history), fallback_reason)
+        _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, mat, basis, len(history), fallback_reason)
         return res

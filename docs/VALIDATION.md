@@ -9,7 +9,7 @@ This document records the exact procedures for reproducing all numerical benchma
 All commands below assume execution from the project root with the project-local virtual environment active:
 
 ```bash
-# 1. Run full unit and regression test suite (81 tests: 79 passing, 2 integration tests skipped in restricted sandbox)
+# 1. Run full unit and regression test suite (109 tests: 107 passing, 2 integration tests skipped in restricted sandbox)
 .venv/bin/python -m unittest discover -s tests -v
 
 # 2. Run automated report and benchmark generator
@@ -26,7 +26,7 @@ SOVOPT_BENCHMARK_PYTHON=.venv-benchmark/bin/python .venv/bin/python scripts/gene
 
 ## 2. Test Suite Organization
 
-The active test suite is split into three modules (81 tests total):
+The active test suite is split into four modules (109 tests total):
 
 ### 2.1 Solver Correctness (`tests/test_solver.py` — 45 tests)
 - Core solver tests for LU pivot refinement, verified Netlib instances (AFIRO, SC50A, SC50B, BLEND), FLUGPL MILP lower bounding and Farkas certificate generation, bad candidate rejection, affine coordinate transformations, PDHG first-order convergence, and limits enforcement.
@@ -68,6 +68,39 @@ The active test suite is split into three modules (81 tests total):
   27. Sparse primal revised simplex solve on genuine Netlib BLEND (`OPTIMAL_VERIFIED`).
   28. Original untransformed model KKT verification after sparse solves across all 4 Netlib instances.
 
+### 2.4 Bounded-Variable Revised Dual Simplex (`tests/test_dual_simplex.py` — 28 tests)
+- Unit and integration tests covering the complete sovereign dual simplex engine:
+  1. `DualBasisState` serialization, deserialization, and structural invariants.
+  2. Initial variable states classification (`BASIC`, `AT_LOWER`, `AT_UPPER`, `FREE_NONBASIC`, `FIXED`).
+  3. Dual feasibility verification on nonbasic reduced costs.
+  4. Leaving row selection under primal bound violation.
+  5. Devex pricing initialization with unit norm approximations.
+  6. Devex weight update via Harris recurrence formula.
+  7. Devex weight reset on excessive numerical growth.
+  8. Two-Pass Harris ratio test Pass 1 threshold computation ($\delta = 10^{-7}$).
+  9. Two-Pass Harris ratio test Pass 2 maximum pivot magnitude selection.
+  10. Rejection of numerically unstable tiny pivots ($< 10^{-8}$) with telemetry.
+  11. Bounded-variable ratio-test bound flips without basis refactorization.
+  12. Multiple consecutive bound flips in a single dual iteration.
+  13. Unbounded dual / primal infeasibility detection.
+  14. Free nonbasic variable entering pivot dynamics.
+  15. Fixed variable non-eligibility for entering basis.
+  16. Sparse LU basis factorization and triangular substitution integration.
+  17. Product-Form of Inverse (PFI) eta updates during real dual simplex pivots.
+  18. Refactorization trigger after accumulated eta vectors.
+  19. Dual Phase I auxiliary pricing for dual-infeasible starts.
+  20. Dual Phase II transition with primal feasibility restoration.
+  21. Cycling prevention and anti-degeneracy perturbations.
+  22. Pure dual simplex solve on genuine Netlib AFIRO (`OPTIMAL_VERIFIED`).
+  23. Pure dual simplex solve on genuine Netlib SC50A (`OPTIMAL_VERIFIED`).
+  24. Pure dual simplex solve on genuine Netlib SC50B (`OPTIMAL_VERIFIED`).
+  25. Pure dual simplex solve on genuine Netlib BLEND (`OPTIMAL_VERIFIED`).
+  26. Original-model KKT verification across all 4 Netlib dual solutions.
+  27. Warm reoptimization using saved `DualBasisState` after RHS bound perturbation.
+  28. Fallback hierarchy to primal revised simplex upon numerical failure.
+
+*(Note: Synthetic unit fixtures in `tests/test_dual_simplex.py` are strictly marked `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are excluded from benchmark reports).*
+
 ---
 
 ## 3. External Differential Validation Setup
@@ -92,7 +125,28 @@ This script invokes \`scripts/baseline_worker.py\` in a separate subprocess for 
 - Status, objective, solution availability, and best bounds.
 - Comparison status (\`MATCH\` or \`BOUND_ONLY\`) and objective discrepancy vs SOV-OPT.
 
-Output is written to \`reports/external_validation.json\` and summarized in \`reports/VERIFIED_BENCHMARKS.md\`.
+Output is written to `reports/external_validation.json` and summarized in `reports/VERIFIED_BENCHMARKS.md`.
+
+### 3.1 Netlib Dual Simplex vs Primal Simplex Benchmark Comparison
+
+Measured on Apple Silicon ARM64 (Python 3.11.16, NumPy 2.3.5) with sovereign sparse LU algebra (`linear_algebra="sparse"`):
+
+| Instance | Solver Method | Status | Objective | Ref Objective | Iters | Time (ms) | KKT Passed | Primal Res ($r_p$) | Dual Res ($r_d$) | Comp ($c$) | Devex Calls | Harris Calls | Bound Flips | Etas / Refactors |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **AFIRO** | Dual Simplex | `OPTIMAL_VERIFIED` | -464.753143 | -464.753143 | 23 | 15.1 | Yes | 2.96e-16 | 2.64e-18 | 1.48e-17 | 23 | 23 | 1 | 22 / 1 |
+| **AFIRO** | Primal Simplex | `OPTIMAL_VERIFIED` | -464.753143 | -464.753143 | 53 | 36.3 | Yes | 2.84e-14 | 2.64e-18 | 1.48e-17 | — | — | — | 52 / 3 |
+| **SC50A** | Dual Simplex | `OPTIMAL_VERIFIED` | -64.575077 | -64.575077 | 54 | 48.0 | Yes | 2.87e-16 | 3.23e-17 | 4.72e-17 | 54 | 54 | 1 | 51 / 3 |
+| **SC50A** | Primal Simplex | `OPTIMAL_VERIFIED` | -64.575077 | -64.575077 | 56 | 55.2 | Yes | 9.66e-17 | 4.09e-17 | 4.19e-17 | — | — | — | 54 / 4 |
+| **SC50B** | Dual Simplex | `OPTIMAL_VERIFIED` | -70.000000 | -70.000000 | 49 | 42.5 | Yes | 8.54e-16 | 3.97e-17 | 1.03e-16 | 49 | 49 | 1 | 47 / 2 |
+| **SC50B** | Primal Simplex | `OPTIMAL_VERIFIED` | -70.000000 | -70.000000 | 54 | 55.5 | Yes | 1.56e-16 | 2.90e-17 | 9.01e-17 | — | — | — | 52 / 4 |
+| **BLEND** | Dual Simplex | `OPTIMAL_VERIFIED` | -30.812150 | -30.812150 | 127 | 170.0 | Yes | 2.93e-15 | 1.47e-16 | 2.81e-16 | 127 | 127 | 17 | 106 / 5 |
+| **BLEND** | Primal Simplex | `OPTIMAL_VERIFIED` | -30.812150 | -30.812150 | 321 | 432.6 | Yes | 6.34e-14 | 2.27e-15 | 1.38e-15 | — | — | — | 310 / 13 |
+
+#### Differential Agreement with HiGHS 1.15.1
+- **AFIRO:** HiGHS `-464.75314285714285` vs SOV-OPT `-464.75314285714285` ($\Delta = 0.0$)
+- **SC50A:** HiGHS `-64.5750770585645` vs SOV-OPT `-64.57507705856452` ($\Delta = 2.8 \times 10^{-14}$)
+- **SC50B:** HiGHS `-69.99999999999999` vs SOV-OPT `-70.00000000000000` ($\Delta = 1.4 \times 10^{-14}$)
+- **BLEND:** HiGHS `-30.812149845828237` vs SOV-OPT `-30.812149845828226` ($\Delta = 1.0 \times 10^{-14}$)
 
 ---
 
@@ -146,6 +200,11 @@ Output is written to \`reports/external_validation.json\` and summarized in \`re
 7. **CUDA Acceleration (Hardware Unavailable):**
    - Development is performed on Apple Silicon ARM64, which lacks NVIDIA CUDA hardware.
    - `gpu_executed` is strictly `false` on all local runs. CUDA kernels in `sovopt/pdhg.py` remain unvalidated until tested on a physical NVIDIA device.
+
+8. **Dual Simplex B&B Warm-Start Integration (Intentionally Reserved for Gate 6):**
+   - Bounded-variable revised dual simplex with Devex pricing, two-pass Harris ratio testing, bound flips, and warm basis reoptimization interface (`DualBasisState`) is fully implemented and tested in `sovopt/dual_simplex.py`.
+   - The Branch-and-Bound MILP engine (`sovopt/milp.py`) currently uses cold-start LP relaxations to strictly preserve exact rational lower bound safety invariants (`safe_lower_bound`) and exact Farkas infeasibility pruning.
+   - Warm-started reoptimization within the branch-and-bound tree is intentionally scheduled for Gate 6.
 
 ---
 

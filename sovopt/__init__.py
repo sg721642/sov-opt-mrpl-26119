@@ -1,11 +1,11 @@
-"""SOV-OPT reference prototype 0.1.7."""
+"""SOV-OPT reference prototype 0.1.8."""
 import platform, time
 from datetime import datetime, timezone
 from .model import Model, load
 from .dispatcher import auto_dispatch, inspect_model
 from .refinery_twin import build_refinery_twin
 
-__version__ = '0.1.7'
+__version__ = '0.1.8'
 
 def solve(model, backend='cpu', tol=1e-7, method='auto', **options):
     model.validate()
@@ -34,11 +34,16 @@ def solve(model, backend='cpu', tol=1e-7, method='auto', **options):
     elif selected_method == 'ipm' or model.Q is not None:
         from .qp import solve_qp
         r = solve_qp(model, tol=tol, **options)
+    elif selected_method == 'dual-simplex':
+        from .dual_simplex import solve_dual_simplex
+        r = solve_dual_simplex(model, tol=tol, **options)
     else:
         from .simplex import solve_lp
         r = solve_lp(model, tol=tol, **options)
 
     r.pop('dual_exact_fraction', None)
+    if 'basis_state' in r and hasattr(r['basis_state'], 'to_dict'):
+        r['basis_state'] = r['basis_state'].to_dict()
     gpu_done = bool(r.get('gpu_executed', False))
     r.update(
         model_name=model.name,

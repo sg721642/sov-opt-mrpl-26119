@@ -66,6 +66,7 @@ Run the 5-step mathematical verification demonstration:
 
 # Automatic algorithm dispatcher with explicit method overrides
 .venv/bin/python -m sovopt examples/afiro.json --method simplex
+.venv/bin/python -m sovopt examples/afiro.json --method dual-simplex
 .venv/bin/python -m sovopt examples/afiro.json --backend pdhg-cpu
 ```
 
@@ -87,7 +88,8 @@ SOVOPT_BENCHMARK_PYTHON=.venv-benchmark/bin/python .venv/bin/python scripts/gene
 ## Implemented Algorithms & Automatic Dispatcher
 
 - **Automatic Algorithm Dispatcher (`sovopt.auto_dispatch`):** Inspects problem dimensions, matrix sparsity, dynamic range, integrality, and quadratic objective structure to select the appropriate solver core automatically:
-  - **Linear Programming (LP):** Two-phase primal revised simplex with sovereign sparse LU factorization (Threshold Markowitz pivoting, Product-Form of Inverse / eta updates, periodic refactorization) and dense LU fallback, iterative refinement, and exact rational basis dual recovery.
+  - **Primal Revised Simplex (LP):** Two-phase revised simplex with sovereign sparse LU factorization (Threshold Markowitz pivoting, Product-Form of Inverse / eta updates, periodic refactorization) and dense LU fallback, iterative refinement, and exact rational basis dual recovery.
+  - **Bounded-Variable Revised Dual Simplex (LP):** Sovereign bounded-variable revised dual simplex (`sovopt/dual_simplex.py`) with 5 explicit variable states (`BASIC`, `AT_LOWER`, `AT_UPPER`, `FREE_NONBASIC`, `FIXED`), Devex pricing, Two-Pass Harris dual ratio test with tiny pivot rejection, ratio-test bound flips without refactorization, and reusable `DualBasisState` for warm reoptimization.
   - **Mixed-Integer Linear Programming (MILP):** Branch-and-bound with exact rational Lagrangian lower bounds (`safe_lower_bound`) and exact Farkas infeasibility pruning.
   - **Convex Quadratic Programming (QP):** Infeasible-start Mehrotra predictor-corrector primal-dual interior point algorithm for convex objectives ($\min \frac{1}{2} x^T Q x + c^T x$) with linear constraints.
   - **First-Order LP (PDHG):** Primal-Dual Hybrid Gradient method (Chambolle-Pock) with diagonal preconditioning and periodic restart. Includes CPU SpMV and CUDA RawKernel source.
@@ -152,7 +154,7 @@ $$\text{LP} \longrightarrow \text{MILP} \longrightarrow \text{QP} \longrightarro
 ## Honest Limitations & Competition Disclosures
 
 - **Linear Algebra Backends:** Sovereign sparse numerical linear algebra is implemented in `sovopt/sparse.py` and `sovopt/sparse_lu.py`, featuring pure NumPy CSR/CSC matrices, Markowitz threshold pivoting ($u=0.1$), FTRAN/BTRAN sparse triangular solves, and Product-Form of Inverse (PFI) eta updates. Dense LU factorization remains active as small-problem default ($m < 25$) and numerical fallback. Full dense size caps remain enforced on fallback paths (250 variables / 1000 rows CLI, 100 variables / 150 rows web).
-- **Primal Simplex Only:** The current LP implementation is primal revised simplex. Dual simplex, Devex pricing, and basis warm-starts are not yet implemented.
+- **Dual Simplex & Warm Starts:** Bounded-variable revised dual simplex with Devex pricing, two-pass Harris ratio testing, and bound flips is implemented (`sovopt/dual_simplex.py`) and verified on Netlib instances. Re-optimization via warm basis states (`DualBasisState`) is functional at the API level; integration into the branch-and-bound MILP tree search is planned for Gate 6.
 - **MILP Scale:** Branch-and-bound uses cold-start LP relaxations. Large integer problems reach node limits. FLUGPL terminates at `LIMIT_REACHED` at 50 nodes with a valid conservative lower bound, but no incumbent found.
 - **QP Conditioning:** The interior-point method solves normal equations via dense LU; severely ill-conditioned matrices may encounter numerical failure.
 - **Public Unbounded Benchmark:** No suitable provenance-verified public unbounded LP instance was identified in the Netlib and HiGHS collections searched during this audit (search date: 2026-10-01). Therefore: `PUBLIC UNBOUNDED CERTIFICATE BENCHMARK: NOT YET AVAILABLE`. Handcrafted test cases are used solely as internal mathematical unit fixtures.

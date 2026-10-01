@@ -82,6 +82,10 @@ class Model:
             from .linalg import positive_semidefinite
             if not positive_semidefinite(self.Q): raise ValueError('Q is not demonstrably positive semidefinite')
 
+    def __post_init__(self):
+        if not self.names or len(self.names) != len(self.c):
+            self.names = tuple(f'x{i}' for i in range(len(self.c)))
+
     def inequalities(self, bounds=True):
         """Return (G, h, labels) for G*x <= h encoding all finite constraints.
         Infinite variable bounds produce no bound row; the unbounded direction
@@ -95,8 +99,9 @@ class Model:
         if bounds:
             for i in range(len(self.c)):
                 e=np.zeros(len(self.c)); e[i]=1
-                if np.isfinite(self.upper[i]): rows.append(e.copy()); rhs.append(self.upper[i]); labels.append(f'{self.names[i]} upper')
-                if np.isfinite(self.lower[i]): rows.append(-e.copy()); rhs.append(-self.lower[i]); labels.append(f'{self.names[i]} lower')
+                var_name = self.names[i] if i < len(self.names) else f'x{i}'
+                if np.isfinite(self.upper[i]): rows.append(e.copy()); rhs.append(self.upper[i]); labels.append(f'{var_name} upper')
+                if np.isfinite(self.lower[i]): rows.append(-e.copy()); rhs.append(-self.lower[i]); labels.append(f'{var_name} lower')
         if not rows:
             return np.zeros((0,len(self.c)),float), np.zeros(0,float), []
         return np.asarray(rows,float).reshape((-1,len(self.c))),np.asarray(rhs,float),labels
