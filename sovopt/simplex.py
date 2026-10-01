@@ -11,7 +11,17 @@ from math import lcm
 import numpy as np
 from .linalg import LU, NumericalError
 from .transforms import transform_model, postsolve_primal, postsolve_dual, postsolve_ray
-from .verify import verify, exact_farkas
+from .verify import verify, exact_farkas, verify_unbounded_ray
+
+class _UnboundedError(Exception):
+    """Raised by _iterate when an unbounded direction is found.
+    Carries d_basis (B^{-1} a_entering) and entering column index for ray recovery."""
+    def __init__(self, d_basis, entering, basis_snapshot, xb_snapshot):
+        super().__init__('LP is unbounded (no finite ratio in simplex pivot)')
+        self.d_basis = d_basis            # B^{-1} a_entering direction in basis rows
+        self.entering = entering          # entering column index in M
+        self.basis_snapshot = list(basis_snapshot)
+        self.xb_snapshot = xb_snapshot.copy()
 
 def _exact_solve_BT(B_float, rhs_float):
     """Solve B^T y = rhs in exact rational arithmetic (Fractions)."""
@@ -334,7 +344,7 @@ def _iterate(M, b, c, basis, allowed, limit, history):
         d = lu.solve(M[:, entering])
         possible = np.flatnonzero(d > 1e-12)
         if not len(possible):
-            raise NumericalError('LP is unbounded (no finite ratio in simplex pivot)')
+            raise _UnboundedError(d, entering, basis, xb)
         ratios = np.maximum(xb[possible], 0) / d[possible]
         best = np.min(ratios)
         ties = [int(possible[t]) for t, v in enumerate(ratios) if v <= best + 1e-12 * (1 + abs(best))]
@@ -384,8 +394,15 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
 
         if unbounded_rays:
             ray = unbounded_rays[0]
+            ray_report = verify_unbounded_ray(model, ray, tol=tol)
+            if not ray_report['verified']:
+                return dict(status='NUMERICAL_FAILURE',
+                            message=f'Box unbounded direction failed verification: {ray_report["message"]}',
+                            ray_verification=ray_report,
+                            algorithm='separable box analysis', iterations=0, history=history)
             return dict(status='UNBOUNDED_CERTIFIED', message='LP is unbounded in box direction',
                         ray=ray.tolist(), base_point=x.tolist(), x=x.tolist(),
+                        ray_verification=ray_report,
                         algorithm='separable box analysis', iterations=0, history=history)
 
         z_box = _dual_for_separable_box(model)
@@ -476,8 +493,15 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
             t_ray = np.zeros(n_trans); t_ray[k] = 1.0
             ray = postsolve_ray(t_ray, trans)
             if model.c @ ray < 0.0:
+                ray_report = verify_unbounded_ray(model, ray, tol=tol)
+                if not ray_report['verified']:
+                    return dict(status='NUMERICAL_FAILURE',
+                                message=f'Unconstrained unbounded direction failed verification: {ray_report["message"]}',
+                                ray_verification=ray_report,
+                                algorithm='transformed unconstrained analysis', iterations=0, history=history)
                 return dict(status='UNBOUNDED_CERTIFIED', message='LP is unbounded in transformed direction',
                             ray=ray.tolist(), base_point=x_base.tolist(), x=x_base.tolist(),
+                            ray_verification=ray_report,
                             algorithm='transformed unconstrained analysis', iterations=0, history=history)
 
         z_uncon = _dual_for_fixed_vars(model)
@@ -605,12 +629,53 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
             res_dict['dual_exact_fraction'] = z_exact
         return res_dict
 
+    except _UnboundedError as ue:
+        # Recover the full transformed-space direction d_trans from the simplex direction.
+        # d_basis = B^{-1} a_entering, d_entering = 1; all other columns are zero.
+        # Reconstruct the full length-total_cols direction vector in t-space.
+        try:
+            d_full = np.zeros(total_cols, dtype=float)
+            basis_snap = ue.basis_snapshot
+            d_basis = ue.d_basis
+            entering = ue.entering
+            for row_idx, col_idx in enumerate(basis_snap):
+                if col_idx < n_trans:
+                    d_full[col_idx] -= d_basis[row_idx]
+            if entering < n_trans:
+                d_full[entering] += 1.0
+            # t-space direction (first n_trans coords)
+            d_t = d_full[:n_trans]
+            # Postsolve to original variable space
+            d_orig = postsolve_ray(d_t, trans)
+            # Independently verify the recession direction against the original model
+            ray_report = verify_unbounded_ray(model, d_orig, tol=tol)
+            if ray_report['verified']:
+                return dict(
+                    status='UNBOUNDED_CERTIFIED',
+                    message='LP is unbounded; recession direction independently verified',
+                    ray=d_orig.tolist(),
+                    ray_verification=ray_report,
+                    algorithm='two-phase primal revised simplex',
+                    iterations=history[-1]['iteration'] if history else 0,
+                    history=history,
+                )
+            else:
+                # Ray failed independent verification — cannot safely certify unboundedness
+                return dict(
+                    status='NUMERICAL_FAILURE',
+                    message=f'Unbounded direction detected but failed verification: {ray_report["message"]}',
+                    ray_verification=ray_report,
+                    algorithm='two-phase primal revised simplex',
+                    history=history,
+                )
+        except Exception as inner:
+            return dict(status='NUMERICAL_FAILURE',
+                        message=f'Unbounded direction detected; ray recovery error: {inner}',
+                        algorithm='two-phase primal revised simplex', history=history)
+
     except (NumericalError, FloatingPointError, OverflowError) as e:
         if 'iteration limit' in str(e).lower():
             return dict(status='LIMIT_REACHED', message='Simplex iteration limit reached',
-                        algorithm='two-phase primal revised simplex', history=history)
-        if 'unbounded' in str(e).lower():
-            return dict(status='UNBOUNDED_CERTIFIED', message=str(e),
                         algorithm='two-phase primal revised simplex', history=history)
         if scaling:
             # Fallback to unscaled solve if equilibration caused an unsafe basis pivot

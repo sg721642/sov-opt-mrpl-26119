@@ -172,3 +172,97 @@ def exact_farkas(model, z):
             return False
     h_sum = sum((F(float(h[i])) * z_F[i] for i in range(len(h))), F(0))
     return h_sum < 0
+
+
+def verify_unbounded_ray(model, d, x0=None, tol=1e-7):
+    """Independently verify that d is a valid unbounded recession direction for model.
+
+    A direction d is a valid recession direction iff:
+      1. Improving objective direction: c^T d < 0 for minimization (or c^T d > 0 for maximization,
+         noting that maximization stores negated c internally).
+      2. Row recession: for each finite-upper row,   A[i] @ d <= tol * (1 + |A[i]| @ |d|)
+                        for each finite-lower row,  -A[i] @ d <= tol * (1 + |A[i]| @ |d|)
+                        for each equality row, |A[i] @ d|  <= tol * (1 + |A[i]| @ |d|)
+      3. Variable bound directions:
+         - If lower[j] is finite and upper[j] is not: d[j] >= -tol  (can only go up or be fixed)
+         - If upper[j] is finite and lower[j] is not: d[j] <=  tol  (can only go down or be fixed)
+         - If both bounds finite:                    |d[j]| <= tol  (bounded, no recession direction)
+         - If both infinite: d[j] unrestricted.
+
+    KKT checks are floating-point (not exact rational). Returns a dict:
+      verified:        bool — True iff all conditions pass within tol
+      obj_direction:   float — c^T d (should be < 0 for min, > 0 for max internal)
+      max_row_violation: float — worst row recession violation
+      max_bound_violation: float — worst variable bound direction violation
+      message:         str — human-readable summary
+    """
+    d = np.asarray(d, dtype=float)
+    n = len(model.c)
+    if d.shape != (n,) or not np.isfinite(d).all():
+        return dict(verified=False, message='ray direction is nonfinite or wrong shape',
+                    obj_direction=None, max_row_violation=None, max_bound_violation=None)
+
+    # Condition 1: improving objective direction
+    # model.c is always in internal minimization form (negated if maximize=True)
+    obj_dir = float(model.c @ d)
+    # For internal minimization, an improving direction satisfies c^T d < 0.
+    obj_ok = obj_dir < -tol * (1.0 + np.max(np.abs(model.c)) * np.max(np.abs(d), initial=1.0))
+
+    # Condition 2: row recession constraints
+    m_rows = len(model.A)
+    row_viols = []
+    for i in range(m_rows):
+        ad = float(model.A[i] @ d)
+        scale = tol * (1.0 + float(np.abs(model.A[i]) @ np.abs(d)))
+        rl, ru = model.row_lower[i], model.row_upper[i]
+        if np.isfinite(rl) and np.isfinite(ru) and rl == ru:
+            # equality row: A[i] @ d must == 0
+            row_viols.append(abs(ad) - scale)
+        else:
+            if np.isfinite(ru):
+                row_viols.append(ad - scale)   # A[i]@d <= 0 required
+            if np.isfinite(rl):
+                row_viols.append(-ad - scale)  # A[i]@d >= 0 required
+
+    max_row_viol = float(max(row_viols, default=0.0))
+    row_ok = max_row_viol <= 0.0
+
+    # Condition 3: variable bound directions
+    bound_viols = []
+    for j in range(n):
+        lj = model.lower[j]
+        uj = model.upper[j]
+        fin_lo = np.isfinite(lj)
+        fin_hi = np.isfinite(uj)
+        if fin_lo and fin_hi:
+            # Both finite — no recession direction is possible for this variable
+            bound_viols.append(abs(d[j]) - tol)
+        elif fin_lo:
+            # Only lower bound — d[j] must be >= 0 (or negligibly negative)
+            bound_viols.append(-d[j] - tol)
+        elif fin_hi:
+            # Only upper bound — d[j] must be <= 0 (or negligibly positive)
+            bound_viols.append(d[j] - tol)
+        # else: free variable, any d[j] is fine
+
+    max_bound_viol = float(max(bound_viols, default=0.0))
+    bound_ok = max_bound_viol <= 0.0
+
+    verified = obj_ok and row_ok and bound_ok
+    msg_parts = []
+    if not obj_ok:
+        sense = 'maximization (internal min of negated c)' if model.maximize else 'minimization'
+        msg_parts.append(f'objective direction c^T d = {obj_dir:.4g} is not improving for {sense}')
+    if not row_ok:
+        msg_parts.append(f'row recession violated (max violation {max_row_viol:.4g})')
+    if not bound_ok:
+        msg_parts.append(f'variable bound direction violated (max violation {max_bound_viol:.4g})')
+    message = '; '.join(msg_parts) if msg_parts else 'ray verified as valid unbounded recession direction'
+
+    return dict(
+        verified=verified,
+        obj_direction=obj_dir,
+        max_row_violation=max_row_viol,
+        max_bound_violation=max_bound_viol,
+        message=message,
+    )

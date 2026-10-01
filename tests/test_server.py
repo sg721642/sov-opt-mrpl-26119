@@ -47,7 +47,7 @@ class HandlerUnitTests(unittest.TestCase):
         self.assertEqual(status, 200)
         data = json.loads(body)
         self.assertEqual(data.get("status"), "ok")
-        self.assertEqual(data.get("version"), "0.1.5")
+        self.assertEqual(data.get("version"), "0.1.6")
 
     def test_get_root_page(self):
         status, body = self._invoke("GET", "/")

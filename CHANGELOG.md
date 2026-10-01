@@ -1,5 +1,37 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.1.6] - 2026-10-01
+
+### Gate 2: Terminal Status & Certificate Correctness — Verified Recession Rays
+
+- **`sovopt/verify.py` — `verify_unbounded_ray(model, d, x0=None, tol=1e-7)`:** Added independent
+  floating-point verifier for recession directions. Checks: (1) improving objective direction
+  (`c^T d < 0` for minimization), (2) row recession conditions for all finite-bounded rows,
+  (3) variable bound direction consistency. Returns a structured report with `verified`,
+  `obj_direction`, `max_row_violation`, `max_bound_violation`, and `message`.
+
+- **`sovopt/simplex.py` — `_UnboundedError` class:** Replaced the generic `NumericalError`
+  raised on simplex unboundedness with a dedicated `_UnboundedError` that carries the
+  unbounded simplex direction `d_basis`, the entering column index, and a basis snapshot.
+  This allows `solve_lp()` to reconstruct and independently verify the recession direction
+  before returning `UNBOUNDED_CERTIFIED`.
+
+- **`sovopt/simplex.py` — `solve_lp()` unbounded paths:** All three `UNBOUNDED_CERTIFIED`
+  paths (separable box analysis, transformed unconstrained analysis, and two-phase simplex)
+  now call `verify_unbounded_ray()` before returning `UNBOUNDED_CERTIFIED`. If verification
+  fails, `NUMERICAL_FAILURE` is returned instead. All `UNBOUNDED_CERTIFIED` results now
+  include `ray_verification` dict.
+
+- **`docs/STATUS_SEMANTICS.md`:** New document defining the precise semantics of every
+  status value (`OPTIMAL_VERIFIED`, `INFEASIBLE_CERTIFIED`, `UNBOUNDED_CERTIFIED`,
+  `LIMIT_REACHED`, `NUMERICAL_FAILURE`, `INVALID_MODEL`), including what is and is not
+  claimed by each certificate type.
+
+- **`tests/test_solver.py` — `TestUnboundedRay`:** Added 6 regression tests covering:
+  simplex-path verified unbounded ray, box-analysis unbounded ray, `verify_unbounded_ray`
+  accepting a valid direction, and rejecting non-improving / bound-violating /
+  row-constraint-violating directions.
+
 ## [0.1.5] - 2026-10-01
 
 ### MRPL Refinery Planning Digital Twin & Demonstration

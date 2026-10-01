@@ -564,6 +564,139 @@ class TestAutoDispatcher(unittest.TestCase):
             auto_dispatch(m_lp, method='invalid_method')
 
 
+class TestUnboundedRay(unittest.TestCase):
+    """Regression tests for verified recession direction detection (Gate 2)."""
+
+    def _make_model(self, c, A_rows, row_lower, row_upper, lower, upper, names=None):
+        n = len(c)
+        if names is None:
+            names = tuple(f'x{j}' for j in range(n))
+        m = len(A_rows) if A_rows else 0
+        A = np.array(A_rows, dtype=float).reshape(m, n) if m > 0 else np.zeros((0, n), dtype=float)
+        return Model(
+            c=np.array(c, dtype=float),
+            A=A,
+            row_lower=np.array(row_lower, dtype=float),
+            row_upper=np.array(row_upper, dtype=float),
+            lower=np.array(lower, dtype=float),
+            upper=np.array(upper, dtype=float),
+            names=names,
+        )
+
+    def test_simplex_unbounded_verified_ray(self):
+        """Simplex must return UNBOUNDED_CERTIFIED with a verified ray when the LP is truly unbounded.
+        Model: min -x1 - x2 s.t. x1 + x2 <= 10, x1 >= 0, x2 >= 0 (but no upper bound on x2)
+        The LP is bounded. Use simpler: min -x1 s.t. x1 - x2 <= 1, x1 >= 0, x2 >= 0.
+        Increasing x1 and x2 together keeps x1-x2 feasible and drives -x1 to -inf.
+        """
+        # min -x1 s.t. x1 - x2 <= 1, x1 >= 0, x2 >= 0 (x2 unbounded above)
+        m = self._make_model(
+            c=[-1.0, 0.0],
+            A_rows=[[1.0, -1.0]],
+            row_lower=[-np.inf],
+            row_upper=[1.0],
+            lower=[0.0, 0.0],
+            upper=[np.inf, np.inf],
+        )
+        from sovopt.simplex import solve_lp
+        r = solve_lp(m)
+        self.assertEqual(r['status'], 'UNBOUNDED_CERTIFIED',
+                         f"Expected UNBOUNDED_CERTIFIED, got {r['status']}: {r.get('message')}")
+        self.assertIn('ray', r)
+        ray_report = r.get('ray_verification')
+        self.assertIsNotNone(ray_report, 'UNBOUNDED_CERTIFIED must include ray_verification dict')
+        self.assertTrue(ray_report['verified'],
+                        f"Ray failed independent verification: {ray_report['message']}")
+        # The ray direction must reduce the objective: c^T d < 0
+        ray = np.array(r['ray'])
+        self.assertLess(float(m.c @ ray), 0.0, 'Ray must be an improving direction for minimization')
+
+    def test_box_analysis_unbounded_verified_ray(self):
+        """Box analysis path (no row constraints) returns UNBOUNDED_CERTIFIED with verified ray."""
+        # min -x1 with x1 >= 0 (no upper bound, no row constraints)
+        m = self._make_model(
+            c=[-1.0, 0.5],
+            A_rows=[],
+            row_lower=[],
+            row_upper=[],
+            lower=[0.0, 0.0],
+            upper=[np.inf, 5.0],  # x2 bounded, x1 unbounded with negative cost
+        )
+        from sovopt.simplex import solve_lp
+        r = solve_lp(m)
+        self.assertEqual(r['status'], 'UNBOUNDED_CERTIFIED',
+                         f"Expected UNBOUNDED_CERTIFIED, got {r['status']}")
+        ray_report = r.get('ray_verification')
+        self.assertIsNotNone(ray_report, 'Box-analysis UNBOUNDED_CERTIFIED must include ray_verification')
+        self.assertTrue(ray_report['verified'],
+                        f"Box-analysis ray failed verification: {ray_report['message']}")
+
+    def test_verify_unbounded_ray_accepts_valid_direction(self):
+        """verify_unbounded_ray must accept a genuine improving unbounded direction."""
+        from sovopt.verify import verify_unbounded_ray
+        # min -x1 - x2 s.t. x1 >= 0, x2 >= 0 (free recession in (+1,+1) direction)
+        m = self._make_model(
+            c=[-1.0, -1.0],
+            A_rows=[],
+            row_lower=[],
+            row_upper=[],
+            lower=[0.0, 0.0],
+            upper=[np.inf, np.inf],
+        )
+        d = np.array([1.0, 1.0])
+        result = verify_unbounded_ray(m, d)
+        self.assertTrue(result['verified'], f"Should accept valid ray: {result['message']}")
+        self.assertLess(result['obj_direction'], 0.0)
+
+    def test_verify_unbounded_ray_rejects_non_improving_direction(self):
+        """verify_unbounded_ray must reject a direction that does not improve the objective."""
+        from sovopt.verify import verify_unbounded_ray
+        # min x1 s.t. x1 >= 0 (increasing x1 worsens objective)
+        m = self._make_model(
+            c=[1.0],
+            A_rows=[],
+            row_lower=[],
+            row_upper=[],
+            lower=[0.0],
+            upper=[np.inf],
+        )
+        d = np.array([1.0])  # increasing x1 increases objective — not a valid recession dir
+        result = verify_unbounded_ray(m, d)
+        self.assertFalse(result['verified'], 'Should reject non-improving direction')
+
+    def test_verify_unbounded_ray_rejects_bound_violated_direction(self):
+        """verify_unbounded_ray must reject a direction that violates variable bound constraints."""
+        from sovopt.verify import verify_unbounded_ray
+        # min -x1 s.t. 0 <= x1 <= 10 (bounded variable — no recession possible)
+        m = self._make_model(
+            c=[-1.0],
+            A_rows=[],
+            row_lower=[],
+            row_upper=[],
+            lower=[0.0],
+            upper=[10.0],
+        )
+        d = np.array([5.0])  # +5 direction violates upper bound direction constraint
+        result = verify_unbounded_ray(m, d)
+        self.assertFalse(result['verified'], 'Should reject direction violating bounded variable')
+
+    def test_verify_unbounded_ray_rejects_row_violating_direction(self):
+        """verify_unbounded_ray must reject a direction that violates a row constraint."""
+        from sovopt.verify import verify_unbounded_ray
+        # min -x1 s.t. x1 <= 5, x1 >= 0
+        m = self._make_model(
+            c=[-1.0],
+            A_rows=[[1.0]],
+            row_lower=[-np.inf],
+            row_upper=[5.0],
+            lower=[0.0],
+            upper=[np.inf],
+        )
+        d = np.array([1.0])  # A[0] @ d = 1 > 0, violates row recession for upper-bounded row
+        result = verify_unbounded_ray(m, d)
+        self.assertFalse(result['verified'], 'Should reject direction violating row upper bound recession')
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
 
