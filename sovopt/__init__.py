@@ -1,11 +1,11 @@
-"""SOV-OPT reference prototype 0.1.9."""
+"""SOV-OPT reference prototype 0.2.0."""
 import platform, time
 from datetime import datetime, timezone
 from .model import Model, load
 from .dispatcher import auto_dispatch, inspect_model
 from .refinery_twin import build_refinery_twin
 
-__version__ = '0.1.9'
+__version__ = '0.2.0'
 
 def solve(model, backend='cpu', tol=1e-7, method='auto', presolve=True, scaling=True, **options):
     model.validate()

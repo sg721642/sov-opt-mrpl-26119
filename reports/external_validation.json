@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-01T18:58:11.777830+00:00",
-  "git_revision": "ad9991b8cce2faeda30917108744e4919435c9b5+dirty",
+  "generated_at": "2026-10-01T19:20:39.890094+00:00",
+  "git_revision": "40800987f4a36de59f240a8dd55ed1bdcd575bac+dirty",
   "environment": "Darwin arm64, Python 3.11.16",
   "note": "External validation run by invoking scripts/baseline_worker.py in an isolated subprocess. Comparison results reflect actual subprocess output. If highspy is unavailable in the subprocess Python, baseline_worker falls back to scipy.optimize.linprog/milp. If both fail, status is FAILED with actual_error recorded.",
   "instances": {
@@ -23,7 +23,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 6,
       "ipm_iterations": 0,
-      "seconds": 0.00043391700091888197,
+      "seconds": 0.0004341669991845265,
       "command": [
         "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -59,7 +59,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 18,
       "ipm_iterations": 0,
-      "seconds": 0.0005124580020492431,
+      "seconds": 0.0004914580022159498,
       "command": [
         "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -95,7 +95,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 18,
       "ipm_iterations": 0,
-      "seconds": 0.000494542000524234,
+      "seconds": 0.0005106249991513323,
       "command": [
         "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -131,7 +131,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 80,
       "ipm_iterations": 0,
-      "seconds": 0.0010072920013044495,
+      "seconds": 0.0010056249993795063,
       "command": [
         "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -167,7 +167,7 @@
       "has_dual_solution": false,
       "simplex_iterations": 858,
       "ipm_iterations": -1,
-      "seconds": 0.038268624997726874,
+      "seconds": 0.0380935840003076,
       "command": [
         "/Users/satyamgupta/Documents/sov-opt/.venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -181,10 +181,10 @@
       "dimensions_match": true,
       "ext_optimal": true,
       "sovopt_status": "LIMIT_REACHED",
-      "sovopt_best_bound": 1173719.9999999998,
+      "sovopt_best_bound": 1173063.7852941174,
       "bound_direction_valid": true,
       "comparison_status": "BOUND_ONLY",
-      "comparison_note": "BOUND_ONLY represents incomplete SOV-OPT evidence: valid conservative lower bound 1173719.9999999998 validated against external optimum 1201500.0 (MINIMIZE), without discovering an incumbent solution."
+      "comparison_note": "BOUND_ONLY represents incomplete SOV-OPT evidence: valid conservative lower bound 1173063.7852941174 validated against external optimum 1201500.0 (MINIMIZE), without discovering an incumbent solution."
     }
   }
 }

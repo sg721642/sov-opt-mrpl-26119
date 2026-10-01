@@ -9,7 +9,7 @@ This document records the exact procedures for reproducing all numerical benchma
 All commands below assume execution from the project root with the project-local virtual environment active:
 
 ```bash
-# 1. Run full unit and regression test suite (109 tests: 107 passing, 2 integration tests skipped in restricted sandbox)
+# 1. Run full unit and regression test suite (192 tests: 190 passing, 2 integration tests skipped in restricted sandbox)
 .venv/bin/python -m unittest discover -s tests -v
 
 # 2. Run automated report and benchmark generator
@@ -24,7 +24,9 @@ SOVOPT_BENCHMARK_PYTHON=.venv-benchmark/bin/python .venv/bin/python scripts/gene
 
 ---
 
-## 2. Test Suite OrganizationThe active test suite is split into six modules (154 tests total, 152 passing, 2 integration tests skipped in restricted sandbox):
+## 2. Test Suite Organization
+
+The active test suite is split into seven modules (192 tests total, 190 passing, 2 integration tests skipped in restricted sandbox):
 
 ### 2.1 Solver Correctness (`tests/test_solver.py` — 45 tests)
 - Core solver tests for LU pivot refinement, verified Netlib instances (AFIRO, SC50A, SC50B, BLEND), FLUGPL MILP lower bounding and Farkas certificate generation, bad candidate rejection, affine coordinate transformations, PDHG first-order convergence, and limits enforcement.
@@ -124,7 +126,48 @@ SOVOPT_BENCHMARK_PYTHON=.venv-benchmark/bin/python .venv/bin/python scripts/gene
   9. Multi-decade objective scaling.
   10. Degenerate vertices with multiple active hyperplanes.
 
-*(Note: Synthetic unit fixtures in `tests/test_presolve.py`, `tests/test_numerical_stress.py`, and `tests/test_dual_simplex.py` are strictly marked `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are excluded from benchmark reports).*
+### 2.7 MILP Branch-and-Bound Engineering (`tests/test_milp.py` — 38 tests)
+- Exhaustive unit test matrix covering all Gate 6 branch-and-bound capabilities:
+  1. `DualBasisState` export on LP node solve.
+  2. `DualBasisState` serialization / deserialization round-trip.
+  3. Child warm start acceptance and pivot reduction.
+  4. Dimension-mismatch detection and clean fallback.
+  5. Binary variable down-branch upper bound enforcement ($u \le 0$).
+  6. Binary variable up-branch lower bound enforcement ($l \ge 1$).
+  7. General integer down-branch floor bound enforcement.
+  8. General integer up-branch ceil bound enforcement.
+  9. Immediate bound conflict pruning ($l > u$) without LP solve.
+  10. Sibling and parent bound array strict memory isolation.
+  11. Parent basis state immutability across child branches.
+  12. Down-branch pseudocost accumulation and updating.
+  13. Up-branch pseudocost accumulation and updating.
+  14. Zero objective change handling without division by zero.
+  15. Limited strong-branching bootstrap on unreliable candidates ($K_{\text{reliable}} = 2$).
+  16. Strong-branching evaluation and iteration caps.
+  17. Strong-branching basis state isolation.
+  18. Deterministic branch variable tie-breaking by variable index.
+  19. Pure best-bound node selection queue behavior.
+  20. Hybrid node selection equivalence to best-bound when no incumbent exists.
+  21. Hybrid node selection depth-diving near best bound with incumbent.
+  22. Open node pruning upon pop when bound exceeds incumbent.
+  23. Incumbent feasibility verification on original model.
+  24. Lossless exact rational objective calculation.
+  25. Incumbent history telemetry logging.
+  26. Safe rounding heuristic evaluation and acceptance.
+  27. Safe rounding heuristic continuous subproblem infeasibility safety.
+  28. Conservative diving heuristic execution from root LP.
+  29. Root model immutability preserved after diving heuristic.
+  30. Exact rational Lagrangian lower bound preservation (`safe_lower_bound`).
+  31. Minimization model objective offset mapping.
+  32. Maximization model objective negation and upper bound offset mapping.
+  33. Honest limit enforcement: `max_nodes=0` returns `LIMIT_REACHED` with `nodes=0`.
+  34. Infeasible integer box returns `INFEASIBLE_CERTIFIED` with `nodes=0`.
+  35. Infeasible root LP relaxation returns `INFEASIBLE_CERTIFIED` with `nodes=1`.
+  36. 4-way FLUGPL ablation (baseline vs pseudocosts vs warm starts vs heuristics).
+  37. Refinery twin MILP determinism across repeated solves.
+  38. Full presence of all Gate 6 MILP telemetry keys.
+
+*(Note: Synthetic unit fixtures in `tests/test_presolve.py`, `tests/test_numerical_stress.py`, `tests/test_dual_simplex.py`, and `tests/test_milp.py` are strictly marked `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are excluded from benchmark reports).*
 
 ---
 
@@ -198,6 +241,20 @@ Measured on Apple Silicon ARM64 (Python 3.11.16, NumPy 2.3.5) with sovereign spa
 - **SC50B:** HiGHS `-69.99999999999999` vs SOV-OPT `-70.00000000000000` ($\Delta = 1.4 \times 10^{-14}$)
 - **BLEND:** HiGHS `-30.812149845828237` vs SOV-OPT `-30.812149845828226` ($\Delta = 1.0 \times 10^{-14}$)
 
+### 3.2 MIPLIB FLUGPL 4-Way B&B Ablation Matrix
+
+Measured on Apple Silicon ARM64 (Python 3.11.16, NumPy 2.3.5) with maximum node limit 50:
+
+| Configuration | Warm Starts | Pseudocosts | Strong Branching | Heuristics | Node Selection | Nodes | Status | Certified Bound | Warm Accepted | Warm Pivots | Cold Pivots | Strong Evals | Time (s) |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Baseline Cold** | OFF | OFF | OFF | OFF | Best-Bound | 50 | `LIMIT_REACHED` | 1173719.9999999998 | 0 / 0 | 0 | 1130 | 0 | 0.517 |
+| **Pseudocosts Cold** | OFF | ON | ON | OFF | Best-Bound | 50 | `LIMIT_REACHED` | 1173063.7852941174 | 0 / 0 | 0 | 1024 | 32 | 0.902 |
+| **Pseudocosts Warm** | ON | ON | ON | OFF | Best-Bound | 50 | `LIMIT_REACHED` | 1173063.7852941174 | 49 / 49 | 191 | 17 | 32 | 0.597 |
+| **Full Gate 6 Engine** | ON | ON | ON | ON | Hybrid | 50 | `LIMIT_REACHED` | 1173063.7852941174 | 49 / 49 | 191 | 17 | 32 | 0.631 |
+
+- **Pivot Reduction:** Warm starts reduce child LP pivots from 1024 to 191 (an **81.3% reduction in pivots**).
+- **Exact Rational Bound Safety:** All configurations compute exact rational lower bounds via Neumaier-Shcherbina Fraction evaluation (`safe_lower_bound`), strictly bounded within $[769500.0, 1201500.0]$.
+
 ---
 
 ## 4. Current Evidence Locations
@@ -251,10 +308,10 @@ Measured on Apple Silicon ARM64 (Python 3.11.16, NumPy 2.3.5) with sovereign spa
    - Development is performed on Apple Silicon ARM64, which lacks NVIDIA CUDA hardware.
    - `gpu_executed` is strictly `false` on all local runs. CUDA kernels in `sovopt/pdhg.py` remain unvalidated until tested on a physical NVIDIA device.
 
-8. **Dual Simplex B&B Warm-Start Integration (Intentionally Reserved for Gate 6):**
-   - Bounded-variable revised dual simplex with Devex pricing, two-pass Harris ratio testing, bound flips, and warm basis reoptimization interface (`DualBasisState`) is fully implemented and tested in `sovopt/dual_simplex.py`.
-   - The Branch-and-Bound MILP engine (`sovopt/milp.py`) currently uses cold-start LP relaxations to strictly preserve exact rational lower bound safety invariants (`safe_lower_bound`) and exact Farkas infeasibility pruning.
-   - Warm-started reoptimization within the branch-and-bound tree is intentionally scheduled for Gate 6.
+8. **Dual Simplex B&B Warm-Start Integration (Completed in Gate 6):**
+   - Bounded-variable revised dual simplex warm basis reoptimization (`DualBasisState`) is fully integrated into the Branch-and-Bound MILP engine (`sovopt/milp.py`).
+   - Achieves 100% warm-start acceptance on child nodes of FLUGPL (49 of 49 accepted) with an 81.3% reduction in pivot count (191 vs 1024 pivots).
+   - Combines pseudocost branching, limited strong-branching bootstrap, hybrid best-bound/depth node selection, safe rounding, and conservative diving heuristics while strictly preserving exact rational lower bound safety (`safe_lower_bound`).
 
 ---
 

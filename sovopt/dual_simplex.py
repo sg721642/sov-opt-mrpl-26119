@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import Optional, Tuple, List, Dict, Any
 import numpy as np
 
+from .model import Model
 from .linalg import NumericalError
 from .sparse import csc_from_triplets, CSCMatrix
 from .sparse_lu import SparseBasisEngine, PLATFORM_LONGDOUBLE_EXTENDED
@@ -37,6 +38,16 @@ class DualBasisState:
             'n_vars': self.n_vars,
             'm_rows': self.m_rows,
         }
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> 'DualBasisState':
+        return cls(
+            basis=list(d['basis']),
+            states=list(d['states']),
+            nonbasic_values=np.array(d['nonbasic_values'], dtype=np.float64),
+            n_vars=int(d['n_vars']),
+            m_rows=int(d['m_rows']),
+        )
 
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> 'DualBasisState':
@@ -260,6 +271,60 @@ def _reconstruct_dual_kkt(model, y_eff: np.ndarray) -> np.ndarray:
             z[var_upper_idx[j]] += -r[j]
 
     return z
+
+
+def _exact_dual_from_basis_dual_simplex(model: Model, M_csc, basis: List[int], cost: np.ndarray) -> Optional[List[Any]]:
+    """Solve basis in exact rational arithmetic and construct exact dual vector for original model."""
+    from fractions import Fraction as F
+    from .simplex import _exact_solve_BT, _get_basis_matrix
+    try:
+        y_F = _exact_solve_BT(_get_basis_matrix(M_csc, basis), cost[basis])
+        if y_F is None:
+            return None
+
+        G, h, _ = model.inequalities()
+        m_ineq = len(h)
+        n = len(model.c)
+        m_rows = len(model.A)
+        z_F = [F(0) for _ in range(m_ineq)]
+
+        row_upper_idx = {}
+        row_lower_idx = {}
+        var_upper_idx = {}
+        var_lower_idx = {}
+        idx = 0
+        for i in range(m_rows):
+            if np.isfinite(model.row_upper[i]): row_upper_idx[i] = idx; idx += 1
+            if np.isfinite(model.row_lower[i]): row_lower_idx[i] = idx; idx += 1
+        for j in range(n):
+            if np.isfinite(model.upper[j]): var_upper_idx[j] = idx; idx += 1
+            if np.isfinite(model.lower[j]): var_lower_idx[j] = idx; idx += 1
+
+        for i in range(m_rows):
+            val = -y_F[i]
+            b_l = model.row_lower[i]
+            b_u = model.row_upper[i]
+            if val > 0 and i in row_upper_idx:
+                z_F[row_upper_idx[i]] = val
+            elif val < 0 and i in row_lower_idx:
+                z_F[row_lower_idx[i]] = -val
+
+        r_exact = [F(float(c_j)) for c_j in model.c]
+        for i in range(m_ineq):
+            if z_F[i] != 0:
+                for j in range(n):
+                    if G[i, j] != 0:
+                        r_exact[j] += F(float(G[i, j])) * z_F[i]
+
+        for j in range(n):
+            if r_exact[j] > 0 and j in var_lower_idx:
+                z_F[var_lower_idx[j]] += r_exact[j]
+            elif r_exact[j] < 0 and j in var_upper_idx:
+                z_F[var_upper_idx[j]] += -r_exact[j]
+
+        return z_F
+    except Exception:
+        return None
 
 
 def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
@@ -661,10 +726,13 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                 pricer_tel = pricer.get_telemetry()
                 ratio_tel = ratio_test.get_telemetry()
 
+                z_exact = _exact_dual_from_basis_dual_simplex(model, M_csc, basis, cost)
+
                 res_dict = {
                     'status': 'OPTIMAL_VERIFIED' if report['kkt_passed'] else 'NUMERICAL_FAILURE',
                     'x': x_sol.tolist(),
                     'dual': z_sol.tolist(),
+                    'dual_exact_fraction': z_exact,
                     'y': y_sol.tolist(),
                     'verification': report,
                     'objective': report['objective'],
@@ -674,6 +742,9 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                     'algorithm': 'bounded-variable revised dual simplex',
                     'method_requested': 'dual-simplex',
                     'method_used': 'dual-simplex',
+                    'is_warm': is_warm,
+                    'warm_start_attempted': bool(basis_state is not None),
+                    'warm_start_accepted': bool(is_warm),
                     'bound_flips': bound_flips_count,
                     'degenerate_pivots': degenerate_pivots_count,
                     'consecutive_degenerate_pivots': consecutive_degenerate,
@@ -719,6 +790,9 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                 if res.get('status') == 'INFEASIBLE_CERTIFIED':
                     res['method_requested'] = 'dual-simplex'
                     res['method_used'] = 'dual-simplex'
+                    res['is_warm'] = is_warm
+                    res['warm_start_attempted'] = bool(basis_state is not None)
+                    res['warm_start_accepted'] = bool(is_warm)
                     res['phase1_artificial_bounds_used'] = bool(len(artificial_bound_vars) > 0)
                     res['phase1_artificial_bound_count'] = len(artificial_bound_vars)
                     res['phase1_artificial_bounds_removed'] = True
@@ -742,6 +816,9 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                     'algorithm': 'bounded-variable revised dual simplex',
                     'method_requested': 'dual-simplex',
                     'method_used': 'dual-simplex',
+                    'is_warm': is_warm,
+                    'warm_start_attempted': bool(basis_state is not None),
+                    'warm_start_accepted': bool(is_warm),
                     'bound_flips': bound_flips_count,
                     'degenerate_pivots': degenerate_pivots_count,
                     'consecutive_degenerate_pivots': consecutive_degenerate,

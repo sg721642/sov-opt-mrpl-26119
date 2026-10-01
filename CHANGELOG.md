@@ -1,5 +1,30 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.2.0] - 2026-10-02
+
+### Gate 6: MILP Branch-and-Bound Engineering
+
+- **`sovopt/milp.py` — High-Performance Sovereign Branch-and-Bound Engine:**
+  - **`MILPNode` Dataclass:** Complete node state tracking (`node_id`, `parent_id`, `depth`, `branch_variable`, `branch_direction`, `branch_value`, `local_lower_bounds`, `local_upper_bounds`, `certified_lp_bound`, `lp_status`, `basis_state`, `warm_start_source`, `creation_order`, `x_sol`).
+  - **Dual Simplex Basis Warm Starts (`DualBasisState`):** Reusable basis states passed from parent to child nodes, enabling warm reoptimization of bound perturbations without re-factorizing from scratch; achieved 100% acceptance (49 of 49) on FLUGPL with an 81.3% reduction in child LP pivot count (191 vs 1024 pivots).
+  - **Fallback Hierarchy:** Clean fallback from warm dual simplex to cold dual simplex to primal revised simplex upon numerical breakdown, ensuring absolute robustness.
+  - **Pseudocost Branching:** Historical per-unit objective change tracking ($\Delta z^- / f^-$, $\Delta z^+ / f^+$), dynamic average initialization, and product scoring ($q^- \times q^+$) with deterministic variable index tie-breaking.
+  - **Limited Strong-Branching Bootstrap:** Evaluates up to 4 unreliable candidates ($\min(\text{down\_count}, \text{up\_count}) < 2$) with 50-iteration cap using parent warm starts, strictly isolating parent basis states.
+  - **Hybrid Best-Bound / Depth Node Selection:** Operates as pure best-bound prior to discovering an incumbent; switches to depth-biased diving among open nodes within 15% of best bound once an incumbent exists to rapidly find and improve integer solutions.
+  - **Verified Incumbent Propagation:** Every candidate integer solution is verified on the untouched original model (`verify(model, x)`), with exact rational objective evaluation and full `incumbent_history` telemetry.
+  - **Safe Rounding Heuristic:** Evaluates near-integral fractional solutions ($\le 0.4$), solves continuous subproblems with fixed integers, and updates incumbents safely without tree side-effects.
+  - **Conservative Diving Heuristic:** Depth-limited diving (up to depth 8) from root LP relaxation using warm starts.
+  - **Conservative Bound Safety:** Exhaustive accounting across open leaves and tolerance-closed nodes preserving exact rational Neumaier-Shcherbina lower bounds (`safe_lower_bound`) and objective offsets.
+  - **Detailed Telemetry:** Tracks `warm_starts_attempted`, `warm_starts_accepted`, `warm_starts_rejected`, `warm_start_pivots_total`, `cold_start_pivots_total`, `strong_branching_evaluations`, `heuristics_attempted`, `heuristics_found_incumbent`, `pruned_by_bound`, `pruned_by_infeasibility`, `pruned_by_integrality`, `root_lp_iterations`, `root_lp_time`, `root_lp_bound`, and `incumbent_history`.
+- **`sovopt/dual_simplex.py`:**
+  - Added `_exact_dual_from_basis_dual_simplex` solving $B^T y = c_B$ in exact rational Fraction arithmetic to provide exact dual multiplier vectors for `safe_lower_bound`.
+  - Added `is_warm`, `warm_start_attempted`, `warm_start_accepted`, and `dual_exact_fraction` telemetry fields across all return paths.
+  - Added `DualBasisState.from_dict` deserializer classmethod.
+- **`tests/test_milp.py` — 38-Point Test Matrix:**
+  - 38 unit tests covering parent basis export, serialization round-trip, child warm start acceptance and rejection, binary and general branch bounds, immediate conflict pruning, sibling/parent isolation, pseudocosts, strong branching bootstrap, deterministic tie-breaking, hybrid node selection, incumbent verification, heuristics, objective offsets, honest limit enforcement, 4-way FLUGPL ablation, and refinery twin determinism.
+- **`docs/MILP_ENGINE.md`:**
+  - Complete architectural audit, mathematical specification, and execution dynamics documentation for the Gate 6 B&B engine.
+
 ## [0.1.9] - 2026-10-02
 
 ### Gate 5: Reversible Presolve and Row/Column Scaling
