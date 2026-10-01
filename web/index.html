@@ -21,6 +21,7 @@ h2{font-size:18px;margin:0 0 16px}
 label{display:block;color:var(--muted);margin:14px 0 6px;font-size:13px;font-weight:500}
 select,input,textarea{width:100%;background:#0d1726;color:var(--text);border:1px solid #3b506d;border-radius:8px;padding:11px;font:inherit}
 textarea{font:12px/1.5 ui-monospace,monospace;min-height:180px;resize:vertical}
+textarea[readonly]{background:#080e18;color:var(--muted);border-color:#202e42;cursor:default}
 button{border:0;border-radius:8px;background:var(--green);color:#08231b;padding:12px 16px;font-weight:750;cursor:pointer;width:100%;margin-top:14px}
 button:disabled{opacity:.5;cursor:wait}.secondary{background:#243752;color:var(--text)}
 .provenance-card{background:#0d1726;border:1px solid #2a3d58;border-radius:8px;padding:14px;margin-top:14px;font-size:12px}
@@ -91,8 +92,9 @@ footer{padding:20px 5%;border-top:1px solid var(--line);font-size:12px;color:var
       </details>
 
       <details>
-        <summary>Inspect model JSON</summary>
-        <textarea id="editor" spellcheck="false" aria-label="Model JSON"></textarea>
+        <summary>Inspect verified model JSON (read-only)</summary>
+        <div class="tiny" style="margin:8px 0 6px;color:var(--muted)">Verified dataset specification (read-only to preserve dataset provenance and prevent synthetic modification).</div>
+        <textarea id="editor" readonly spellcheck="false" aria-label="Verified Model JSON (Read-Only)"></textarea>
       </details>
       <div id="message" role="alert"></div>
     </section>
@@ -216,7 +218,6 @@ Promise.all([
 
 $('example').onchange=choose;
 $('backend').onchange=clearResult;
-$('editor').oninput=clearResult;
 
 function cellRow(key,value){
   const tr=document.createElement('tr');
@@ -259,6 +260,8 @@ $('solve').onclick=async()=>{
       backend:selectedBackend,
       model,
       result:r,
+      certificate:r.certificate||null,
+      certificate_exact:r.certificate_exact||null,
       solve_timestamp:new Date().toISOString(),
       measured_duration_seconds:elapsed
     };
@@ -293,7 +296,8 @@ $('solve').onclick=async()=>{
     $('trust').replaceChildren();
     cellRow('Original model feasibility',v.feasible==null?'Not available':(v.feasible?'PASSED':'FAILED'));
     cellRow('KKT stationarity & complementarity',v.kkt_passed==null?'Not applicable':(v.kkt_passed?'PASSED':'NOT ESTABLISHED'));
-    cellRow('Farkas certificate',r.farkas_certificate?'VERIFIED (exact rational certificate)':'None');
+    const farkasVerified = r.status === 'INFEASIBLE_CERTIFIED' && (v.farkas_verified === true || r.farkas_certificate === true);
+    cellRow('Farkas certificate',farkasVerified?'VERIFIED (exact rational certificate)':'None');
     cellRow('Absolute constraint violation',v.absolute_primal_violation!=null?sci(v.absolute_primal_violation):'—');
     cellRow('Mantissa precision',v.precision_bits!=null?`${v.precision_bits} bits (IEEE 754)`:'Unknown');
     cellRow('Hardware execution',r.gpu_executed?'GPU accelerated':'CPU only (gpu_executed: false)');
@@ -314,6 +318,27 @@ $('solve').onclick=async()=>{
         more.className='tiny';
         more.textContent=`... and ${r.x.length-25} more variables`;
         $('variables').append(more);
+      }
+    }else if(r.status === 'INFEASIBLE_CERTIFIED' && r.certificate_exact){
+      const header=document.createElement('div');
+      header.className='tiny';
+      header.innerHTML='<strong>Exact rational Farkas certificate (lossless Fractions):</strong>';
+      $('variables').append(header);
+      let nonZeroCount = 0;
+      r.certificate_exact.forEach((z,i)=>{
+        if(z !== '0' && z !== '0/1' && nonZeroCount < 25){
+          nonZeroCount++;
+          const line=document.createElement('div');
+          line.className='tiny';
+          line.textContent=`z[${i}] = ${z}`;
+          $('variables').append(line);
+        }
+      });
+      if(nonZeroCount === 0){
+        const line=document.createElement('div');
+        line.className='tiny';
+        line.textContent='All Farkas multipliers are recorded in audit JSON.';
+        $('variables').append(line);
       }
     }else{
       $('variables').textContent=r.message||'No feasible primal solution vector.';

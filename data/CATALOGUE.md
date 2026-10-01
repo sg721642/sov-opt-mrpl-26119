@@ -47,10 +47,10 @@ parameters are presented as measured evidence.
 - **Published Reference Objective:** `-4.6475314286E+02` (Netlib README, 11 significant digits from MINOS 5.3 report).
 - **SOV-OPT Measured Result:**
   - Status: `OPTIMAL_VERIFIED`
-  - Objective: `-464.753142857143`
-  - Discrepancy vs Netlib reference: `< 1e-12`
-  - Primal residual: `3.55e-15`
-  - Dual residual: `4.44e-16`
+  - Objective: `-464.753142857143` (exact IEEE 754: `-464.75314285714285`)
+  - Discrepancy vs Netlib reference: `~2.857e-9` (due to 11-digit precision of published MINOS 5.3 reference `-464.75314286` vs full-precision solution; agreement with independent HiGHS solve is `0.0`)
+  - Primal residual: `1.42e-14`
+  - Dual residual: `1.72e-17`
   - KKT passed: `true`
   - Backends: `cpu` (primal revised simplex) and `pdhg-cpu` (first-order PDHG)
 
@@ -76,10 +76,10 @@ parameters are presented as measured evidence.
 - **Published Reference Objective:** `-6.4575077059E+01` (Netlib README, MINOS 5.3 report).
 - **SOV-OPT Measured Result:**
   - Status: `OPTIMAL_VERIFIED`
-  - Objective: `-64.575077058564`
-  - Discrepancy vs Netlib reference: `< 1e-11`
-  - Primal residual: `2.22e-16`
-  - Dual residual: `0.0`
+  - Objective: `-64.5750770585645`
+  - Discrepancy vs Netlib reference: `~4.355e-10` (due to 11-digit precision of published MINOS 5.3 reference `-64.575077059` vs full-precision solution; agreement with independent HiGHS solve is `0.0`)
+  - Primal residual: `5.37e-16`
+  - Dual residual: `4.09e-17`
   - KKT passed: `true`
 
 ---

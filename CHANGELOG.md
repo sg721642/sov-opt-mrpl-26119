@@ -1,5 +1,30 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.1.5] - 2026-10-01
+
+### Checksum Generation & Verification Tooling
+- Repaired `SHA256SUMS.json` parsing failure: removed trailing literal backslash-n defect, ensuring valid JSON decoding with standard newline.
+- Created `scripts/verify_checksums.py`: provides CLI verification (`scripts/verify_checksums.py`) and generation (`--update`), excluding the checksum file itself and covering all tracked repository files (including newly added docs, scripts, and quarantined files).
+- Integrated automated checksum manifest synchronization into `scripts/generate_reports.py` so later report generation cannot silently leave `SHA256SUMS.json` stale.
+
+### Web Dashboard & Model Viewer
+- Made `#editor` in `web/index.html` explicitly read-only with styled appearance and added a clear provenance banner (`Verified dataset specification (read-only to preserve dataset provenance and prevent synthetic modification)`).
+- Removed input event listener on editor to ensure submitted solves remain strictly identical to verified dataset definitions.
+
+### Farkas Certificate Rendering & Schema Alignment
+- Aligned schema across solver (`sovopt/simplex.py`), server, and dashboard UI: set `farkas_certificate` and `verification.farkas_verified` strictly when original-model certification succeeds.
+- Displayed exact rational Farkas certificate in UI trust table only when verified against the original model, and rendered non-zero exact multiplier Fractions in solution summary.
+- Preserved lossless exact certificate Fractions in downloaded audit JSON records.
+
+### Hardened Differential Verification
+- Enforced strict criteria for external solver comparison: required successful termination (`exit_code == 0`), optimal status (`kOptimal`), and verified SOV-OPT status (`OPTIMAL_VERIFIED` with valid KKT) before labelling `MATCH`.
+- Validated native-parsed dimensions (`variables`, `constraints`, `integers`) between SOV-OPT and external solver.
+- Implemented bound direction validation for minimization and maximization: checked that conservative MILP lower bound does not exceed external optimum ($B \le z^* + \epsilon$).
+- Clarified that `BOUND_ONLY` denotes incomplete SOV-OPT evidence (search tree halted at node limit without finding an incumbent solution).
+
+### Documentation & Catalogue Synchronization
+- Corrected `data/CATALOGUE.md` discrepancy values against published references: AFIRO (`~2.857e-9` vs 11-digit Netlib MINOS 5.3 reference `-464.75314286`) and SC50A (`~4.355e-10` vs 11-digit reference `-64.575077059`), reflecting measured values from run records.
+
 ## [0.1.4] - 2026-10-01
 
 ### Documentation Consolidation

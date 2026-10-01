@@ -2807,10 +2807,10 @@
   "model_name": "BLEND",
   "model_sha256": "b7f520aecdb4384d4516752f266bfc5f3897045a610edb01cc1a94a9cd36f6a2",
   "solver_version": "0.1.2",
-  "elapsed_seconds": 0.9179491249997227,
+  "elapsed_seconds": 0.916747082999791,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T13:28:03.380004+00:00",
+  "timestamp_utc": "2026-10-01T13:41:22.011847+00:00",
   "variables": 83,
   "rows": 74,
   "nonzeros": 491,
@@ -2819,7 +2819,7 @@
     "architecture": "arm64",
     "python": "3.11.16"
   },
-  "measured_duration_seconds": 0.917991833999622,
-  "git_revision": "2c8e33930856142e034addd8aaa1ee6b4a6486cd",
+  "measured_duration_seconds": 0.9167898749997221,
+  "git_revision": "b895c5e696f40734c26af5715e40ec94a1ae9170+dirty",
   "input_mps_sha256": "c8bb193f8af5dcff735a3b8db62077db93625e93cfb26e2b01f83ca3039cbf7d"
 }

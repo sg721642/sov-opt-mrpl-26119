@@ -87,6 +87,8 @@ class SolverTests(unittest.TestCase):
         r = solve_lp(node)
         self.assertEqual(r['status'], 'INFEASIBLE_CERTIFIED')
         self.assertTrue(exact_farkas(node, r['certificate']))
+        self.assertTrue(r.get('farkas_certificate'))
+        self.assertTrue(r.get('verification', {}).get('farkas_verified'))
         
         # Lossless round-trip export to JSON and reload
         cert_json = json.dumps({'certificate_exact': r['certificate_exact']})
@@ -238,6 +240,19 @@ class SolverTests(unittest.TestCase):
             if r.get('verification'):
                 self.assertTrue(r['verification'].get('feasible'),
                                 "Reported incumbent must be feasible in the original model")
+
+    def test_checksum_manifest_integrity(self):
+        """Verify that SHA256SUMS.json parses cleanly with json.loads and has no syntax or trailing data defects."""
+        chk_file = ROOT / 'SHA256SUMS.json'
+        self.assertTrue(chk_file.exists(), "SHA256SUMS.json must exist")
+        raw = chk_file.read_bytes()
+        self.assertFalse(raw.endswith(b"\\n"), "SHA256SUMS.json must not have literal trailing backslash-n")
+        try:
+            data = json.loads(raw.decode('utf-8'))
+        except Exception as e:
+            self.fail(f"SHA256SUMS.json failed json.loads: {e}")
+        self.assertIsInstance(data, dict)
+        self.assertNotIn("SHA256SUMS.json", data, "SHA256SUMS.json must not list itself")
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

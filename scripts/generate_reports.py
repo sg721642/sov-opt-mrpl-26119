@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from sovopt import load, solve
+from scripts.verify_checksums import generate_checksums, verify_checksums
 
 
 def compute_sha256(path):
@@ -215,23 +216,73 @@ def main():
 
         # Compare with sovopt result
         sovopt_res = results[k]['result']
-        if ext.get('status') not in ('NOT_RUN', 'FAILED'):
-            h_obj = ext.get('objective')
-            s_obj = sovopt_res.get('objective')
-            if h_obj is not None and s_obj is not None:
+        meta = results[k]['meta']
+
+        # Compare native parsed dimensions where available
+        ext_dims = ext.get('parsed_dimensions')
+        dims_match = True
+        if ext_dims:
+            dims_match = (
+                ext_dims.get('variables') == meta.get('variables') and
+                ext_dims.get('constraints') == meta.get('constraints') and
+                ext_dims.get('integers', 0) == meta.get('integers', 0)
+            )
+            ext['dimensions_match'] = dims_match
+
+        ext_status_raw = str(ext.get('model_status', ext.get('status', '')))
+        ext_optimal = (
+            ext.get('exit_code') == 0 and
+            ext.get('success') is True and
+            ('kOptimal' in ext_status_raw or 'Optimal' in ext_status_raw or 'optimal' in str(ext.get('message', '')).lower())
+        )
+        sovopt_verified = (
+            sovopt_res.get('status') == 'OPTIMAL_VERIFIED' and
+            sovopt_res.get('verification', {}).get('kkt_passed') is True
+        )
+
+        h_obj = ext.get('objective')
+        s_obj = sovopt_res.get('objective')
+        s_bound = sovopt_res.get('best_bound')
+
+        if ext.get('status') in ('NOT_RUN', 'FAILED'):
+            ext['comparison_status'] = ext.get('status')
+        elif not dims_match:
+            ext['comparison_status'] = 'DIMENSION_MISMATCH'
+        elif s_obj is not None and h_obj is not None:
+            if not ext_optimal:
+                ext['comparison_status'] = 'EXTERNAL_NOT_OPTIMAL'
+            elif not sovopt_verified:
+                ext['comparison_status'] = 'SOVOPT_NOT_VERIFIED'
+            else:
                 disc = abs(h_obj - s_obj)
                 ext['discrepancy_vs_sovopt'] = disc
                 ext['comparison_status'] = 'MATCH' if disc < 1e-6 else 'MISMATCH'
-            elif k == 'flugpl':
-                # No incumbent expected from sovopt; compare bound only
-                s_bound = sovopt_res.get('best_bound')
-                ext['sovopt_status'] = sovopt_res['status']
-                ext['sovopt_best_bound'] = s_bound
-                ext['comparison_status'] = 'BOUND_ONLY' if s_bound is not None else 'NO_BOUND'
+        elif s_bound is not None and h_obj is not None:
+            # Bound validation (e.g. MILP limit reached)
+            sense = meta.get('objective_sense', 'MINIMIZE')
+            if sense == 'MINIMIZE':
+                valid_bound = (s_bound <= h_obj + 1e-6)
             else:
-                ext['comparison_status'] = 'COMPARISON_NOT_POSSIBLE'
+                valid_bound = (s_bound >= h_obj - 1e-6)
+            ext['bound_direction_valid'] = valid_bound
+            ext['sovopt_status'] = sovopt_res['status']
+            ext['sovopt_best_bound'] = s_bound
+            if not valid_bound:
+                ext['comparison_status'] = 'INVALID_BOUND'
+            else:
+                ext['comparison_status'] = 'BOUND_ONLY'
+                ext['comparison_note'] = (
+                    'BOUND_ONLY represents incomplete SOV-OPT evidence: valid conservative lower bound '
+                    f'{s_bound} established against external optimum {h_obj}, but branch-and-bound search '
+                    'halted at node limit without discovering an incumbent solution.'
+                )
+        elif s_bound is not None:
+            ext['sovopt_status'] = sovopt_res['status']
+            ext['sovopt_best_bound'] = s_bound
+            ext['comparison_status'] = 'BOUND_ONLY'
+            ext['comparison_note'] = 'BOUND_ONLY represents incomplete SOV-OPT evidence (no external reference objective available).'
         else:
-            ext['comparison_status'] = ext.get('status', 'NOT_RUN')
+            ext['comparison_status'] = 'COMPARISON_NOT_POSSIBLE'
 
         ext_instances[k] = ext
         status_label = ext.get('comparison_status', ext.get('status', '?'))
@@ -363,9 +414,11 @@ def main():
         "1. **Netlib BLEND:** Both SOV-OPT and the external solver (if available) read `blend.mps` directly. "
         "Agreement between them shows they compute the same objective on the same model. The Netlib MINOS 5.3 README reference "
         "(-3.0812149846E+01, 11 significant digits) differs by ~1.72e-10 from the full-precision result.",
-        "2. **MIPLIB FLUGPL Bound:** MIPLIB integer optimum is 1201500.0. SOV-OPT produces a conservative "
-        "lower bound of approximately 1173644.9999999998 (floating-point display) at 50 nodes with "
-        "no incumbent found. Status: LIMIT_REACHED. This is not a completed MILP solve.",
+        "2. **MIPLIB FLUGPL Bound (BOUND_ONLY):** The `BOUND_ONLY` status denotes incomplete SOV-OPT evidence. "
+        "MIPLIB integer optimum is 1201500.0. SOV-OPT branch-and-bound halted at node limit (50 nodes) without "
+        "discovering a feasible integer incumbent (`status: LIMIT_REACHED`, `objective: null`). However, its "
+        "search frontier establishes a mathematically valid conservative lower bound of 1173644.9999999998 "
+        "($1173644.9999999998 \\le 1201500.0$), confirming correct bound direction for minimization.",
         "3. **Quarantined Instance (AVGAS):** `avgas.mps` is quarantined under `data/quarantined/` pending "
         "independent primary literature verification of its historical attribution (Charnes et al. 1952 / Symonds 1955). "
         "It is excluded from the active verified suite above.",
@@ -395,6 +448,15 @@ def main():
     bench_out = ROOT / 'reports/VERIFIED_BENCHMARKS.md'
     bench_out.write_text('\n'.join(bench_md))
     print(f"Wrote benchmark report to {bench_out}", flush=True)
+
+    # Synchronize SHA256SUMS.json so report generation cannot leave checksum manifest stale
+    print('\nSynchronizing SHA256SUMS.json manifest...', flush=True)
+    chk_manifest = generate_checksums(ROOT)
+    ok, errors = verify_checksums(ROOT)
+    if not ok:
+        print(f"WARNING: Checksum verification encountered errors after report generation: {errors}", flush=True)
+    else:
+        print(f"Successfully synchronized and verified SHA256SUMS.json ({len(chk_manifest)} files covered).", flush=True)
 
 
 if __name__ == '__main__':

@@ -415,6 +415,8 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
                     z_ser = [f'{v.numerator}/{v.denominator}' for v in z_cert]
                     return dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed variables violate row {i} upper bound',
                                 certificate=[float(v) for v in z_cert], certificate_exact=z_ser,
+                                verification=dict(feasible=False, farkas_verified=True, kkt_passed=False),
+                                farkas_certificate=True,
                                 algorithm='fixed variable evaluation', iterations=0, history=history)
                 return dict(status='NUMERICAL_FAILURE', message=f'Fixed variables violate row {i} upper bound without exact certificate',
                             algorithm='fixed variable evaluation', iterations=0, history=history)
@@ -424,6 +426,8 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
                     z_ser = [f'{v.numerator}/{v.denominator}' for v in z_cert]
                     return dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed variables violate row {i} lower bound',
                                 certificate=[float(v) for v in z_cert], certificate_exact=z_ser,
+                                verification=dict(feasible=False, farkas_verified=True, kkt_passed=False),
+                                farkas_certificate=True,
                                 algorithm='fixed variable evaluation', iterations=0, history=history)
                 return dict(status='NUMERICAL_FAILURE', message=f'Fixed variables violate row {i} lower bound without exact certificate',
                             algorithm='fixed variable evaluation', iterations=0, history=history)
@@ -447,6 +451,8 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
                     z_ser = [f'{v.numerator}/{v.denominator}' for v in z_cert]
                     return dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed rows infeasible at base point for row {i}',
                                 certificate=[float(v) for v in z_cert], certificate_exact=z_ser,
+                                verification=dict(feasible=False, farkas_verified=True, kkt_passed=False),
+                                farkas_certificate=True,
                                 algorithm='transformed unconstrained analysis', iterations=0, history=history)
                 return dict(status='NUMERICAL_FAILURE', message=f'Fixed rows infeasible at row {i} without exact certificate',
                             algorithm='transformed unconstrained analysis', iterations=0, history=history)
@@ -456,6 +462,8 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
                     z_ser = [f'{v.numerator}/{v.denominator}' for v in z_cert]
                     return dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed rows infeasible at base point for row {i}',
                                 certificate=[float(v) for v in z_cert], certificate_exact=z_ser,
+                                verification=dict(feasible=False, farkas_verified=True, kkt_passed=False),
+                                farkas_certificate=True,
                                 algorithm='transformed unconstrained analysis', iterations=0, history=history)
                 return dict(status='NUMERICAL_FAILURE', message=f'Fixed rows infeasible at row {i} without exact certificate',
                             algorithm='transformed unconstrained analysis', iterations=0, history=history)
@@ -554,6 +562,8 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
                         message='Phase I infeasibility; exact Farkas certificate ' + ('verified' if cert_ok else 'could not be established'),
                         certificate=[float(v) for v in z_cert],
                         certificate_exact=z_serialized,
+                        verification=dict(feasible=False, farkas_verified=bool(cert_ok), kkt_passed=False),
+                        farkas_certificate=bool(cert_ok),
                         algorithm='two-phase primal revised simplex', iterations=it1, history=history)
 
         # Drive out any remaining zero-valued artificials from the basis

@@ -166,8 +166,16 @@ def run_scipy(target):
 
     return dict(
         backend='external SciPy/HiGHS process',
+        solver_name='SciPy',
         input_source=str(target),
+        parsed_dimensions={
+            'variables': len(c),
+            'constraints': len(A),
+            'integers': len(d.get('integer', []))
+        },
+        objective_sense='MINIMIZE',
         success=bool(r.success),
+        model_status='Optimal' if r.success else str(r.status),
         objective=None if r.fun is None else float(r.fun),
         seconds=time.perf_counter() - start,
         message=r.message
