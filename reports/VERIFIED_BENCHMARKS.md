@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-01  
 **Environment:** Darwin arm64, Python 3.11.16  
-**Solver Revision:** `9fd10c6879ee5daa` (includes +dirty if uncommitted changes)  
+**Solver Revision:** `6eb76d652355178c` (includes +dirty if uncommitted changes)  
 **Core Dependencies:** NumPy and Python standard library only (strictly sovereign core)  
 **External Validation:** via `scripts/baseline_worker.py` isolated subprocess (highspy or scipy fallback)  
 
@@ -17,10 +17,10 @@ No synthetic or fabricated instances are used as performance evidence.
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **AFIRO** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753143** | -4.6475314286E+02 | 2.86e-09 | 1.42e-14 | 1.72e-17 | 24.7 ms |
 | **SC50A** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-64.575077** | -6.4575077059E+01 | 4.35e-10 | 5.37e-16 | 4.09e-17 | 50.0 ms |
-| **SC50B** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000** | -7.0000000000E+01 | 0.0 | 2.49e-16 | 3.97e-17 | 46.6 ms |
-| **BLEND** | LP | 74 x 83 | `OPTIMAL_VERIFIED` | **-30.812150** | -3.0812149846E+01 | 1.72e-10 | 1.78e-15 | 1.23e-16 | 909.2 ms |
-| **FLUGPL** | MILP | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **1173645** | 1201500 (integer optimal); 769500.0 (LP relaxation root bound) | N/A | N/A | N/A | 1018.6 ms |
-| **AFIRO (PDHG-CPU)** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753142** | -464.75314286 (Netlib) | 6.3e-07 | 8.07e-09 | 5.93e-08 | 103.2 ms |
+| **SC50B** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000** | -7.0000000000E+01 | 0.0 | 2.49e-16 | 3.97e-17 | 47.3 ms |
+| **BLEND** | LP | 74 x 83 | `OPTIMAL_VERIFIED` | **-30.812150** | -3.0812149846E+01 | 1.72e-10 | 1.78e-15 | 1.23e-16 | 917.6 ms |
+| **FLUGPL** | MILP | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **1173645** | 1201500 (integer optimal); 769500.0 (LP relaxation root bound) | N/A | N/A | N/A | 1041.1 ms |
+| **AFIRO (PDHG-CPU)** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753142** | -464.75314286 (Netlib) | 6.3e-07 | 8.07e-09 | 5.93e-08 | 114.0 ms |
 
 ---
 
