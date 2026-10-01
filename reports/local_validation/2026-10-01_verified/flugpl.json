@@ -66,202 +66,196 @@
       "nodes": 12,
       "open_nodes": 11,
       "incumbent": null,
-      "node_bound": 1172069.9999999998
+      "node_bound": 1171519.9999999998
     },
     {
       "nodes": 13,
       "open_nodes": 12,
       "incumbent": null,
-      "node_bound": 1171757.4074074072
+      "node_bound": 1170979.9999999998
     },
     {
       "nodes": 14,
       "open_nodes": 13,
       "incumbent": null,
-      "node_bound": 1173125.8714596948
+      "node_bound": 1172429.9999999998
     },
     {
       "nodes": 15,
       "open_nodes": 14,
       "incumbent": null,
-      "node_bound": 1174403.6492374726
+      "node_bound": 1171953.0555555555
     },
     {
       "nodes": 17,
       "open_nodes": 14,
       "incumbent": null,
-      "node_bound": 1172120.8333333333
+      "node_bound": 1172119.9999999998
     },
     {
       "nodes": 18,
       "open_nodes": 15,
       "incumbent": null,
-      "node_bound": 1172283.3333333333
+      "node_bound": 1173125.8714596948
     },
     {
       "nodes": 19,
       "open_nodes": 16,
       "incumbent": null,
+      "node_bound": 1174403.6492374726
+    },
+    {
+      "nodes": 21,
+      "open_nodes": 16,
+      "incumbent": null,
+      "node_bound": 1172120.8333333333
+    },
+    {
+      "nodes": 22,
+      "open_nodes": 17,
+      "incumbent": null,
+      "node_bound": 1172643.3333333333
+    },
+    {
+      "nodes": 23,
+      "open_nodes": 18,
+      "incumbent": null,
       "node_bound": 1173819.9999999998
     },
     {
-      "nodes": 20,
-      "open_nodes": 17,
+      "nodes": 24,
+      "open_nodes": 19,
       "incumbent": null,
       "node_bound": 1172677.0588235292
     },
     {
-      "nodes": 21,
-      "open_nodes": 18,
+      "nodes": 25,
+      "open_nodes": 20,
       "incumbent": null,
       "node_bound": 1173873.1699346404
     },
     {
-      "nodes": 22,
-      "open_nodes": 19,
-      "incumbent": null,
-      "node_bound": 1172969.9999999998
-    },
-    {
-      "nodes": 23,
-      "open_nodes": 20,
-      "incumbent": null,
-      "node_bound": 1172429.9999999998
-    },
-    {
-      "nodes": 24,
+      "nodes": 26,
       "open_nodes": 21,
       "incumbent": null,
-      "node_bound": 1174827.4999999998
-    },
-    {
-      "nodes": 25,
-      "open_nodes": 22,
-      "incumbent": null,
-      "node_bound": 1172466.4999999998
-    },
-    {
-      "nodes": 26,
-      "open_nodes": 23,
-      "incumbent": null,
-      "node_bound": 1173048.3333333333
+      "node_bound": 1173003.3854166665
     },
     {
       "nodes": 27,
-      "open_nodes": 24,
+      "open_nodes": 22,
       "incumbent": null,
-      "node_bound": 1172751.3333333333
+      "node_bound": 1172599.9999999998
+    },
+    {
+      "nodes": 28,
+      "open_nodes": 23,
+      "incumbent": null,
+      "node_bound": 1174827.4999999998
     },
     {
       "nodes": 29,
       "open_nodes": 24,
       "incumbent": null,
-      "node_bound": 1173644.9999999998
+      "node_bound": 1172466.4999999998
     },
     {
       "nodes": 31,
       "open_nodes": 24,
       "incumbent": null,
-      "node_bound": 1174332.4999999998
+      "node_bound": 1173644.9999999998
     },
     {
       "nodes": 33,
       "open_nodes": 24,
       "incumbent": null,
-      "node_bound": 1173633.1699346404
-    },
-    {
-      "nodes": 34,
-      "open_nodes": 25,
-      "incumbent": null,
-      "node_bound": 1173410.1851851852
+      "node_bound": 1174332.4999999998
     },
     {
       "nodes": 35,
-      "open_nodes": 26,
+      "open_nodes": 24,
       "incumbent": null,
-      "node_bound": 1173858.3333333333
+      "node_bound": 1174219.9999999998
+    },
+    {
+      "nodes": 36,
+      "open_nodes": 25,
+      "incumbent": null,
+      "node_bound": 1175105.9999999998
     },
     {
       "nodes": 37,
       "open_nodes": 26,
       "incumbent": null,
-      "node_bound": 1173569.9999999998
+      "node_bound": 1173719.9999999998
     },
     {
       "nodes": 39,
       "open_nodes": 26,
       "incumbent": null,
-      "node_bound": 1173805.2469135802
+      "node_bound": 1173633.1699346404
     },
     {
-      "nodes": 40,
+      "nodes": 41,
+      "open_nodes": 26,
+      "incumbent": null,
+      "node_bound": 1174353.3854166665
+    },
+    {
+      "nodes": 42,
       "open_nodes": 27,
       "incumbent": null,
       "node_bound": 1173612.3529411764
     },
     {
-      "nodes": 41,
+      "nodes": 43,
       "open_nodes": 28,
       "incumbent": null,
       "node_bound": 1174674.019607843
     },
     {
-      "nodes": 42,
-      "open_nodes": 29,
-      "incumbent": null,
-      "node_bound": 1175049.9999999998
-    },
-    {
-      "nodes": 44,
-      "open_nodes": 29,
-      "incumbent": null,
-      "node_bound": 1174415.6249999998
-    },
-    {
       "nodes": 45,
-      "open_nodes": 30,
+      "open_nodes": 28,
       "incumbent": null,
-      "node_bound": 1174049.9999999998
+      "node_bound": 1174492.4999999998
+    },
+    {
+      "nodes": 46,
+      "open_nodes": 29,
+      "incumbent": null,
+      "node_bound": 1175527.0588235292
     },
     {
       "nodes": 47,
       "open_nodes": 30,
       "incumbent": null,
-      "node_bound": 1174492.4999999998
+      "node_bound": 1175777.5588235294
     },
     {
       "nodes": 48,
       "open_nodes": 31,
       "incumbent": null,
-      "node_bound": 1175527.0588235292
+      "node_bound": 1174319.9999999998
     },
     {
       "nodes": 49,
       "open_nodes": 32,
       "incumbent": null,
-      "node_bound": 1175777.5588235294
-    },
-    {
-      "nodes": 50,
-      "open_nodes": 33,
-      "incumbent": null,
-      "node_bound": 1174319.9999999998
+      "node_bound": 1176209.9999999998
     }
   ],
   "bound_kind": "exact rational Lagrangian bounds of binary64 input",
-  "open_nodes": 33,
+  "open_nodes": 31,
   "tolerance_closed_nodes": 0,
   "pruned_nodes": 0,
-  "best_bound": 1173644.9999999998,
+  "best_bound": 1173719.9999999998,
   "status": "LIMIT_REACHED",
   "model_name": "flugpl",
   "model_sha256": "8ac7f0195eb38f3ff192e669609da587f33d5c8a8744e62e1f2b809074eb7cb6",
-  "solver_version": "0.1.6",
-  "elapsed_seconds": 1.0372561660005886,
+  "solver_version": "0.1.7",
+  "elapsed_seconds": 1.1696662499998638,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T16:08:48.361761+00:00",
+  "timestamp_utc": "2026-10-01T17:23:29.178749+00:00",
   "variables": 18,
   "rows": 18,
   "nonzeros": 46,
@@ -287,7 +281,7 @@
     "architecture": "arm64",
     "python": "3.11.16"
   },
-  "measured_duration_seconds": 1.0372873750002327,
-  "git_revision": "a9753433509ff530f9929ed9977c117e6bd6cf85+dirty",
+  "measured_duration_seconds": 1.1696943750011997,
+  "git_revision": "c8c4fe7e14c08272b00961cf0575c7187e955a5c+dirty",
   "input_mps_sha256": "a1f0cb79a95639450dd984473a00efca24365457153d7fcb859c6581ddab4c2c"
 }

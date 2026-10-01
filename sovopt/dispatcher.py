@@ -108,7 +108,7 @@ def auto_dispatch(model, method='auto', backend='cpu'):
         else:
             resolved_method = 'simplex'
             resolved_backend = 'cpu'
-            rationale = "Continuous LP dispatched to dense Primal Simplex with LU refactorization, Markowitz pivoting, and exact KKT/Farkas certification."
+            rationale = "Continuous LP dispatched to Primal Simplex with sparse/dense LU refactorization, Markowitz pivoting, and exact KKT/Farkas certification."
 
     return {
         'method': resolved_method,

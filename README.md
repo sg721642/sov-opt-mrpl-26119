@@ -87,7 +87,7 @@ SOVOPT_BENCHMARK_PYTHON=.venv-benchmark/bin/python .venv/bin/python scripts/gene
 ## Implemented Algorithms & Automatic Dispatcher
 
 - **Automatic Algorithm Dispatcher (`sovopt.auto_dispatch`):** Inspects problem dimensions, matrix sparsity, dynamic range, integrality, and quadratic objective structure to select the appropriate solver core automatically:
-  - **Linear Programming (LP):** Two-phase primal revised simplex with dense LU factorization, Markowitz partial pivoting, iterative refinement, and exact rational basis dual recovery.
+  - **Linear Programming (LP):** Two-phase primal revised simplex with sovereign sparse LU factorization (Threshold Markowitz pivoting, Product-Form of Inverse / eta updates, periodic refactorization) and dense LU fallback, iterative refinement, and exact rational basis dual recovery.
   - **Mixed-Integer Linear Programming (MILP):** Branch-and-bound with exact rational Lagrangian lower bounds (`safe_lower_bound`) and exact Farkas infeasibility pruning.
   - **Convex Quadratic Programming (QP):** Infeasible-start Mehrotra predictor-corrector primal-dual interior point algorithm for convex objectives ($\min \frac{1}{2} x^T Q x + c^T x$) with linear constraints.
   - **First-Order LP (PDHG):** Primal-Dual Hybrid Gradient method (Chambolle-Pock) with diagonal preconditioning and periodic restart. Includes CPU SpMV and CUDA RawKernel source.
@@ -151,7 +151,7 @@ $$\text{LP} \longrightarrow \text{MILP} \longrightarrow \text{QP} \longrightarro
 
 ## Honest Limitations & Competition Disclosures
 
-- **Dense Linear Algebra:** The solver core uses dense LU factorization. Size caps are enforced: 250 variables / 1000 rows (CLI), 100 variables / 150 rows (web). Problems exceeding limits report `LIMIT_REACHED` or `NUMERICAL_FAILURE`. Sparse LU is planned.
+- **Linear Algebra Backends:** Sovereign sparse numerical linear algebra is implemented in `sovopt/sparse.py` and `sovopt/sparse_lu.py`, featuring pure NumPy CSR/CSC matrices, Markowitz threshold pivoting ($u=0.1$), FTRAN/BTRAN sparse triangular solves, and Product-Form of Inverse (PFI) eta updates. Dense LU factorization remains active as small-problem default ($m < 25$) and numerical fallback. Full dense size caps remain enforced on fallback paths (250 variables / 1000 rows CLI, 100 variables / 150 rows web).
 - **Primal Simplex Only:** The current LP implementation is primal revised simplex. Dual simplex, Devex pricing, and basis warm-starts are not yet implemented.
 - **MILP Scale:** Branch-and-bound uses cold-start LP relaxations. Large integer problems reach node limits. FLUGPL terminates at `LIMIT_REACHED` at 50 nodes with a valid conservative lower bound, but no incumbent found.
 - **QP Conditioning:** The interior-point method solves normal equations via dense LU; severely ill-conditioned matrices may encounter numerical failure.

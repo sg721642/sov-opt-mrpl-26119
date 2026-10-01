@@ -10,6 +10,8 @@ from fractions import Fraction as F
 from math import lcm
 import numpy as np
 from .linalg import LU, NumericalError
+from .sparse import csc_from_dense, CSCMatrix
+from .sparse_lu import SparseBasisEngine, SparseLU, PLATFORM_LONGDOUBLE_EXTENDED
 from .transforms import transform_model, postsolve_primal, postsolve_dual, postsolve_ray, postsolve_direction
 from .verify import verify, exact_farkas, verify_unbounded_ray, verify_unbounded_certificate
 
@@ -329,7 +331,7 @@ def _dual_for_separable_box(model):
             z[var_upper_idx[j]] = -c_j
     return z
 
-def _iterate(M, b, c, basis, allowed, limit, history):
+def _iterate_dense(M, b, c, basis, allowed, limit, history):
     for k in range(limit):
         B = M[:, basis]
         lu = LU(B)
@@ -354,7 +356,120 @@ def _iterate(M, b, c, basis, allowed, limit, history):
         basis[leaving] = entering
     raise NumericalError('Simplex iteration limit')
 
-def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
+# Backward compatibility alias
+_iterate = _iterate_dense
+
+
+def _iterate_sparse(M_csc: CSCMatrix, b: np.ndarray, c: np.ndarray, basis: list[int],
+                    allowed: int, limit: int, history: list, engine: SparseBasisEngine,
+                    pivot_tol: float = 1e-8):
+    """Sovereign sparse primal revised simplex iteration with Threshold Markowitz LU and PFI eta updates."""
+    m = M_csc.n_rows
+    for k in range(limit):
+        xb = engine.ftran(b)
+        y = engine.btran(c[basis])
+        rc = c - M_csc.rmatvec(y)
+
+        if np.min(xb, initial=0) < -1e-7 * (1 + np.max(abs(b), initial=0)):
+            raise NumericalError('Lost basis feasibility')
+
+        entering = next((j for j in range(allowed) if j not in basis and rc[j] < -1e-10 * (1 + abs(c[j]))), None)
+        if entering is None:
+            return xb, y, k
+
+        col_rows, col_vals = M_csc.get_col(entering)
+        a_ent = np.zeros(m, dtype=float)
+        a_ent[col_rows] = col_vals
+        d = engine.ftran(a_ent)
+
+        possible = np.flatnonzero(d > pivot_tol)
+        if not len(possible):
+            raise _UnboundedError(d, entering, basis, xb)
+
+        ratios = np.maximum(xb[possible], 0) / d[possible]
+        best = np.min(ratios)
+        ties = [int(possible[t]) for t, v in enumerate(ratios) if v <= best + 1e-12 * (1 + abs(best))]
+        # Tie-breaking for degenerate pivots: prefer larger pivot magnitude for stability
+        leaving = max(ties, key=lambda i: (abs(d[i]), -basis[i]))
+
+        if len(history) < 1000:
+            history.append({'iteration': len(history), 'objective_transformed': float(c[basis] @ np.maximum(xb, 0))})
+
+        engine.update(leaving, entering, d)
+        basis[leaving] = entering
+    raise NumericalError('Simplex iteration limit')
+
+
+def _attach_telemetry(res_dict: dict, requested: str, used: str,
+                      engine: any, M: np.ndarray,
+                      basis: list[int], iterations: int,
+                      fallback_reason: str = None) -> None:
+    """Helper to attach uniform linear algebra telemetry to LP result dictionary."""
+    if used == 'sparse' and engine is not None:
+        t = engine.get_telemetry()
+    elif used == 'dense':
+        m = len(basis) if basis is not None else 0
+        try:
+            if M is not None and basis is not None:
+                B = M[:, basis]
+                nnz = int((B != 0).sum())
+                density = float(nnz / (m * m)) if (m * m) > 0 else 0.0
+            else:
+                nnz = 0
+                density = 0.0
+        except Exception:
+            nnz = 0
+            density = 0.0
+        t = {
+            'basis_factorization': 'dense_lu_full_refactorization',
+            'sparse_basis_nnz': nnz,
+            'sparse_basis_density': density,
+            'refactorizations': max(iterations, 1),
+            'eta_updates': 0,
+            'ftran_count': max(iterations, 1),
+            'btran_count': max(iterations, 1),
+            'max_eta_depth': 0,
+            'iterative_refinement_steps': 0,
+            'last_refactorization_reason': 'EVERY_ITERATION',
+            'growth_factor': 1.0,
+            'platform_longdouble_extended': PLATFORM_LONGDOUBLE_EXTENDED,
+        }
+    else:
+        t = {
+            'basis_factorization': 'none',
+            'sparse_basis_nnz': 0,
+            'sparse_basis_density': 0.0,
+            'refactorizations': 0,
+            'eta_updates': 0,
+            'ftran_count': 0,
+            'btran_count': 0,
+            'max_eta_depth': 0,
+            'iterative_refinement_steps': 0,
+            'last_refactorization_reason': 'NONE',
+            'growth_factor': 1.0,
+            'platform_longdouble_extended': PLATFORM_LONGDOUBLE_EXTENDED,
+        }
+
+    res_dict['linear_algebra_requested'] = requested
+    res_dict['linear_algebra_used'] = used
+    res_dict['basis_factorization'] = t['basis_factorization']
+    res_dict['sparse_basis_nnz'] = t['sparse_basis_nnz']
+    res_dict['sparse_basis_density'] = t['sparse_basis_density']
+    res_dict['refactorizations'] = t['refactorizations']
+    res_dict['eta_updates'] = t['eta_updates']
+    res_dict['ftran_count'] = t['ftran_count']
+    res_dict['btran_count'] = t['btran_count']
+    res_dict['max_eta_depth'] = t['max_eta_depth']
+    res_dict['iterative_refinement_steps'] = t['iterative_refinement_steps']
+    if fallback_reason is not None:
+        res_dict['fallback_reason'] = fallback_reason
+
+
+def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto'):
+    if linear_algebra not in ('auto', 'dense', 'sparse'):
+        raise ValueError(f"linear_algebra must be 'auto', 'dense', or 'sparse', got {linear_algebra!r}")
+    linear_algebra_requested = linear_algebra
+
     n = len(model.c)
     m_rows = len(model.A)
     history = []
@@ -362,8 +477,10 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
     # 1. Handle unconstrained / box-only model (m_rows == 0)
     if m_rows == 0:
         if np.any(model.lower > model.upper):
-            return dict(status='INFEASIBLE_CERTIFIED', message='Box lower bound exceeds upper bound',
-                        algorithm='separable box analysis', iterations=0, history=history)
+            res = dict(status='INFEASIBLE_CERTIFIED', message='Box lower bound exceeds upper bound',
+                       algorithm='separable box analysis', iterations=0, history=history)
+            _attach_telemetry(res, linear_algebra_requested, 'none', None, None, None, 0)
+            return res
         # Construct guaranteed feasible base point x (l <= x <= u)
         x = np.zeros(n, dtype=float)
         for j in range(n):
@@ -397,20 +514,25 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
             # x is the feasible base point; verify the full certificate (x0, d)
             cert = verify_unbounded_certificate(model, x, ray, tol=tol)
             if not cert['verified']:
-                return dict(status='NUMERICAL_FAILURE',
-                            message=f'Box unbounded certificate failed: {cert["message"]}',
-                            ray_verification=cert,
-                            algorithm='separable box analysis', iterations=0, history=history)
-            return dict(status='UNBOUNDED_CERTIFIED', message='LP is unbounded in box direction',
-                        ray=ray.tolist(), base_point=x.tolist(), x=x.tolist(),
-                        ray_verification=cert,
-                        algorithm='separable box analysis', iterations=0, history=history)
+                res = dict(status='NUMERICAL_FAILURE',
+                           message=f'Box unbounded certificate failed: {cert["message"]}',
+                           ray_verification=cert,
+                           algorithm='separable box analysis', iterations=0, history=history)
+            else:
+                res = dict(status='UNBOUNDED_CERTIFIED', message='LP is unbounded in box direction',
+                           ray=ray.tolist(), base_point=x.tolist(), x=x.tolist(),
+                           ray_verification=cert,
+                           algorithm='separable box analysis', iterations=0, history=history)
+            _attach_telemetry(res, linear_algebra_requested, 'none', None, None, None, 0)
+            return res
 
         z_box = _dual_for_separable_box(model)
         report = verify(model, x, z_box, tol, check_integer=False)
-        return dict(status='OPTIMAL_VERIFIED' if report['kkt_passed'] else 'NUMERICAL_FAILURE',
-                    x=x.tolist(), dual=z_box.tolist(), verification=report, objective=report['objective'],
-                    iterations=0, algorithm='separable box analysis', history=history)
+        res = dict(status='OPTIMAL_VERIFIED' if report['kkt_passed'] else 'NUMERICAL_FAILURE',
+                   x=x.tolist(), dual=z_box.tolist(), verification=report, objective=report['objective'],
+                   iterations=0, algorithm='separable box analysis', history=history)
+        _attach_telemetry(res, linear_algebra_requested, 'none', None, None, None, 0)
+        return res
 
     # 2. Transform model into standard non-negative form t >= 0
     trans = transform_model(model)
@@ -431,30 +553,38 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
                 z_cert = _exact_farkas_for_fixed_row(model, i, violated_upper=True)
                 if z_cert is not None:
                     z_ser = [f'{v.numerator}/{v.denominator}' for v in z_cert]
-                    return dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed variables violate row {i} upper bound',
-                                certificate=[float(v) for v in z_cert], certificate_exact=z_ser,
-                                verification=dict(feasible=False, farkas_verified=True, kkt_passed=False),
-                                farkas_certificate=True,
-                                algorithm='fixed variable evaluation', iterations=0, history=history)
-                return dict(status='NUMERICAL_FAILURE', message=f'Fixed variables violate row {i} upper bound without exact certificate',
-                            algorithm='fixed variable evaluation', iterations=0, history=history)
+                    res = dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed variables violate row {i} upper bound',
+                               certificate=[float(v) for v in z_cert], certificate_exact=z_ser,
+                               verification=dict(feasible=False, farkas_verified=True, kkt_passed=False),
+                               farkas_certificate=True,
+                               algorithm='fixed variable evaluation', iterations=0, history=history)
+                else:
+                    res = dict(status='NUMERICAL_FAILURE', message=f'Fixed variables violate row {i} upper bound without exact certificate',
+                               algorithm='fixed variable evaluation', iterations=0, history=history)
+                _attach_telemetry(res, linear_algebra_requested, 'none', None, None, None, 0)
+                return res
             if lo_F is not None and val_F < lo_F:
                 z_cert = _exact_farkas_for_fixed_row(model, i, violated_upper=False)
                 if z_cert is not None:
                     z_ser = [f'{v.numerator}/{v.denominator}' for v in z_cert]
-                    return dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed variables violate row {i} lower bound',
-                                certificate=[float(v) for v in z_cert], certificate_exact=z_ser,
-                                verification=dict(feasible=False, farkas_verified=True, kkt_passed=False),
-                                farkas_certificate=True,
-                                algorithm='fixed variable evaluation', iterations=0, history=history)
-                return dict(status='NUMERICAL_FAILURE', message=f'Fixed variables violate row {i} lower bound without exact certificate',
-                            algorithm='fixed variable evaluation', iterations=0, history=history)
+                    res = dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed variables violate row {i} lower bound',
+                               certificate=[float(v) for v in z_cert], certificate_exact=z_ser,
+                               verification=dict(feasible=False, farkas_verified=True, kkt_passed=False),
+                               farkas_certificate=True,
+                               algorithm='fixed variable evaluation', iterations=0, history=history)
+                else:
+                    res = dict(status='NUMERICAL_FAILURE', message=f'Fixed variables violate row {i} lower bound without exact certificate',
+                               algorithm='fixed variable evaluation', iterations=0, history=history)
+                _attach_telemetry(res, linear_algebra_requested, 'none', None, None, None, 0)
+                return res
 
         z_fixed = _dual_for_fixed_vars(model)
         report = verify(model, x_fixed, z_fixed, tol, check_integer=False)
-        return dict(status='OPTIMAL_VERIFIED' if report['kkt_passed'] else 'NUMERICAL_FAILURE',
-                    x=x_fixed.tolist(), dual=z_fixed.tolist(), verification=report, objective=report['objective'],
-                    iterations=0, algorithm='fixed variable evaluation', history=history)
+        res = dict(status='OPTIMAL_VERIFIED' if report['kkt_passed'] else 'NUMERICAL_FAILURE',
+                   x=x_fixed.tolist(), dual=z_fixed.tolist(), verification=report, objective=report['objective'],
+                   iterations=0, algorithm='fixed variable evaluation', history=history)
+        _attach_telemetry(res, linear_algebra_requested, 'none', None, None, None, 0)
+        return res
 
     # 2b. Transformed system has zero effective rows: m_total == 0
     if m_total == 0:
@@ -467,24 +597,30 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
                 z_cert = _exact_farkas_for_fixed_row(model, i, violated_upper=True)
                 if z_cert is not None:
                     z_ser = [f'{v.numerator}/{v.denominator}' for v in z_cert]
-                    return dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed rows infeasible at base point for row {i}',
-                                certificate=[float(v) for v in z_cert], certificate_exact=z_ser,
-                                verification=dict(feasible=False, farkas_verified=True, kkt_passed=False),
-                                farkas_certificate=True,
-                                algorithm='transformed unconstrained analysis', iterations=0, history=history)
-                return dict(status='NUMERICAL_FAILURE', message=f'Fixed rows infeasible at row {i} without exact certificate',
-                            algorithm='transformed unconstrained analysis', iterations=0, history=history)
+                    res = dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed rows infeasible at base point for row {i}',
+                               certificate=[float(v) for v in z_cert], certificate_exact=z_ser,
+                               verification=dict(feasible=False, farkas_verified=True, kkt_passed=False),
+                               farkas_certificate=True,
+                               algorithm='transformed unconstrained analysis', iterations=0, history=history)
+                else:
+                    res = dict(status='NUMERICAL_FAILURE', message=f'Fixed rows infeasible at row {i} without exact certificate',
+                               algorithm='transformed unconstrained analysis', iterations=0, history=history)
+                _attach_telemetry(res, linear_algebra_requested, 'none', None, None, None, 0)
+                return res
             if lo_F is not None and val_F < lo_F:
                 z_cert = _exact_farkas_for_fixed_row(model, i, violated_upper=False)
                 if z_cert is not None:
                     z_ser = [f'{v.numerator}/{v.denominator}' for v in z_cert]
-                    return dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed rows infeasible at base point for row {i}',
-                                certificate=[float(v) for v in z_cert], certificate_exact=z_ser,
-                                verification=dict(feasible=False, farkas_verified=True, kkt_passed=False),
-                                farkas_certificate=True,
-                                algorithm='transformed unconstrained analysis', iterations=0, history=history)
-                return dict(status='NUMERICAL_FAILURE', message=f'Fixed rows infeasible at row {i} without exact certificate',
-                            algorithm='transformed unconstrained analysis', iterations=0, history=history)
+                    res = dict(status='INFEASIBLE_CERTIFIED', message=f'Fixed rows infeasible at base point for row {i}',
+                               certificate=[float(v) for v in z_cert], certificate_exact=z_ser,
+                               verification=dict(feasible=False, farkas_verified=True, kkt_passed=False),
+                               farkas_certificate=True,
+                               algorithm='transformed unconstrained analysis', iterations=0, history=history)
+                else:
+                    res = dict(status='NUMERICAL_FAILURE', message=f'Fixed rows infeasible at row {i} without exact certificate',
+                               algorithm='transformed unconstrained analysis', iterations=0, history=history)
+                _attach_telemetry(res, linear_algebra_requested, 'none', None, None, None, 0)
+                return res
 
         # Check for unconstrained negative cost on non-negative variables
         # Any strictly negative coefficient implies unboundedness
@@ -497,20 +633,25 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
                 # x_base is the feasible base point at current t=0 point postsolved
                 cert = verify_unbounded_certificate(model, x_base, ray, tol=tol)
                 if not cert['verified']:
-                    return dict(status='NUMERICAL_FAILURE',
-                                message=f'Unconstrained unbounded certificate failed: {cert["message"]}',
-                                ray_verification=cert,
-                                algorithm='transformed unconstrained analysis', iterations=0, history=history)
-                return dict(status='UNBOUNDED_CERTIFIED', message='LP is unbounded in transformed direction',
-                            ray=ray.tolist(), base_point=x_base.tolist(), x=x_base.tolist(),
-                            ray_verification=cert,
-                            algorithm='transformed unconstrained analysis', iterations=0, history=history)
+                    res = dict(status='NUMERICAL_FAILURE',
+                               message=f'Unconstrained unbounded certificate failed: {cert["message"]}',
+                               ray_verification=cert,
+                               algorithm='transformed unconstrained analysis', iterations=0, history=history)
+                else:
+                    res = dict(status='UNBOUNDED_CERTIFIED', message='LP is unbounded in transformed direction',
+                               ray=ray.tolist(), base_point=x_base.tolist(), x=x_base.tolist(),
+                               ray_verification=cert,
+                               algorithm='transformed unconstrained analysis', iterations=0, history=history)
+                _attach_telemetry(res, linear_algebra_requested, 'none', None, None, None, 0)
+                return res
 
         z_uncon = _dual_for_fixed_vars(model)
         report = verify(model, x_base, z_uncon, tol, check_integer=False)
-        return dict(status='OPTIMAL_VERIFIED' if report['kkt_passed'] else 'NUMERICAL_FAILURE',
-                    x=x_base.tolist(), dual=z_uncon.tolist(), verification=report, objective=report['objective'],
-                    iterations=0, algorithm='transformed unconstrained analysis', history=history)
+        res = dict(status='OPTIMAL_VERIFIED' if report['kkt_passed'] else 'NUMERICAL_FAILURE',
+                   x=x_base.tolist(), dual=z_uncon.tolist(), verification=report, objective=report['objective'],
+                   iterations=0, algorithm='transformed unconstrained analysis', history=history)
+        _attach_telemetry(res, linear_algebra_requested, 'none', None, None, None, 0)
+        return res
 
     # Stack rows: equality rows first, then LE rows
     if m_eq > 0 and m_le > 0:
@@ -544,7 +685,6 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
     if m_le > 0:
         slack_mat = np.zeros((m_total, m_le), dtype=float)
         for k in range(m_le):
-            # Row index in A_all is m_eq + k
             slack_mat[m_eq + k, k] = row_signs[m_eq + k]
         cols.append(slack_mat)
 
@@ -562,13 +702,43 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
     phase_cost = np.zeros(total_cols, dtype=float)
     phase_cost[art_start:] = 1.0
 
+    if linear_algebra == 'auto':
+        linear_algebra_used = 'sparse' if m_total >= 25 else 'dense'
+    else:
+        linear_algebra_used = linear_algebra
+
+    engine: any = None
+    fallback_reason: str = None
+    M_csc: any = None
+    it1 = 0
+    it2 = 0
+
     try:
-        xb, y, it1 = _iterate(M, rhs_all, phase_cost, basis, total_cols, max_iter, history)
+        if linear_algebra_used == 'sparse':
+            try:
+                M_csc = csc_from_dense(M)
+                engine = SparseBasisEngine(max_eta_depth=25, pivot_threshold=0.1)
+                engine.initialize(M_csc, basis)
+                xb, y, it1 = _iterate_sparse(M_csc, rhs_all, phase_cost, basis, total_cols, max_iter, history, engine)
+            except _UnboundedError:
+                raise
+            except (NumericalError, FloatingPointError, OverflowError) as e:
+                if linear_algebra_requested == 'auto':
+                    linear_algebra_used = 'dense'
+                    fallback_reason = f"sparse_lu_failure: {e}"
+                    engine = None
+                    basis = list(range(art_start, art_start + m_total))
+                    history.clear()
+                    xb, y, it1 = _iterate_dense(M, rhs_all, phase_cost, basis, total_cols, max_iter, history)
+                else:
+                    raise
+        else:
+            xb, y, it1 = _iterate_dense(M, rhs_all, phase_cost, basis, total_cols, max_iter, history)
+
         sum_art = float(phase_cost[basis] @ xb)
 
         if sum_art > 1e-8:
             # Model is infeasible! Reconstruct Farkas certificate.
-            # Dual for scaled system:
             y_system = -y * row_signs / row_scale
             y_eq_cand = y_system[:m_eq]
             y_le_cand = y_system[m_eq:]
@@ -584,25 +754,52 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
 
             # Serialize certificate losslessly
             z_serialized = [f'{v.numerator}/{v.denominator}' if isinstance(v, F) else (f'{F(float(v)).numerator}/{F(float(v)).denominator}' if v != 0 else '0') for v in z_cert]
-            return dict(status='INFEASIBLE_CERTIFIED' if cert_ok else 'NUMERICAL_FAILURE',
-                        message='Phase I infeasibility; exact Farkas certificate ' + ('verified' if cert_ok else 'could not be established'),
-                        certificate=[float(v) for v in z_cert],
-                        certificate_exact=z_serialized,
-                        verification=dict(feasible=False, farkas_verified=bool(cert_ok), kkt_passed=False),
-                        farkas_certificate=bool(cert_ok),
-                        algorithm='two-phase primal revised simplex', iterations=it1, history=history)
+            res = dict(status='INFEASIBLE_CERTIFIED' if cert_ok else 'NUMERICAL_FAILURE',
+                       message='Phase I infeasibility; exact Farkas certificate ' + ('verified' if cert_ok else 'could not be established'),
+                       certificate=[float(v) for v in z_cert],
+                       certificate_exact=z_serialized,
+                       verification=dict(feasible=False, farkas_verified=bool(cert_ok), kkt_passed=False),
+                       farkas_certificate=bool(cert_ok),
+                       algorithm='two-phase primal revised simplex', iterations=it1, history=history)
+            _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, M, basis, it1, fallback_reason)
+            return res
 
         # Drive out any remaining zero-valued artificials from the basis
-        for i in range(m_total):
-            if basis[i] >= art_start:
-                row = LU(M[:, basis].T).solve(np.eye(m_total)[i]) @ M[:, :art_start]
-                j = next((j for j in range(art_start) if j not in basis and abs(row[j]) > 1e-10), None)
-                if j is not None:
-                    basis[i] = j
+        if linear_algebra_used == 'sparse' and engine is not None:
+            for i in range(m_total):
+                if basis[i] >= art_start:
+                    e_i = np.zeros(m_total, dtype=float); e_i[i] = 1.0
+                    y_i = engine.btran(e_i)
+                    row = M_csc.extract_columns(range(art_start)).rmatvec(y_i)
+                    j = next((j for j in range(art_start) if j not in basis and abs(row[j]) > 1e-10), None)
+                    if j is not None:
+                        basis[i] = j
+            engine.initialize(M_csc, basis)
+        else:
+            for i in range(m_total):
+                if basis[i] >= art_start:
+                    row = LU(M[:, basis].T).solve(np.eye(m_total)[i]) @ M[:, :art_start]
+                    j = next((j for j in range(art_start) if j not in basis and abs(row[j]) > 1e-10), None)
+                    if j is not None:
+                        basis[i] = j
 
         # Phase II: minimize real objective
         phase2_cost = np.r_[trans.c, np.zeros(m_le + m_total)]
-        xb, y, it2 = _iterate(M, rhs_all, phase2_cost, basis, art_start, max_iter, history)
+        if linear_algebra_used == 'sparse' and engine is not None:
+            try:
+                xb, y, it2 = _iterate_sparse(M_csc, rhs_all, phase2_cost, basis, art_start, max_iter - it1, history, engine)
+            except _UnboundedError:
+                raise
+            except (NumericalError, FloatingPointError, OverflowError) as e:
+                if linear_algebra_requested == 'auto':
+                    linear_algebra_used = 'dense'
+                    fallback_reason = f"sparse_lu_phase2_failure: {e}"
+                    engine = None
+                    xb, y, it2 = _iterate_dense(M, rhs_all, phase2_cost, basis, art_start, max_iter - it1, history)
+                else:
+                    raise
+        else:
+            xb, y, it2 = _iterate_dense(M, rhs_all, phase2_cost, basis, art_start, max_iter - it1, history)
 
         # Reconstruct transformed primal vector t
         t_sol = np.zeros(total_cols, dtype=float)
@@ -629,6 +826,7 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
         if z_exact is not None:
             res_dict['dual_exact'] = [f'{v.numerator}/{v.denominator}' if isinstance(v, F) else str(v) for v in z_exact]
             res_dict['dual_exact_fraction'] = z_exact
+        _attach_telemetry(res_dict, linear_algebra_requested, linear_algebra_used, engine, M, basis, it1 + it2, fallback_reason)
         return res_dict
 
     except _UnboundedError as ue:
@@ -657,7 +855,7 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
             # Independently verify the complete certificate (x0, d) against the original model
             cert = verify_unbounded_certificate(model, x_base, d_orig, tol=tol)
             if cert['verified']:
-                return dict(
+                res = dict(
                     status='UNBOUNDED_CERTIFIED',
                     message='LP is unbounded; recession certificate (x0, d) independently verified',
                     ray=d_orig.tolist(),
@@ -670,24 +868,32 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
                 )
             else:
                 # Certificate failed independent verification — cannot safely certify unboundedness
-                return dict(
+                res = dict(
                     status='NUMERICAL_FAILURE',
                     message=f'Unbounded direction detected but certificate verification failed: {cert["message"]}',
                     ray_verification=cert,
                     algorithm='two-phase primal revised simplex',
                     history=history,
                 )
+            _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, M, basis, len(history), fallback_reason)
+            return res
         except Exception as inner:
-            return dict(status='NUMERICAL_FAILURE',
+            res = dict(status='NUMERICAL_FAILURE',
                         message=f'Unbounded direction detected; ray recovery error: {inner}',
                         algorithm='two-phase primal revised simplex', history=history)
+            _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, M, basis, len(history), fallback_reason)
+            return res
 
     except (NumericalError, FloatingPointError, OverflowError) as e:
         if 'iteration limit' in str(e).lower():
-            return dict(status='LIMIT_REACHED', message='Simplex iteration limit reached',
+            res = dict(status='LIMIT_REACHED', message='Simplex iteration limit reached',
                         algorithm='two-phase primal revised simplex', history=history)
+            _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, M, basis, len(history), fallback_reason)
+            return res
         if scaling:
             # Fallback to unscaled solve if equilibration caused an unsafe basis pivot
-            return solve_lp(model, tol=tol, max_iter=max_iter, scaling=False)
-        return dict(status='NUMERICAL_FAILURE', message=str(e),
+            return solve_lp(model, tol=tol, max_iter=max_iter, scaling=False, linear_algebra=linear_algebra)
+        res = dict(status='NUMERICAL_FAILURE', message=str(e),
                     algorithm='two-phase primal revised simplex', history=history)
+        _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, M, basis, len(history), fallback_reason)
+        return res

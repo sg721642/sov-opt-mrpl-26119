@@ -1,6 +1,6 @@
 # SOV-OPT Solver Status Semantics
 
-**Version:** 0.1.6  
+**Version:** 0.1.7  
 **Applies to:** `sovopt/simplex.py`, `sovopt/milp.py`, `sovopt/qp.py`, `sovopt/pdhg.py`
 
 Every result dict returned by `solve()`, `solve_lp()`, `solve_milp()`, `solve_qp()`,

@@ -16,7 +16,9 @@ SOV-OPT is an original numerical optimization research prototype developed for l
 | Module | Purpose | Sovereign Dependencies |
 |:---|:---|:---|
 | `sovopt/model.py` | Canonical `Model` dataclass: $c$, $A$, row bounds, variable bounds, integer indices, names, objective offset, and maximization flag. Validates finite bounds and cryptographic model fingerprint. | `dataclasses`, `hashlib`, `json`, NumPy |
-| `sovopt/simplex.py` | Two-phase primal revised simplex algorithm with dense LU factorization, Markowitz partial pivoting, iterative refinement, exact rational basis dual solver (`_exact_dual_from_basis`), and Phase I/II ray recovery (`postsolve_ray`). | NumPy, Python `fractions.Fraction` |
+| `sovopt/sparse.py` | Pure NumPy CSRMatrix and CSCMatrix classes supporting matrix-vector and transpose products, column extraction, index sorting, duplicate summing, zero dropping, and coordinate constructors. Zero external dependencies. | NumPy, Python stdlib |
+| `sovopt/sparse_lu.py` | Sovereign sparse LU factorization engine ($P B Q = L U$) with Threshold Markowitz fill-in minimization ($u=0.1$), FTRAN/BTRAN sparse triangular substitution, iterative refinement with platform longdouble precision detection, Product-Form of Inverse (PFI) eta updates, and deterministic refactorization triggers. | NumPy, `dataclasses` |
+| `sovopt/simplex.py` | Two-phase primal revised simplex algorithm supporting both sparse LU (Threshold Markowitz + PFI eta updates) and dense LU backends, iterative refinement, exact rational basis dual solver (`_exact_dual_from_basis`), unbounded recession certificate pairs $(x_0, d)$, and Phase I Farkas ray recovery. | NumPy, Python `fractions.Fraction` |
 | `sovopt/milp.py` | Branch-and-bound mixed-integer linear programming (MILP). Best-bound search queue, most-fractional branching, exact rational Lagrangian lower bounding via `safe_lower_bound`, safe integer leaf fathoming, and exact Farkas infeasibility pruning. | `heapq`, `math`, NumPy, `fractions.Fraction` |
 | `sovopt/qp.py` | Infeasible-start Mehrotra predictor-corrector primal-dual interior point solver for convex quadratic programs: $\min \frac{1}{2} x^T Q x + c^T x$ subject to $l \le A x \le u$. Floating-point eigenvalue inspection. | NumPy |
 | `sovopt/pdhg.py` | Experimental first-order Primal-Dual Hybrid Gradient (PDHG / Chambolle-Pock) solver for continuous linear programs. Supports diagonal step sizes and periodic restart. Contains CPU SpMV and CUDA RawKernel source. | NumPy (CPU); optional CuPy (CUDA) |
@@ -109,13 +111,14 @@ Every solve is evaluated by `sovopt/verify.py` against the **original, untransfo
 |:---|:---|:---:|:---|
 | **Gate 0** | Reproducible baseline & sovereign boundary | **COMPLETED** | Pure NumPy core; no external optimizer imports in `sovopt/`. Initial baseline committed in git history. |
 | **Gate 1** | Mathematical coverage & transformations | **COMPLETED** | Maximization, objective offsets, free variables, box bounds, one-sided bounds, `QUADOBJ` in QPS. Tested via affine transformation recovery to machine precision ($10^{-16}$). |
-| **Gate 2** | Sparse numerical linear algebra | *PLANNED* | Dense LU decomposition with partial pivoting and iterative refinement is implemented. Size limits: 250 variables / 1000 rows (CLI), 100 variables / 150 rows (web). Sparse LU (Markowitz) deferred to compiled core. |
-| **Gate 3** | Robust dual simplex | *PLANNED* | Current LP solver is two-phase primal revised simplex. Re-optimization in B&B uses cold starts. |
-| **Gate 4** | Reversible presolve & scaling | **PARTIAL** | Reversible variable transformations (`sovopt/transforms.py`) and geometric row scaling implemented with exact primal/dual postsolve. Full bound tightening and singleton row elimination planned. |
-| **Gate 5** | Conservative MILP bounds | **COMPLETED** | Exact rational basis dual engine (`_exact_dual_from_basis`), exact rational Farkas certificates, and safe leaf node fathoming. Validated on MIPLIB FLUGPL and MRPL Twin MILP. |
-| **Gate 6** | Convex QP hardening | **COMPLETED** | Mehrotra predictor-corrector interior point method implemented and KKT verified on authentic and MRPL operational QP twin models. |
-| **Gate 7** | GPU acceleration validation | *UNAVAILABLE ON MAC* | CUDA RawKernel source included in `sovopt/pdhg.py`. Apple Silicon hardware lacks NVIDIA CUDA. `gpu_executed` is strictly `false` on all CPU runs; no GPU speedup is claimed without physical NVIDIA hardware. |
-| **Gate 8** | Validated cutting planes | *PLANNED* | Gomory mixed-integer (GMI) and mixed-integer rounding (MIR) cuts planned for future release. |
+| **Gate 2** | Unbounded certificate hardening & provenance consistency | **COMPLETED** | Verified $(x_0, d)$ certificate pairs for unboundedness across all paths; 18-point unit fixture matrix; authoritative Netlib WOODINFE provenance. |
+| **Gate 3** | True sovereign sparse numerical linear algebra | **COMPLETED** | Sovereign pure-NumPy CSR/CSC (`sovopt/sparse.py`), SparseLU with Threshold Markowitz pivoting ($u=0.1$) and FTRAN/BTRAN triangular solves (`sovopt/sparse_lu.py`), PFI eta updates, refactorization triggers, and sparse simplex iteration (`sovopt/simplex.py`). Tested across 28 unit/integration cases in `tests/test_sparse.py` and Netlib benchmarks (AFIRO, SC50A, SC50B, BLEND). |
+| **Gate 4** | Robust dual simplex | *PLANNED* | Current LP solver is two-phase primal revised simplex. Re-optimization in B&B uses cold starts. |
+| **Gate 5** | Reversible presolve & scaling | **PARTIAL** | Reversible variable transformations (`sovopt/transforms.py`) and geometric row scaling implemented with exact primal/dual postsolve. Full bound tightening and singleton row elimination planned. |
+| **Gate 6** | Conservative MILP bounds | **COMPLETED** | Exact rational basis dual engine (`_exact_dual_from_basis`), exact rational Farkas certificates, and safe leaf node fathoming. Validated on MIPLIB FLUGPL and MRPL Twin MILP. |
+| **Gate 7** | Convex QP hardening | **COMPLETED** | Mehrotra predictor-corrector interior point method implemented and KKT verified on authentic and MRPL operational QP twin models. |
+| **Gate 8** | GPU acceleration validation | *UNAVAILABLE ON MAC* | CUDA RawKernel source included in `sovopt/pdhg.py`. Apple Silicon hardware lacks NVIDIA CUDA. `gpu_executed` is strictly `false` on all CPU runs; no GPU speedup is claimed without physical NVIDIA hardware. |
+| **Gate 9** | Validated cutting planes | *PLANNED* | Gomory mixed-integer (GMI) and mixed-integer rounding (MIR) cuts planned for future release. |
 
 ---
 

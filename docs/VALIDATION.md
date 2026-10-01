@@ -9,7 +9,7 @@ This document records the exact procedures for reproducing all numerical benchma
 All commands below assume execution from the project root with the project-local virtual environment active:
 
 ```bash
-# 1. Run full unit and regression test suite (18 tests: 16 passing, 2 integration tests skipped in restricted sandbox)
+# 1. Run full unit and regression test suite (81 tests: 79 passing, 2 integration tests skipped in restricted sandbox)
 .venv/bin/python -m unittest discover -s tests -v
 
 # 2. Run automated report and benchmark generator
@@ -26,29 +26,47 @@ SOVOPT_BENCHMARK_PYTHON=.venv-benchmark/bin/python .venv/bin/python scripts/gene
 
 ## 2. Test Suite Organization
 
-The active test suite is split into two modules:
+The active test suite is split into three modules (81 tests total):
 
-### 2.1 Solver Correctness (\`tests/test_solver.py\`)
-1. **\`test_lu_pivot_refinement_real_basis\`**: Evaluates dense LU factorization residuals ($\le 10^{-10}$) on actual basis matrices from Netlib LP instances (AFIRO, SC50A, BLEND).
-2. **\`test_verified_real_instances\`**: Validates end-to-end revised simplex solutions and KKT conditions against published Netlib MINOS 5.3 reference values for AFIRO, SC50A, SC50B, and BLEND.
-3. **\`test_milib_flugpl_solve_and_lower_bound\`**: Solves MIPLIB FLUGPL to node limit (50 nodes); verifies the conservative rational lower bound is $\ge 769500.0$ and $\le 1201500.0$.
-4. **\`test_infeasible_farkas_certificate_genuine\`**: Tests exact rational Farkas certificate generation and lossless JSON round-trip on a genuine infeasible branch node of FLUGPL.
-5. **\`test_bad_candidate_validation\`**: Challenges the independent verifier (\`sovopt/verify.py\`) with intentionally corrupted and non-feasible vectors on Netlib AFIRO to ensure invalid candidates are strictly rejected.
-6. **\`test_variable_transformations_equiv\`**: Applies an invertible affine transformation ($x = D \tilde{x} + s$) to Netlib AFIRO; confirms postsolve recovers original primal and dual solutions matching KKT conditions to machine precision ($10^{-12}$).
-7. **\`test_pdhg_cpu_convergence\`**: Verifies first-order Primal-Dual Hybrid Gradient convergence on Netlib AFIRO to $-464.75314$ within tolerance.
-8. **\`test_limits_honest_enforcement\`**: Validates that node limits (0 nodes) and iteration limits (1 iteration) trigger honest \`LIMIT_REACHED\` status without fabricating an incumbent.
-9. **\`test_exact_rational_lagrangian_bound\`**: Verifies that exact rational basis duals construct a provably valid lower bound on the FLUGPL LP relaxation node.
-10. **\`test_flugpl_honest_metadata\`**: Enforces mathematical invariants on the FLUGPL branch-and-bound search: valid finite lower bound, strictly respected node budget, and required incumbent feasibility if an incumbent is found.
+### 2.1 Solver Correctness (`tests/test_solver.py` — 45 tests)
+- Core solver tests for LU pivot refinement, verified Netlib instances (AFIRO, SC50A, SC50B, BLEND), FLUGPL MILP lower bounding and Farkas certificate generation, bad candidate rejection, affine coordinate transformations, PDHG first-order convergence, and limits enforcement.
+- `TestUnboundedCertificateHardening` (18 tests): Exhaustive validation of primal-feasible base points $x_0$ and recession directions $d$ for `UNBOUNDED_CERTIFIED` status across unconstrained, constrained, free, shifted, and ranged models.
+- Differential comparison unit tests and MRPL refinery planning twin tests across all 4 operational variants.
 
-### 2.2 Server and Dashboard API (\`tests/test_server.py\`)
-- **\`HandlerUnitTests\`**: Direct in-process testing of the HTTP request handler:
-  - \`test_get_health\`: Validates 200 response and version string.
-  - \`test_get_root_page\`: Validates dashboard HTML serving.
-  - \`test_get_manifest\`: Validates dataset manifest serving.
-  - \`test_get_examples\`: Confirms examples list contains only verified instances.
-  - \`test_post_solve_afiro\`: End-to-end solve request; checks \`model_name\`, \`backend\`, and \`OPTIMAL_VERIFIED\` status.
-  - \`test_post_solve_invalid_payload\`: Confirms 400 error on malformed input.
-- **\`ServerIntegrationTests\`**: Socket-based integration tests connecting over loopback network. (Automatically skipped when loopback sockets are restricted by sandbox policy).
+### 2.2 Server and Dashboard API (`tests/test_server.py` — 8 tests)
+- **`HandlerUnitTests`**: Direct in-process testing of the HTTP request handler (`/health`, `/`, `/api/manifest`, `/api/examples`, `/api/solve`, invalid payloads).
+- **`ServerIntegrationTests`**: Socket-based integration tests connecting over loopback network. (Automatically skipped when loopback sockets are restricted by sandbox policy).
+
+### 2.3 Sparse Numerical Linear Algebra (`tests/test_sparse.py` — 28 tests)
+- Unit and integration tests covering the complete sovereign sparse numerical linear algebra stack:
+  1. CSR matrix construction, storage validation, and shape properties.
+  2. CSC matrix construction and coordinate triplet conversion.
+  3. Sparse matrix-vector product ($A x$).
+  4. Sparse transpose matrix-vector product ($A^T y$).
+  5. Arbitrary sparse column subset basis extraction.
+  6. Deterministic column/row index sorting.
+  7. Duplicate coordinate summation.
+  8. Numerical zero-entry dropping.
+  9. Markowitz fill-in pivot selection scoring.
+  10. Threshold numerical pivot rejection ($u=0.1$).
+  11. Honest singular sparse matrix error detection.
+  12. Sparse LU factorization ($P B Q = L U$) numerical equality.
+  13. Forward sparse solve (FTRAN) residual verification ($\le 10^{-12}$).
+  14. Backward transpose sparse solve (BTRAN) residual verification ($\le 10^{-12}$).
+  15. Exact agreement between sparse and dense solves across random systems.
+  16. Iterative refinement residual improvement and telemetry tracking.
+  17. Single Product-Form of Inverse (PFI) eta basis update.
+  18. Multiple sequential eta basis updates matching direct solves.
+  19. Backward eta sweep (BTRAN) with multiple accumulated eta vectors.
+  20. Forced basis refactorization trigger and state reset.
+  21. Eta-limit refactorization trigger (`ETA_LIMIT`).
+  22. Residual-degradation refactorization trigger (`RESIDUAL_DETERIORATION`).
+  23. Small-pivot near-singular basis refactorization trigger (`SMALL_PIVOT`).
+  24. Sparse primal revised simplex solve on genuine Netlib AFIRO (`OPTIMAL_VERIFIED`).
+  25. Sparse primal revised simplex solve on genuine Netlib SC50A (`OPTIMAL_VERIFIED`).
+  26. Sparse primal revised simplex solve on genuine Netlib SC50B (`OPTIMAL_VERIFIED`).
+  27. Sparse primal revised simplex solve on genuine Netlib BLEND (`OPTIMAL_VERIFIED`).
+  28. Original untransformed model KKT verification after sparse solves across all 4 Netlib instances.
 
 ---
 

@@ -1,5 +1,26 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.1.7] - 2026-10-01
+
+### Gate 3: Sovereign Sparse Numerical Linear Algebra & Basis Engine
+
+- **`sovopt/sparse.py` — Pure NumPy Sparse Matrix Classes:** Implemented sovereign `CSRMatrix` and `CSCMatrix` data structures with zero external dependencies (no `scipy.sparse`):
+  - Row and column slicing, arbitrary column extraction (`extract_columns`).
+  - Sparse matrix-vector product (`matvec`, $A x$) and sparse transpose matrix-vector product (`rmatvec`, $A^T y$).
+  - Coordinate triplet constructors (`csr_from_triplets`, `csc_from_triplets`), coordinate sorting (`sort_indices`), duplicate summation (`sum_duplicates`), and zero value pruning (`drop_zeros`).
+- **`sovopt/sparse_lu.py` — Sovereign Sparse LU & Basis Engine:**
+  - `MarkowitzPivotSelector`: Threshold stability criterion $|a_{ij}| \ge u \cdot \max_k |a_{kj}|$ with $u = 0.1$, fill-in risk minimization $(r_i - 1)(c_j - 1)$, and deterministic tie-breaking.
+  - `SparseLU`: Exact sparse factorization $P B Q = L U$ avoiding dense basis materialization; sparse forward/backward triangular substitution for both FTRAN ($B x = b$) and BTRAN ($B^T y = c$); iterative refinement with dynamic platform longdouble precision detection.
+  - `SparseBasisEngine`: Product-Form of Inverse (PFI) maintaining eta vectors $E_k$; forward eta sweep for FTRAN and backward eta sweep for BTRAN; deterministic refactorization triggers (`INITIAL`, `ETA_LIMIT`, `SMALL_PIVOT`, `RESIDUAL_DETERIORATION`, `FORCED`).
+- **`sovopt/simplex.py` — Sparse Simplex Integration & Telemetry:**
+  - Implemented `_iterate_sparse` utilizing `SparseBasisEngine` with ratio test tie-breaking favoring larger pivot magnitudes for degenerate bases.
+  - Preserved `_iterate_dense` as full-refactorization baseline and fallback.
+  - Added parameter `linear_algebra='auto'|'dense'|'sparse'` to `solve_lp`. In `'auto'` mode, models with $m \ge 25$ automatically use sparse LU with graceful fallback to dense LU upon numerical difficulty.
+  - Attached uniform linear algebra telemetry to all LP return dictionaries (`linear_algebra_requested`, `linear_algebra_used`, `basis_factorization`, `sparse_basis_nnz`, `sparse_basis_density`, `refactorizations`, `eta_updates`, `ftran_count`, `btran_count`, `max_eta_depth`, `iterative_refinement_steps`).
+- **`sovopt/dispatcher.py`:** Updated continuous LP dispatcher rationale to reflect sparse and dense LU refactorization.
+- **`tests/test_sparse.py` — 28-Point Test Matrix:** Added comprehensive unit and integration suite covering all 28 required dimensions of sparse algebra, error recovery, and end-to-end solves on authentic Netlib benchmarks (AFIRO, SC50A, SC50B, BLEND). All internal fixtures labeled `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA`.
+- **`docs/SPARSE_ALGEBRA_AUDIT.md`:** Added Section 6 documenting post-implementation verification, answering "YES" to production sparse LU usage, and tabulating empirical refactorizations and eta updates on genuine Netlib models.
+
 ## [0.1.6] - 2026-10-01
 
 ### Gate 2.2: Provenance and Dataset-Layout Consistency Patch

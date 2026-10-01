@@ -3,51 +3,51 @@
     "status": "OPTIMAL_VERIFIED",
     "objective": -464.75314285714285,
     "best_bound": null,
-    "iterations": 55,
-    "primal_residual": 1.4210854715201802e-14,
-    "dual_residual": 1.7193502857276608e-17,
+    "iterations": 53,
+    "primal_residual": 2.84217094304032e-14,
+    "dual_residual": 2.64338815386942e-18,
     "kkt_passed": true,
-    "seconds": 0.030102750000878586
+    "seconds": 0.027759082999182283
   },
   "sc50a": {
     "status": "OPTIMAL_VERIFIED",
-    "objective": -64.5750770585645,
+    "objective": -64.57507705856449,
     "best_bound": null,
     "iterations": 56,
-    "primal_residual": 5.367434915118819e-16,
+    "primal_residual": 9.662732769316646e-17,
     "dual_residual": 4.0893641093287975e-17,
     "kkt_passed": true,
-    "seconds": 0.05041991600046458
+    "seconds": 0.05336058299872093
   },
   "sc50b": {
     "status": "OPTIMAL_VERIFIED",
-    "objective": -70.0,
+    "objective": -69.99999999999999,
     "best_bound": null,
-    "iterations": 50,
-    "primal_residual": 2.493132406175791e-16,
-    "dual_residual": 3.9650822308041306e-17,
+    "iterations": 54,
+    "primal_residual": 1.5637804363358459e-16,
+    "dual_residual": 2.896988204881268e-17,
     "kkt_passed": true,
-    "seconds": 0.04721925000012561
+    "seconds": 0.0631712909998896
   },
   "blend": {
     "status": "OPTIMAL_VERIFIED",
-    "objective": -30.812149845828237,
+    "objective": -30.812149845828202,
     "best_bound": null,
-    "iterations": 555,
-    "primal_residual": 1.7763568394002473e-15,
-    "dual_residual": 1.227694079519073e-16,
+    "iterations": 321,
+    "primal_residual": 6.343389819255631e-14,
+    "dual_residual": 2.2746869367088913e-15,
     "kkt_passed": true,
-    "seconds": 0.9198250410008768
+    "seconds": 0.4188747919997695
   },
   "flugpl": {
     "status": "LIMIT_REACHED",
     "objective": null,
-    "best_bound": 1173644.9999999998,
+    "best_bound": 1173719.9999999998,
     "iterations": 50,
     "primal_residual": null,
     "dual_residual": null,
     "kkt_passed": null,
-    "seconds": 1.0372873750002327
+    "seconds": 1.1696943750011997
   },
   "afiro_pdhg": {
     "status": "OPTIMAL_VERIFIED",
@@ -56,6 +56,6 @@
     "primal_residual": 8.069888712327982e-09,
     "dual_residual": 5.931405140274168e-08,
     "kkt_passed": true,
-    "seconds": 0.10508750000008149
+    "seconds": 0.10238691700033087
   }
 }
