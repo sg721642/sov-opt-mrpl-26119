@@ -86,7 +86,9 @@ def verify(model, x, z=None, tol=1e-7, check_integer=True):
             dual_sign_violation=dual,
             complementarity=comp,
             relative_duality_gap=gap,
-            kkt_passed=kkt_ok
+            kkt_passed=kkt_ok,
+            kkt_evaluated=True,
+            kkt_status='FULL_KKT_PASSED' if kkt_ok else 'FULL_KKT_FAILED',
         )
     elif len(h) == 0:
         # No inequality constraints: stationarity requires grad == 0 (or bounded box stationarity)
@@ -96,7 +98,14 @@ def verify(model, x, z=None, tol=1e-7, check_integer=True):
             dual_sign_violation=0.0,
             complementarity=0.0,
             relative_duality_gap=0.0,
-            kkt_passed=report['feasible'] and grad_norm <= tol
+            kkt_passed=report['feasible'] and grad_norm <= tol,
+            kkt_evaluated=True,
+            kkt_status='FULL_KKT_PASSED' if (report['feasible'] and grad_norm <= tol) else 'FULL_KKT_FAILED',
+        )
+    else:
+        report.update(
+            kkt_evaluated=False,
+            kkt_status='PRIMAL_FEASIBILITY_ONLY',
         )
 
     return report

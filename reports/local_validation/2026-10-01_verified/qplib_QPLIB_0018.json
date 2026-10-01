@@ -1,0 +1,17 @@
+{
+  "status": "UNSUPPORTED_NONCONVEX_QP",
+  "reason_code": "UNSUPPORTED_NONCONVEX_QP",
+  "probtype": "QCL",
+  "eligibility": "UNSUPPORTED_NONCONVEX_QP",
+  "evidence_source": "SOVOPT_PARSER_GUARD",
+  "sovopt_solve_status": "NOT_ATTEMPTED",
+  "reference_validation_status": "NOT_APPLICABLE",
+  "objective": null,
+  "reference_objective": -6.38601498,
+  "kkt_status": "NOT_APPLICABLE",
+  "reason": "UNSUPPORTED_NONCONVEX_QP",
+  "rejection_verified": true,
+  "solver_generated_x": false,
+  "reference_solution_used_as_initialization": false,
+  "reference_solution_used_in_search": false
+}

@@ -4,6 +4,9 @@
   "nodes": 1,
   "message": "Time limit reached during root LP relaxation",
   "best_bound": -Infinity,
+  "configured_time_limit": 3.0,
+  "measured_runtime": 3.0201767910002673,
+  "deadline_checks": 2,
   "telemetry": {
     "warm_starts_attempted": 0,
     "warm_starts_accepted": 0,
@@ -17,16 +20,17 @@
     "pruned_by_infeasibility": 0,
     "pruned_by_integrality": 0,
     "root_lp_iterations": 0,
-    "root_lp_time": 3.0100460840003507,
-    "root_lp_bound": null
+    "root_lp_time": 3.0071131250006147,
+    "root_lp_bound": null,
+    "deadline_checks": 2
   },
   "model_name": "ran14x18-disj-8",
   "model_sha256": "624355ff313cc7562d4464a965958ac82a8eff757b21c234c3f3d828e5d8feac",
   "solver_version": "0.3.0",
-  "elapsed_seconds": 3.02355662500122,
+  "elapsed_seconds": 3.0200189589995716,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:16:04.269627+00:00",
+  "timestamp_utc": "2026-10-01T21:35:35.222165+00:00",
   "variables": 504,
   "rows": 447,
   "nonzeros": 10277,
@@ -60,8 +64,8 @@
   "linear_algebra_used": "dense",
   "presolve_applied": false,
   "scaling_applied": false,
-  "measured_duration_seconds": 3.023750625001412,
-  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty",
+  "measured_duration_seconds": 3.0201767910002673,
+  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
   "input_mps_sha256": "42c8804fa44742cf94b09238f1f03781ae89b25f6c31902c15ce25c2ba22f1cd",
   "bound_direction_safe": true
 }

@@ -1,0 +1,17 @@
+{
+  "status": "UNSUPPORTED_RESOURCE_LIMIT",
+  "reason_code": "UNSUPPORTED_RESOURCE_LIMIT",
+  "probtype": "DCL",
+  "eligibility": "UNSUPPORTED_RESOURCE_LIMIT",
+  "evidence_source": "SOVOPT_PARSER_GUARD",
+  "sovopt_solve_status": "NOT_ATTEMPTED",
+  "reference_validation_status": "NOT_APPLICABLE",
+  "objective": null,
+  "reference_objective": -35.77945,
+  "kkt_status": "NOT_APPLICABLE",
+  "reason": "Dense Q allocation for n=4001 would require approximately 488.4 MB, exceeding the 250 MB memory guard. Parser raises UNSUPPORTED_RESOURCE_LIMIT before unsafe dense Q allocation.",
+  "rejection_verified": true,
+  "solver_generated_x": false,
+  "reference_solution_used_as_initialization": false,
+  "reference_solution_used_in_search": false
+}

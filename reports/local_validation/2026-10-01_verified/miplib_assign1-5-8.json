@@ -4,6 +4,9 @@
   "nodes": 1,
   "message": "Time limit reached during root LP relaxation",
   "best_bound": -Infinity,
+  "configured_time_limit": 3.0,
+  "measured_runtime": 3.005620750001981,
+  "deadline_checks": 2,
   "telemetry": {
     "warm_starts_attempted": 0,
     "warm_starts_accepted": 0,
@@ -17,16 +20,17 @@
     "pruned_by_infeasibility": 0,
     "pruned_by_integrality": 0,
     "root_lp_iterations": 0,
-    "root_lp_time": 3.0008500420008204,
-    "root_lp_bound": null
+    "root_lp_time": 3.003589291998651,
+    "root_lp_bound": null,
+    "deadline_checks": 2
   },
   "model_name": "assign1-5-8",
   "model_sha256": "c69612d91c6b2e01d7a3427c54969bdfbeedce4008fe5caf9f95aa6f3b8b4e78",
   "solver_version": "0.3.0",
-  "elapsed_seconds": 3.00266025000019,
+  "elapsed_seconds": 3.005554250001296,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:15:26.206305+00:00",
+  "timestamp_utc": "2026-10-01T21:35:03.063307+00:00",
   "variables": 156,
   "rows": 161,
   "nonzeros": 3720,
@@ -60,8 +64,8 @@
   "linear_algebra_used": "dense",
   "presolve_applied": false,
   "scaling_applied": false,
-  "measured_duration_seconds": 3.002708125000936,
-  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty",
+  "measured_duration_seconds": 3.005620750001981,
+  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
   "input_mps_sha256": "cb63a8b3480eaca33562ab4960b0b795604aa520e4241761eae6aa86df30ca6b",
   "bound_direction_safe": true
 }

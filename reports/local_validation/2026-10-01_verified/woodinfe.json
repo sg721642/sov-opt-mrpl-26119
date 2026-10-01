@@ -620,10 +620,10 @@
   "model_name": "WOODINFE",
   "model_sha256": "8fff4510f22cbe4103546c62f82ba530fd1379284b718ed3e78fab813e2182ba",
   "solver_version": "0.3.0",
-  "elapsed_seconds": 0.058030000000144355,
+  "elapsed_seconds": 0.06193325000276673,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:15:10.559345+00:00",
+  "timestamp_utc": "2026-10-01T21:34:47.613274+00:00",
   "variables": 89,
   "rows": 35,
   "nonzeros": 140,
@@ -653,5 +653,5 @@
   "selection_reason": "Continuous LP dispatched to Bounded-Variable Revised Dual Simplex with sparse LU refactorization, Markowitz pivoting, Devex pricing, and exact KKT certification.",
   "fallback_reason": null,
   "exact_farkas_certified": true,
-  "measured_duration_seconds": 0.05806720799955656
+  "measured_duration_seconds": 0.061974915999599034
 }

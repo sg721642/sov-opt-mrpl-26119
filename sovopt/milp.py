@@ -146,6 +146,7 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
         'root_lp_iterations': 0,
         'root_lp_time': 0.0,
         'root_lp_bound': None,
+        'deadline_checks': 0,
     }
 
     # Pseudocost data structures
@@ -157,9 +158,13 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
     # LP solver helper with warm start and fallbacks
     deadline = start_time + time_limit
 
+    def check_deadline() -> bool:
+        telemetry['deadline_checks'] += 1
+        return time.perf_counter() >= deadline
+
     def solve_node_lp(node_model: Model, basis_state: Optional[DualBasisState],
                       max_iter: Optional[int] = None) -> Dict[str, Any]:
-        if time.perf_counter() >= deadline:
+        if check_deadline():
             return {'status': 'LIMIT_REACHED', 'message': 'Time limit reached'}
 
         n_total = len(node_model.A) + len(node_model.c)
@@ -179,7 +184,7 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
                 return res
             telemetry['warm_starts_rejected'] += 1
 
-        if time.perf_counter() >= deadline:
+        if check_deadline():
             return {'status': 'LIMIT_REACHED', 'message': 'Time limit reached'}
 
         # Cold dual simplex solve
@@ -190,7 +195,7 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
             telemetry['cold_start_pivots_total'] += res.get('iterations', 0)
             return res
 
-        if time.perf_counter() >= deadline:
+        if check_deadline():
             return {'status': 'LIMIT_REACHED', 'message': 'Time limit reached'}
 
         # Cold primal simplex fallback
@@ -214,6 +219,9 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
             'nodes': 1,
             'message': 'Root LP relaxation is infeasible',
             'best_bound': math.inf,
+            'configured_time_limit': float(time_limit),
+            'measured_runtime': float(time.perf_counter() - start_time),
+            'deadline_checks': int(telemetry['deadline_checks']),
             'telemetry': telemetry,
         }
 
@@ -224,6 +232,9 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
             'nodes': 1,
             'message': 'Time limit reached during root LP relaxation',
             'best_bound': -math.inf,
+            'configured_time_limit': float(time_limit),
+            'measured_runtime': float(time.perf_counter() - start_time),
+            'deadline_checks': int(telemetry['deadline_checks']),
             'telemetry': telemetry,
         }
 
@@ -234,6 +245,9 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
             'nodes': 1,
             'message': 'Root LP relaxation could not be solved: ' + res_root.get('message', res_root['status']),
             'best_bound': -math.inf,
+            'configured_time_limit': float(time_limit),
+            'measured_runtime': float(time.perf_counter() - start_time),
+            'deadline_checks': int(telemetry['deadline_checks']),
             'telemetry': telemetry,
         }
 
@@ -290,11 +304,11 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
         open_nodes.append(root_node)
 
         # Heuristics at root node
-        if use_heuristics:
+        if use_heuristics and time.perf_counter() < deadline:
             # Safe Rounding Heuristic
             telemetry['heuristics_attempted'] += 1
             can_round = all(abs(x_root[j] - round(x_root[j])) <= 0.4 for j in model.integer)
-            if can_round:
+            if can_round and time.perf_counter() < deadline:
                 x_cand = x_root.copy()
                 round_feasible = True
                 for j in model.integer:
@@ -303,7 +317,7 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
                         round_feasible = False
                         break
                     x_cand[j] = rj
-                if round_feasible:
+                if round_feasible and time.perf_counter() < deadline:
                     lo_fix = lo.copy()
                     hi_fix = hi.copy()
                     for j in model.integer:
@@ -328,51 +342,54 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
                                 })
 
             # Conservative Diving Heuristic from root
-            telemetry['heuristics_attempted'] += 1
-            try:
-                dive_lo = lo.copy()
-                dive_hi = hi.copy()
-                dive_basis = res_root.get('basis_state')
-                dive_x = x_root.copy()
-                dive_success = False
-                for step in range(8):
-                    frac_dive = [j for j in model.integer if abs(dive_x[j] - round(dive_x[j])) > tol]
-                    if not frac_dive:
-                        dive_success = True
-                        break
-                    j_dive = min(frac_dive, key=lambda j: abs(dive_x[j] - round(dive_x[j])))
-                    r_val = round(dive_x[j_dive])
-                    if r_val < dive_lo[j_dive] or r_val > dive_hi[j_dive]:
-                        break
-                    dive_lo[j_dive] = r_val
-                    dive_hi[j_dive] = r_val
-                    m_dive = replace(model, lower=dive_lo, upper=dive_hi, integer=())
-                    res_dive = solve_dual_simplex(m_dive, basis_state=dive_basis, presolve=False,
-                                                  scaling=False, tol=tol, max_iter=50)
-                    if res_dive['status'] != 'OPTIMAL_VERIFIED':
-                        break
-                    dive_x = np.array(res_dive['x'])
-                    dive_basis = res_dive.get('basis_state')
+            if time.perf_counter() < deadline:
+                telemetry['heuristics_attempted'] += 1
+                try:
+                    dive_lo = lo.copy()
+                    dive_hi = hi.copy()
+                    dive_basis = res_root.get('basis_state')
+                    dive_x = x_root.copy()
+                    dive_success = False
+                    for step in range(8):
+                        if time.perf_counter() >= deadline:
+                            break
+                        frac_dive = [j for j in model.integer if abs(dive_x[j] - round(dive_x[j])) > tol]
+                        if not frac_dive:
+                            dive_success = True
+                            break
+                        j_dive = min(frac_dive, key=lambda j: abs(dive_x[j] - round(dive_x[j])))
+                        r_val = round(dive_x[j_dive])
+                        if r_val < dive_lo[j_dive] or r_val > dive_hi[j_dive]:
+                            break
+                        dive_lo[j_dive] = r_val
+                        dive_hi[j_dive] = r_val
+                        m_dive = replace(model, lower=dive_lo, upper=dive_hi, integer=())
+                        res_dive = solve_dual_simplex(m_dive, basis_state=dive_basis, presolve=False,
+                                                      scaling=False, tol=tol, max_iter=50, deadline=deadline)
+                        if res_dive['status'] != 'OPTIMAL_VERIFIED':
+                            break
+                        dive_x = np.array(res_dive['x'])
+                        dive_basis = res_dive.get('basis_state')
 
-                if dive_success:
-                    xr_dive = dive_x.copy()
-                    for j in model.integer:
-                        xr_dive[j] = round(xr_dive[j])
-                    vr_dive = verify(model, xr_dive, tol=tol)
-                    if vr_dive['feasible']:
-                        val_dive = exact_objective(model, xr_dive)
-                        if incval is None or val_dive < incval:
-                            inc = xr_dive
-                            incval = val_dive
-                            telemetry['heuristics_found_incumbent'] += 1
-                            incumbent_history.append({
-                                'node_id': 1,
-                                'objective': float(val_dive),
-                                'source': 'conservative_diving',
-                                'time': time.perf_counter() - start_time,
-                            })
-            except Exception:
-                pass
+                    if dive_success:
+                        xr_dive = dive_x.copy()
+                        for j in model.integer:
+                            xr_dive[j] = round(xr_dive[j])
+                        vr_dive = verify(model, xr_dive, tol=tol)
+                        if vr_dive['feasible']:
+                            val_dive = exact_objective(model, xr_dive)
+                            if incval is None or val_dive < incval:
+                                inc = xr_dive
+                                incval = val_dive
+                                telemetry['heuristics_found_incumbent'] += 1
+                                incumbent_history.append({
+                                    'node_id': 1,
+                                    'objective': float(val_dive),
+                                    'source': 'conservative_diving',
+                                    'time': time.perf_counter() - start_time,
+                                })
+                except Exception:
+                    pass
 
     history: List[Dict[str, Any]] = []
     failure: Optional[str] = None
@@ -436,7 +453,7 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
         if avg_up <= 0.0: avg_up = 1.0
 
         # Strong branching bootstrap on unreliable candidates
-        if use_strong_branching and parent_node.basis_state is not None:
+        if use_strong_branching and parent_node.basis_state is not None and time.perf_counter() < deadline:
             K_reliable = 2
             unreliable = [j for j in fractional_vars if min(down_count[j], up_count[j]) < K_reliable]
             if unreliable:
@@ -444,6 +461,8 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
                 eval_candidates = unreliable[:4]
 
                 for cand_j in eval_candidates:
+                    if time.perf_counter() >= deadline:
+                        break
                     xj = parent_node.x_sol[cand_j]
                     f_down = xj - math.floor(xj)
                     f_up = math.ceil(xj) - xj
@@ -456,11 +475,15 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
                     if lo_d[cand_j] <= hi_d[cand_j]:
                         m_d = replace(model, lower=lo_d, upper=hi_d, integer=())
                         res_d = solve_dual_simplex(m_d, basis_state=parent_node.basis_state,
-                                                   presolve=False, scaling=False, tol=tol, max_iter=50)
+                                                   presolve=False, scaling=False, tol=tol, max_iter=50,
+                                                   deadline=deadline)
                         if res_d['status'] == 'OPTIMAL_VERIFIED':
                             dz = max(0.0, res_d['objective'] - float(parent_node.certified_lp_bound if parent_node.certified_lp_bound != -math.inf else res_d['objective']))
                             down_count[cand_j] += 1
                             down_sum[cand_j] += dz / max(f_down, 1e-4)
+
+                    if time.perf_counter() >= deadline:
+                        break
 
                     # Evaluate up
                     lo_u = parent_node.local_lower_bounds.copy()
@@ -469,7 +492,8 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
                     if lo_u[cand_j] <= hi_u[cand_j]:
                         m_u = replace(model, lower=lo_u, upper=hi_u, integer=())
                         res_u = solve_dual_simplex(m_u, basis_state=parent_node.basis_state,
-                                                   presolve=False, scaling=False, tol=tol, max_iter=50)
+                                                   presolve=False, scaling=False, tol=tol, max_iter=50,
+                                                   deadline=deadline)
                         if res_u['status'] == 'OPTIMAL_VERIFIED':
                             dz = max(0.0, res_u['objective'] - float(parent_node.certified_lp_bound if parent_node.certified_lp_bound != -math.inf else res_u['objective']))
                             up_count[cand_j] += 1
@@ -718,6 +742,9 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
         'incumbent_history': incumbent_history,
         'selection_strategy': 'hybrid best-bound/depth' if node_selection == 'hybrid' else 'best-bound',
         'branching_strategy': 'pseudocost with strong branching bootstrap' if use_pseudocosts else 'most-fractional',
+        'configured_time_limit': float(time_limit),
+        'measured_runtime': float(time.perf_counter() - start_time),
+        'deadline_checks': int(telemetry['deadline_checks']),
     }
     result.update(telemetry)
 

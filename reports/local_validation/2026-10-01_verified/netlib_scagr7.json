@@ -509,7 +509,9 @@
     "dual_residual": 3.895466940924142e-17,
     "dual_sign_violation": 0.0,
     "complementarity": 3.9652442634812093e-17,
-    "relative_duality_gap": 2.4060308070531083e-17
+    "relative_duality_gap": 2.4060308070531083e-17,
+    "kkt_evaluated": true,
+    "kkt_status": "FULL_KKT_PASSED"
   },
   "objective": -2331389.824330984,
   "iterations": 373,
@@ -2659,10 +2661,10 @@
   "model_name": "SCAGR7",
   "model_sha256": "da61ba6a7310825378d9eb9123942e5f86b02136c4dde37fbff863f2578d732a",
   "solver_version": "0.3.0",
-  "elapsed_seconds": 0.8356496250016789,
+  "elapsed_seconds": 0.9130576669995207,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:15:05.232286+00:00",
+  "timestamp_utc": "2026-10-01T21:34:41.861355+00:00",
   "variables": 140,
   "rows": 129,
   "nonzeros": 420,
@@ -2690,7 +2692,7 @@
   },
   "method_selected": "dual-simplex",
   "selection_reason": "Continuous LP dispatched to Bounded-Variable Revised Dual Simplex with sparse LU refactorization, Markowitz pivoting, Devex pricing, and exact KKT certification.",
-  "measured_duration_seconds": 0.8357110420001845,
-  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty",
+  "measured_duration_seconds": 0.9131139170021925,
+  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
   "input_mps_sha256": "30cccee0e5adb619dc0f1ea257b350a3cc407c1212d814249ab2ab6218936bc3"
 }

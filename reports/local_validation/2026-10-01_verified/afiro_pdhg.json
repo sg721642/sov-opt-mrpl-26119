@@ -117,7 +117,9 @@
     "dual_residual": 5.931405140274168e-08,
     "dual_sign_violation": 0.0,
     "complementarity": 1.878545527472409e-09,
-    "relative_duality_gap": 6.70291125794412e-10
+    "relative_duality_gap": 6.70291125794412e-10,
+    "kkt_evaluated": true,
+    "kkt_status": "FULL_KKT_PASSED"
   },
   "iterations": 12000,
   "history": [
@@ -842,15 +844,15 @@
       "relative_gap": 6.70291125794412e-10
     }
   ],
-  "setup_seconds": 8.975000309874304e-05,
-  "iteration_and_verification_seconds": 0.10849950000192621,
+  "setup_seconds": 0.00010816700159921311,
+  "iteration_and_verification_seconds": 0.11679750000257627,
   "gpu_executed": false,
   "model_name": "AFIRO",
   "model_sha256": "1f08328913d4bdf2204f2e1e6cd6e5c224f1ea237ab78f95cb5da2f74165154e",
   "solver_version": "0.3.0",
-  "elapsed_seconds": 0.10906362499736133,
+  "elapsed_seconds": 0.11740866599939181,
   "backend": "pdhg-cpu",
-  "timestamp_utc": "2026-10-01T21:15:10.500226+00:00",
+  "timestamp_utc": "2026-10-01T21:34:47.548150+00:00",
   "variables": 32,
   "rows": 27,
   "nonzeros": 83,
@@ -884,6 +886,6 @@
   "linear_algebra_used": "pdhg",
   "presolve_applied": false,
   "scaling_applied": false,
-  "measured_duration_seconds": 0.10911966699859477,
-  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty"
+  "measured_duration_seconds": 0.11747279200062621,
+  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty"
 }

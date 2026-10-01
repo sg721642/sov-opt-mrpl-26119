@@ -1,0 +1,18 @@
+{
+  "status": "STRUCTURE_VERIFIED",
+  "probtype": "DCL",
+  "eligibility": "SUPPORTED_AND_SELECTED",
+  "evidence_source": "SOVOPT_STRUCTURAL_PARSER",
+  "sovopt_solve_status": "NOT_ATTEMPTED",
+  "reference_validation_status": "NOT_AVAILABLE",
+  "objective": null,
+  "reference_objective": null,
+  "kkt_status": "NOT_APPLICABLE",
+  "reason": "Continuous convex QP structure verified within declared envelope; solve deferred pending sparse QP support",
+  "variables": 2890,
+  "constraints": 1649,
+  "quadratic_terms": 2890,
+  "solver_generated_x": false,
+  "reference_solution_used_as_initialization": false,
+  "reference_solution_used_in_search": false
+}

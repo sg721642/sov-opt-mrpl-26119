@@ -378,7 +378,9 @@
     "dual_residual": 0.0038582399020682663,
     "dual_sign_violation": 0.0,
     "complementarity": 1.6913294309423929e-15,
-    "relative_duality_gap": 2.6904938176398194e-17
+    "relative_duality_gap": 2.6904938176398194e-17,
+    "kkt_evaluated": true,
+    "kkt_status": "FULL_KKT_FAILED"
   },
   "objective": -401.89720159708753,
   "iterations": 130,
@@ -1807,10 +1809,10 @@
   "model_name": "SHARE2B",
   "model_sha256": "fd0748ab2afd117fd9d95aab9498aa5b8907096e98735e897f402c2e1a6c2705",
   "solver_version": "0.3.0",
-  "elapsed_seconds": 0.2513514159982151,
+  "elapsed_seconds": 0.25762645899885683,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:15:08.041976+00:00",
+  "timestamp_utc": "2026-10-01T21:34:44.920020+00:00",
   "variables": 79,
   "rows": 96,
   "nonzeros": 694,
@@ -1839,7 +1841,7 @@
   "method_selected": "dual-simplex",
   "selection_reason": "Continuous LP dispatched to Bounded-Variable Revised Dual Simplex with sparse LU refactorization, Markowitz pivoting, Devex pricing, and exact KKT certification.",
   "fallback_reason": null,
-  "measured_duration_seconds": 0.2514029580015631,
-  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty",
+  "measured_duration_seconds": 0.2576779169976362,
+  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
   "input_mps_sha256": "b861a8d9711956007c0419f956d29e78f20d12aac5b2c65d1a85a88468423754"
 }

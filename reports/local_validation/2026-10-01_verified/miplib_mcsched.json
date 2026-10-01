@@ -4,6 +4,9 @@
   "nodes": 1,
   "message": "Time limit reached during root LP relaxation",
   "best_bound": -Infinity,
+  "configured_time_limit": 3.0,
+  "measured_runtime": 4.41048475000207,
+  "deadline_checks": 2,
   "telemetry": {
     "warm_starts_attempted": 0,
     "warm_starts_accepted": 0,
@@ -17,16 +20,17 @@
     "pruned_by_infeasibility": 0,
     "pruned_by_integrality": 0,
     "root_lp_iterations": 0,
-    "root_lp_time": 4.288647708999633,
-    "root_lp_bound": null
+    "root_lp_time": 4.235205416000099,
+    "root_lp_bound": null,
+    "deadline_checks": 2
   },
   "model_name": "mcsched",
   "model_sha256": "44e0601b9cf52ba866b70824e74e81449913820afddc88583b40227e8f5cf532",
   "solver_version": "0.3.0",
-  "elapsed_seconds": 4.463369834000332,
+  "elapsed_seconds": 4.408759250000003,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:17:28.274080+00:00",
+  "timestamp_utc": "2026-10-01T21:36:21.538607+00:00",
   "variables": 1747,
   "rows": 2107,
   "nonzeros": 8088,
@@ -60,8 +64,8 @@
   "linear_algebra_used": "dense",
   "presolve_applied": false,
   "scaling_applied": false,
-  "measured_duration_seconds": 4.465110832999926,
-  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty",
+  "measured_duration_seconds": 4.41048475000207,
+  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
   "input_mps_sha256": "39c18a78edecfde12f10f4baf958986d9de827a030c6b25d0d86f46a2ebf4d3a",
   "bound_direction_safe": true
 }

@@ -2,6 +2,27 @@
 
 ## [0.3.0] - 2026-10-02
 
+### Gate 7.1: QPLIB Evidence Integrity Repair & Benchmark Semantics
+
+- **Reference Solution Evidence Separation:**
+  - Segregated published/reference solution files (`.sol`) from sovereign solver results across all benchmark suites.
+  - Reference files are strictly restricted to `REFERENCE_OBJECTIVE_VALIDATION` and `REFERENCE_SOLUTION_FEASIBILITY_VALIDATION`.
+  - For `QPLIB_8845`, sovereign `solve_qp` runs independently (`status = LIMIT_REACHED` due to 490 equality constraints closing relative interior); reference solution is labelled `status = REFERENCE_SOLUTION_VALIDATED`, `evidence_source = QPLIB_PUBLISHED_SOLUTION`, `kkt_status = PRIMAL_FEASIBILITY_ONLY`.
+  - Gate 7 is honestly marked **PARTIAL** in reports and audits because no authentic QPLIB convex QP is currently solved to optimality by SOV-OPT itself.
+- **KKT Semantics Audit (`sovopt/verify.py`):**
+  - Primal-only verification without dual multipliers $z$ sets `kkt_evaluated = False` and `kkt_status = 'PRIMAL_FEASIBILITY_ONLY'`.
+  - Full KKT is only claimed when dual feasibility, stationarity, and complementarity are actually evaluated.
+- **Benchmark Manifest Amendments (`reports/BENCHMARK_MANIFEST_AMENDMENTS.md`):**
+  - Formally logged the post-freeze capability reclassification of `QPLIB_8938` from `is_supported: true` to `is_supported: false` (`UNSUPPORTED_RESOURCE_LIMIT`).
+  - Recorded original SHA-256 (`8d4b...`) and amended SHA-256 (`8cfc...`), retaining instance visibility in all reports.
+- **Netlib Count Consistency:**
+  - Programmatically asserted Netlib LP status counts: exactly 9 `OPTIMAL_VERIFIED` + 7 `NUMERICAL_FAILURE` = 16 candidate instances.
+- **Nested Time Limit Propagation (`sovopt/milp.py`):**
+  - Hardened global deadline checks across `solve_node_lp`, strong branching evaluations, and heuristic diving loops.
+  - Verified `sp150x300d` runtime dropped from 37s to 4.2s with `LIMIT_REACHED`.
+- **12-Point Regression Test Suite (`tests/test_gate7_1.py`):**
+  - Added 12 rigorous tests verifying evidence separation, reference solution labelling, primal-only KKT semantics, manifest amendment documentation, Netlib count consistency, and nested deadline propagation.
+
 ### Gate 7: Real QPLIB Support + Expanded Public Benchmark Suite
 
 - **`sovopt/qplib.py` — Sovereign Native QPLIB 2018 Parser:**

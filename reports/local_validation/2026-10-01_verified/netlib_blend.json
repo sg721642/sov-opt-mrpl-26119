@@ -375,7 +375,9 @@
     "dual_residual": 2.360145954275455e-15,
     "dual_sign_violation": 0.0,
     "complementarity": 2.753729629087546e-15,
-    "relative_duality_gap": 5.247381116821256e-17
+    "relative_duality_gap": 5.247381116821256e-17,
+    "kkt_evaluated": true,
+    "kkt_status": "FULL_KKT_PASSED"
   },
   "objective": -30.812149845828237,
   "iterations": 119,
@@ -1720,10 +1722,10 @@
   "model_name": "BLEND",
   "model_sha256": "b7f520aecdb4384d4516752f266bfc5f3897045a610edb01cc1a94a9cd36f6a2",
   "solver_version": "0.3.0",
-  "elapsed_seconds": 0.2177797920012381,
+  "elapsed_seconds": 0.23263529199903132,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:14:53.108252+00:00",
+  "timestamp_utc": "2026-10-01T21:34:29.074655+00:00",
   "variables": 83,
   "rows": 74,
   "nonzeros": 491,
@@ -1752,7 +1754,7 @@
   "method_selected": "dual-simplex",
   "selection_reason": "Continuous LP dispatched to Bounded-Variable Revised Dual Simplex with sparse LU refactorization, Markowitz pivoting, Devex pricing, and exact KKT certification.",
   "fallback_reason": null,
-  "measured_duration_seconds": 0.2178315829987696,
-  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty",
+  "measured_duration_seconds": 0.23269237500062445,
+  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
   "input_mps_sha256": "c8bb193f8af5dcff735a3b8db62077db93625e93cfb26e2b01f83ca3039cbf7d"
 }

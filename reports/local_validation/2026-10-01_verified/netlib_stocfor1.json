@@ -537,7 +537,9 @@
     "dual_residual": 0.25044074622963103,
     "dual_sign_violation": 0.0,
     "complementarity": 0.09213823546647959,
-    "relative_duality_gap": 0.07689983514132286
+    "relative_duality_gap": 0.07689983514132286,
+    "kkt_evaluated": true,
+    "kkt_status": "FULL_KKT_FAILED"
   },
   "objective": -41131.976219436416,
   "iterations": 138,
@@ -2036,10 +2038,10 @@
   "model_name": "STOCFOR1",
   "model_sha256": "210b20d61bbf06f254dbd84a93b2384ac2f8b2cf08620723e0840020757ae783",
   "solver_version": "0.3.0",
-  "elapsed_seconds": 0.2770175419973384,
+  "elapsed_seconds": 0.2832517499991809,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:15:08.384398+00:00",
+  "timestamp_utc": "2026-10-01T21:34:45.273813+00:00",
   "variables": 111,
   "rows": 117,
   "nonzeros": 447,
@@ -2068,7 +2070,7 @@
   "method_selected": "dual-simplex",
   "selection_reason": "Continuous LP dispatched to Bounded-Variable Revised Dual Simplex with sparse LU refactorization, Markowitz pivoting, Devex pricing, and exact KKT certification.",
   "fallback_reason": null,
-  "measured_duration_seconds": 0.27706920800119406,
-  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty",
+  "measured_duration_seconds": 0.28330225000172504,
+  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
   "input_mps_sha256": "a7996944d096c3cd74ca7cbeeb77e75804bcaaaba17620dba86108555912b4c3"
 }

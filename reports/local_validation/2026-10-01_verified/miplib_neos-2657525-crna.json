@@ -4,6 +4,9 @@
   "nodes": 1,
   "message": "Time limit reached during root LP relaxation",
   "best_bound": -Infinity,
+  "configured_time_limit": 3.0,
+  "measured_runtime": 3.0160287500002596,
+  "deadline_checks": 2,
   "telemetry": {
     "warm_starts_attempted": 0,
     "warm_starts_accepted": 0,
@@ -17,16 +20,17 @@
     "pruned_by_infeasibility": 0,
     "pruned_by_integrality": 0,
     "root_lp_iterations": 0,
-    "root_lp_time": 3.0394050419999985,
-    "root_lp_bound": null
+    "root_lp_time": 3.006880083001306,
+    "root_lp_bound": null,
+    "deadline_checks": 2
   },
   "model_name": "neos-2657525-crna",
   "model_sha256": "c02c1971987f43ef13002e857106044d08ad7b481d52706458766877ae0cdb0f",
   "solver_version": "0.3.0",
-  "elapsed_seconds": 3.048632666999765,
+  "elapsed_seconds": 3.0158901250033523,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:16:10.374109+00:00",
+  "timestamp_utc": "2026-10-01T21:35:41.296725+00:00",
   "variables": 524,
   "rows": 342,
   "nonzeros": 1690,
@@ -60,8 +64,8 @@
   "linear_algebra_used": "dense",
   "presolve_applied": false,
   "scaling_applied": false,
-  "measured_duration_seconds": 3.0487697919998027,
-  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty",
+  "measured_duration_seconds": 3.0160287500002596,
+  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
   "input_mps_sha256": "31a5a4880f97d3844a273b57221e88a6491bb392b1185290548d9f18b17402eb",
   "bound_direction_safe": true
 }

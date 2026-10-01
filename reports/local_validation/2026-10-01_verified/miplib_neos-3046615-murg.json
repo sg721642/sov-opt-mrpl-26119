@@ -4,6 +4,9 @@
   "nodes": 1,
   "message": "Time limit reached during root LP relaxation",
   "best_bound": -Infinity,
+  "configured_time_limit": 3.0,
+  "measured_runtime": 3.0102014580006653,
+  "deadline_checks": 2,
   "telemetry": {
     "warm_starts_attempted": 0,
     "warm_starts_accepted": 0,
@@ -17,16 +20,17 @@
     "pruned_by_infeasibility": 0,
     "pruned_by_integrality": 0,
     "root_lp_iterations": 0,
-    "root_lp_time": 3.002100249999785,
-    "root_lp_bound": null
+    "root_lp_time": 3.0028982920011913,
+    "root_lp_bound": null,
+    "deadline_checks": 2
   },
   "model_name": "neos-3046615-murg",
   "model_sha256": "234ac906d1e2edeb922677cd34983ef2ddbf59e616f8b1d2c3d092854f5e4393",
   "solver_version": "0.3.0",
-  "elapsed_seconds": 3.009132415998465,
+  "elapsed_seconds": 3.0100881250000384,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:15:46.158064+00:00",
+  "timestamp_utc": "2026-10-01T21:35:23.019575+00:00",
   "variables": 274,
   "rows": 498,
   "nonzeros": 1266,
@@ -60,8 +64,8 @@
   "linear_algebra_used": "dense",
   "presolve_applied": false,
   "scaling_applied": false,
-  "measured_duration_seconds": 3.009237333000783,
-  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty",
+  "measured_duration_seconds": 3.0102014580006653,
+  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
   "input_mps_sha256": "d8bfe7f051fdf60fdd27c0c5e7e6286729561275f13d87e2f71b1e78b19ccaf5",
   "bound_direction_safe": true
 }

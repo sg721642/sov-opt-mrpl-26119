@@ -4,6 +4,9 @@
   "nodes": 1,
   "message": "Time limit reached during root LP relaxation",
   "best_bound": -Infinity,
+  "configured_time_limit": 3.0,
+  "measured_runtime": 3.0416694170016854,
+  "deadline_checks": 2,
   "telemetry": {
     "warm_starts_attempted": 0,
     "warm_starts_accepted": 0,
@@ -17,16 +20,17 @@
     "pruned_by_infeasibility": 0,
     "pruned_by_integrality": 0,
     "root_lp_iterations": 0,
-    "root_lp_time": 3.017435708999983,
-    "root_lp_bound": null
+    "root_lp_time": 3.0149751249991823,
+    "root_lp_bound": null,
+    "deadline_checks": 2
   },
   "model_name": "gmu-35-40",
   "model_sha256": "897a4b61c2e48186ee141839c5e830daefd8fea6e7851e2ded96c1256e23d54b",
   "solver_version": "0.3.0",
-  "elapsed_seconds": 3.0440522499993676,
+  "elapsed_seconds": 3.041345541998453,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:17:06.065276+00:00",
+  "timestamp_utc": "2026-10-01T21:36:04.102543+00:00",
   "variables": 1205,
   "rows": 424,
   "nonzeros": 4843,
@@ -60,8 +64,8 @@
   "linear_algebra_used": "dense",
   "presolve_applied": false,
   "scaling_applied": false,
-  "measured_duration_seconds": 3.0443680419994052,
-  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty",
+  "measured_duration_seconds": 3.0416694170016854,
+  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
   "input_mps_sha256": "c0ae69e1cddf62318987abb2f4fdab189b3c84374e168c532ab4d917d0753895",
   "bound_direction_safe": true
 }

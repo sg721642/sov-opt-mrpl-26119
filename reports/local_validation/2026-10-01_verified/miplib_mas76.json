@@ -4,6 +4,9 @@
   "nodes": 1,
   "message": "Time limit reached during root LP relaxation",
   "best_bound": -Infinity,
+  "configured_time_limit": 3.0,
+  "measured_runtime": 1.6344225840002764,
+  "deadline_checks": 2,
   "telemetry": {
     "warm_starts_attempted": 0,
     "warm_starts_accepted": 0,
@@ -17,16 +20,17 @@
     "pruned_by_infeasibility": 0,
     "pruned_by_integrality": 0,
     "root_lp_iterations": 0,
-    "root_lp_time": 1.6323451249991194,
-    "root_lp_bound": null
+    "root_lp_time": 1.6336697500009905,
+    "root_lp_bound": null,
+    "deadline_checks": 2
   },
   "model_name": "mas76",
   "model_sha256": "2df67fcdd916aba2cf9e4f2791a4118c5b72dcddfd57381160a49b4426a4a52e",
   "solver_version": "0.3.0",
-  "elapsed_seconds": 1.633132666000165,
+  "elapsed_seconds": 1.6343858750005893,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:15:23.200118+00:00",
+  "timestamp_utc": "2026-10-01T21:35:00.054203+00:00",
   "variables": 151,
   "rows": 12,
   "nonzeros": 1640,
@@ -60,8 +64,8 @@
   "linear_algebra_used": "dense",
   "presolve_applied": false,
   "scaling_applied": false,
-  "measured_duration_seconds": 1.6331749169985414,
-  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty",
+  "measured_duration_seconds": 1.6344225840002764,
+  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
   "input_mps_sha256": "114b73dbe17c1d1b4d37a09311424571781225e01edfbec1c6acb320214593f6",
   "bound_direction_safe": true
 }
