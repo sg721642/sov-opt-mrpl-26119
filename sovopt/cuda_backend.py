@@ -4,12 +4,53 @@ Uses CuPy exclusively for GPU memory management and runtime dispatch.
 Core linear algebra is executed via an explicit custom RawKernel SpMV.
 Truthfully reports CUDA availability and hardware capabilities.
 Strictly returns CUDA_UNAVAILABLE on Apple Silicon and non-CUDA environments.
+
+Environment setup: CUDA_PATH is auto-detected from the conda environment
+Library directory (Library/include/cuda.h) so that CuPy can compile
+RawKernel JIT kernels without requiring a system-level CUDA toolkit install.
 """
 
+import os
 import sys
+
+
+def _ensure_cuda_path():
+    """Auto-detect and set CUDA_PATH if it is not already set.
+
+    CuPy's RawKernel JIT compilation requires CUDA toolkit headers.
+    In conda environments, these are installed under Library/include/cuda.h.
+    This function finds and sets CUDA_PATH so CuPy can locate them.
+    """
+    if os.environ.get("CUDA_PATH"):
+        return  # Already set by user or environment
+
+    # Strategy 1: check relative to the running Python executable
+    try:
+        import sys
+        python_dir = os.path.dirname(sys.executable)
+        # In conda envs, Library/ is sibling to Scripts/ (Windows) or bin/
+        for candidate in [
+            os.path.join(python_dir, "Library"),
+            os.path.join(python_dir, "..", "Library"),
+            os.path.join(python_dir, "..", "..", "Library"),
+        ]:
+            candidate = os.path.normpath(candidate)
+            if os.path.isfile(os.path.join(candidate, "include", "cuda.h")):
+                os.environ["CUDA_PATH"] = candidate
+                # Also add Library/bin to PATH so DLLs (nvJitLink etc.) are found
+                lib_bin = os.path.join(candidate, "bin")
+                if os.path.isdir(lib_bin):
+                    current_path = os.environ.get("PATH", "")
+                    if lib_bin not in current_path:
+                        os.environ["PATH"] = lib_bin + os.pathsep + current_path
+                return
+    except Exception:
+        pass
+
 
 def is_cuda_available():
     """Return True if CuPy and at least one CUDA-capable GPU are accessible."""
+    _ensure_cuda_path()
     try:
         import cupy as cp
         return cp.cuda.runtime.getDeviceCount() > 0
@@ -18,6 +59,7 @@ def is_cuda_available():
 
 def get_device_info():
     """Return detailed metadata about CUDA runtime and hardware, or empty if unavailable."""
+    _ensure_cuda_path()
     if not is_cuda_available():
         return {
             "cuda_available": False,
@@ -75,7 +117,12 @@ extern "C" __global__ void spmv(const int* p, const int* j, const double* a,
 '''
 
 class CUDACSR:
-    """Device CSR matrix representation with sovereign RawKernel SpMV."""
+    """Device CSR matrix representation with sovereign RawKernel SpMV.
+
+    Row pointer p, column indices j, and values a must be in CSR format:
+    entries must be grouped by row (i.e., COO (r,j,a) sorted by row before
+    computing bincount-based row pointer).
+    """
 
     def __init__(self, p, j, a, shape, kernel, xp):
         self.xp = xp
@@ -101,6 +148,7 @@ class CUDABackend:
     """NVIDIA CUDA execution backend for restarted preconditioned PDHG."""
 
     def __init__(self):
+        _ensure_cuda_path()
         if not is_cuda_available():
             raise RuntimeError("CUDA is not available on this machine.")
         import cupy as cp

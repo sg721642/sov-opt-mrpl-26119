@@ -81,12 +81,23 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
     if cuda is not None:
         r_G, j_G = np.nonzero(G)
         a_G = G[r_G, j_G]
-        p_G = np.r_[0, np.cumsum(np.bincount(r_G, minlength=m))]
+        # Sort COO by row before building CSR row pointer; without this, p
+        # describes grouped rows while j_G/a_G remain in column-major COO
+        # order, causing the custom RawKernel SpMV to produce wrong results.
+        ord_G = np.argsort(r_G, kind="stable")
+        r_G = r_G[ord_G].astype(np.int32)
+        j_G = j_G[ord_G].astype(np.int32)
+        a_G = a_G[ord_G].astype(np.float64)
+        p_G = np.r_[0, np.cumsum(np.bincount(r_G, minlength=m))].astype(np.int32)
         A = cuda.build_csr(p_G, j_G, a_G, (m, n))
 
         r_GT, j_GT = np.nonzero(G.T)
         a_GT = G.T[r_GT, j_GT]
-        p_GT = np.r_[0, np.cumsum(np.bincount(r_GT, minlength=n))]
+        ord_GT = np.argsort(r_GT, kind="stable")
+        r_GT = r_GT[ord_GT].astype(np.int32)
+        j_GT = j_GT[ord_GT].astype(np.int32)
+        a_GT = a_GT[ord_GT].astype(np.float64)
+        p_GT = np.r_[0, np.cumsum(np.bincount(r_GT, minlength=n))].astype(np.int32)
         AT = cuda.build_csr(p_GT, j_GT, a_GT, (n, m))
     else:
         A = CSRMatrix(G)

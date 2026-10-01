@@ -46,13 +46,24 @@ def run_preflight(output_path=None):
             import numpy as np
             m, n, nnz = 1000, 1000, 5000
             np.random.seed(42)
-            r = np.random.randint(0, m, nnz)
-            j = np.random.randint(0, n, nnz)
-            a = np.random.randn(nnz)
-            p = np.r_[0, np.cumsum(np.bincount(r, minlength=m))]
-            x = np.random.randn(n)
+            r = np.random.randint(0, m, nnz).astype(np.int32)
+            j = np.random.randint(0, n, nnz).astype(np.int32)
+            a = np.random.randn(nnz).astype(np.float64)
 
-            csr = backend.build_csr(p, j, a, (m, n))
+            # CRITICAL: sort COO entries by row before building CSR row pointer.
+            # Without this, p describes grouped rows while j/a are in random COO
+            # order, causing incorrect SpMV results.
+            order = np.argsort(r, kind="stable")
+            r_sorted = r[order]
+            j_sorted = j[order]
+            a_sorted = a[order]
+
+            # Build CSR row pointer from sorted row indices
+            p = np.r_[0, np.cumsum(np.bincount(r_sorted, minlength=m))].astype(np.int32)
+
+            x = np.random.randn(n).astype(np.float64)
+
+            csr = backend.build_csr(p, j_sorted, a_sorted, (m, n))
             x_dev = backend.asarray(x)
             backend.synchronize()
 
@@ -63,8 +74,9 @@ def run_preflight(output_path=None):
             spmv_time = (time.perf_counter() - t0) / 50.0
 
             out_cpu = backend.to_cpu(out)
-            ref_cpu = np.zeros(m)
-            np.add.at(ref_cpu, r, a * x[j])
+            # Reference: compute using sorted COO representation
+            ref_cpu = np.zeros(m, dtype=np.float64)
+            np.add.at(ref_cpu, r_sorted, a_sorted * x[j_sorted])
             max_err = float(np.max(np.abs(out_cpu - ref_cpu)))
 
             mem_stats = backend.get_memory_stats()
@@ -81,7 +93,16 @@ def run_preflight(output_path=None):
                 "error": str(e),
             }
 
-    status_str = "NVIDIA_CUDA_READY" if (cuda_ok and micro_test and micro_test.get("passed")) else "CUDA_UNAVAILABLE"
+    # Three distinct status states:
+    # CUDA_UNAVAILABLE   : no physical CUDA device detected
+    # CUDA_SPMV_FAILED   : CUDA device present but sparse GPU validation failed
+    # NVIDIA_CUDA_READY  : CUDA device present and sparse GPU validation passed
+    if not cuda_ok:
+        status_str = "CUDA_UNAVAILABLE"
+    elif micro_test is None or not micro_test.get("passed"):
+        status_str = "CUDA_SPMV_FAILED"
+    else:
+        status_str = "NVIDIA_CUDA_READY"
 
     report = {
         "timestamp_utc": ts,
@@ -126,8 +147,11 @@ def main():
             print(f" GPU Device       : {dev.get('device_name')} (CC {dev.get('compute_capability')})")
             print(f" VRAM Total       : {dev.get('total_memory_bytes', 0) / (1024**3):.2f} GB")
             if report['micro_spmv_test']:
-                print(f" Micro SpMV Test  : {'PASSED' if report['micro_spmv_test']['passed'] else 'FAILED'}")
-                print(f" SpMV Latency     : {report['micro_spmv_test'].get('avg_spmv_microseconds', 0):.2f} us")
+                mt = report['micro_spmv_test']
+                print(f" Micro SpMV Test  : {'PASSED' if mt['passed'] else 'FAILED'}")
+                if mt.get('max_discrepancy') is not None:
+                    print(f" Max Discrepancy  : {mt['max_discrepancy']:.2e}")
+                print(f" SpMV Latency     : {mt.get('avg_spmv_microseconds', 0):.2f} us")
         else:
             print(" Host Diagnostics : No NVIDIA CUDA runtime detected (CPU-only execution).")
         print(f" Saved report to  : {args.output}")

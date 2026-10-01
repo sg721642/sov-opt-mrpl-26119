@@ -1,0 +1,30 @@
+# SOV-OPT .gitattributes
+# Prevent CRLF line-ending conversion for benchmark data files.
+# These files must remain byte-stable across Windows/macOS so that
+# SHA256 provenance values recorded in the manifests remain valid.
+
+# Benchmark data formats — never apply CRLF conversion
+*.mps       -text
+*.qplib     -text
+*.sol       -text
+*.lp        -text
+
+# Manifest JSON files — binary-safe to preserve canonical SHA256 provenance
+data/manifests/*.json  -text
+
+# Verified / catalogue data
+data/verified/*        -text
+data/netlib/*          -text
+data/qplib/*           -text
+data/miplib/*          -text
+data/certificate_validation/* -text
+
+# Normal text files — use system default (CRLF on Windows, LF elsewhere)
+*.py    text eol=lf
+*.md    text eol=lf
+*.json  text eol=lf
+*.html  text eol=lf
+*.sh    text eol=lf
+
+# Exception: manifest JSON files are already covered above with -text
+# The wildcard *.json rule below is overridden by the more specific rule above

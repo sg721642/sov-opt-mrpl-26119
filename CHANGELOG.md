@@ -1,5 +1,47 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.3] - 2026-10-02
+
+### Gate 8 Phase B: Physical RTX 5050 CUDA Validation
+
+- **fix(gpu): Correct CUDA sparse preflight validation (`scripts/gpu_preflight.py`):**
+  - Fixed mathematically incorrect CSR construction: COO entries (r, j, a) are now sorted
+    stably by row index before building the `bincount`-based row pointer `p`. Without this
+    sort, `p` described grouped rows while `j` and `a` remained in random COO order, causing
+    the custom RawKernel SpMV to produce wrong results (previously: max_discrepancy ~18).
+  - Corrected preflight status semantics: introduced three distinct states:
+    - `CUDA_UNAVAILABLE`: no physical CUDA device detected.
+    - `CUDA_SPMV_FAILED`: CUDA device present but sparse GPU validation failed.
+    - `NVIDIA_CUDA_READY`: CUDA device present and sparse GPU validation passed.
+    Previously, `CUDA_SPMV_FAILED` was incorrectly mapped to `CUDA_UNAVAILABLE`.
+  - All CSR types are explicit: `p` → int32, `j` → int32, `a` → float64, `x` → float64.
+  - Enhanced console output to display `Max Discrepancy`.
+
+- **fix(gpu): Correct CUDA CSR construction in PDHG solver (`sovopt/pdhg.py`):**
+  - Applied the same COO-sort fix to both `A` (G matrix) and `A^T` (G transposed) CSR
+    construction in `solve_pdhg`. Both now sort by row index before building row pointers.
+  - All types are explicit: `r`, `j` cast to int32; `a` cast to float64; `p` is int32.
+
+- **fix(gpu): Auto-detect CUDA_PATH in conda environments (`sovopt/cuda_backend.py`):**
+  - Added `_ensure_cuda_path()` which automatically locates the conda environment's CUDA
+    toolkit headers (Library/include/cuda.h) and sets CUDA_PATH + Library/bin in PATH,
+    enabling CuPy RawKernel JIT compilation without a system-level CUDA toolkit install.
+  - Called before all CuPy operations in `is_cuda_available()`, `get_device_info()`,
+    and `CUDABackend.__init__()`.
+  - Added docstring to CUDACSR noting the CSR row-sorted invariant.
+
+- **test: Gate 8 Phase B regression test suite (`tests/test_gpu_phase_b.py` — 16 tests):**
+  - `TestPreflightCSRConstruction`: Verifies correct CSR row-sorted construction.
+  - `TestPreflightStatusSemantics`: Validates all three preflight status states.
+  - `TestCUDACSRSpMVCorrectness` (CUDA-only, skips on non-CUDA): Verifies custom
+    RawKernel SpMV against NumPy reference for hand-checkable, random, deterministic,
+    non-square, and different sparsity-pattern matrices; FP64 precision; determinism;
+    and `gpu_executed` truthfulness.
+  - `TestCUDACSRTransposeCorrectness` (CUDA-only, skips on non-CUDA): Verifies A^T SpMV.
+  - `TestPreflightCUDAIntegration` (CUDA-only, skips on non-CUDA): Full physical preflight
+    integration test requiring NVIDIA_CUDA_READY and max_discrepancy < 1e-12.
+  - All CUDA-specific tests skip cleanly on non-CUDA hosts (Mac/CPU-only).
+
 ## [0.3.2] - 2026-10-02
 
 ### Gate 8 Phase A: Restarted GPU PDHG & Physical CUDA Validation Preparation
