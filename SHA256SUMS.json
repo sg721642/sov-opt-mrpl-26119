@@ -105,6 +105,7 @@
   "docs/MILP_ENGINE.md": "2ea870c33ebd564b69ac8d8f5fe161f2ab4c128911280d3ff00e2bea9027a15c",
   "docs/PRESOLVE_AND_SCALING.md": "d5df0a98315fe044ea9aaa7e08cfab4efb26377c47cddbd472f6cbca469082c1",
   "docs/QPLIB_SUPPORT.md": "09b1614588fdb945a031125e6e4a73211685d0bf5f771d465a0edd3677e130bc",
+  "docs/QP_IPM.md": "3668aba302d811382100f00e9ec026bde7e4235119ed5be3fe2dcfa3500b4588",
   "docs/SPARSE_ALGEBRA_AUDIT.md": "c512aea8e55b9d39e94576dae54b1365f8323ba9db5710c24306687163ff6091",
   "docs/STATUS_SEMANTICS.md": "6a305e513728f0dacba20112b6a68ac1e9d2270e2455bc1661c71c21f6fae8d8",
   "docs/VALIDATION.md": "6a47c772e78e223a106b58d32f853b31991d3bfb5f87861d0f5f9a49144e36db",
@@ -230,9 +231,10 @@
   "tests/test_milp.py": "b8d7eff49c83c71524f2591921bf2a9314cbe5498effbd98700137534e9c5261",
   "tests/test_numerical_stress.py": "5aea2627ccd7db5d9cc50d5d9d8eaf9d81e6c74abf61b18c52e0bb19e82964d2",
   "tests/test_presolve.py": "8f41498ec0f3e5abda617e2ae0cff5fb94903368d2799382c70175051360090a",
+  "tests/test_qp_internal.py": "d20483af93f4237a13e8f23bd032b7455f85bc69cb942958fc27f5d13da356af",
   "tests/test_qplib.py": "1ba0c80cdc451fb666f83c79125d5c6f9f03e5941501dd973662779ddfff0410",
   "tests/test_server.py": "0b35af666bcaa5543cbe34eca6ac1acd431881e5dd7f74b55b517689f0817e3b",
   "tests/test_solver.py": "17ab13c4768f516093eef5d809ab0e11e87dbf450e7aa59edb4291f9924f127a",
   "tests/test_sparse.py": "52d49a27c5499bef894917b29eeed05ee45f66191dbc067a3724001a390b1244",
-  "web/index.html": "0e5e0ff75daa0a15b3526f2933b4bba27ebd4c8087ab4953041522ca70e3238e"
+  "web/index.html": "f19fff3effcb20ac781b7e3b2ed488e93d15ab3426cef434ad8abdf8ce2d9cdd"
 }

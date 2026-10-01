@@ -87,7 +87,7 @@ footer{padding:20px 5%;border-top:1px solid var(--line);font-size:12px;color:var
         <summary>Empty states &amp; disclosures</summary>
         <div class="provenance-card" style="margin-top:8px">
           <div><strong>Proprietary MRPL Data:</strong> <span>No authorized MRPL dataset is available in this project. Fictional refinery parameters are strictly prohibited; authentic historical LP/MILP benchmarks are provided instead.</span></div>
-          <div style="margin-top:6px"><strong>Industrial Convex QP:</strong> <span>No authentic public industrial convex QP benchmark is currently verified in the active suite. Numerical eigenvalue checks are floating-point checks, not exact rational PSD certificates.</span></div>
+          <div style="margin-top:6px"><strong>Convex QP Benchmark Support (Gate 7 Complete):</strong> <span>Authentic public convex continuous QPLIB benchmarks (QPLIB_8845, QPLIB_9002) are verified and solved to OPTIMAL_VERIFIED via SOV-OPT's equality-aware interior-point QP solver. Large instances (&gt;250 MB) and nonconvex models are cleanly rejected.</span></div>
         </div>
       </details>
 
@@ -188,12 +188,16 @@ function choose(){
   current=structuredClone(examples[key]||{});
   $('editor').value=JSON.stringify(current,null,2);
   const m=manifest.instances?.[key]||{};
-  $('m_app').textContent=m.domain||'—';
-  $('m_source').textContent=m.reference_source||'—';
-  $('m_dims').textContent=(m.variables||current.c?.length||0)+' vars, '+(m.constraints||current.A?.length||0)+' rows'+(m.matrix_nonzeros?' ('+m.matrix_nonzeros+' nonzeros)':'');
+  $('m_app').textContent=m.collection||m.domain||m.application||'—';
+  $('m_source').textContent=m.primary_source||m.reference_source||'—';
+  const nVars = m.n_variables || m.variables || current.c?.length || 0;
+  const nCons = m.n_constraints || m.constraints || current.A?.length || 0;
+  const nNnz = m.n_nonzeros || m.matrix_nonzeros;
+  $('m_dims').textContent=nVars+' vars, '+nCons+' rows'+(nNnz?' ('+nNnz+' nonzeros)':'');
   const refText=m.published_reference_text||(m.reference_objective!=null?m.reference_objective:null);
-  $('m_ref').textContent=refText?`${refText} (${m.reference_source||'Published'})`:'—';
-  $('modelname').textContent='Selected: '+(m.name||key)+' ('+(m.class||'')+') · Click Run & verify live';
+  $('m_ref').textContent=refText?`${refText} (${m.primary_source||m.reference_source||'Published'})`:'—';
+  const probClass = m.problem_class || m.class || 'LP';
+  $('modelname').textContent='Selected: '+(m.name||key)+' ('+probClass+') · Click Run & verify live';
   clearResult();
 }
 
@@ -208,7 +212,9 @@ Promise.all([
     if(examples[key]){
       const o=document.createElement('option');
       o.value=key;
-      o.textContent=`${d.name} (${d.class}) — ${d.domain}`;
+      const pClass = d.problem_class || d.class || 'LP';
+      const pSrc = d.collection || d.primary_source || d.domain || '';
+      o.textContent=`${d.name} (${pClass}) — ${pSrc}`;
       $('example').append(o);
     }
   }
@@ -272,7 +278,8 @@ $('solve').onclick=async()=>{
     const st=STATUS_MAP[r.status]||{cls:'bad',text:'UNKNOWN: '+r.status};
     $('status').textContent=st.text;
     $('status').className='status '+st.cls;
-    $('modelname').textContent=`${r.model_name||instMeta.name||selectedKey} (${instMeta.class||''}) solved via ${r.backend||selectedBackend}`;
+    const probClass = instMeta.problem_class || instMeta.class || '';
+    $('modelname').textContent=`${r.model_name||instMeta.name||selectedKey} (${probClass}) solved via ${r.backend||selectedBackend}`;
 
     // Objective, bound, gap
     $('objective').textContent=r.objective!=null?fmt(r.objective):(r.incumbent!=null?fmt(r.incumbent):'—');
