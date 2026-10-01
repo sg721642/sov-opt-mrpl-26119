@@ -444,10 +444,10 @@
   "model_name": "SC50B",
   "model_sha256": "9859c232d93307cd6bc879c0a8a2b4b85833772ab0eadb86edd1e2793cf5cce3",
   "solver_version": "0.1.2",
-  "elapsed_seconds": 0.04620270799978243,
+  "elapsed_seconds": 0.04676800000015646,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T13:41:21.094070+00:00",
+  "timestamp_utc": "2026-10-01T13:42:42.937100+00:00",
   "variables": 48,
   "rows": 50,
   "nonzeros": 118,
@@ -456,7 +456,7 @@
     "architecture": "arm64",
     "python": "3.11.16"
   },
-  "measured_duration_seconds": 0.046234915999775694,
-  "git_revision": "b895c5e696f40734c26af5715e40ec94a1ae9170+dirty",
+  "measured_duration_seconds": 0.04679920799981119,
+  "git_revision": "99ebb231f4ba62b5acc287c6677310167bf7bc1b",
   "input_mps_sha256": "15c9d96e1d518dddc197e8e107febce590d0ae94594c676ff0d135b5642c1be5"
 }
