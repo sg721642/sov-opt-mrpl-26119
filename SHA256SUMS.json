@@ -2,7 +2,7 @@
   ".dockerignore": "9363c86f473ebaa7c38e50374d746401f2b24d437a4e86f58587ec95ab866a54",
   ".gitignore": "98e13a44ae43d72258db60e424eb190d297c63e6a126ad1404c30429289d87fe",
   "AGENTS.md": "8773797982fe1f5f50352db7e7e6e04dc1197319eb8d35c5b90773151b46dba4",
-  "CHANGELOG.md": "681988261558ffc2e01befeb9169d3f5985d6ee2f3747763361de475fb8b4cf4",
+  "CHANGELOG.md": "f6bd778f98598b2ed8bc484c565ccb0e3237bb61bda288948e257a89f5b1a3d7",
   "Dockerfile": "b880c8e5d32aedc3ebeba6ed5133aa118922875f5f4a4a3a716794b4f5410a15",
   "README.md": "aed1294cfe450a80ee0f96432cf63e630cfec9bd7c74f44e1d8fd2d8a4c89a95",
   "START_HERE.html": "518d95b4e354195f9bf11488cf6b4f7e5da2a724e1905eb01a5d35afd0b3bf96",
@@ -66,7 +66,7 @@
   "scripts/run_manifest.py": "d2fd6c8a5b9c2067d25182f54d2d7cde235bdfe5abd97e7fde42e08a142940a2",
   "scripts/validate_audit.py": "b491f93c91db9196dec262b9fb62e127648d5f47f7d0b40d0c877830a23c440c",
   "scripts/verify_checksums.py": "61111ad49232ea7dec2e2fc8e50e79d2f457d9b040428f7922a985a768349687",
-  "server.py": "5d8d2aeded5afd340d6c2e3747191ae6e0008df9183ef34a1e7a5a251a0e688c",
+  "server.py": "46200aa37f8198a27c261b9990708043fb04c11deed646948ad911ee9dc26ef0",
   "sovopt/__init__.py": "fe317cdce4aa4f62fa86e80386fd9bc1c550283644f53f9ccbe364a580386b2d",
   "sovopt/__main__.py": "82e15f8395537609ce93b4655e433f3489f3a3167e81cfa779a4c874ee01e01d",
   "sovopt/dispatcher.py": "e6a05ff642317aa3ad1ed6c170d6be1ecc5cf0281be4228a81099dcb784b78ec",
@@ -84,5 +84,5 @@
   "start_windows.bat": "dff121e27f0076f45b4ca93e1c4b1bde203c22bc7f309729fda9e78ee0495c1e",
   "tests/test_server.py": "405f72394da524d11f2b5b5915e88dd435aa8b1382e4a053d316623f7853fcd6",
   "tests/test_solver.py": "f86711cb9d974a68dac89179820593ccb154d7e878a27a458440b057dccf01a0",
-  "web/index.html": "a401de6107ec09573f54a03059e2e1ff4c21eb0d84e9a81fe57963e4824763e4"
+  "web/index.html": "416ce3714f837f14b90c075a9ce7d755634595e7d0d84ba25a842dff5720816f"
 }

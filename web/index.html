@@ -277,8 +277,10 @@ $('solve').onclick=async()=>{
     // Objective, bound, gap
     $('objective').textContent=r.objective!=null?fmt(r.objective):(r.incumbent!=null?fmt(r.incumbent):'—');
     $('bound').textContent=r.best_bound!=null?fmt(r.best_bound):'—';
-    if(r.relative_gap!=null){
+    if(r.relative_gap!=null && isFinite(r.relative_gap)){
       $('gap').textContent=r.relative_gap===0.0?'0.00% (float)':(r.relative_gap*100).toFixed(4)+'%';
+    }else if(r.relative_gap!=null && !isFinite(r.relative_gap)){
+      $('gap').textContent='Open (no incumbent)';
     }else{
       $('gap').textContent='— (LP/QP KKT)';
     }

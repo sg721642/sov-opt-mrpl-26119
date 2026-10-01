@@ -24,6 +24,8 @@
 - Integrated automated checksum manifest synchronization into `scripts/generate_reports.py` so later report generation cannot silently leave `SHA256SUMS.json` stale.
 
 ### Web Dashboard & Model Viewer
+- Added HTTP `HEAD` request handler (`do_HEAD`) in `server.py` to support standard browser preflight and health checks without returning 501.
+- Refined optimality gap display in `web/index.html` to clearly show `Open (no incumbent)` when relative gap is infinite on incomplete branch-and-bound searches.
 - Made `#editor` in `web/index.html` explicitly read-only with styled appearance and added a clear provenance banner (`Verified dataset specification (read-only to preserve dataset provenance and prevent synthetic modification)`).
 - Removed input event listener on editor to ensure submitted solves remain strictly identical to verified dataset definitions.
 
