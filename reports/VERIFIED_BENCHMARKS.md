@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-01  
 **Environment:** Darwin arm64, Python 3.11.16  
-**Solver Revision:** `9a19c9224f4a827c` (includes +dirty if uncommitted changes)  
+**Solver Revision:** `ad9991b8cce2faed` (includes +dirty if uncommitted changes)  
 **Core Dependencies:** NumPy and Python standard library only (strictly sovereign core)  
 **External Validation:** via `scripts/baseline_worker.py` isolated subprocess (highspy or scipy fallback)  
 
@@ -15,12 +15,12 @@ No synthetic or fabricated instances are used as performance evidence.
 
 | Instance | Problem Class | Dimensions (m x n) | SOV-OPT Status | SOV-OPT Objective | Published Reference Text | Discrepancy | Primal Residual | Stationarity (Dual) | Runtime |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **AFIRO** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753143** | -4.6475314286E+02 | 2.86e-09 | 2.84e-14 | 2.64e-18 | 29.8 ms |
-| **SC50A** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-64.575077** | -6.4575077059E+01 | 4.36e-10 | 9.66e-17 | 4.09e-17 | 57.9 ms |
-| **SC50B** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000** | -7.0000000000E+01 | 1.42e-14 | 1.56e-16 | 2.90e-17 | 62.0 ms |
-| **BLEND** | LP | 74 x 83 | `OPTIMAL_VERIFIED` | **-30.812150** | -3.0812149846E+01 | 1.72e-10 | 6.34e-14 | 2.27e-15 | 434.9 ms |
-| **FLUGPL** | MILP | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **1173720** | 1201500 (integer optimal); 769500.0 (LP relaxation root bound) | N/A | N/A | N/A | 1179.7 ms |
-| **AFIRO (PDHG-CPU)** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753142** | -464.75314286 (Netlib) | 6.3e-07 | 8.07e-09 | 5.93e-08 | 104.5 ms |
+| **AFIRO** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753143** | -4.6475314286E+02 | 2.86e-09 | 1.14e-16 | 2.64e-18 | 14.5 ms |
+| **SC50A** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-64.575077** | -6.4575077059E+01 | 4.35e-10 | 3.13e-16 | 2.26e-16 | 42.4 ms |
+| **SC50B** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000** | -7.0000000000E+01 | 1.42e-14 | 3.12e-16 | 2.54e-16 | 44.3 ms |
+| **BLEND** | LP | 74 x 83 | `OPTIMAL_VERIFIED` | **-30.812150** | -3.0812149846E+01 | 1.72e-10 | 1.50e-14 | 2.36e-15 | 157.4 ms |
+| **FLUGPL** | MILP | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **1173720** | 1201500 (integer optimal); 769500.0 (LP relaxation root bound) | N/A | N/A | N/A | 1175.1 ms |
+| **AFIRO (PDHG-CPU)** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753142** | -464.75314286 (Netlib) | 6.3e-07 | 8.07e-09 | 5.93e-08 | 105.9 ms |
 
 ---
 
@@ -33,9 +33,9 @@ If neither is available, status is `NOT_RUN` or `FAILED` with the actual error r
 | Instance | Input MPS File | External Status | External Objective | SOV-OPT Objective / Bound | Discrepancy | Comparison |
 |:---|:---|:---:|:---:|:---:|:---:|:---:|
 | **AFIRO** | `data/verified/afiro.mps` | `HighsModelStatus.kOptimal` | -464.753143 | -464.753143 | 0.0 | `MATCH` |
-| **SC50A** | `data/verified/sc50a.mps` | `HighsModelStatus.kOptimal` | -64.575077 | -64.575077 | 1.42e-14 | `MATCH` |
+| **SC50A** | `data/verified/sc50a.mps` | `HighsModelStatus.kOptimal` | -64.575077 | -64.575077 | 0.0 | `MATCH` |
 | **SC50B** | `data/verified/sc50b.mps` | `HighsModelStatus.kOptimal` | -70.000000 | -70.000000 | 0.0 | `MATCH` |
-| **BLEND** | `data/verified/blend.mps` | `HighsModelStatus.kOptimal` | -30.812150 | -30.812150 | 3.55e-14 | `MATCH` |
+| **BLEND** | `data/verified/blend.mps` | `HighsModelStatus.kOptimal` | -30.812150 | -30.812150 | 0.0 | `MATCH` |
 | **FLUGPL** | `data/verified/flugpl.mps` | `HighsModelStatus.kOptimal` | 1201500.000000 | Bound: 1173720 | Bound diff: 2.778e+04 | `BOUND_ONLY` |
 
 ### Notes on External Differential Comparison:

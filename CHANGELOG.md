@@ -1,5 +1,36 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.1.9] - 2026-10-02
+
+### Gate 5: Reversible Presolve and Row/Column Scaling
+
+- **`sovopt/presolve.py` — Sovereign Reversible Presolve & Matrix Scaling:**
+  - Implemented 5 reversible reduction passes:
+    1. Fixed variable elimination: shifts row bounds, accumulates objective offset, removes fixed columns.
+    2. Empty row processing: removes redundant rows ($b_l \le 0 \le b_u$), certifies infeasibility with exact Farkas certificate for impossible rows.
+    3. Empty column processing: places bounded variables at optimal bound, discovers unbounded rays and certifies `UNBOUNDED_CERTIFIED` for unbounded empty columns.
+    4. Singleton row bound tightening: inverts positive and negative row coefficients, tightens variable bounds, detects bound contradictions.
+    5. Conservative activity bound propagation: computes $[L_i, U_i]$ over finite bounds without unsafe IEEE infinity arithmetic, detecting redundant and impossible rows.
+  - Implemented reversible matrix equilibration scaling:
+    - Row scaling: $s_i = \text{clip}(1 / \max_j |A_{ij}|, 10^{-6}, 10^{6})$.
+    - Column scaling: $d_j = \text{clip}(1 / \max_i |A_{ij}|, 10^{-6}, 10^{6})$, preserving integrality for integer variables ($d_j = 1.0$).
+  - Dynamic-range diagnostic: `compute_dynamic_range(A, c)` tracked across initial, presolved, and scaled stages.
+  - Reversible `PresolveStack` with LIFO unwinding:
+    - `postsolve_primal`: un-scales columns and restores eliminated variables.
+    - `postsolve_direction`: strictly linear direction postsolve (zero affine shift, no constants added).
+    - `postsolve_dual_rows`: un-scales row duals and executes two-pass stationarity reconstruction for singleton row multipliers.
+- **`sovopt/dual_simplex.py` & `sovopt/__init__.py` Integration:**
+  - Integrated `presolve=True, scaling=True` parameters into `solve()` and `solve_dual_simplex()`.
+  - Presolve pipeline solves reduced model and lifts solutions back to original model space with full KKT verification.
+  - Pre-Flight A: hardened Phase-I artificial bounds in dual simplex to prevent semantic leakage.
+  - Pre-Flight B: aligned automatic dispatcher to route continuous LP under CPU backend to bounded-variable revised dual simplex.
+- **`tests/test_presolve.py` — 35-Point Test Matrix:**
+  - 35 unit tests covering all presolve reductions, scaling round-trips, direction linearity, dual stationarity recovery, original model immutability, and 4-way ablation on Netlib benchmarks (AFIRO, SC50A, SC50B, BLEND).
+- **`tests/test_numerical_stress.py` — 10-Point Numerical Stress Matrix:**
+  - 10 stress tests covering 8 orders of magnitude row/col scale imbalances, near-dependent rows, duplicate rows, extreme finite bounds ($10^{14}$), small coefficients ($10^{-10}$), and degenerate vertices.
+- **`docs/PRESOLVE_AND_SCALING.md`:**
+  - Complete mathematical specification of presolve reductions, equilibration equations, postsolve invariants, and Netlib 4-way ablation results.
+
 ## [0.1.8] - 2026-10-01
 
 ### Gate 4: Robust Bounded-Variable Revised Dual Simplex

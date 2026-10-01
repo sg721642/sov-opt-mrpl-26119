@@ -538,7 +538,7 @@ class TestAutoDispatcher(unittest.TestCase):
         m_lp = build_refinery_twin('lp')
         disp_lp = auto_dispatch(m_lp)
         self.assertEqual(disp_lp['problem_class'], 'LP')
-        self.assertEqual(disp_lp['method'], 'simplex')
+        self.assertEqual(disp_lp['method'], 'dual-simplex')
         self.assertEqual(disp_lp['backend'], 'cpu')
 
         m_milp = build_refinery_twin('milp')

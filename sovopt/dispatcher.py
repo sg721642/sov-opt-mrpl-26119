@@ -106,9 +106,9 @@ def auto_dispatch(model, method='auto', backend='cpu'):
             resolved_method = 'pdhg-gpu' if backend == 'pdhg-cuda' else 'pdhg-cpu'
             rationale = f"Continuous LP executed with first-order PDHG on {backend}."
         else:
-            resolved_method = 'simplex'
+            resolved_method = 'dual-simplex'
             resolved_backend = 'cpu'
-            rationale = "Continuous LP dispatched to Primal Simplex with sparse/dense LU refactorization, Markowitz pivoting, and exact KKT/Farkas certification."
+            rationale = "Continuous LP dispatched to Bounded-Variable Revised Dual Simplex with sparse LU refactorization, Markowitz pivoting, Devex pricing, and exact KKT certification."
 
     return {
         'method': resolved_method,

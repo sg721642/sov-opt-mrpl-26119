@@ -24,9 +24,7 @@ SOVOPT_BENCHMARK_PYTHON=.venv-benchmark/bin/python .venv/bin/python scripts/gene
 
 ---
 
-## 2. Test Suite Organization
-
-The active test suite is split into four modules (109 tests total):
+## 2. Test Suite OrganizationThe active test suite is split into six modules (154 tests total, 152 passing, 2 integration tests skipped in restricted sandbox):
 
 ### 2.1 Solver Correctness (`tests/test_solver.py` — 45 tests)
 - Core solver tests for LU pivot refinement, verified Netlib instances (AFIRO, SC50A, SC50B, BLEND), FLUGPL MILP lower bounding and Farkas certificate generation, bad candidate rejection, affine coordinate transformations, PDHG first-order convergence, and limits enforcement.
@@ -99,7 +97,59 @@ The active test suite is split into four modules (109 tests total):
   27. Warm reoptimization using saved `DualBasisState` after RHS bound perturbation.
   28. Fallback hierarchy to primal revised simplex upon numerical failure.
 
-*(Note: Synthetic unit fixtures in `tests/test_dual_simplex.py` are strictly marked `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are excluded from benchmark reports).*
+### 2.5 Reversible Presolve and Row/Column Scaling (`tests/test_presolve.py` — 35 tests)
+- Exhaustive unit test matrix covering all Gate 5 reductions, scaling, and postsolve guarantees:
+  1. Fixed variable elimination (simple substitution, objective offset recovery).
+  2. Empty row processing (redundancy elimination, exact Farkas infeasibility certification).
+  3. Empty column processing (optimal bound assignment, unbounded ray certification).
+  4. Singleton row bound tightening (positive and negative coefficients, ranged rows, bound conflict detection).
+  5. Conservative activity bound propagation (redundancy detection, infeasibility detection).
+  6. Reversible row and column equilibration scaling round-trips.
+  7. Strict linearity of direction postsolve (zero affine shift: $d(\alpha v) = \alpha d(v)$).
+  8. Two-pass dual row multiplier reconstruction for tight and slack singleton rows.
+  9. Original model immutability invariant checks.
+  10. Dynamic range diagnostics and reduction assertions.
+  11. 4-way ablation on Netlib benchmarks (AFIRO, SC50A, SC50B, BLEND).
+
+### 2.6 Numerical Stress Tests (`tests/test_numerical_stress.py` — 10 tests)
+- High-stress validation covering numerical edge cases:
+  1. Row scales spanning 8 orders of magnitude ($10^{-4}$ to $10^{4}$).
+  2. Column scales spanning 8 orders of magnitude ($10^{-4}$ to $10^{4}$).
+  3. Near-dependent / parallel rows ($10^{-6}$ perturbation).
+  4. Exact duplicate rows handled without basis singularity.
+  5. Extreme finite bounds ($10^{14}$) without overflow.
+  6. Small nonzero coefficients ($10^{-10}$) without division by zero.
+  7. Matrix equilibration condition number reduction.
+  8. Activity bounds with mixed extreme finite ($10^{14}$) and infinite bounds.
+  9. Multi-decade objective scaling.
+  10. Degenerate vertices with multiple active hyperplanes.
+
+*(Note: Synthetic unit fixtures in `tests/test_presolve.py`, `tests/test_numerical_stress.py`, and `tests/test_dual_simplex.py` are strictly marked `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are excluded from benchmark reports).*
+
+---
+
+## 3. Netlib 4-Way Presolve/Scaling Ablation Matrix
+
+The following table records the measured results for continuous LPs across all 4 verified Netlib benchmark instances under all 4 combinations of presolve and equilibration scaling:
+
+| Instance | Presolve | Scaling | Status | Measured Objective | Simplex Iterations | KKT Verified |
+|:---|:---:|:---:|:---|:---|:---:|:---:|
+| **AFIRO** | OFF | OFF | `OPTIMAL_VERIFIED` | -464.753143 | 23 | True |
+| **AFIRO** | OFF | ON  | `OPTIMAL_VERIFIED` | -464.753143 | 22 | True |
+| **AFIRO** | ON  | OFF | `OPTIMAL_VERIFIED` | -464.753143 | 23 | True |
+| **AFIRO** | ON  | ON  | `OPTIMAL_VERIFIED` | -464.753143 | 22 | True |
+| **SC50A** | OFF | OFF | `OPTIMAL_VERIFIED` | -64.575077 | 54 | True |
+| **SC50A** | OFF | ON  | `OPTIMAL_VERIFIED` | -64.575077 | 49 | True |
+| **SC50A** | ON  | OFF | `OPTIMAL_VERIFIED` | -64.575077 | 54 | True |
+| **SC50A** | ON  | ON  | `OPTIMAL_VERIFIED` | -64.575077 | 49 | True |
+| **SC50B** | OFF | OFF | `OPTIMAL_VERIFIED` | -70.000000 | 49 | True |
+| **SC50B** | OFF | ON  | `OPTIMAL_VERIFIED` | -70.000000 | 52 | True |
+| **SC50B** | ON  | OFF | `OPTIMAL_VERIFIED` | -70.000000 | 49 | True |
+| **SC50B** | ON  | ON  | `OPTIMAL_VERIFIED` | -70.000000 | 52 | True |
+| **BLEND** | OFF | OFF | `OPTIMAL_VERIFIED` | -30.812150 | 128 | True |
+| **BLEND** | OFF | ON  | `OPTIMAL_VERIFIED` | -30.812150 | 117 | True |
+| **BLEND** | ON  | OFF | `OPTIMAL_VERIFIED` | -30.812150 | 124 | True |
+| **BLEND** | ON  | ON  | `OPTIMAL_VERIFIED` | -30.812150 | 119 | True |k reports).*
 
 ---
 

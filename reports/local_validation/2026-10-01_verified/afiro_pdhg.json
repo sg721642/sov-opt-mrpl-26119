@@ -842,15 +842,15 @@
       "relative_gap": 6.70291125794412e-10
     }
   ],
-  "setup_seconds": 5.116600004839711e-05,
-  "iteration_and_verification_seconds": 0.10411387500062119,
+  "setup_seconds": 5.029199746786617e-05,
+  "iteration_and_verification_seconds": 0.10556533300041337,
   "gpu_executed": false,
   "model_name": "AFIRO",
   "model_sha256": "1f08328913d4bdf2204f2e1e6cd6e5c224f1ea237ab78f95cb5da2f74165154e",
-  "solver_version": "0.1.8",
-  "elapsed_seconds": 0.10447016599937342,
+  "solver_version": "0.1.9",
+  "elapsed_seconds": 0.10590787500041188,
   "backend": "pdhg-cpu",
-  "timestamp_utc": "2026-10-01T17:52:27.533098+00:00",
+  "timestamp_utc": "2026-10-01T18:58:13.322229+00:00",
   "variables": 32,
   "rows": 27,
   "nonzeros": 83,
@@ -876,6 +876,14 @@
     "architecture": "arm64",
     "python": "3.11.16"
   },
-  "measured_duration_seconds": 0.10450145800132304,
-  "git_revision": "9a19c9224f4a827c5e7c312742f5af8e2cb3815d+dirty"
+  "method_requested": "auto",
+  "method_selected": "pdhg-cpu",
+  "selection_reason": "Continuous LP executed with first-order PDHG on pdhg-cpu.",
+  "method_used": "pdhg-cpu",
+  "fallback_reason": null,
+  "linear_algebra_used": "pdhg",
+  "presolve_applied": false,
+  "scaling_applied": false,
+  "measured_duration_seconds": 0.1059394580006483,
+  "git_revision": "ad9991b8cce2faeda30917108744e4919435c9b5+dirty"
 }

@@ -90,6 +90,7 @@ SOVOPT_BENCHMARK_PYTHON=.venv-benchmark/bin/python .venv/bin/python scripts/gene
 - **Automatic Algorithm Dispatcher (`sovopt.auto_dispatch`):** Inspects problem dimensions, matrix sparsity, dynamic range, integrality, and quadratic objective structure to select the appropriate solver core automatically:
   - **Primal Revised Simplex (LP):** Two-phase revised simplex with sovereign sparse LU factorization (Threshold Markowitz pivoting, Product-Form of Inverse / eta updates, periodic refactorization) and dense LU fallback, iterative refinement, and exact rational basis dual recovery.
   - **Bounded-Variable Revised Dual Simplex (LP):** Sovereign bounded-variable revised dual simplex (`sovopt/dual_simplex.py`) with 5 explicit variable states (`BASIC`, `AT_LOWER`, `AT_UPPER`, `FREE_NONBASIC`, `FIXED`), Devex pricing, Two-Pass Harris dual ratio test with tiny pivot rejection, ratio-test bound flips without refactorization, and reusable `DualBasisState` for warm reoptimization.
+  - **Reversible Presolve and Row/Column Scaling (`sovopt/presolve.py`):** Sovereign reversible reductions (fixed variable substitution, empty row/column elimination, singleton row tightening, conservative activity bound propagation) and matrix equilibration scaling with strictly linear direction postsolve and two-pass singleton dual multiplier stationarity recovery.
   - **Mixed-Integer Linear Programming (MILP):** Branch-and-bound with exact rational Lagrangian lower bounds (`safe_lower_bound`) and exact Farkas infeasibility pruning.
   - **Convex Quadratic Programming (QP):** Infeasible-start Mehrotra predictor-corrector primal-dual interior point algorithm for convex objectives ($\min \frac{1}{2} x^T Q x + c^T x$) with linear constraints.
   - **First-Order LP (PDHG):** Primal-Dual Hybrid Gradient method (Chambolle-Pock) with diagonal preconditioning and periodic restart. Includes CPU SpMV and CUDA RawKernel source.
@@ -166,6 +167,8 @@ $$\text{LP} \longrightarrow \text{MILP} \longrightarrow \text{QP} \longrightarro
 ## Documentation Index
 
 - [Architecture & Mathematics](docs/ARCHITECTURE.md): Implemented algorithms, variable transformations, objective conventions, verification semantics, and roadmap gates.
+- [Bounded-Variable Dual Simplex](docs/DUAL_SIMPLEX.md): Dual simplex engine, Devex pricing, Harris ratio test, and basis state dynamics.
+- [Reversible Presolve & Scaling](docs/PRESOLVE_AND_SCALING.md): Reversible reductions, matrix equilibration, dynamic-range diagnostics, and postsolve guarantees.
 - [Validation Guide & Evidence](docs/VALIDATION.md): Reproducible test and benchmark commands, differential comparisons, evidence file locations, and coverage gaps.
 - [Dataset Catalogue](data/CATALOGUE.md): Dataset provenance, cryptographic hashes, source links, and empty state declarations.
 - [Changelog](CHANGELOG.md): Complete release history and development record.

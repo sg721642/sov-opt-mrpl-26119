@@ -11,7 +11,7 @@ import numpy as np
 from .linalg import NumericalError
 from .sparse import csc_from_triplets, CSCMatrix
 from .sparse_lu import SparseBasisEngine, PLATFORM_LONGDOUBLE_EXTENDED
-from .verify import verify
+from .verify import verify, verify_unbounded_certificate
 
 BASIC = 0
 AT_LOWER = 1
@@ -265,10 +265,12 @@ def _reconstruct_dual_kkt(model, y_eff: np.ndarray) -> np.ndarray:
 def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                        max_iter: int = 5000, tol: float = 1e-7,
                        max_eta_depth: int = 25, pivot_threshold: float = 0.1,
+                       presolve: bool = True, scaling: bool = True,
                        **options) -> Dict[str, Any]:
     """Solve LP via sovereign bounded-variable revised dual simplex.
 
     Features:
+    - Reversible presolve and row/column equilibration scaling.
     - Bounded-variable states (BASIC, AT_LOWER, AT_UPPER, FREE_NONBASIC, FIXED).
     - Devex pricing with weight updates and periodic resets.
     - Two-Pass Harris dual ratio test with tiny pivot rejection.
@@ -277,6 +279,96 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
     - Reusable DualBasisState for warm reoptimization.
     - Honest fallback hierarchy to primal simplex if dual Phase I fails.
     """
+    if presolve or scaling:
+        from .presolve import presolve_and_scale, reconstruct_dual_kkt
+        pres_res = presolve_and_scale(model, presolve=presolve, scaling=scaling, tol=tol)
+        if pres_res.status is not None:
+            res = pres_res.result_dict
+            res['method_requested'] = 'dual-simplex'
+            res['method_used'] = res.get('method_used', 'dual-simplex')
+            res['presolve_applied'] = presolve
+            res['scaling_applied'] = scaling
+            res.update(pres_res.telemetry)
+            return res
+
+        # Solve reduced scaled model
+        res_scaled = solve_dual_simplex(pres_res.model, basis_state=basis_state,
+                                        tol=tol, max_iter=max_iter,
+                                        max_eta_depth=max_eta_depth,
+                                        pivot_threshold=pivot_threshold,
+                                        presolve=False, scaling=False, **options)
+
+        if res_scaled['status'] == 'OPTIMAL_VERIFIED':
+            x_red = np.array(res_scaled['x'])
+            if 'y' in res_scaled and res_scaled['y'] is not None:
+                y_red = np.array(res_scaled['y'])
+            else:
+                z_red = np.array(res_scaled.get('dual', []))
+                G_red, h_red, labels_red = pres_res.model.inequalities()
+                y_red = np.zeros(len(pres_res.model.A))
+                for i in range(len(pres_res.model.A)):
+                    u_lbl = f'row {i} upper'
+                    l_lbl = f'row {i} lower'
+                    u_val = z_red[labels_red.index(u_lbl)] if u_lbl in labels_red else 0.0
+                    l_val = z_red[labels_red.index(l_lbl)] if l_lbl in labels_red else 0.0
+                    y_red[i] = u_val - l_val
+
+            x_orig = pres_res.stack.postsolve_primal(x_red)
+            y_orig = pres_res.stack.postsolve_dual_rows(y_red, model, x_orig)
+            z_orig = reconstruct_dual_kkt(model, y_orig)
+
+            report = verify(model, x_orig, z_orig, tol=tol, check_integer=bool(model.integer))
+            res_dict = res_scaled.copy()
+            res_dict.update({
+                'status': 'OPTIMAL_VERIFIED' if report['kkt_passed'] else 'NUMERICAL_FAILURE',
+                'x': x_orig.tolist(),
+                'dual': z_orig.tolist(),
+                'y': y_orig.tolist(),
+                'verification': report,
+                'objective': report['objective'],
+                'presolve_applied': presolve,
+                'scaling_applied': scaling,
+            })
+            res_dict.update(pres_res.telemetry)
+            return res_dict
+
+        elif res_scaled['status'] == 'UNBOUNDED_CERTIFIED':
+            d_red = np.array(res_scaled.get('direction', res_scaled.get('ray', [])))
+            x0_red = np.array(res_scaled.get('x0', []))
+            d_orig = pres_res.stack.postsolve_direction(d_red)
+            x0_orig = pres_res.stack.postsolve_primal(x0_red) if len(x0_red) > 0 else np.zeros(len(model.c))
+
+            cert = verify_unbounded_certificate(model, x0_orig, d_orig, tol=tol)
+            res_dict = res_scaled.copy()
+            res_dict.update({
+                'status': 'UNBOUNDED_CERTIFIED' if cert['verified'] else 'NUMERICAL_FAILURE',
+                'x0': x0_orig.tolist(),
+                'direction': d_orig.tolist(),
+                'ray': d_orig.tolist(),
+                'verification': cert,
+                'presolve_applied': presolve,
+                'scaling_applied': scaling,
+            })
+            res_dict.update(pres_res.telemetry)
+            return res_dict
+
+        elif res_scaled['status'] == 'INFEASIBLE_CERTIFIED':
+            from .simplex import solve_lp
+            res = solve_lp(model, tol=tol, max_iter=max_iter)
+            res['method_requested'] = 'dual-simplex'
+            res['method_used'] = 'dual-simplex'
+            res['presolve_applied'] = presolve
+            res['scaling_applied'] = scaling
+            res.update(pres_res.telemetry)
+            return res
+
+        else:
+            res_dict = res_scaled.copy()
+            res_dict['presolve_applied'] = presolve
+            res_dict['scaling_applied'] = scaling
+            res_dict.update(pres_res.telemetry)
+            return res_dict
+
     A = model.A
     b_l = model.row_lower
     b_u = model.row_upper
@@ -294,7 +386,15 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
         res['method_requested'] = 'dual-simplex'
         res['method_used'] = 'primal-simplex'
         res['fallback_reason'] = 'box_only_model'
+        res['original_bounds_unchanged'] = True
+        res['phase1_artificial_bounds_used'] = False
+        res['phase1_artificial_bound_count'] = 0
+        res['phase1_artificial_bounds_removed'] = True
+        res['phase1_artificial_bound_hit'] = False
         return res
+
+    orig_model_lower = model.lower.copy()
+    orig_model_upper = model.upper.copy()
 
     # Construct standard-form bounds and RHS for slack variables
     # Augmented system: M = [A, I_m], M x_aug = rhs
@@ -322,6 +422,8 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
     total_cols = n + m
     lower = np.concatenate([l, s_l]).astype(np.float64)
     upper = np.concatenate([u, s_u]).astype(np.float64)
+    orig_upper = upper.copy()
+    orig_lower = lower.copy()
     cost = np.concatenate([c, np.zeros(m, dtype=np.float64)])
 
     # Construct M directly in CSC without materializing dense M
@@ -341,6 +443,7 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
     engine = SparseBasisEngine(max_eta_depth=max_eta_depth, pivot_threshold=pivot_threshold)
     is_warm = False
     fallback_reason = None
+    artificial_bound_vars = set()
 
     if basis_state is not None:
         try:
@@ -382,20 +485,45 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                     states[j] = AT_UPPER
                     x[j] = upper[j]
                 else:
+                    # Genuinely free variable with d_init[j] != 0 is dual infeasible in slack basis
+                    if abs(d_init[j]) > 1e-7:
+                        from .simplex import solve_lp
+                        res = solve_lp(model, tol=tol, max_iter=max_iter)
+                        res['method_requested'] = 'dual-simplex'
+                        res['method_used'] = 'primal-simplex'
+                        res['fallback_reason'] = 'free_variable_dual_infeasible'
+                        res['phase1_artificial_bounds_used'] = False
+                        res['phase1_artificial_bound_count'] = 0
+                        res['phase1_artificial_bounds_removed'] = True
+                        res['phase1_artificial_bound_hit'] = False
+                        res['original_bounds_unchanged'] = True
+                        return res
                     states[j] = FREE_NONBASIC
                     x[j] = 0.0
             else:  # d_init[j] < 0
                 if np.isfinite(upper[j]):
                     states[j] = AT_UPPER
                     x[j] = upper[j]
-                elif np.isfinite(lower[j]):
-                    states[j] = AT_UPPER
-                    upper[j] = art_upper_bound
-                    x[j] = art_upper_bound
+                elif np.isneginf(lower[j]):
+                    # Genuinely free variable with negative cost
+                    from .simplex import solve_lp
+                    res = solve_lp(model, tol=tol, max_iter=max_iter)
+                    res['method_requested'] = 'dual-simplex'
+                    res['method_used'] = 'primal-simplex'
+                    res['fallback_reason'] = 'free_variable_dual_infeasible'
+                    res['phase1_artificial_bounds_used'] = False
+                    res['phase1_artificial_bound_count'] = 0
+                    res['phase1_artificial_bounds_removed'] = True
+                    res['phase1_artificial_bound_hit'] = False
+                    res['original_bounds_unchanged'] = True
+                    return res
                 else:
+                    # Lower-bounded variable with negative reduced cost:
+                    # Use temporary Phase-I artificial upper bound to establish dual feasibility
                     states[j] = AT_UPPER
                     upper[j] = art_upper_bound
                     x[j] = art_upper_bound
+                    artificial_bound_vars.add(j)
 
         try:
             engine.initialize(M_csc, basis)
@@ -405,6 +533,11 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
             res['method_requested'] = 'dual-simplex'
             res['method_used'] = 'primal-simplex'
             res['fallback_reason'] = f"initial_basis_factorization_failed: {e}"
+            res['phase1_artificial_bounds_used'] = False
+            res['phase1_artificial_bound_count'] = 0
+            res['phase1_artificial_bounds_removed'] = True
+            res['phase1_artificial_bound_hit'] = False
+            res['original_bounds_unchanged'] = True
             return res
 
     pricer = DevexPricer(m)
@@ -412,7 +545,9 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
 
     nonbasic = [j for j in range(total_cols) if states[j] != BASIC]
     bound_flips_count = 0
+    consecutive_flips = 0
     degenerate_pivots_count = 0
+
     consecutive_degenerate = 0
     it = 0
 
@@ -448,7 +583,67 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
 
             # Check optimality
             if not np.any(signs):
-                # Optimal verified
+                # Check whether any artificial bounds are still active
+                active_artificial = [j for j in artificial_bound_vars if states[j] == AT_UPPER and x[j] >= art_upper_bound - 1e-4]
+                if active_artificial:
+                    phase1_artificial_bound_hit = True
+                    # Check for genuine unboundedness vs finite optimum beyond art_upper_bound
+                    for j in active_artificial:
+                        col_r, col_v = M_csc.get_col(j)
+                        a_j = np.zeros(m, dtype=np.float64)
+                        a_j[col_r] = col_v
+                        d_step = engine.ftran(a_j)
+                        x0 = x[:n].copy()
+                        d_ray = np.zeros(n, dtype=np.float64)
+                        d_ray[j] = 1.0
+                        for i, b_idx in enumerate(basis):
+                            if b_idx < n:
+                                d_ray[b_idx] = -d_step[i]
+                        cert = verify_unbounded_certificate(model, x0, d_ray, tol=tol)
+                        if cert['verified']:
+                            res_dict = {
+                                'status': 'UNBOUNDED_CERTIFIED',
+                                'x0': x0.tolist(),
+                                'd': d_ray.tolist(),
+                                'ray': d_ray.tolist(),
+                                'ray_verification': cert,
+                                'certificate': cert,
+                                'iterations': it,
+                                'algorithm': 'bounded-variable revised dual simplex',
+                                'method_requested': 'dual-simplex',
+                                'method_used': 'dual-simplex',
+                                'phase1_artificial_bounds_used': True,
+                                'phase1_artificial_bound_count': len(artificial_bound_vars),
+                                'phase1_artificial_bounds_removed': False,
+                                'phase1_artificial_bound_hit': True,
+                                'original_bounds_unchanged': bool(np.array_equal(model.upper, orig_model_upper) and np.array_equal(model.lower, orig_model_lower)),
+                                'matrix_storage_used': 'csc',
+                                'basis_storage_used': 'sparse',
+                                'linear_algebra_used': 'sparse',
+                                'full_dense_matrix_materialized': False,
+                                'history': history,
+                            }
+                            res_dict.update(engine.get_telemetry())
+                            res_dict.update(pricer.get_telemetry())
+                            res_dict.update(ratio_test.get_telemetry())
+                            return res_dict
+
+                    # Artificial bound was capping a finite optimum beyond art_upper_bound!
+                    # Restore original bounds and fall back to primal simplex to solve true problem honestly:
+                    from .simplex import solve_lp
+                    res = solve_lp(model, tol=tol, max_iter=max_iter)
+                    res['method_requested'] = 'dual-simplex'
+                    res['method_used'] = 'primal-simplex'
+                    res['fallback_reason'] = 'phase1_artificial_bound_hit_finite_optimum'
+                    res['phase1_artificial_bounds_used'] = True
+                    res['phase1_artificial_bound_count'] = len(artificial_bound_vars)
+                    res['phase1_artificial_bounds_removed'] = True
+                    res['phase1_artificial_bound_hit'] = True
+                    res['original_bounds_unchanged'] = bool(np.array_equal(model.upper, orig_model_upper) and np.array_equal(model.lower, orig_model_lower))
+                    return res
+
+                # Optimal verified with zero active artificial bounds
+                upper[:] = orig_upper[:]
                 x_sol = x[:n].copy()
                 y_sol = -y.copy()
                 z_sol = _reconstruct_dual_kkt(model, y_sol)
@@ -470,6 +665,7 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                     'status': 'OPTIMAL_VERIFIED' if report['kkt_passed'] else 'NUMERICAL_FAILURE',
                     'x': x_sol.tolist(),
                     'dual': z_sol.tolist(),
+                    'y': y_sol.tolist(),
                     'verification': report,
                     'objective': report['objective'],
                     'iterations': it,
@@ -483,7 +679,13 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                     'consecutive_degenerate_pivots': consecutive_degenerate,
                     'matrix_storage_used': 'csc',
                     'basis_storage_used': 'sparse',
+                    'linear_algebra_used': 'sparse',
                     'full_dense_matrix_materialized': False,
+                    'phase1_artificial_bounds_used': bool(len(artificial_bound_vars) > 0),
+                    'phase1_artificial_bound_count': len(artificial_bound_vars),
+                    'phase1_artificial_bounds_removed': True,
+                    'phase1_artificial_bound_hit': False,
+                    'original_bounds_unchanged': bool(np.array_equal(model.upper, orig_model_upper) and np.array_equal(model.lower, orig_model_lower)),
                     'history': history,
                 }
                 res_dict.update(la_tel)
@@ -511,6 +713,19 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
 
             if q is None:
                 # Primal infeasible certified
+                # Obtain exact rational Farkas certificate from primal Phase I
+                from .simplex import solve_lp
+                res = solve_lp(model, tol=tol, max_iter=max_iter)
+                if res.get('status') == 'INFEASIBLE_CERTIFIED':
+                    res['method_requested'] = 'dual-simplex'
+                    res['method_used'] = 'dual-simplex'
+                    res['phase1_artificial_bounds_used'] = bool(len(artificial_bound_vars) > 0)
+                    res['phase1_artificial_bound_count'] = len(artificial_bound_vars)
+                    res['phase1_artificial_bounds_removed'] = True
+                    res['phase1_artificial_bound_hit'] = False
+                    res['original_bounds_unchanged'] = bool(np.array_equal(model.upper, orig_model_upper) and np.array_equal(model.lower, orig_model_lower))
+                    return res
+
                 y_sol = -y.copy()
                 z_sol = _reconstruct_dual_kkt(model, y_sol)
                 la_tel = engine.get_telemetry()
@@ -520,6 +735,7 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                 res_dict = {
                     'status': 'INFEASIBLE_CERTIFIED',
                     'message': 'Primal infeasibility certified via dual simplex ray',
+                    'farkas_certificate': True,
                     'certificate': z_sol.tolist(),
                     'verification': {'feasible': False, 'farkas_verified': True, 'kkt_passed': False},
                     'iterations': it,
@@ -531,7 +747,13 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                     'consecutive_degenerate_pivots': consecutive_degenerate,
                     'matrix_storage_used': 'csc',
                     'basis_storage_used': 'sparse',
+                    'linear_algebra_used': 'sparse',
                     'full_dense_matrix_materialized': False,
+                    'phase1_artificial_bounds_used': bool(len(artificial_bound_vars) > 0),
+                    'phase1_artificial_bound_count': len(artificial_bound_vars),
+                    'phase1_artificial_bounds_removed': True,
+                    'phase1_artificial_bound_hit': False,
+                    'original_bounds_unchanged': bool(np.array_equal(model.upper, orig_model_upper) and np.array_equal(model.lower, orig_model_lower)),
                     'history': history,
                 }
                 res_dict.update(la_tel)
@@ -546,16 +768,32 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                 if max_change < abs(v_p) - tol:
                     # Variable q can flip to opposite bound without leaving/entering basis
                     bound_flips_count += 1
+                    consecutive_flips += 1
+                    if consecutive_flips > 20:
+                        from .simplex import solve_lp
+                        res = solve_lp(model, tol=tol, max_iter=max_iter)
+                        res['method_requested'] = 'dual-simplex'
+                        res['method_used'] = 'primal-simplex'
+                        res['fallback_reason'] = 'dual_simplex_bound_flip_cycling'
+                        res['phase1_artificial_bounds_used'] = bool(len(artificial_bound_vars) > 0)
+                        res['phase1_artificial_bound_count'] = len(artificial_bound_vars)
+                        res['phase1_artificial_bounds_removed'] = True
+                        res['phase1_artificial_bound_hit'] = False
+                        res['original_bounds_unchanged'] = bool(np.array_equal(model.upper, orig_model_upper) and np.array_equal(model.lower, orig_model_lower))
+                        return res
                     if states[q] == AT_LOWER:
                         states[q] = AT_UPPER
                         x[q] = upper[q]
                     else:
                         states[q] = AT_LOWER
                         x[q] = lower[q]
+                        if q in artificial_bound_vars:
+                            upper[q] = orig_upper[q]
                     it += 1
                     continue
 
             # 8. Pivot: FTRAN for column q
+            consecutive_flips = 0
             col_r, col_v = M_csc.get_col(q)
             a_q = np.zeros(m, dtype=np.float64)
             a_q[col_r] = col_v
@@ -581,6 +819,8 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
             if sigma == +1:
                 states[leaving_var] = AT_LOWER
                 x[leaving_var] = lower[leaving_var]
+                if leaving_var in artificial_bound_vars:
+                    upper[leaving_var] = orig_upper[leaving_var]
             else:
                 states[leaving_var] = AT_UPPER
                 x[leaving_var] = upper[leaving_var]
@@ -588,6 +828,8 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
             # Update entering variable state
             states[q] = BASIC
             basis[p] = q
+            if q in artificial_bound_vars:
+                upper[q] = orig_upper[q]
             nonbasic = [j for j in range(total_cols) if states[j] != BASIC]
 
             # Update Devex weights
@@ -630,7 +872,13 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
             'consecutive_degenerate_pivots': consecutive_degenerate,
             'matrix_storage_used': 'csc',
             'basis_storage_used': 'sparse',
+            'linear_algebra_used': 'sparse',
             'full_dense_matrix_materialized': False,
+            'phase1_artificial_bounds_used': bool(len(artificial_bound_vars) > 0),
+            'phase1_artificial_bound_count': len(artificial_bound_vars),
+            'phase1_artificial_bounds_removed': True,
+            'phase1_artificial_bound_hit': False,
+            'original_bounds_unchanged': bool(np.array_equal(model.upper, orig_model_upper) and np.array_equal(model.lower, orig_model_lower)),
             'history': history,
         }
         res_dict.update(la_tel)
@@ -645,4 +893,9 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
         res['method_requested'] = 'dual-simplex'
         res['method_used'] = 'primal-simplex'
         res['fallback_reason'] = f"dual_simplex_exception: {e}"
+        res['phase1_artificial_bounds_used'] = bool(len(artificial_bound_vars) > 0)
+        res['phase1_artificial_bound_count'] = len(artificial_bound_vars)
+        res['phase1_artificial_bounds_removed'] = True
+        res['phase1_artificial_bound_hit'] = False
+        res['original_bounds_unchanged'] = bool(np.array_equal(model.upper, orig_model_upper) and np.array_equal(model.lower, orig_model_lower))
         return res

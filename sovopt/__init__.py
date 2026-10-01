@@ -1,13 +1,13 @@
-"""SOV-OPT reference prototype 0.1.8."""
+"""SOV-OPT reference prototype 0.1.9."""
 import platform, time
 from datetime import datetime, timezone
 from .model import Model, load
 from .dispatcher import auto_dispatch, inspect_model
 from .refinery_twin import build_refinery_twin
 
-__version__ = '0.1.8'
+__version__ = '0.1.9'
 
-def solve(model, backend='cpu', tol=1e-7, method='auto', **options):
+def solve(model, backend='cpu', tol=1e-7, method='auto', presolve=True, scaling=True, **options):
     model.validate()
     if not 1e-10 <= tol <= 1e-4:
         raise ValueError('Tolerance must be between 1e-10 and 1e-4')
@@ -36,10 +36,10 @@ def solve(model, backend='cpu', tol=1e-7, method='auto', **options):
         r = solve_qp(model, tol=tol, **options)
     elif selected_method == 'dual-simplex':
         from .dual_simplex import solve_dual_simplex
-        r = solve_dual_simplex(model, tol=tol, **options)
+        r = solve_dual_simplex(model, tol=tol, presolve=presolve, scaling=scaling, **options)
     else:
         from .simplex import solve_lp
-        r = solve_lp(model, tol=tol, **options)
+        r = solve_lp(model, tol=tol, scaling=scaling, **options)
 
     r.pop('dual_exact_fraction', None)
     if 'basis_state' in r and hasattr(r['basis_state'], 'to_dict'):
@@ -59,6 +59,25 @@ def solve(model, backend='cpu', tol=1e-7, method='auto', **options):
         dispatch=disp,
         machine=dict(system=platform.system(), architecture=platform.machine(), python=platform.python_version())
     )
+    r['method_requested'] = method
+    r['method_selected'] = selected_method
+    r['selection_reason'] = disp['rationale']
+    if 'method_used' not in r:
+        if selected_method == 'simplex':
+            r['method_used'] = 'primal-simplex'
+        else:
+            r['method_used'] = selected_method
+    if 'fallback_reason' not in r:
+        r['fallback_reason'] = None
+    if 'linear_algebra_used' not in r:
+        if effective_backend.startswith('pdhg'):
+            r['linear_algebra_used'] = 'pdhg'
+        elif r.get('matrix_storage_used') == 'csc' or r.get('basis_storage_used') == 'sparse':
+            r['linear_algebra_used'] = 'sparse'
+        else:
+            r['linear_algebra_used'] = 'dense'
+    r.setdefault('presolve_applied', presolve if selected_method in ('dual-simplex', 'simplex') else False)
+    r.setdefault('scaling_applied', scaling if selected_method in ('dual-simplex', 'simplex') else False)
     if model.maximize:
         r['objective_sense'] = 'maximize'
     if model.obj_offset != 0.0:
