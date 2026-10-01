@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-01T15:51:50.887001+00:00",
-  "git_revision": "0759f81122cee331833af1603316ad07f690f527+dirty",
+  "generated_at": "2026-10-01T16:08:46.272127+00:00",
+  "git_revision": "a9753433509ff530f9929ed9977c117e6bd6cf85+dirty",
   "environment": "Darwin arm64, Python 3.11.16",
   "note": "External validation run by invoking scripts/baseline_worker.py in an isolated subprocess. Comparison results reflect actual subprocess output. If highspy is unavailable in the subprocess Python, baseline_worker falls back to scipy.optimize.linprog/milp. If both fail, status is FAILED with actual_error recorded.",
   "instances": {
@@ -23,7 +23,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 6,
       "ipm_iterations": 0,
-      "seconds": 0.003150499998810119,
+      "seconds": 0.00041658300142444205,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -59,7 +59,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 18,
       "ipm_iterations": 0,
-      "seconds": 0.0004852090005442733,
+      "seconds": 0.0004970829995727399,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -95,7 +95,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 18,
       "ipm_iterations": 0,
-      "seconds": 0.0004881250006292248,
+      "seconds": 0.000496832999488106,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -131,7 +131,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 80,
       "ipm_iterations": 0,
-      "seconds": 0.0010179580003750743,
+      "seconds": 0.0010208749990852084,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -167,7 +167,7 @@
       "has_dual_solution": false,
       "simplex_iterations": 858,
       "ipm_iterations": -1,
-      "seconds": 0.047383999999510706,
+      "seconds": 0.03882366700054263,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",

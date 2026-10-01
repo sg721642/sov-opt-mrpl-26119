@@ -2,6 +2,19 @@
 
 ## [0.1.6] - 2026-10-01
 
+### Gate 2.2: Provenance and Dataset-Layout Consistency Patch
+
+- **Dataset Layout Architecture:** Separated active public runtime performance benchmarks (`data/verified/`, 5 instances: AFIRO, SC50A, SC50B, BLEND, FLUGPL) from public certificate-validation datasets (`data/certificate_validation/`, 1 instance: WOODINFE). Updated `data/manifest.json` with dedicated `"certificate_validation_instances"` section.
+- **Authoritative Netlib WOODINFE Provenance:** Corrected primary upstream provenance for `WOODINFE` to the authoritative Netlib LP / Infeasible collection (`https://www.netlib.org/lp/infeas/`, curated by John W. Chinneck 1993, contributed by Harvey J. Greenberg 1993). Literature attribution: Greenberg (1993), *Annals of Mathematics and Artificial Intelligence*. HiGHS test suite recorded strictly as an independent cross-validation reference mirror with identical SHA-256 (`26cb8633...`).
+- **Exact Unbounded Search Audit Scope:** Replaced over-broad negative claims with exact searched audit scope: *"No suitable provenance-verified public unbounded LP instance was identified in the Netlib and HiGHS collections searched during this audit (search date: 2026-10-01)."* Retained formal status: `PUBLIC UNBOUNDED CERTIFICATE BENCHMARK: NOT YET AVAILABLE`.
+- **Five Distinct Model Categories Established:** Synchronized documentation across `README.md`, `data/CATALOGUE.md`, `docs/STATUS_SEMANTICS.md`, and `docs/VALIDATION.md` establishing 5 distinct categories:
+  - *Category A (Public Performance Benchmark):* 5 instances (AFIRO, SC50A, SC50B, BLEND, FLUGPL)
+  - *Category B (Public Certificate-Validation Dataset):* 1 instance (WOODINFE)
+  - *Category C (Representative Refinery Formulation):* 1 model with 4 operational variants (MRPL Planning Twin)
+  - *Category D (Internal Mathematical Unit Fixture):* 18 fixtures (`TestUnboundedCertificateHardening`)
+  - *Category E (Quarantined Dataset):* 1 instance (AVGAS)
+- **Competition Integrity Statement:** Formalized explicit declaration across documentation: *"No synthetic or team-invented model is used as public benchmark, performance evidence, accuracy evidence, or industrial-data evidence. Small handcrafted models are used only as isolated mathematical unit tests."*
+
 ### Gate 2.1: Complete Unbounded Certificate Hardening & Authentic Infeasible Evidence
 
 - **`sovopt/verify.py` — `verify_unbounded_certificate(model, x0, d, tol=1e-7)`:** Implemented complete

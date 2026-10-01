@@ -112,9 +112,9 @@ The repository includes a parameterised multi-period digital twin formulation re
 
 ---
 
-## Active Verified Datasets
+## Active Verified Datasets & Model Categories
 
-All models in the active benchmark suite (`data/verified/`) are genuine, provenance-verified instances from authoritative sources:
+All models in the active performance suite (`data/verified/`) are genuine, provenance-verified instances from authoritative sources:
 
 | Dataset | Problem Class | Origin | Reference Objective / Bound |
 |:---|:---:|:---|:---|
@@ -123,6 +123,17 @@ All models in the active benchmark suite (`data/verified/`) are genuine, provena
 | **SC50B** | LP | Netlib staircase dynamic production LP | -70.000000000 (MINOS 5.3) |
 | **BLEND** | LP | Netlib petroleum refinery blending LP (Murtagh) | -30.812149846 (MINOS 5.3) |
 | **FLUGPL** | MILP | MIPLIB airline fleet allocation model (Wagner et al.) | 1201500.0 (integer optimum) |
+
+### Dataset Architecture & Category Separation
+
+SOV-OPT maintains strict dataset separation across five categories:
+1. **Category A (Public Performance Benchmark):** 5 instances in `data/verified/` (AFIRO, SC50A, SC50B, BLEND, FLUGPL).
+2. **Category B (Public Certificate-Validation Dataset):** 1 instance in `data/certificate_validation/` (WOODINFE — Netlib infeasible LP collection, Chinneck 1993 / Greenberg 1993; evaluated strictly for Farkas certificate validity, not runtime speed).
+3. **Category C (Representative Refinery Formulation):** 1 model with 4 operational variants (`sovopt/refinery_twin.py`, MRPL digital twin with continuous LP, discrete MILP, smooth QP, and infeasible diagnostic variants).
+4. **Category D (Internal Mathematical Unit Fixture):** 18 edge cases in `TestUnboundedCertificateHardening` (`tests/test_solver.py`).
+5. **Category E (Quarantined Dataset):** 1 instance in `data/quarantined/` (AVGAS).
+
+> *COMPETITION INTEGRITY STATEMENT: No synthetic or team-invented model is used as public benchmark, performance evidence, accuracy evidence, or industrial-data evidence. Small handcrafted models are used only as isolated mathematical unit tests.*
 
 *Full provenance, hashes, and redistribution terms are recorded in [`data/CATALOGUE.md`](data/CATALOGUE.md).*
 
@@ -144,6 +155,7 @@ $$\text{LP} \longrightarrow \text{MILP} \longrightarrow \text{QP} \longrightarro
 - **Primal Simplex Only:** The current LP implementation is primal revised simplex. Dual simplex, Devex pricing, and basis warm-starts are not yet implemented.
 - **MILP Scale:** Branch-and-bound uses cold-start LP relaxations. Large integer problems reach node limits. FLUGPL terminates at `LIMIT_REACHED` at 50 nodes with a valid conservative lower bound, but no incumbent found.
 - **QP Conditioning:** The interior-point method solves normal equations via dense LU; severely ill-conditioned matrices may encounter numerical failure.
+- **Public Unbounded Benchmark:** No suitable provenance-verified public unbounded LP instance was identified in the Netlib and HiGHS collections searched during this audit (search date: 2026-10-01). Therefore: `PUBLIC UNBOUNDED CERTIFICATE BENCHMARK: NOT YET AVAILABLE`. Handcrafted test cases are used solely as internal mathematical unit fixtures.
 - **CUDA / GPU Acceleration:** The development environment is macOS Apple Silicon (ARM64), which lacks NVIDIA CUDA hardware. `gpu_executed` is strictly `false` on all local runs. CUDA source exists in `sovopt/pdhg.py` but requires physical NVIDIA hardware to execute.
 - **Defensible Competition Claims:** We do not claim commercial-solver parity across all benchmark libraries or universal zero errors. We do claim: an original sovereign core, mathematically verified solutions with rigorous KKT and exact rational certificates, zero external solver dependencies in the solver core, and an authentic parameterised refinery planning digital twin.
 

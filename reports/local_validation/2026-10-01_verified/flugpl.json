@@ -258,10 +258,10 @@
   "model_name": "flugpl",
   "model_sha256": "8ac7f0195eb38f3ff192e669609da587f33d5c8a8744e62e1f2b809074eb7cb6",
   "solver_version": "0.1.6",
-  "elapsed_seconds": 1.0189564159991278,
+  "elapsed_seconds": 1.0372561660005886,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T15:51:52.948548+00:00",
+  "timestamp_utc": "2026-10-01T16:08:48.361761+00:00",
   "variables": 18,
   "rows": 18,
   "nonzeros": 46,
@@ -287,7 +287,7 @@
     "architecture": "arm64",
     "python": "3.11.16"
   },
-  "measured_duration_seconds": 1.0189941669996188,
-  "git_revision": "0759f81122cee331833af1603316ad07f690f527+dirty",
+  "measured_duration_seconds": 1.0372873750002327,
+  "git_revision": "a9753433509ff530f9929ed9977c117e6bd6cf85+dirty",
   "input_mps_sha256": "a1f0cb79a95639450dd984473a00efca24365457153d7fcb859c6581ddab4c2c"
 }

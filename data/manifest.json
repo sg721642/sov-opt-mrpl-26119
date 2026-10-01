@@ -152,5 +152,27 @@
       "matrix_nonzeros": 30,
       "quarantine_reason": "Historical petroleum blending attribution (Charnes et al. 1952 / Symonds 1955) has not been independently verified against primary literature in this project. MPS file source (HiGHS repository check/instances/avgas.mps) and SHA-256 are verified. Quarantined outside active runtime paths."
     }
+  },
+  "certificate_validation_instances": {
+    "woodinfe": {
+      "name": "WOODINFE",
+      "class": "LP",
+      "category": "Public certificate-validation dataset (infeasible LP)",
+      "domain": "Network-based forestry model infeasibility diagnosis (Harvey J. Greenberg, 1993)",
+      "primary_source_url": "https://www.netlib.org/lp/infeas/",
+      "primary_collection": "Netlib LP / Infeasible collection (John W. Chinneck, 1993)",
+      "reference_mirror_url": "https://raw.githubusercontent.com/ERGO-Code/HiGHS/master/check/instances/woodinfe.mps",
+      "mps_file": "data/certificate_validation/woodinfe.mps",
+      "retrieval_date": "2026-10-01",
+      "sha256": "26cb8633b4d9bb9dcbd60b04534ef7b9b0709a67b0ba62c0a95481a8ea71181f",
+      "variables": 89,
+      "constraints": 35,
+      "integers": 0,
+      "matrix_nonzeros": 209,
+      "objective_sense": "MINIMIZE",
+      "expected_status": "INFEASIBLE_CERTIFIED",
+      "certificate_type": "Exact binary-rational Farkas ray (y >= 0, y^T A <= 0, y^T b > 0)",
+      "literature_attribution": "Greenberg, H.J. (1993), 'How to Analyze the Results of Linear Programs - Part 3: Infeasibility Diagnosis', Annals of Mathematics and Artificial Intelligence."
+    }
   }
 }

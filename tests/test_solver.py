@@ -867,14 +867,15 @@ class TestUnboundedCertificateHardening(unittest.TestCase):
         # Dimension mismatch in direction
         self.assertFalse(verify_unbounded_certificate(m, [0.0], [1.0, 0.0])['verified'])
 
-    def test_highs_woodinfe_infeasible_farkas_certified(self):
-        """Authentic public infeasible LP benchmark: HiGHS woodinfe.mps.
+    def test_netlib_woodinfe_infeasible_farkas_certified(self):
+        """Authentic public certificate-validation dataset: Netlib WOODINFE (lp/infeas).
+        Primary source: Netlib LP / Infeasible collection (Chinneck 1993 / Greenberg 1993).
         Confirms sovopt generates a verified exact rational Farkas certificate.
         """
         from sovopt import load, solve
-        wood_path = ROOT / "data" / "verified" / "woodinfe.mps"
+        wood_path = ROOT / "data" / "certificate_validation" / "woodinfe.mps"
         if not wood_path.exists():
-            self.skipTest("data/verified/woodinfe.mps not found")
+            self.skipTest("data/certificate_validation/woodinfe.mps not found")
         m = load(wood_path)
         r = solve(m)
         self.assertEqual(r['status'], 'INFEASIBLE_CERTIFIED')

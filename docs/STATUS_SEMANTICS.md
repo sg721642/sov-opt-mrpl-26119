@@ -181,16 +181,27 @@ which are losslessly representable as rational numbers.
 - Exact rational Farkas and Lagrangian bounds use the binary64 model coefficients as
   exact rationals; they do not account for measurement error in input data.
 - The simplex implementation is dense (no sparse infrastructure in this version).
-- **Public Infeasible Certificate Benchmark:** `WOODINFE` from the official HiGHS test
-  suite (`data/verified/woodinfe.mps`) is admitted as a genuine public infeasible LP
-  benchmark with verified exact rational Farkas certificate.
-- **Public Unbounded Certificate Benchmark:** Search of authoritative public archives
-  (Netlib LP, HiGHS test suite) confirmed that no authentic public unbounded LP
-  instances in standard MPS format are available. Therefore:
+- **Public Certificate-Validation Dataset (Infeasible LP):** `WOODINFE` from the
+  authoritative Netlib LP / Infeasible collection (`data/certificate_validation/woodinfe.mps`;
+  Chinneck 1993, Greenberg 1993) is maintained exclusively for mathematical certificate
+  validation with verified exact rational Farkas certificate ($y \ge 0, y^T A \le 0, y^T b > 0$).
+  HiGHS test suite serves as an independent reference mirror with identical SHA-256.
+- **Public Unbounded Certificate Benchmark:** No suitable provenance-verified public unbounded
+  LP instance was identified in the Netlib and HiGHS collections searched during this audit
+  (search date: 2026-10-01). Therefore:
   **PUBLIC UNBOUNDED CERTIFICATE BENCHMARK: NOT YET AVAILABLE**.
   Unit test instances in `tests/test_solver.py` are strictly labeled
   `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are explicitly excluded
   from public benchmark counts and performance reports.
+- **Model Categories & Dataset Integrity:** No synthetic or team-invented model is used as
+  public benchmark, performance evidence, accuracy evidence, or industrial-data evidence.
+  Small handcrafted models are used only as isolated mathematical unit tests.
+  All optimization models are categorized into five distinct tiers:
+  1. *Category A: Active Public Performance Benchmarks* (5 instances: AFIRO, SC50A, SC50B, BLEND, FLUGPL)
+  2. *Category B: Public Certificate-Validation Datasets* (1 instance: WOODINFE)
+  3. *Category C: Representative Refinery Formulations* (1 model: MRPL Planning Twin with 4 variants)
+  4. *Category D: Internal Mathematical Unit Fixtures* (18 fixtures: `TestUnboundedCertificateHardening`)
+  5. *Category E: Quarantined Datasets* (1 instance: AVGAS)
 
 ---
 

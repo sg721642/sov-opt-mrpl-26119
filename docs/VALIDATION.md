@@ -80,38 +80,54 @@ Output is written to \`reports/external_validation.json\` and summarized in \`re
 
 ## 4. Current Evidence Locations
 
-- **Automated Benchmark Report:** \`reports/VERIFIED_BENCHMARKS.md\`
-- **External Validation JSON:** \`reports/external_validation.json\`
-- **Local Solve Records (timestamped):** \`reports/local_validation/2026-10-01_verified/\`
-  - \`afiro.json\`, \`sc50a.json\`, \`sc50b.json\`, \`blend.json\`, \`flugpl.json\`, \`afiro_pdhg.json\`, \`summary.json\`
-- **Verified Dataset Files:** \`data/verified/\` (MPS and normalized JSON)
-- **Dataset Provenance and Metadata:** \`data/CATALOGUE.md\` and \`data/manifest.json\`
-- **Quarantined Datasets:** \`data/quarantined/\`
+- **Automated Benchmark Report:** `reports/VERIFIED_BENCHMARKS.md`
+- **External Validation JSON:** `reports/external_validation.json`
+- **Local Solve Records (timestamped):** `reports/local_validation/2026-10-01_verified/`
+  - `afiro.json`, `sc50a.json`, `sc50b.json`, `blend.json`, `flugpl.json`, `afiro_pdhg.json`, `summary.json`
+- **Active Public Performance Benchmarks:** `data/verified/` (5 instances: AFIRO, SC50A, SC50B, BLEND, FLUGPL)
+- **Public Certificate-Validation Datasets:** `data/certificate_validation/` (1 instance: WOODINFE)
+- **Representative Refinery Formulations:** `sovopt/refinery_twin.py` (4 variants: LP, MILP, QP, Infeasible)
+- **Dataset Provenance and Metadata:** `data/CATALOGUE.md` and `data/manifest.json`
+- **Quarantined Datasets:** `data/quarantined/` (1 instance: AVGAS)
 
 ---
 
 ## 5. Coverage Gaps & Honest Disclosures
 
-1. **MILP \`OPTIMAL_VERIFIED\` Coverage Gap:**
-   - There is currently no admitted genuine MILP instance in the verified suite that solves to full tree closure (\`OPTIMAL_VERIFIED\`) within practical automated test time limits on this machine.
-   - MIPLIB \`FLUGPL\` reaches \`LIMIT_REACHED\` at 50 nodes, advancing the conservative lower bound to approximately \`1173644.9999999998\` (optimal is 1201500).
+1. **Dataset Integrity & Five Distinct Categories:**
+   - No synthetic or team-invented model is used as public benchmark, performance evidence, accuracy evidence, or industrial-data evidence. Small handcrafted models are used only as isolated mathematical unit tests.
+   - All models are organized into five distinct tiers:
+     - **Category A (Public Performance Benchmark):** 5 instances in `data/verified/` (AFIRO, SC50A, SC50B, BLEND, FLUGPL).
+     - **Category B (Public Certificate-Validation Dataset):** 1 instance in `data/certificate_validation/` (WOODINFE).
+     - **Category C (Representative Refinery Formulation):** 1 model with 4 operational variants (`sovopt/refinery_twin.py`).
+     - **Category D (Internal Mathematical Unit Fixture):** 18 edge cases in `TestUnboundedCertificateHardening` (`tests/test_solver.py`).
+     - **Category E (Quarantined Dataset):** 1 instance in `data/quarantined/` (AVGAS).
+
+2. **MILP `OPTIMAL_VERIFIED` Coverage Gap:**
+   - There is currently no admitted genuine MILP instance in the verified suite that solves to full tree closure (`OPTIMAL_VERIFIED`) within practical automated test time limits on this machine.
+   - MIPLIB `FLUGPL` reaches `LIMIT_REACHED` at 50 nodes, advancing the conservative lower bound to approximately `1173644.9999999998` (optimal is 1201500).
    - The optimality basis language regression is verified by code inspection and invariant checks; no synthetic MILP model has been constructed to manufacture a false green badge.
 
-2. **Proprietary MRPL Refinery Data (Empty State):**
+3. **Proprietary MRPL Refinery Data (Empty State):**
    - No authorized MRPL refinery dataset is available in this project.
-   - Fictional refinery numbers are prohibited. Netlib refinery LP \`BLEND\` is provided as an authentic blending problem.
+   - Fictional refinery numbers are prohibited. Netlib refinery LP `BLEND` is provided as an authentic blending problem.
 
-3. **Industrial Convex QP Data (Empty State):**
+4. **Industrial Convex QP Data (Empty State):**
    - No authentic public industrial convex QP benchmark is currently admitted. Synthetic toy models have been removed.
    - Convex QP solving is validated via continuous KKT conditions on positive semi-definite matrices.
 
-4. **AVGAS Historical Provenance (Quarantined):**
-   - \`avgas.mps\` is sourced from the HiGHS repository (SHA-256 verified).
+5. **AVGAS Historical Provenance (Quarantined):**
+   - `avgas.mps` is sourced from the HiGHS repository (SHA-256 verified).
    - Its historical attribution to Charnes, Cooper, Mellon (1952) and Symonds (1955) has not been verified against primary literature. It is quarantined outside active runtime paths.
 
-5. **CUDA Acceleration (Hardware Unavailable):**
+6. **Public Unbounded Certificate Benchmark (Not Yet Available):**
+   - No suitable provenance-verified public unbounded LP instance was identified in the Netlib and HiGHS collections searched during this audit (search date: 2026-10-01).
+   - Therefore: **PUBLIC UNBOUNDED CERTIFICATE BENCHMARK: NOT YET AVAILABLE**.
+   - Unit test instances in `tests/test_solver.py` are strictly labeled `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are explicitly excluded from public benchmark counts and performance reports.
+
+7. **CUDA Acceleration (Hardware Unavailable):**
    - Development is performed on Apple Silicon ARM64, which lacks NVIDIA CUDA hardware.
-   - \`gpu_executed\` is strictly \`false\` on all local runs. CUDA kernels in \`sovopt/pdhg.py\` remain unvalidated until tested on a physical NVIDIA device.
+   - `gpu_executed` is strictly `false` on all local runs. CUDA kernels in `sovopt/pdhg.py` remain unvalidated until tested on a physical NVIDIA device.
 
 ---
 
