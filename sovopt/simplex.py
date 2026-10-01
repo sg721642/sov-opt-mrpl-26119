@@ -10,8 +10,8 @@ from fractions import Fraction as F
 from math import lcm
 import numpy as np
 from .linalg import LU, NumericalError
-from .transforms import transform_model, postsolve_primal, postsolve_dual, postsolve_ray
-from .verify import verify, exact_farkas, verify_unbounded_ray
+from .transforms import transform_model, postsolve_primal, postsolve_dual, postsolve_ray, postsolve_direction
+from .verify import verify, exact_farkas, verify_unbounded_ray, verify_unbounded_certificate
 
 class _UnboundedError(Exception):
     """Raised by _iterate when an unbounded direction is found.
@@ -394,15 +394,16 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
 
         if unbounded_rays:
             ray = unbounded_rays[0]
-            ray_report = verify_unbounded_ray(model, ray, tol=tol)
-            if not ray_report['verified']:
+            # x is the feasible base point; verify the full certificate (x0, d)
+            cert = verify_unbounded_certificate(model, x, ray, tol=tol)
+            if not cert['verified']:
                 return dict(status='NUMERICAL_FAILURE',
-                            message=f'Box unbounded direction failed verification: {ray_report["message"]}',
-                            ray_verification=ray_report,
+                            message=f'Box unbounded certificate failed: {cert["message"]}',
+                            ray_verification=cert,
                             algorithm='separable box analysis', iterations=0, history=history)
             return dict(status='UNBOUNDED_CERTIFIED', message='LP is unbounded in box direction',
                         ray=ray.tolist(), base_point=x.tolist(), x=x.tolist(),
-                        ray_verification=ray_report,
+                        ray_verification=cert,
                         algorithm='separable box analysis', iterations=0, history=history)
 
         z_box = _dual_for_separable_box(model)
@@ -493,15 +494,16 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
             t_ray = np.zeros(n_trans); t_ray[k] = 1.0
             ray = postsolve_ray(t_ray, trans)
             if model.c @ ray < 0.0:
-                ray_report = verify_unbounded_ray(model, ray, tol=tol)
-                if not ray_report['verified']:
+                # x_base is the feasible base point at current t=0 point postsolved
+                cert = verify_unbounded_certificate(model, x_base, ray, tol=tol)
+                if not cert['verified']:
                     return dict(status='NUMERICAL_FAILURE',
-                                message=f'Unconstrained unbounded direction failed verification: {ray_report["message"]}',
-                                ray_verification=ray_report,
+                                message=f'Unconstrained unbounded certificate failed: {cert["message"]}',
+                                ray_verification=cert,
                                 algorithm='transformed unconstrained analysis', iterations=0, history=history)
                 return dict(status='UNBOUNDED_CERTIFIED', message='LP is unbounded in transformed direction',
                             ray=ray.tolist(), base_point=x_base.tolist(), x=x_base.tolist(),
-                            ray_verification=ray_report,
+                            ray_verification=cert,
                             algorithm='transformed unconstrained analysis', iterations=0, history=history)
 
         z_uncon = _dual_for_fixed_vars(model)
@@ -630,41 +632,48 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True):
         return res_dict
 
     except _UnboundedError as ue:
-        # Recover the full transformed-space direction d_trans from the simplex direction.
-        # d_basis = B^{-1} a_entering, d_entering = 1; all other columns are zero.
-        # Reconstruct the full length-total_cols direction vector in t-space.
         try:
-            d_full = np.zeros(total_cols, dtype=float)
             basis_snap = ue.basis_snapshot
             d_basis = ue.d_basis
             entering = ue.entering
+            xb_snap = ue.xb_snapshot
+
+            # Reconstruct transformed primal base point t_vars and postsolve to original x_base
+            t_full = np.zeros(total_cols, dtype=float)
             for row_idx, col_idx in enumerate(basis_snap):
-                if col_idx < n_trans:
-                    d_full[col_idx] -= d_basis[row_idx]
-            if entering < n_trans:
-                d_full[entering] += 1.0
-            # t-space direction (first n_trans coords)
+                t_full[col_idx] = max(0.0, float(xb_snap[row_idx]))
+            t_vars = t_full[:n_trans]
+            x_base = postsolve_primal(t_vars, trans)
+
+            # Reconstruct transformed direction vector d_t and postsolve to original d_orig
+            d_full = np.zeros(total_cols, dtype=float)
+            for row_idx, col_idx in enumerate(basis_snap):
+                d_full[col_idx] -= d_basis[row_idx]
+            d_full[entering] += 1.0
+
             d_t = d_full[:n_trans]
-            # Postsolve to original variable space
-            d_orig = postsolve_ray(d_t, trans)
-            # Independently verify the recession direction against the original model
-            ray_report = verify_unbounded_ray(model, d_orig, tol=tol)
-            if ray_report['verified']:
+            d_orig = postsolve_direction(d_t, trans)
+
+            # Independently verify the complete certificate (x0, d) against the original model
+            cert = verify_unbounded_certificate(model, x_base, d_orig, tol=tol)
+            if cert['verified']:
                 return dict(
                     status='UNBOUNDED_CERTIFIED',
-                    message='LP is unbounded; recession direction independently verified',
+                    message='LP is unbounded; recession certificate (x0, d) independently verified',
                     ray=d_orig.tolist(),
-                    ray_verification=ray_report,
+                    base_point=x_base.tolist(),
+                    x=x_base.tolist(),
+                    ray_verification=cert,
                     algorithm='two-phase primal revised simplex',
                     iterations=history[-1]['iteration'] if history else 0,
                     history=history,
                 )
             else:
-                # Ray failed independent verification — cannot safely certify unboundedness
+                # Certificate failed independent verification — cannot safely certify unboundedness
                 return dict(
                     status='NUMERICAL_FAILURE',
-                    message=f'Unbounded direction detected but failed verification: {ray_report["message"]}',
-                    ray_verification=ray_report,
+                    message=f'Unbounded direction detected but certificate verification failed: {cert["message"]}',
+                    ray_verification=cert,
                     algorithm='two-phase primal revised simplex',
                     history=history,
                 )

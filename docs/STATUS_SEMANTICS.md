@@ -1,6 +1,6 @@
 # SOV-OPT Solver Status Semantics
 
-**Version:** 0.1.5  
+**Version:** 0.1.6  
 **Applies to:** `sovopt/simplex.py`, `sovopt/milp.py`, `sovopt/qp.py`, `sovopt/pdhg.py`
 
 Every result dict returned by `solve()`, `solve_lp()`, `solve_milp()`, `solve_qp()`,
@@ -13,8 +13,13 @@ each status value means, what certificates accompany it, and what it does NOT cl
 
 ### `OPTIMAL_VERIFIED`
 
-**Meaning:** The solver found a candidate solution `x` that passes the independent
-floating-point KKT check in `sovopt/verify.py`.
+**Meaning:** Numerically verified global optimum for the supported convex problem class
+within stated tolerances; not a formal exact-rational or interval proof.
+
+For LP and supported convex QP, satisfaction of the first-order Karush-Kuhn-Tucker (KKT)
+primal-dual conditions is both necessary and sufficient for global optimality. In SOV-OPT,
+these conditions are verified independently in `sovopt/verify.py` using IEEE 754
+floating-point arithmetic within the user-specified tolerance `tol`.
 
 **What is checked:**
 - Primal feasibility: all row constraints and variable bounds satisfied within `tol`.
@@ -23,8 +28,8 @@ floating-point KKT check in `sovopt/verify.py`.
 - Complementary slackness: `z_i * (G_i x - h_i) ≈ 0`.
 
 **What this is NOT:**
-- Not a formal interval-arithmetic or exact rational optimality certificate.
-- Not a proof that no better feasible solution exists globally.
+- Not a formal exact-rational or interval-arithmetic optimality proof (checks are
+  evaluated in IEEE 754 floating-point arithmetic within tolerance `tol`).
 - For MILP: not an exact rational optimality certificate. Incumbent feasibility is
   verified numerically; relative gap is floating-point (see `optimality_basis` field).
 
@@ -53,25 +58,45 @@ Farkas certificate is constructed and independently verified.
 
 ### `UNBOUNDED_CERTIFIED`
 
-**Meaning:** The LP is unbounded — there exists a feasible recession direction `d`
-along which the objective decreases without bound. The direction is independently
-verified by `verify_unbounded_ray()` before this status is assigned.
+**Meaning:** The LP is unbounded — there exists a certified certificate pair $(x_0, d)$
+consisting of a feasible base point $x_0$ and an improving recession direction $d$
+along which the objective decreases (or increases for maximization) without bound.
+The complete certificate is independently verified by `verify_unbounded_certificate()`
+against the original model before this status is assigned.
 
-**What is checked (by `verify_unbounded_ray`):**
-1. **Improving direction:** `c^T d < 0` (for minimization; `c` is internal form).
-2. **Row recession:** For each row constraint, `A[i] @ d` satisfies the recession
-   condition for that row's bound type (equality, upper, lower, or range).
-3. **Variable bound directions:** For each variable, `d[j]` is consistent with the
-   variable's bound type (non-negative for lower-bounded-only variables, etc.).
+`UNBOUNDED_CERTIFIED` is returned **ONLY** when BOTH conditions hold:
+1. `base_feasible == True`: $x_0$ is a feasible point for the original model within `tol`.
+2. `ray_verified == True`: $d$ is a valid recession direction for the original model within `tol`.
 
-**What this is NOT:**
-- Not certifying that the LP has a feasible point (feasibility is assumed from the
-  Phase I completion; the recession direction is verified independently).
-- Floating-point verification, not exact rational.
+If either condition fails, the solver returns `NUMERICAL_FAILURE`.
 
-**Accompanying fields:** `ray` (verified direction vector), `ray_verification` dict
-containing `verified`, `obj_direction`, `max_row_violation`, `max_bound_violation`,
-`message`.
+**What is checked (by `verify_unbounded_certificate`):**
+1. **Base point feasibility ($x_0$):**
+   - Correct dimension and finite components.
+   - All original row lower and upper bounds satisfied within `tol`.
+   - All original variable lower and upper bounds satisfied within `tol`.
+2. **Row recession conditions ($d$):**
+   - Finite lower AND finite upper (equality or ranged row): $|A_i d| \le \text{rtol}$.
+   - Finite upper only: $A_i d \le \text{rtol}$.
+   - Finite lower only: $A_i d \ge -\text{rtol}$.
+   - No finite row bound: unrestricted.
+3. **Variable bound directions ($d$):**
+   - Finite lower AND finite upper: $|d_j| \le \text{tol}$ (bounded variable).
+   - Finite lower only: $d_j \ge -\text{tol}$.
+   - Finite upper only: $d_j \le \text{tol}$.
+   - Free variable: unrestricted.
+4. **Objective improvement:**
+   - Internal canonical minimization form: $c^T d < 0$.
+   - Original problem sense: objective strictly improves (decreases to $-\infty$ for min,
+     increases to $+\infty$ for max).
+5. **Purely linear direction postsolve:**
+   - Recession directions transform strictly through the linear mapping $d_x = D d_t$
+     via `postsolve_direction()`. Affine shifts $s$ are never added to directions.
+
+**Accompanying fields:** `base_point` ($x_0$), `ray` ($d$), `x` ($x_0$), `ray_verification`
+dict containing `verified`, `base_feasible`, `ray_verified`, `base_primal_residual`,
+`objective_direction`, `original_objective_direction`, `max_row_direction_violation`,
+`max_bound_direction_violation`, `message`.
 
 ---
 
@@ -97,8 +122,8 @@ objective, computed from exact rational Lagrangian bounds over the explored tree
 ### `NUMERICAL_FAILURE`
 
 **Meaning:** The solver detected an internal numerical problem (singular basis, lost
-primal feasibility, nonfinite iterates, or an `UNBOUNDED_CERTIFIED` direction that
-failed independent verification). No result can be trusted from this run.
+primal feasibility, nonfinite iterates, or an unverified unbounded certificate).
+No result can be trusted from this run.
 
 **What to do:**
 - Inspect `message` for the specific failure reason.
@@ -106,14 +131,17 @@ failed independent verification). No result can be trusted from this run.
 - Check the model for extreme dynamic range or near-degenerate structure.
 
 **Accompanying fields:** `message`, and optionally `ray_verification` if the failure
-was due to a failed ray check.
+was due to a failed certificate check.
 
 ---
 
-### `INVALID_MODEL`
+### Model Validation Exceptions (`ValueError`)
 
-**Meaning:** The model failed structural validation (`Model.validate()`) before solving.
-This is raised as a `ValueError` rather than returned as a status dict.
+`Model.validate()` enforces dimensional, bound, and coefficient consistency immediately
+upon model creation or before solving. When a model violates structural constraints
+(e.g., non-finite coefficients, contradictory bounds $l_j > u_j$, non-PSD $Q$), a
+`ValueError` exception is raised immediately. It is a Python exception, not a status
+code in a returned result dictionary.
 
 ---
 
@@ -121,11 +149,11 @@ This is raised as a `ValueError` rather than returned as a status dict.
 
 ```
 solve_lp() / solve_qp() / solve_milp() / solve_pdhg()
-    |
-    |-- sovopt/verify.py::verify()              KKT check (floating-point)
-    |-- sovopt/verify.py::exact_farkas()        Farkas check (exact rational Fractions)
-    |-- sovopt/verify.py::safe_lower_bound()    Lagrangian lower bound (exact rational)
-    +-- sovopt/verify.py::verify_unbounded_ray() Ray check (floating-point)
+    │
+    ├── sovopt/verify.py::verify()                     KKT check (floating-point)
+    ├── sovopt/verify.py::exact_farkas()               Farkas check (exact rational Fractions)
+    ├── sovopt/verify.py::safe_lower_bound()           Lagrangian lower bound (exact rational)
+    └── sovopt/verify.py::verify_unbounded_certificate() Complete certificate (x0, d) check
 ```
 
 **All checks are floating-point unless explicitly marked "exact rational".**
@@ -138,26 +166,33 @@ which are losslessly representable as rational numbers.
 
 | Status | Implies feasibility? | Implies optimality? | Certificate type |
 |---|---|---|---|
-| `OPTIMAL_VERIFIED` | Yes (floating-point) | Yes (floating-point KKT) | KKT multipliers |
+| `OPTIMAL_VERIFIED` | Yes (floating-point) | Yes (floating-point KKT global optimum for convex models) | KKT multipliers |
 | `INFEASIBLE_CERTIFIED` | No | N/A | Exact rational Farkas |
-| `UNBOUNDED_CERTIFIED` | Assumed (Phase I passed) | N/A (minus-infinity) | Verified floating-point ray |
+| `UNBOUNDED_CERTIFIED` | Yes (verified at $x_0$) | N/A (improving direction $d$) | Certified pair $(x_0, d)$ |
 | `LIMIT_REACHED` | Unknown | No | Conservative rational bound (MILP only) |
 | `NUMERICAL_FAILURE` | Unknown | No | None |
 
 ---
 
-## Honest Limitations
+## Honest Limitations & Public Benchmark Status
 
-- All floating-point KKT checks are necessary but not sufficient conditions for exact
-  optimality. They are not formal mathematical proofs.
+- All floating-point KKT checks are necessary and sufficient for global optimality
+  of continuous convex problems, evaluated numerically within tolerance `tol`.
 - Exact rational Farkas and Lagrangian bounds use the binary64 model coefficients as
   exact rationals; they do not account for measurement error in input data.
 - The simplex implementation is dense (no sparse infrastructure in this version).
-- `UNBOUNDED_CERTIFIED` from the simplex path uses the Phase II entering column
-  direction; if the basis is numerically ill-conditioned, verification may fail and
-  `NUMERICAL_FAILURE` is returned instead.
+- **Public Infeasible Certificate Benchmark:** `WOODINFE` from the official HiGHS test
+  suite (`data/verified/woodinfe.mps`) is admitted as a genuine public infeasible LP
+  benchmark with verified exact rational Farkas certificate.
+- **Public Unbounded Certificate Benchmark:** Search of authoritative public archives
+  (Netlib LP, HiGHS test suite) confirmed that no authentic public unbounded LP
+  instances in standard MPS format are available. Therefore:
+  **PUBLIC UNBOUNDED CERTIFICATE BENCHMARK: NOT YET AVAILABLE**.
+  Unit test instances in `tests/test_solver.py` are strictly labeled
+  `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are explicitly excluded
+  from public benchmark counts and performance reports.
 
 ---
 
-*This document is part of the SOV-OPT architecture specification.*
+*This document is part of the SOV-OPT architecture specification.*  
 *See also: docs/ARCHITECTURE.md, docs/VALIDATION.md, sovopt/verify.py*

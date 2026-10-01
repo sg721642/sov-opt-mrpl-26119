@@ -174,95 +174,238 @@ def exact_farkas(model, z):
     return h_sum < 0
 
 
-def verify_unbounded_ray(model, d, x0=None, tol=1e-7):
-    """Independently verify that d is a valid unbounded recession direction for model.
+def verify_unbounded_certificate(model, x0, d, tol=1e-7):
+    """Verify a complete unbounded certificate (x0, d) against the original model.
 
-    A direction d is a valid recession direction iff:
-      1. Improving objective direction: c^T d < 0 for minimization (or c^T d > 0 for maximization,
-         noting that maximization stores negated c internally).
-      2. Row recession: for each finite-upper row,   A[i] @ d <= tol * (1 + |A[i]| @ |d|)
-                        for each finite-lower row,  -A[i] @ d <= tol * (1 + |A[i]| @ |d|)
-                        for each equality row, |A[i] @ d|  <= tol * (1 + |A[i]| @ |d|)
-      3. Variable bound directions:
-         - If lower[j] is finite and upper[j] is not: d[j] >= -tol  (can only go up or be fixed)
-         - If upper[j] is finite and lower[j] is not: d[j] <=  tol  (can only go down or be fixed)
-         - If both bounds finite:                    |d[j]| <= tol  (bounded, no recession direction)
-         - If both infinite: d[j] unrestricted.
+    An UNBOUNDED_CERTIFIED result is justified iff BOTH:
+      (A) x0 is a feasible base point satisfying all original model constraints, AND
+      (B) d is a valid recession direction satisfying all original row and bound conditions,
+          with an improving objective direction in the original problem sense.
 
-    KKT checks are floating-point (not exact rational). Returns a dict:
-      verified:        bool — True iff all conditions pass within tol
-      obj_direction:   float — c^T d (should be < 0 for min, > 0 for max internal)
-      max_row_violation: float — worst row recession violation
-      max_bound_violation: float — worst variable bound direction violation
-      message:         str — human-readable summary
+    This function verifies all conditions independently from the solver and is the
+    sole gate for returning UNBOUNDED_CERTIFIED from any code path.
+
+    Objective sense:
+    - model.c is stored in INTERNAL CANONICAL (minimization) form.
+    - If model.maximize is True, the original objective was maximisation; c was negated
+      before storage. An improving INTERNAL direction has c^T d < 0 (internal minimises
+      a larger-and-larger negated value, meaning the original maximisation objective
+      goes to +inf). We verify c^T d < 0 in BOTH senses because the stored c is always
+      the internal min coefficient.
+
+    Row recession conditions (for each row i):
+      Equality (row_lower[i] == row_upper[i] and both finite): A[i] @ d == 0
+      Upper bound only (finite row_upper[i]): A[i] @ d <= 0
+      Lower bound only (finite row_lower[i]): A[i] @ d >= 0
+      No finite bound: unrestricted
+
+    Variable bound directions (for each j):
+      Both bounds finite:    d[j] == 0   (bounded variable; no recession direction)
+      Lower bound only:      d[j] >= 0
+      Upper bound only:      d[j] <= 0
+      Free variable:         unrestricted
+
+    Returns a dict:
+      verified:               bool — True iff BOTH base_feasible and ray_verified
+      base_feasible:          bool — x0 satisfies all constraints within tol
+      ray_verified:           bool — d is a valid recession direction within tol
+      base_primal_residual:   float — worst scaled constraint violation at x0
+      objective_direction:    float — c^T d (internal; < 0 means improving)
+      max_row_direction_violation: float — worst row recession violation
+      max_bound_direction_violation: float — worst variable bound direction violation
+      message:                str — human-readable summary
     """
-    d = np.asarray(d, dtype=float)
     n = len(model.c)
-    if d.shape != (n,) or not np.isfinite(d).all():
-        return dict(verified=False, message='ray direction is nonfinite or wrong shape',
-                    obj_direction=None, max_row_violation=None, max_bound_violation=None)
 
-    # Condition 1: improving objective direction
-    # model.c is always in internal minimization form (negated if maximize=True)
-    obj_dir = float(model.c @ d)
-    # For internal minimization, an improving direction satisfies c^T d < 0.
-    obj_ok = obj_dir < -tol * (1.0 + np.max(np.abs(model.c)) * np.max(np.abs(d), initial=1.0))
-
-    # Condition 2: row recession constraints
-    m_rows = len(model.A)
-    row_viols = []
-    for i in range(m_rows):
-        ad = float(model.A[i] @ d)
-        scale = tol * (1.0 + float(np.abs(model.A[i]) @ np.abs(d)))
-        rl, ru = model.row_lower[i], model.row_upper[i]
-        if np.isfinite(rl) and np.isfinite(ru) and rl == ru:
-            # equality row: A[i] @ d must == 0
-            row_viols.append(abs(ad) - scale)
+    # --- Part A: base point feasibility ---
+    if x0 is None:
+        base_report = dict(base_feasible=False, base_primal_residual=float('inf'),
+                           message_base='no base point provided')
+    else:
+        x0 = np.asarray(x0, dtype=float)
+        if x0.shape != (n,) or not np.isfinite(x0).all():
+            base_report = dict(base_feasible=False, base_primal_residual=float('inf'),
+                               message_base='base point is nonfinite or wrong dimension')
         else:
-            if np.isfinite(ru):
-                row_viols.append(ad - scale)   # A[i]@d <= 0 required
-            if np.isfinite(rl):
-                row_viols.append(-ad - scale)  # A[i]@d >= 0 required
+            # Check variable bounds
+            lb_viol = np.maximum(model.lower - x0, 0.0)
+            ub_viol = np.maximum(x0 - model.upper, 0.0)
+            box_abs = float(max(lb_viol.max(), ub_viol.max()))
 
-    max_row_viol = float(max(row_viols, default=0.0))
-    row_ok = max_row_viol <= 0.0
+            # Check row constraints
+            m_rows = len(model.A)
+            row_viols_abs = []
+            row_viols_scaled = []
+            for i in range(m_rows):
+                ai_x = float(model.A[i] @ x0)
+                rl, ru = model.row_lower[i], model.row_upper[i]
+                if np.isfinite(ru):
+                    v = max(0.0, ai_x - float(ru))
+                    scale = 1.0 + abs(float(ru)) + float(np.abs(model.A[i]) @ np.abs(x0))
+                    row_viols_abs.append(v)
+                    row_viols_scaled.append(v / scale)
+                if np.isfinite(rl):
+                    v = max(0.0, float(rl) - ai_x)
+                    scale = 1.0 + abs(float(rl)) + float(np.abs(model.A[i]) @ np.abs(x0))
+                    row_viols_abs.append(v)
+                    row_viols_scaled.append(v / scale)
 
-    # Condition 3: variable bound directions
-    bound_viols = []
-    for j in range(n):
-        lj = model.lower[j]
-        uj = model.upper[j]
-        fin_lo = np.isfinite(lj)
-        fin_hi = np.isfinite(uj)
-        if fin_lo and fin_hi:
-            # Both finite — no recession direction is possible for this variable
-            bound_viols.append(abs(d[j]) - tol)
-        elif fin_lo:
-            # Only lower bound — d[j] must be >= 0 (or negligibly negative)
-            bound_viols.append(-d[j] - tol)
-        elif fin_hi:
-            # Only upper bound — d[j] must be <= 0 (or negligibly positive)
-            bound_viols.append(d[j] - tol)
-        # else: free variable, any d[j] is fine
+            bound_scale = 1.0 + float(np.max(np.abs(model.upper[np.isfinite(model.upper)]), initial=1.0))
+            primal_res_scaled = max(max(row_viols_scaled, default=0.0),
+                                    box_abs / bound_scale)
+            base_feasible = primal_res_scaled <= tol
+            base_report = dict(base_feasible=base_feasible,
+                               base_primal_residual=primal_res_scaled,
+                               message_base='base point feasible' if base_feasible else
+                                            f'base point infeasible (scaled residual {primal_res_scaled:.4g})')
 
-    max_bound_viol = float(max(bound_viols, default=0.0))
-    bound_ok = max_bound_viol <= 0.0
+    # --- Part B: direction verification ---
+    d = np.asarray(d, dtype=float)
+    if d.shape != (n,) or not np.isfinite(d).all():
+        dir_report = dict(ray_verified=False,
+                          objective_direction=None,
+                          max_row_direction_violation=float('inf'),
+                          max_bound_direction_violation=float('inf'),
+                          message_dir='recession direction is nonfinite or wrong dimension')
+    else:
+        # B1: Improving objective direction
+        # model.c is always internal minimization form. An improving direction has c^T d < 0.
+        # For maximisation models: c was negated before storage, so c^T d < 0 still means
+        # the stored min objective decreases, which equals the original max objective
+        # going to +inf. We always check c^T d < 0.
+        obj_dir = float(model.c @ d)
+        c_scale = tol * (1.0 + float(np.max(np.abs(model.c))) * float(np.max(np.abs(d), initial=1.0)))
+        obj_ok = obj_dir < -c_scale
 
-    verified = obj_ok and row_ok and bound_ok
-    msg_parts = []
-    if not obj_ok:
-        sense = 'maximization (internal min of negated c)' if model.maximize else 'minimization'
-        msg_parts.append(f'objective direction c^T d = {obj_dir:.4g} is not improving for {sense}')
-    if not row_ok:
-        msg_parts.append(f'row recession violated (max violation {max_row_viol:.4g})')
-    if not bound_ok:
-        msg_parts.append(f'variable bound direction violated (max violation {max_bound_viol:.4g})')
-    message = '; '.join(msg_parts) if msg_parts else 'ray verified as valid unbounded recession direction'
+        # B2: Row recession
+        m_rows = len(model.A)
+        row_dir_viols = []
+        for i in range(m_rows):
+            ad = float(model.A[i] @ d)
+            rtol = tol * (1.0 + float(np.abs(model.A[i]) @ np.abs(d)))
+            rl, ru = model.row_lower[i], model.row_upper[i]
+            if np.isfinite(rl) and np.isfinite(ru):
+                # Finite lower AND finite upper (equality or ranged row): A_i @ d must == 0
+                row_dir_viols.append(abs(ad) - rtol)
+            elif np.isfinite(ru):
+                # Finite upper only: A_i @ d <= 0
+                row_dir_viols.append(ad - rtol)
+            elif np.isfinite(rl):
+                # Finite lower only: A_i @ d >= 0
+                row_dir_viols.append(-ad - rtol)
+            # No finite bounds: unrestricted
+
+        max_row_viol = float(max(row_dir_viols, default=0.0))
+        row_ok = max_row_viol <= 0.0
+
+        # B3: Variable bound directions
+        bound_dir_viols = []
+        for j in range(n):
+            lj, uj = model.lower[j], model.upper[j]
+            fin_lo = np.isfinite(lj)
+            fin_hi = np.isfinite(uj)
+            if fin_lo and fin_hi:
+                bound_dir_viols.append(abs(d[j]) - tol)  # d[j] must be == 0
+            elif fin_lo:
+                bound_dir_viols.append(-d[j] - tol)       # d[j] must be >= 0
+            elif fin_hi:
+                bound_dir_viols.append(d[j] - tol)        # d[j] must be <= 0
+            # free: no constraint
+
+        max_bound_viol = float(max(bound_dir_viols, default=0.0))
+        bound_ok = max_bound_viol <= 0.0
+
+        ray_verified = obj_ok and row_ok and bound_ok
+        msg_parts = []
+        orig_obj_dir = float(-obj_dir if model.maximize else obj_dir)
+        if not obj_ok:
+            sense = 'max (internal neg-c)' if model.maximize else 'min'
+            msg_parts.append(f'c^T d = {obj_dir:.4g} not improving for {sense}')
+        if not row_ok:
+            msg_parts.append(f'row recession violated ({max_row_viol:.4g})')
+        if not bound_ok:
+            msg_parts.append(f'bound direction violated ({max_bound_viol:.4g})')
+
+        dir_report = dict(
+            ray_verified=ray_verified,
+            objective_direction=obj_dir,
+            original_objective_direction=orig_obj_dir,
+            max_row_direction_violation=max_row_viol,
+            max_bound_direction_violation=max_bound_viol,
+            message_dir='; '.join(msg_parts) if msg_parts else
+                        'direction verified as valid recession direction',
+        )
+
+    # --- Combine ---
+    base_feasible = base_report['base_feasible']
+    ray_verified = dir_report['ray_verified']
+    verified = base_feasible and ray_verified
+
+    msg = []
+    if not base_feasible:
+        msg.append(base_report['message_base'])
+    if not ray_verified:
+        msg.append(dir_report['message_dir'])
+    if verified:
+        msg.append('unbounded certificate (x0, d) fully verified')
 
     return dict(
         verified=verified,
-        obj_direction=obj_dir,
-        max_row_violation=max_row_viol,
-        max_bound_violation=max_bound_viol,
-        message=message,
+        base_feasible=base_feasible,
+        ray_verified=ray_verified,
+        base_primal_residual=base_report['base_primal_residual'],
+        objective_direction=dir_report['objective_direction'],
+        obj_direction=dir_report['objective_direction'],
+        original_objective_direction=dir_report.get('original_objective_direction'),
+        max_row_direction_violation=dir_report['max_row_direction_violation'],
+        max_bound_direction_violation=dir_report['max_bound_direction_violation'],
+        max_row_violation=dir_report['max_row_direction_violation'],
+        max_bound_violation=dir_report['max_bound_direction_violation'],
+        message='; '.join(msg),
     )
+
+
+def verify_unbounded_ray(model, d, x0=None, tol=1e-7):
+    """Direction-only verification subcheck (backward compatibility wrapper).
+
+    Calls verify_unbounded_certificate(model, x0, d, tol).
+
+    If x0 is None, base point feasibility check is SKIPPED and only direction
+    checks (B1-B3) are evaluated. This is used in tests of direction-only
+    logic. Production UNBOUNDED_CERTIFIED paths must use verify_unbounded_certificate
+    with a valid x0.
+
+    Returns the same dict structure as verify_unbounded_certificate with
+    base_feasible=True assumed when x0 is None (direction-only mode).
+    """
+    if x0 is None:
+        # Direction-only subcheck: skip base point feasibility
+        d = np.asarray(d, dtype=float)
+        n = len(model.c)
+        if d.shape != (n,) or not np.isfinite(d).all():
+            return dict(verified=False, base_feasible=None, ray_verified=False,
+                        base_primal_residual=None, objective_direction=None,
+                        obj_direction=None,
+                        max_row_violation=None, max_bound_violation=None,
+                        max_row_direction_violation=None, max_bound_direction_violation=None,
+                        message='ray direction is nonfinite or wrong shape')
+        # Reuse certificate logic with a dummy feasible x0 at lower bounds
+        x0_dummy = np.where(np.isfinite(model.lower), model.lower,
+                            np.where(np.isfinite(model.upper), model.upper, 0.0))
+        cert = verify_unbounded_certificate(model, x0_dummy, d, tol)
+        # Report direction result only; mask base_feasible to None to indicate skip
+        return dict(
+            verified=cert['ray_verified'],     # direction-only: ray_verified is the gate
+            base_feasible=None,                # skipped
+            ray_verified=cert['ray_verified'],
+            base_primal_residual=None,         # skipped
+            objective_direction=cert['objective_direction'],
+            obj_direction=cert['objective_direction'],
+            original_objective_direction=cert.get('original_objective_direction'),
+            max_row_violation=cert['max_row_direction_violation'],
+            max_bound_violation=cert['max_bound_direction_violation'],
+            max_row_direction_violation=cert['max_row_direction_violation'],
+            max_bound_direction_violation=cert['max_bound_direction_violation'],
+            message=cert['message_dir'] if 'message_dir' in cert else cert['message'],
+        )
+    return verify_unbounded_certificate(model, x0, d, tol)

@@ -19,7 +19,9 @@ parameters are presented as measured evidence.
 | **SC50B** | LP | Netlib staircase production model | **Active Verified** | -70.000000000 (MINOS 5.3) |
 | **BLEND** | LP | Netlib petroleum refinery blending model (Murtagh) | **Active Verified** | -30.812149846 (MINOS 5.3) |
 | **FLUGPL** | MILP | MIPLIB airline fleet allocation model (Wagner et al.) | **Active Verified** | 1201500.0 (integer optimum) |
+| **WOODINFE** | LP | HiGHS official infeasible LP benchmark | **Active Verified** | INFEASIBLE_CERTIFIED (exact Farkas) |
 | **AVGAS** | LP | HiGHS test suite instance (Symonds / Charnes attribution) | **Quarantined** | -7.75 (literature claim; unverified) |
+| **Unbounded LP** | LP | Authentic public unbounded benchmark | **Not Yet Available** | None (public archives lack standard unbounded MPS) |
 | **MRPL Data** | LP/MILP | Proprietary refinery operations data | **Empty State** | None (trade secret; not public) |
 | **Industrial QP** | QP | Industrial convex quadratic program | **Empty State** | None (no authentic public dataset verified) |
 
@@ -165,6 +167,28 @@ parameters are presented as measured evidence.
 
 ---
 
+### 6. WOODINFE — Contradictory Forestry Production Infeasible LP Benchmark
+
+- **Instance Name:** WOODINFE
+- **Problem Class:** Continuous Linear Program (LP)
+- **Category:** Documented infeasible LP benchmark
+- **Application / Domain:** Forestry and wood product allocation model with contradictory requirements, sourced from the official HiGHS optimization test repository.
+- **Original Source URL:** https://github.com/ERGO-Code/HiGHS/tree/master/check/instances
+- **Direct File URL:** https://raw.githubusercontent.com/ERGO-Code/HiGHS/master/check/instances/woodinfe.mps
+- **Retrieval Date:** 2026-10-01 (ISO 8601)
+- **SHA-256 (MPS):** `26cb8633b4d9bb9dcbd60b04534ef7b9b0709a67b0ba62c0a95481a8ea71181f`
+- **Format:** Fixed-column standard MPS (`data/verified/woodinfe.mps`).
+- **Licence / Redistribution:** MIT License (HiGHS copyright ERGO-Code).
+- **Dimensions:** 89 decision variables, 35 constraint rows, 0 integer variables.
+- **Objective Sense:** MINIMIZE (cost row `COST`).
+- **Published Reference Status:** `INFEASIBLE` (official HiGHS test suite expected status).
+- **SOV-OPT Measured Result:**
+  - Status: `INFEASIBLE_CERTIFIED`
+  - Certificate: Exact binary-rational Farkas certificate verified (`verification.farkas_verified = True`)
+  - Algorithm: Two-phase revised simplex (Phase I artificial sum > 0)
+
+---
+
 ## Quarantined Datasets
 
 ### AVGAS — Aviation Gasoline Blending LP (Quarantined)
@@ -187,3 +211,10 @@ parameters are presented as measured evidence.
 ### 2. Industrial Convex QP Data (Empty State)
 - No authentic public industrial convex QP dataset is currently admitted. Toy models have been removed.
 - The sovereign QP interior-point solver (`sovopt/qp.py`) is verified mathematically using KKT residual verification. Industrial QP benchmarks will be admitted when authentic public datasets are verified.
+
+### 3. Public Unbounded Certificate Benchmark (Not Yet Available)
+- **PUBLIC UNBOUNDED CERTIFICATE BENCHMARK: NOT YET AVAILABLE**
+- A comprehensive audit of authoritative optimization repositories (Netlib LP, HiGHS test suite) confirmed that no authentic public unbounded LP instances in standard MPS format are available.
+- Handcrafted test instances in `tests/test_solver.py` are strictly labeled:
+  `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA`
+  They are explicitly excluded from public dataset counts, performance reports, and benchmark tables.

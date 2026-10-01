@@ -2,35 +2,35 @@
 
 ## [0.1.6] - 2026-10-01
 
-### Gate 2: Terminal Status & Certificate Correctness — Verified Recession Rays
+### Gate 2.1: Complete Unbounded Certificate Hardening & Authentic Infeasible Evidence
 
-- **`sovopt/verify.py` — `verify_unbounded_ray(model, d, x0=None, tol=1e-7)`:** Added independent
-  floating-point verifier for recession directions. Checks: (1) improving objective direction
-  (`c^T d < 0` for minimization), (2) row recession conditions for all finite-bounded rows,
-  (3) variable bound direction consistency. Returns a structured report with `verified`,
-  `obj_direction`, `max_row_violation`, `max_bound_violation`, and `message`.
-
-- **`sovopt/simplex.py` — `_UnboundedError` class:** Replaced the generic `NumericalError`
-  raised on simplex unboundedness with a dedicated `_UnboundedError` that carries the
-  unbounded simplex direction `d_basis`, the entering column index, and a basis snapshot.
-  This allows `solve_lp()` to reconstruct and independently verify the recession direction
-  before returning `UNBOUNDED_CERTIFIED`.
-
-- **`sovopt/simplex.py` — `solve_lp()` unbounded paths:** All three `UNBOUNDED_CERTIFIED`
-  paths (separable box analysis, transformed unconstrained analysis, and two-phase simplex)
-  now call `verify_unbounded_ray()` before returning `UNBOUNDED_CERTIFIED`. If verification
-  fails, `NUMERICAL_FAILURE` is returned instead. All `UNBOUNDED_CERTIFIED` results now
-  include `ray_verification` dict.
-
-- **`docs/STATUS_SEMANTICS.md`:** New document defining the precise semantics of every
-  status value (`OPTIMAL_VERIFIED`, `INFEASIBLE_CERTIFIED`, `UNBOUNDED_CERTIFIED`,
-  `LIMIT_REACHED`, `NUMERICAL_FAILURE`, `INVALID_MODEL`), including what is and is not
-  claimed by each certificate type.
-
-- **`tests/test_solver.py` — `TestUnboundedRay`:** Added 6 regression tests covering:
-  simplex-path verified unbounded ray, box-analysis unbounded ray, `verify_unbounded_ray`
-  accepting a valid direction, and rejecting non-improving / bound-violating /
-  row-constraint-violating directions.
+- **`sovopt/verify.py` — `verify_unbounded_certificate(model, x0, d, tol=1e-7)`:** Implemented complete
+  original-model certificate pair verification $(x_0, d)$. Gated `UNBOUNDED_CERTIFIED` strictly on BOTH
+  `base_feasible == True` (primal feasibility of $x_0$ across all original row and variable bounds) AND
+  `ray_verified == True` (independent row recession, variable recession, and objective improvement in original
+  problem sense). Added backward-compatibility wrapper `verify_unbounded_ray`.
+- **`sovopt/transforms.py` — `postsolve_direction(d_t, trans)`:** Added dedicated direction-postsolve
+  mechanism with mathematical proof that affine shifts $s$ are never applied to recession directions
+  ($d_x = D d_t$). Aliased `postsolve_ray = postsolve_direction`.
+- **`sovopt/simplex.py` — Complete Certificate Recovery:** All three unbounded solver paths (separable box,
+  transformed unconstrained, and two-phase Phase II simplex) now recover the original feasible base point $x_0$
+  and recession direction $d$, requiring independent certificate verification. Returns `NUMERICAL_FAILURE`
+  if either condition fails.
+- **`tests/test_solver.py` — 18-Point Regression Matrix:** Added `TestUnboundedCertificateHardening`
+  covering unconstrained min, constrained min, constrained max, lower/upper/free bounds, shifted/sign-flipped/split
+  variable transforms, equality/ranged row recession, finite boxes, invalid objective/row/bound/base rejections,
+  and postsolve shift invariants. All handcrafted fixtures labeled `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA`.
+- **Public Infeasible Benchmark Admitted:** Admitted authentic public infeasible LP benchmark `WOODINFE`
+  from the official HiGHS test suite (`data/verified/woodinfe.mps`, SHA-256 `26cb8633...`, MIT License);
+  verified exact rational Farkas certificate generation (`test_highs_woodinfe_infeasible_farkas_certified`).
+- **Public Unbounded Benchmark Disclosure:** Formally recorded `PUBLIC UNBOUNDED CERTIFICATE BENCHMARK: NOT YET AVAILABLE`
+  in `data/CATALOGUE.md` and `docs/STATUS_SEMANTICS.md` after verifying that Netlib and HiGHS archives contain
+  no standard MPS unbounded LP instances.
+- **Status Semantics Hardened:** Corrected `docs/STATUS_SEMANTICS.md` to state that KKT primal-dual conditions
+  establish global optimality for convex models within stated tolerances; clarified that `Model.validate()` raises
+  a `ValueError` exception and is not a solver dictionary return status.
+- **Version Consistency:** Synchronized version 0.1.6 across `web/index.html`, `START_HERE.html`, `data/manifest.json`,
+  `docs/STATUS_SEMANTICS.md`, `sovopt/__init__.py`, `pyproject.toml`, and server endpoints.
 
 ## [0.1.5] - 2026-10-01
 

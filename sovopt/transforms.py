@@ -224,9 +224,23 @@ def postsolve_primal(t, trans_model):
             x[j] = t[spec['trans_indices'][0]] - t[spec['trans_indices'][1]]
     return x
 
-def postsolve_ray(d_t, trans_model):
-    """Recover original ray direction d from transformed direction d_t using the linear transformation.
-    Avoids subtracting shifted primal points to prevent catastrophic cancellation.
+def postsolve_direction(d_t, trans_model):
+    """Recover original recession direction d from transformed direction d_t using strictly linear mapping.
+
+    CRITICAL MATHEMATICAL DISTINCTION:
+    For an affine solution transformation x = D t + s, primal points use the shift s:
+        x_sol = D t_sol + s
+    However, a recession direction d transforms purely through the LINEAR part D:
+        d_x = D d_t
+    The affine shift s MUST NOT be added to directions. Adding s would corrupt the
+    direction whenever variables have non-zero lower bounds, upper bounds, or fixed values.
+
+    Transformation rules for directions:
+      - FIXED:       d_j = 0.0                      (fixed variable cannot change)
+      - LOWER:       d_j = d_t[trans_idx]           (shift s_j = l_j is NOT applied)
+      - BOX:         d_j = d_t[trans_idx]           (shift s_j = l_j is NOT applied)
+      - UPPER_ONLY:  d_j = -d_t[trans_idx]          (shift s_j = u_j is NOT applied; x = u - t => dx = -dt)
+      - FREE:        d_j = d_t[pos_idx] - d_t[neg_idx] (x = t+ - t- => dx = dt+ - dt-)
     """
     d = np.zeros(trans_model.n_orig, dtype=float)
     for spec in trans_model.var_specs:
@@ -241,6 +255,8 @@ def postsolve_ray(d_t, trans_model):
         elif vtype == 'FREE':
             d[j] = d_t[spec['trans_indices'][0]] - d_t[spec['trans_indices'][1]]
     return d
+
+postsolve_ray = postsolve_direction  # Backward-compatibility alias
 
 def postsolve_dual(original_model, x, y_eq, y_le, trans_model, farkas=False):
     """Recover original model inequality dual multipliers z corresponding to original_model.inequalities().

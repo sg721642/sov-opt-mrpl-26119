@@ -564,10 +564,16 @@ class TestAutoDispatcher(unittest.TestCase):
             auto_dispatch(m_lp, method='invalid_method')
 
 
-class TestUnboundedRay(unittest.TestCase):
-    """Regression tests for verified recession direction detection (Gate 2)."""
+class TestUnboundedCertificateHardening(unittest.TestCase):
+    """Complete 18-point regression matrix for original-model unbounded certificate verification (Gate 2.1).
 
-    def _make_model(self, c, A_rows, row_lower, row_upper, lower, upper, names=None):
+    All handcrafted models in this class are labeled:
+    # INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+    They are not benchmark instances, are not included in public dataset counts,
+    and represent exact mathematical edge cases for verifying certificate invariants.
+    """
+
+    def _make_model(self, c, A_rows, row_lower, row_upper, lower, upper, names=None, maximize=False):
         n = len(c)
         if names is None:
             names = tuple(f'x{j}' for j in range(n))
@@ -581,120 +587,299 @@ class TestUnboundedRay(unittest.TestCase):
             lower=np.array(lower, dtype=float),
             upper=np.array(upper, dtype=float),
             names=names,
+            maximize=maximize,
         )
 
-    def test_simplex_unbounded_verified_ray(self):
-        """Simplex must return UNBOUNDED_CERTIFIED with a verified ray when the LP is truly unbounded.
-        Model: min -x1 - x2 s.t. x1 + x2 <= 10, x1 >= 0, x2 >= 0 (but no upper bound on x2)
-        The LP is bounded. Use simpler: min -x1 s.t. x1 - x2 <= 1, x1 >= 0, x2 >= 0.
-        Increasing x1 and x2 together keeps x1-x2 feasible and drives -x1 to -inf.
+    def test_01_unconstrained_minimization_unbounded(self):
+        """1. unconstrained minimization unbounded: min -x1 s.t. x1 >= 0 (no constraints).
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
         """
-        # min -x1 s.t. x1 - x2 <= 1, x1 >= 0, x2 >= 0 (x2 unbounded above)
-        m = self._make_model(
-            c=[-1.0, 0.0],
-            A_rows=[[1.0, -1.0]],
-            row_lower=[-np.inf],
-            row_upper=[1.0],
-            lower=[0.0, 0.0],
-            upper=[np.inf, np.inf],
-        )
         from sovopt.simplex import solve_lp
+        m = self._make_model(c=[-1.0], A_rows=[], row_lower=[], row_upper=[], lower=[0.0], upper=[np.inf])
         r = solve_lp(m)
-        self.assertEqual(r['status'], 'UNBOUNDED_CERTIFIED',
-                         f"Expected UNBOUNDED_CERTIFIED, got {r['status']}: {r.get('message')}")
+        self.assertEqual(r['status'], 'UNBOUNDED_CERTIFIED')
+        self.assertIn('base_point', r)
         self.assertIn('ray', r)
-        ray_report = r.get('ray_verification')
-        self.assertIsNotNone(ray_report, 'UNBOUNDED_CERTIFIED must include ray_verification dict')
-        self.assertTrue(ray_report['verified'],
-                        f"Ray failed independent verification: {ray_report['message']}")
-        # The ray direction must reduce the objective: c^T d < 0
-        ray = np.array(r['ray'])
-        self.assertLess(float(m.c @ ray), 0.0, 'Ray must be an improving direction for minimization')
+        self.assertIsNotNone(r.get('ray_verification'))
+        self.assertTrue(r['ray_verification']['verified'])
+        self.assertTrue(r['ray_verification']['base_feasible'])
+        self.assertTrue(r['ray_verification']['ray_verified'])
+        self.assertLess(float(m.c @ np.array(r['ray'])), 0.0)
 
-    def test_box_analysis_unbounded_verified_ray(self):
-        """Box analysis path (no row constraints) returns UNBOUNDED_CERTIFIED with verified ray."""
-        # min -x1 with x1 >= 0 (no upper bound, no row constraints)
-        m = self._make_model(
-            c=[-1.0, 0.5],
-            A_rows=[],
-            row_lower=[],
-            row_upper=[],
-            lower=[0.0, 0.0],
-            upper=[np.inf, 5.0],  # x2 bounded, x1 unbounded with negative cost
-        )
+    def test_02_constrained_minimization_unbounded(self):
+        """2. constrained minimization unbounded: min -x1 s.t. x1 - x2 <= 1, x1 >= 0, x2 >= 0.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
         from sovopt.simplex import solve_lp
+        m = self._make_model(c=[-1.0, 0.0], A_rows=[[1.0, -1.0]], row_lower=[-np.inf], row_upper=[1.0],
+                             lower=[0.0, 0.0], upper=[np.inf, np.inf])
         r = solve_lp(m)
-        self.assertEqual(r['status'], 'UNBOUNDED_CERTIFIED',
-                         f"Expected UNBOUNDED_CERTIFIED, got {r['status']}")
-        ray_report = r.get('ray_verification')
-        self.assertIsNotNone(ray_report, 'Box-analysis UNBOUNDED_CERTIFIED must include ray_verification')
-        self.assertTrue(ray_report['verified'],
-                        f"Box-analysis ray failed verification: {ray_report['message']}")
+        self.assertEqual(r['status'], 'UNBOUNDED_CERTIFIED')
+        self.assertIn('base_point', r)
+        self.assertIn('ray', r)
+        self.assertTrue(r['ray_verification']['verified'])
+        self.assertTrue(r['ray_verification']['base_feasible'])
+        self.assertTrue(r['ray_verification']['ray_verified'])
+        self.assertLess(float(m.c @ np.array(r['ray'])), 0.0)
 
-    def test_verify_unbounded_ray_accepts_valid_direction(self):
-        """verify_unbounded_ray must accept a genuine improving unbounded direction."""
-        from sovopt.verify import verify_unbounded_ray
-        # min -x1 - x2 s.t. x1 >= 0, x2 >= 0 (free recession in (+1,+1) direction)
-        m = self._make_model(
-            c=[-1.0, -1.0],
-            A_rows=[],
-            row_lower=[],
-            row_upper=[],
-            lower=[0.0, 0.0],
-            upper=[np.inf, np.inf],
-        )
-        d = np.array([1.0, 1.0])
-        result = verify_unbounded_ray(m, d)
-        self.assertTrue(result['verified'], f"Should accept valid ray: {result['message']}")
-        self.assertLess(result['obj_direction'], 0.0)
+    def test_03_constrained_maximization_unbounded(self):
+        """3. constrained MAXIMIZATION unbounded: max x1 s.t. x1 - x2 <= 2, x1 >= 0, x2 >= 0.
+        Stored c is [-1.0, 0.0] with maximize=True.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.simplex import solve_lp
+        m = self._make_model(c=[-1.0, 0.0], A_rows=[[1.0, -1.0]], row_lower=[-np.inf], row_upper=[2.0],
+                             lower=[0.0, 0.0], upper=[np.inf, np.inf], maximize=True)
+        r = solve_lp(m)
+        self.assertEqual(r['status'], 'UNBOUNDED_CERTIFIED')
+        self.assertIn('base_point', r)
+        self.assertIn('ray', r)
+        cert = r['ray_verification']
+        self.assertTrue(cert['verified'])
+        self.assertTrue(cert['base_feasible'])
+        self.assertTrue(cert['ray_verified'])
+        # Internal min improves: c^T d < 0
+        ray = np.array(r['ray'])
+        self.assertLess(float(m.c @ ray), 0.0)
+        # Original max improves: original_objective_direction > 0
+        self.assertGreater(cert['original_objective_direction'], 0.0)
 
-    def test_verify_unbounded_ray_rejects_non_improving_direction(self):
-        """verify_unbounded_ray must reject a direction that does not improve the objective."""
-        from sovopt.verify import verify_unbounded_ray
-        # min x1 s.t. x1 >= 0 (increasing x1 worsens objective)
-        m = self._make_model(
-            c=[1.0],
-            A_rows=[],
-            row_lower=[],
-            row_upper=[],
-            lower=[0.0],
-            upper=[np.inf],
-        )
-        d = np.array([1.0])  # increasing x1 increases objective — not a valid recession dir
-        result = verify_unbounded_ray(m, d)
-        self.assertFalse(result['verified'], 'Should reject non-improving direction')
+    def test_04_lower_bounded_variable_direction(self):
+        """4. lower-bounded variable direction: x1 >= 10.0 (finite lower, upper inf).
+        d1 >= 0 is valid; d1 < 0 must be rejected.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.verify import verify_unbounded_certificate
+        m = self._make_model(c=[-1.0], A_rows=[], row_lower=[], row_upper=[], lower=[10.0], upper=[np.inf])
+        # Valid direction: d1 = 1.0 >= 0
+        cert_valid = verify_unbounded_certificate(m, [10.0], [1.0])
+        self.assertTrue(cert_valid['verified'])
+        self.assertTrue(cert_valid['ray_verified'])
+        # Invalid direction: d1 = -1.0 < 0
+        cert_invalid = verify_unbounded_certificate(m, [10.0], [-1.0])
+        self.assertFalse(cert_invalid['verified'])
+        self.assertGreater(cert_invalid['max_bound_direction_violation'], 0.0)
 
-    def test_verify_unbounded_ray_rejects_bound_violated_direction(self):
-        """verify_unbounded_ray must reject a direction that violates variable bound constraints."""
-        from sovopt.verify import verify_unbounded_ray
-        # min -x1 s.t. 0 <= x1 <= 10 (bounded variable — no recession possible)
-        m = self._make_model(
-            c=[-1.0],
-            A_rows=[],
-            row_lower=[],
-            row_upper=[],
-            lower=[0.0],
-            upper=[10.0],
-        )
-        d = np.array([5.0])  # +5 direction violates upper bound direction constraint
-        result = verify_unbounded_ray(m, d)
-        self.assertFalse(result['verified'], 'Should reject direction violating bounded variable')
+    def test_05_upper_bounded_variable_direction(self):
+        """5. upper-bounded variable direction: x1 <= 20.0 (lower -inf, finite upper).
+        min x1 with x1 <= 20.0. Direction d1 = -1.0 improves min and satisfies d1 <= 0.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.verify import verify_unbounded_certificate
+        m = self._make_model(c=[1.0], A_rows=[], row_lower=[], row_upper=[], lower=[-np.inf], upper=[20.0])
+        # Valid direction: d1 = -1.0 <= 0 (improves min x1 as x1 -> -inf)
+        cert_valid = verify_unbounded_certificate(m, [20.0], [-1.0])
+        self.assertTrue(cert_valid['verified'])
+        self.assertTrue(cert_valid['ray_verified'])
+        # Invalid direction: d1 = 1.0 > 0 (violates upper bound recession)
+        cert_invalid = verify_unbounded_certificate(m, [20.0], [1.0])
+        self.assertFalse(cert_invalid['verified'])
+        self.assertGreater(cert_invalid['max_bound_direction_violation'], 0.0)
 
-    def test_verify_unbounded_ray_rejects_row_violating_direction(self):
-        """verify_unbounded_ray must reject a direction that violates a row constraint."""
-        from sovopt.verify import verify_unbounded_ray
-        # min -x1 s.t. x1 <= 5, x1 >= 0
-        m = self._make_model(
-            c=[-1.0],
-            A_rows=[[1.0]],
-            row_lower=[-np.inf],
-            row_upper=[5.0],
-            lower=[0.0],
-            upper=[np.inf],
-        )
-        d = np.array([1.0])  # A[0] @ d = 1 > 0, violates row recession for upper-bounded row
-        result = verify_unbounded_ray(m, d)
-        self.assertFalse(result['verified'], 'Should reject direction violating row upper bound recession')
+    def test_06_free_variable_unbounded_case(self):
+        """6. FREE variable unbounded case: min x1 with -inf < x1 < +inf.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.simplex import solve_lp
+        m = self._make_model(c=[1.0], A_rows=[], row_lower=[], row_upper=[], lower=[-np.inf], upper=[np.inf])
+        r = solve_lp(m)
+        self.assertEqual(r['status'], 'UNBOUNDED_CERTIFIED')
+        self.assertIn('base_point', r)
+        self.assertIn('ray', r)
+        self.assertTrue(r['ray_verification']['verified'])
+        # Free variable decreases to -inf: ray[0] < 0
+        self.assertLess(r['ray'][0], 0.0)
+
+    def test_07_shifted_variable_transformation(self):
+        """7. shifted-variable transformation: x1 >= 500.0 (affine shift s = 500).
+        Direction must NOT have 500 added to it; ray[0] == 1.0, not 501.0.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.simplex import solve_lp
+        m = self._make_model(c=[-1.0], A_rows=[], row_lower=[], row_upper=[], lower=[500.0], upper=[np.inf])
+        r = solve_lp(m)
+        self.assertEqual(r['status'], 'UNBOUNDED_CERTIFIED')
+        # Ray direction must be purely linear (1.0), not shifted by 500.0
+        self.assertAlmostEqual(r['ray'][0], 1.0, places=6)
+        self.assertGreaterEqual(r['base_point'][0], 500.0 - 1e-7)
+        self.assertTrue(r['ray_verification']['verified'])
+
+    def test_08_sign_flipped_upper_bound_transformation(self):
+        """8. sign-flipped/upper-bound transformation: x1 <= 150.0 (x = 150 - t).
+        Linear part is dx = -dt. Ray must have dx = -1.0, NOT 149.0.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.simplex import solve_lp
+        m = self._make_model(c=[1.0], A_rows=[], row_lower=[], row_upper=[], lower=[-np.inf], upper=[150.0])
+        r = solve_lp(m)
+        self.assertEqual(r['status'], 'UNBOUNDED_CERTIFIED')
+        self.assertAlmostEqual(r['ray'][0], -1.0, places=6)
+        self.assertLessEqual(r['base_point'][0], 150.0 + 1e-7)
+        self.assertTrue(r['ray_verification']['verified'])
+
+    def test_09_free_variable_split_transformation(self):
+        """9. free-variable split transformation: x1 = t+ - t-.
+        postsolve_direction must map dt+ -> +1 and dt- -> -1 without any shifts.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.transforms import transform_model, postsolve_direction
+        m = self._make_model(c=[1.0], A_rows=[], row_lower=[], row_upper=[], lower=[-np.inf], upper=[np.inf])
+        trans = transform_model(m)
+        # dt+ = 1, dt- = 0 => dx = +1
+        d_pos = postsolve_direction(np.array([1.0, 0.0]), trans)
+        self.assertAlmostEqual(d_pos[0], 1.0, places=9)
+        # dt+ = 0, dt- = 1 => dx = -1
+        d_neg = postsolve_direction(np.array([0.0, 1.0]), trans)
+        self.assertAlmostEqual(d_neg[0], -1.0, places=9)
+
+    def test_10_equality_constrained_recession_direction(self):
+        """10. equality-constrained recession direction: x1 - x2 = 0.
+        A_i @ d must == 0. (1, 1) passes; (1, 0) fails with max_row_direction_violation > 0.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.verify import verify_unbounded_certificate
+        m = self._make_model(c=[-1.0, -1.0], A_rows=[[1.0, -1.0]], row_lower=[0.0], row_upper=[0.0],
+                             lower=[0.0, 0.0], upper=[np.inf, np.inf])
+        cert_valid = verify_unbounded_certificate(m, [0.0, 0.0], [1.0, 1.0])
+        self.assertTrue(cert_valid['verified'])
+        cert_invalid = verify_unbounded_certificate(m, [0.0, 0.0], [1.0, 0.0])
+        self.assertFalse(cert_invalid['verified'])
+        self.assertGreater(cert_invalid['max_row_direction_violation'], 0.0)
+
+    def test_11_ranged_row_recession_direction(self):
+        """11. ranged-row recession direction: 2.0 <= x1 - x2 <= 8.0 (finite lower AND upper).
+        Both bounds finite requires A_i @ d == 0. (1, 1) passes; (2, 1) fails.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.verify import verify_unbounded_certificate
+        m = self._make_model(c=[-1.0, -1.0], A_rows=[[1.0, -1.0]], row_lower=[2.0], row_upper=[8.0],
+                             lower=[5.0, 0.0], upper=[np.inf, np.inf])
+        # (1, 1) has A_i @ d = 1 - 1 = 0
+        cert_valid = verify_unbounded_certificate(m, [5.0, 0.0], [1.0, 1.0])
+        self.assertTrue(cert_valid['verified'])
+        # (2, 1) has A_i @ d = 2 - 1 = 1 != 0
+        cert_invalid = verify_unbounded_certificate(m, [5.0, 0.0], [2.0, 1.0])
+        self.assertFalse(cert_invalid['verified'])
+        self.assertGreater(cert_invalid['max_row_direction_violation'], 0.0)
+
+    def test_12_finite_lower_plus_upper_box_must_not_be_unbounded(self):
+        """12. finite lower+upper box that MUST NOT be unbounded: 0 <= x1 <= 10, 0 <= x2 <= 10.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.simplex import solve_lp
+        m = self._make_model(c=[-1.0, -1.0], A_rows=[], row_lower=[], row_upper=[],
+                             lower=[0.0, 0.0], upper=[10.0, 10.0])
+        r = solve_lp(m)
+        self.assertNotEqual(r['status'], 'UNBOUNDED_CERTIFIED')
+        self.assertEqual(r['status'], 'OPTIMAL_VERIFIED')
+        self.assertAlmostEqual(r['objective'], -20.0, places=6)
+
+    def test_13_invalid_objective_direction_rejection(self):
+        """13. invalid objective direction rejection: c^T d >= 0 must be rejected.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.verify import verify_unbounded_certificate
+        m = self._make_model(c=[1.0], A_rows=[], row_lower=[], row_upper=[], lower=[0.0], upper=[np.inf])
+        # d = [1.0] worsens minimization objective (c^T d = 1.0 > 0)
+        cert_worsen = verify_unbounded_certificate(m, [0.0], [1.0])
+        self.assertFalse(cert_worsen['verified'])
+        self.assertFalse(cert_worsen['ray_verified'])
+        # d = [0.0] has no improvement
+        cert_zero = verify_unbounded_certificate(m, [0.0], [0.0])
+        self.assertFalse(cert_zero['verified'])
+        self.assertFalse(cert_zero['ray_verified'])
+
+    def test_14_invalid_row_recession_rejection(self):
+        """14. invalid row recession rejection: row x1 <= 5.0 with direction d1 = 1.0.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.verify import verify_unbounded_certificate
+        m = self._make_model(c=[-1.0], A_rows=[[1.0]], row_lower=[-np.inf], row_upper=[5.0],
+                             lower=[0.0], upper=[np.inf])
+        cert = verify_unbounded_certificate(m, [0.0], [1.0])
+        self.assertFalse(cert['verified'])
+        self.assertGreater(cert['max_row_direction_violation'], 0.0)
+
+    def test_15_invalid_bound_direction_rejection(self):
+        """15. invalid bound direction rejection: variable 0 <= x1 <= 10 with d1 = 1.0.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.verify import verify_unbounded_certificate
+        m = self._make_model(c=[-1.0], A_rows=[], row_lower=[], row_upper=[], lower=[0.0], upper=[10.0])
+        cert = verify_unbounded_certificate(m, [5.0], [1.0])
+        self.assertFalse(cert['verified'])
+        self.assertGreater(cert['max_bound_direction_violation'], 0.0)
+
+    def test_16_infeasible_base_point_rejection(self):
+        """16. infeasible base-point rejection: valid direction d=(1, 1), but x0=(-5, 0) violates x1 >= 0.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.verify import verify_unbounded_certificate
+        m = self._make_model(c=[-1.0, 0.0], A_rows=[[1.0, -1.0]], row_lower=[-np.inf], row_upper=[1.0],
+                             lower=[0.0, 0.0], upper=[np.inf, np.inf])
+        # x0 = [-5.0, 0.0] violates lower bound x1 >= 0
+        cert = verify_unbounded_certificate(m, [-5.0, 0.0], [1.0, 1.0])
+        self.assertFalse(cert['verified'])
+        self.assertFalse(cert['base_feasible'])
+        self.assertTrue(cert['ray_verified'])  # direction itself is valid, but certificate fails
+
+    def test_17_transformed_direction_postsolve_test(self):
+        """17. transformed direction postsolve test: proves mathematically that postsolve_direction
+        never adds affine shifts s to directions.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.transforms import transform_model, postsolve_direction, postsolve_primal
+        # Large affine bounds: l1 = 1000.0, u2 = -500.0
+        m = self._make_model(c=[-1.0, 1.0], A_rows=[], row_lower=[], row_upper=[],
+                             lower=[1000.0, -np.inf], upper=[np.inf, -500.0])
+        trans = transform_model(m)
+        # Primal postsolve of t=0 MUST include affine shifts: x = [1000.0, -500.0]
+        x_primal = postsolve_primal(np.array([0.0, 0.0]), trans)
+        self.assertAlmostEqual(x_primal[0], 1000.0, places=9)
+        self.assertAlmostEqual(x_primal[1], -500.0, places=9)
+
+        # Direction postsolve of dt=0 MUST BE STRICTLY ZERO: d = [0.0, 0.0], NOT [1000.0, -500.0]
+        d_zero = postsolve_direction(np.array([0.0, 0.0]), trans)
+        self.assertAlmostEqual(d_zero[0], 0.0, places=9)
+        self.assertAlmostEqual(d_zero[1], 0.0, places=9)
+
+        # Direction postsolve of dt=[1.0, 0.0] MUST BE [1.0, 0.0], NOT [1001.0, -500.0]
+        d_unit = postsolve_direction(np.array([1.0, 0.0]), trans)
+        self.assertAlmostEqual(d_unit[0], 1.0, places=9)
+        self.assertAlmostEqual(d_unit[1], 0.0, places=9)
+
+    def test_18_dimension_nonfinite_certificate_rejection(self):
+        """18. dimension/nonfinite certificate rejection: NaN, Inf, dimension mismatch.
+        INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA
+        """
+        from sovopt.verify import verify_unbounded_certificate
+        m = self._make_model(c=[-1.0], A_rows=[], row_lower=[], row_upper=[], lower=[0.0], upper=[np.inf])
+        # NaN in base point
+        self.assertFalse(verify_unbounded_certificate(m, [np.nan], [1.0])['verified'])
+        # Inf in base point
+        self.assertFalse(verify_unbounded_certificate(m, [np.inf], [1.0])['verified'])
+        # Dimension mismatch in base point
+        self.assertFalse(verify_unbounded_certificate(m, [0.0, 0.0], [1.0])['verified'])
+        # NaN in direction
+        self.assertFalse(verify_unbounded_certificate(m, [0.0], [np.nan])['verified'])
+        # Inf in direction
+        self.assertFalse(verify_unbounded_certificate(m, [0.0], [np.inf])['verified'])
+        # Dimension mismatch in direction
+        self.assertFalse(verify_unbounded_certificate(m, [0.0], [1.0, 0.0])['verified'])
+
+    def test_highs_woodinfe_infeasible_farkas_certified(self):
+        """Authentic public infeasible LP benchmark: HiGHS woodinfe.mps.
+        Confirms sovopt generates a verified exact rational Farkas certificate.
+        """
+        from sovopt import load, solve
+        wood_path = ROOT / "data" / "verified" / "woodinfe.mps"
+        if not wood_path.exists():
+            self.skipTest("data/verified/woodinfe.mps not found")
+        m = load(wood_path)
+        r = solve(m)
+        self.assertEqual(r['status'], 'INFEASIBLE_CERTIFIED')
+        self.assertTrue(r['farkas_certificate'])
+        self.assertTrue(r['verification']['farkas_verified'])
 
 
 if __name__ == '__main__':
