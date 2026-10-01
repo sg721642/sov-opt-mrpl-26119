@@ -31,7 +31,15 @@ def verify(model, x, z=None, tol=1e-7, check_integer=True):
     h = h.astype(np.longdouble)
 
     if x.shape != model.c.shape or not np.isfinite(x).all():
-        return {'feasible': False, 'kkt_passed': False, 'reason': 'nonfinite or invalid candidate'}
+        return {
+            'feasible': False,
+            'kkt_passed': False,
+            'reason': 'nonfinite or invalid candidate',
+            'primal_feasibility_passed': False,
+            'dual_feasibility_passed': False,
+            'stationarity_passed': False,
+            'complementarity_passed': False,
+        }
 
     # Verify variable bounds explicitly (including infinite ones)
     lb_viol = np.maximum(model.lower - np.asarray(x, float), 0.0)
@@ -70,6 +78,12 @@ def verify(model, x, z=None, tol=1e-7, check_integer=True):
     if z is not None and len(h) > 0:
         z = np.asarray(z, np.longdouble)
         if z.shape != h.shape or not np.isfinite(z).all():
+            report.update(
+                primal_feasibility_passed=bool(report['feasible']),
+                dual_feasibility_passed=False,
+                stationarity_passed=False,
+                complementarity_passed=False,
+            )
             return report
         raw_obj = float(model.c.astype(np.longdouble) @ x + x @ Q_arr.astype(np.longdouble) @ x / 2.0)
         scale_obj = 1.0 + abs(raw_obj)
@@ -80,7 +94,11 @@ def verify(model, x, z=None, tol=1e-7, check_integer=True):
         comp = float(np.max(np.abs(z * (activity - h))) / comp_denom)
         gap_denom = scale_obj + abs(float(z @ h))
         gap = float(abs(z @ (h - activity)) / gap_denom)
-        kkt_ok = report['feasible'] and max(dual, station, comp, gap) <= tol
+        primal_ok = bool(report['feasible'])
+        dual_ok = bool(dual <= tol)
+        station_ok = bool(station <= tol)
+        comp_ok = bool(comp <= tol and gap <= tol)
+        kkt_ok = primal_ok and dual_ok and station_ok and comp_ok
         report.update(
             dual_residual=station,
             dual_sign_violation=dual,
@@ -89,23 +107,38 @@ def verify(model, x, z=None, tol=1e-7, check_integer=True):
             kkt_passed=kkt_ok,
             kkt_evaluated=True,
             kkt_status='FULL_KKT_PASSED' if kkt_ok else 'FULL_KKT_FAILED',
+            primal_feasibility_passed=primal_ok,
+            dual_feasibility_passed=dual_ok,
+            stationarity_passed=station_ok,
+            complementarity_passed=comp_ok,
         )
     elif len(h) == 0:
         # No inequality constraints: stationarity requires grad == 0 (or bounded box stationarity)
         grad_norm = float(np.max(np.abs(grad)))
+        primal_ok = bool(report['feasible'])
+        station_ok = bool(grad_norm <= tol)
+        kkt_ok = primal_ok and station_ok
         report.update(
             dual_residual=grad_norm / (1.0 + grad_norm),
             dual_sign_violation=0.0,
             complementarity=0.0,
             relative_duality_gap=0.0,
-            kkt_passed=report['feasible'] and grad_norm <= tol,
+            kkt_passed=kkt_ok,
             kkt_evaluated=True,
-            kkt_status='FULL_KKT_PASSED' if (report['feasible'] and grad_norm <= tol) else 'FULL_KKT_FAILED',
+            kkt_status='FULL_KKT_PASSED' if kkt_ok else 'FULL_KKT_FAILED',
+            primal_feasibility_passed=primal_ok,
+            dual_feasibility_passed=True,
+            stationarity_passed=station_ok,
+            complementarity_passed=True,
         )
     else:
         report.update(
             kkt_evaluated=False,
             kkt_status='PRIMAL_FEASIBILITY_ONLY',
+            primal_feasibility_passed=bool(report['feasible']),
+            dual_feasibility_passed=False,
+            stationarity_passed=False,
+            complementarity_passed=False,
         )
 
     return report

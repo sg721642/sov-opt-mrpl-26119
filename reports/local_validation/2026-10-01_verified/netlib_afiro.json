@@ -146,7 +146,11 @@
     "complementarity": 1.483934128975387e-17,
     "relative_duality_gap": 1.5680491272169245e-17,
     "kkt_evaluated": true,
-    "kkt_status": "FULL_KKT_PASSED"
+    "kkt_status": "FULL_KKT_PASSED",
+    "primal_feasibility_passed": true,
+    "dual_feasibility_passed": true,
+    "stationarity_passed": true,
+    "complementarity_passed": true
   },
   "objective": -464.75314285714285,
   "iterations": 22,
@@ -536,11 +540,11 @@
   "col_scale_max": 1.0,
   "model_name": "AFIRO",
   "model_sha256": "1f08328913d4bdf2204f2e1e6cd6e5c224f1ea237ab78f95cb5da2f74165154e",
-  "solver_version": "0.3.0",
-  "elapsed_seconds": 0.014102624998486135,
+  "solver_version": "0.3.1",
+  "elapsed_seconds": 0.012783999998646323,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:34:28.772898+00:00",
+  "timestamp_utc": "2026-10-01T22:05:08.847345+00:00",
   "variables": 32,
   "rows": 27,
   "nonzeros": 83,
@@ -569,7 +573,7 @@
   "method_selected": "dual-simplex",
   "selection_reason": "Continuous LP dispatched to Bounded-Variable Revised Dual Simplex with sparse LU refactorization, Markowitz pivoting, Devex pricing, and exact KKT certification.",
   "fallback_reason": null,
-  "measured_duration_seconds": 0.014147832996968646,
-  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
+  "measured_duration_seconds": 0.012821667001844617,
+  "git_revision": "a0ae370dd23cb93ab2b6faeeb38e6d808388993b+dirty",
   "input_mps_sha256": "fd3562804ff19382a9cd8bcb22ec81bffd24a4143a2290783831d8c64516a24b"
 }

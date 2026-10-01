@@ -652,7 +652,11 @@
     "complementarity": 3.559912471647637e-17,
     "relative_duality_gap": 4.0292263111395634e-17,
     "kkt_evaluated": true,
-    "kkt_status": "FULL_KKT_PASSED"
+    "kkt_status": "FULL_KKT_PASSED",
+    "primal_feasibility_passed": true,
+    "dual_feasibility_passed": true,
+    "stationarity_passed": true,
+    "complementarity_passed": true
   },
   "objective": -896644.8218630458,
   "iterations": 356,
@@ -4302,11 +4306,11 @@
   "col_scale_max": 1000.0,
   "model_name": "ISRAEL",
   "model_sha256": "75d8edc7e07c5c786c570675fac138c913cfbd36eac7121100a77f3b431fe65e",
-  "solver_version": "0.3.0",
-  "elapsed_seconds": 1.5490075409979909,
+  "solver_version": "0.3.1",
+  "elapsed_seconds": 1.4643889170001785,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T21:34:37.328887+00:00",
+  "timestamp_utc": "2026-10-01T22:05:16.994846+00:00",
   "variables": 142,
   "rows": 174,
   "nonzeros": 2269,
@@ -4335,7 +4339,7 @@
   "method_selected": "dual-simplex",
   "selection_reason": "Continuous LP dispatched to Bounded-Variable Revised Dual Simplex with sparse LU refactorization, Markowitz pivoting, Devex pricing, and exact KKT certification.",
   "fallback_reason": null,
-  "measured_duration_seconds": 1.5490686659977655,
-  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
+  "measured_duration_seconds": 1.4644474590022583,
+  "git_revision": "a0ae370dd23cb93ab2b6faeeb38e6d808388993b+dirty",
   "input_mps_sha256": "119a04d815f7db33d67c0647144703a348087397f4440b2d83f1458d9253e5ab"
 }

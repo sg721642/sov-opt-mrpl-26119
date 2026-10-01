@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0.0",
   "generated_at": "2026-10-01T20:27:28.525496+00:00",
-  "solver_version": "0.3.0",
+  "solver_version": "0.3.1",
   "solver_commit": "fc5b537d98a952f01183ae83aea0056e2f9c747f",
   "solver_description": "SOV-OPT Sovereign Numerical Optimization Core (Pure NumPy + Python stdlib)",
   "freeze_date": "2026-10-02",

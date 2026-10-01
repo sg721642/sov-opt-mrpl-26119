@@ -45,7 +45,7 @@ class TestBenchmarkManifest(unittest.TestCase):
 
     def test_01_manifest_schema_and_version(self):
         self.assertEqual(self.master.get("schema_version"), "2.0.0")
-        self.assertEqual(self.master.get("solver_version"), "0.3.0")
+        self.assertEqual(self.master.get("solver_version"), "0.3.1")
         self.assertIn("submanifests", self.master)
         self.assertIn("disclosures", self.master)
         self.assertIn("counts", self.master)

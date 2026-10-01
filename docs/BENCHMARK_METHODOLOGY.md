@@ -1,7 +1,7 @@
 # Benchmark Methodology & Integrity Guarantees — SOV-OPT
 
 **MRPL SIH Problem Statement 26119**  
-**Solver Version:** `0.3.0` (Gate 7)  
+**Solver Version:** `0.3.1` (Gate 7 Complete)  
 **Sovereign Solver Core:** Python standard library and NumPy only.  
 **Differential Solvers:** HiGHS / SciPy invoked exclusively in isolated subprocess worker processes.
 
@@ -70,3 +70,30 @@ The MRPL Refinery Planning Digital Twin (`sovopt/refinery_twin.py`) represents a
 - It contains **no proprietary MRPL operational data**, proprietary crude assays, or confidential refinery recipes.
 - It is evaluated solely to demonstrate solver versatility across 4 operational paradigms (LP, MILP, QP, Infeasible Farkas).
 - It is strictly segregated from public benchmark tables in `reports/VERIFIED_BENCHMARKS.md` and excluded from all statistical aggregations.
+ 
+---
+
+## 6. Convex QP Interior-Point Benchmark Methodology (Gate 7.2)
+
+Public continuous convex quadratic programs from QPLIB 2018 (`https://qplib.zib.de/`) are evaluated under strict mathematical integrity rules:
+1. **Direct Equality-Aware Saddle-Point Architecture:**
+   - Problem constraints are partitioned into native equalities ($E x = f$) and genuine inequalities ($G x \le h$).
+   - Direct augmented saddle-point Newton systems of size $(n + m_e) \times (n + m_e)$ avoid artificial inequality-slack duplication that would otherwise destroy the relative interior.
+   - Quasidefinite regularization ($\delta_p, \delta_d = 10^{-12}$) and iterative refinement guarantee numerical stability without altering the mathematical optimum.
+2. **Strict Internal Initialization:**
+   - The interior-point solver uses 100% internal starting point generation (`initialization_source = 'SOVOPT_INTERNAL'`).
+   - Official published solution vectors (`.sol`) are never read, accessed, or used in the search trajectory or starting point.
+   - Proof of independence is verified programmatically in `tests/test_qplib.py` (`test_18_no_reference_leakage_when_sol_file_hidden`).
+3. **Rigorous Original-Model KKT Verification:**
+   - Every reported solve is verified against the original untransformed model at tolerance $10^{-7}$:
+     - Primal feasibility: $\|E x - f\|_\infty \le 10^{-7}, G x \le h + 10^{-7}$
+     - Dual feasibility: $z \ge -10^{-7}$
+     - Stationarity: $\|Q x + c + E^T y + G^T z\|_\infty / (1 + \|c\|_\infty + \|Q x\|_\infty) \le 10^{-7}$
+     - Complementarity: $z^T (h - G x) / (1 + |c^T x + \frac{1}{2} x^T Q x|) \le 10^{-7}$
+4. **Segregation of Reference Solution Comparisons:**
+   - Published reference objectives are recorded in separate differential comparison columns.
+   - Independent sovereign solves (`QPLIB_8845`, `QPLIB_9002`) are verified and recorded as `OPTIMAL_VERIFIED` with evidence source `SOVOPT_SOLVER`.
+5. **Memory and Dimension Boundaries:**
+   - Dense $Q$ allocation is strictly bounded by a 250 MB memory guard.
+   - Large instances (`QPLIB_8938`, 488 MB) are honestly reported as `UNSUPPORTED_RESOURCE_LIMIT` without crashing or allocating.
+   - Nonconvex instances (`QPLIB_0018`) are rejected cleanly with `UNSUPPORTED_NONCONVEX_QP`.

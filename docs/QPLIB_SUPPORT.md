@@ -3,7 +3,7 @@
 **MRPL SIH Problem Statement 26119**  
 **Specification Reference:** QPLIB 2018 (Furini et al., *Mathematical Programming Computation*, 2019)  
 **Primary Source:** https://qplib.zib.de/doc.html  
-**Solver Version:** `0.3.0`  
+**Solver Version:** `0.3.1`  
 **Core Dependencies:** Python standard library and NumPy only.
 
 ---
@@ -86,20 +86,22 @@ If $\lambda_{\min}(Q) < -\tau$, the model is rejected with `UNSUPPORTED_NONCONVE
 
 ---
 
-## 4. Mehrotra Predictor-Corrector QP Algorithm
+## 4. Native Equality-Aware Mehrotra Predictor-Corrector QP Algorithm
 
-Convex QPs are solved using an infeasible-start primal-dual interior point method (`sovopt/qp.py`):
-1. **Canonical Formulation:**
-   $$\min \frac{1}{2} x^T Q x + c^T x \quad \text{s.t.} \quad A x = b, \quad x \ge 0$$
-   General row and two-sided box bounds are mapped losslessly to equality form using slack variables.
-2. **KKT System:**
-   $$\begin{bmatrix} -(Q + \Theta^{-1}) & A^T \\ A & 0 \end{bmatrix} \begin{bmatrix} \Delta x \\ \Delta y \end{bmatrix} = \begin{bmatrix} r_d \\ r_p \end{bmatrix}$$
-   where $\Theta = X S^{-1}$.
+Convex QPs are solved using an equality-aware infeasible-start primal-dual interior point method (`sovopt/qp.py`):
+1. **Native Partitioning:**
+   $$\min \frac{1}{2} x^T Q x + c^T x \quad \text{s.t.} \quad E x = f, \quad G x \le h$$
+   - Equality rows ($l_i = u_i$) and fixed variables are represented natively in $E x = f$ without slacks or barrier penalties.
+   - Dual multipliers $y \in \mathbb{R}^{m_e}$ are free (unrestricted in sign).
+   - Slacks $s > 0$ and duals $z \ge 0$ exist exclusively for genuine inequalities $G x \le h$.
+2. **Reduced Augmented Saddle-Point System:**
+   $$\begin{bmatrix} H + \delta_p I & E^T \\ E & -\delta_d I \end{bmatrix} \begin{bmatrix} \Delta x \\ \Delta y \end{bmatrix} = \begin{bmatrix} \text{rhs}_x \\ -r_e \end{bmatrix}$$
+   where $H = Q + G^T \text{diag}(z/s) G$, solved with 1 step of iterative refinement against the unregularized operator.
 3. **Predictor-Corrector Steps:**
-   - Affine predictor step solves for $(\Delta x^{\text{aff}}, \Delta s^{\text{aff}}, \Delta y^{\text{aff}})$.
-   - Centering parameter $\sigma = (\mu_{\text{aff}} / \mu)^3$ is computed.
-   - Mehrotra corrector step incorporates second-order perturbation $\Delta X^{\text{aff}} \Delta S^{\text{aff}} e$ and centering $\sigma \mu e$.
-   - Step sizes $\alpha_p, \alpha_d$ are determined with step-to-boundary factor $\gamma = 0.995$.
+   - Affine predictor step solves for $(\Delta x^{\text{aff}}, \Delta y^{\text{aff}}, \Delta s^{\text{aff}}, \Delta z^{\text{aff}})$.
+   - Centering parameter $\sigma = (\mu_{\text{aff}} / \mu)^3$ is computed from affine slacks and inequality duals.
+   - Combined Mehrotra corrector step incorporates second-order perturbation $\Delta S^{\text{aff}} \Delta Z^{\text{aff}} \mathbf{1} - \sigma \mu \mathbf{1}$.
+   - Step sizes $\alpha_p, \alpha_d$ are determined with fraction-to-boundary factor $\eta = 0.995$ applied to $s$ and $z$ only.
 
 ---
 

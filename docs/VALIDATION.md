@@ -9,7 +9,7 @@ This document records the exact procedures for reproducing all numerical benchma
 All commands below assume execution from the project root with the project-local virtual environment active:
 
 ```bash
-# 1. Run full unit and regression test suite (216 tests: 214 passing, 2 integration tests skipped in restricted sandbox)
+# 1. Run full unit and regression test suite (249 tests: 247 passing, 2 integration tests skipped in restricted sandbox)
 .venv/bin/python -m unittest discover -s tests -v
 
 # 2. Run automated report and benchmark generator
@@ -26,7 +26,7 @@ SOVOPT_BENCHMARK_PYTHON=.venv-benchmark/bin/python .venv/bin/python scripts/gene
 
 ## 2. Test Suite Organization
 
-The active test suite is split into nine modules (216 tests total, 214 passing, 2 integration tests skipped in restricted sandbox):
+The active test suite is split into 11 modules (249 tests total, 247 passing, 2 integration tests skipped in restricted sandbox):
 
 ### 2.1 Solver Correctness (`tests/test_solver.py` — 45 tests)
 - Core solver tests for LU pivot refinement, verified Netlib instances (AFIRO, SC50A, SC50B, BLEND), FLUGPL MILP lower bounding and Farkas certificate generation, bad candidate rejection, affine coordinate transformations, PDHG first-order convergence, and limits enforcement.
@@ -167,14 +167,14 @@ The active test suite is split into nine modules (216 tests total, 214 passing, 
   37. Refinery twin MILP determinism across repeated solves.
   38. Full presence of all Gate 6 MILP telemetry keys.
 
-### 2.8 QPLIB Format Parser & Convexity Verification (`tests/test_qplib.py` — 17 tests)
+### 2.8 QPLIB Format Parser & Convexity Verification (`tests/test_qplib.py` — 18 tests)
 - Comprehensive test matrix validating Gate 7 QPLIB support:
   1. Header and metadata parsing across official QPLIB test cases.
   2. Diagonal quadratic objective function evaluation matching $\frac{1}{2} x^T Q x + b^T x + q$.
   3. Off-diagonal symmetric quadratic objective evaluation with equal splitting ($Q_{ij} = Q_{ji} = 0.5 Q^0_{ij}$).
   4. Parsed objective equivalence against manual formula $\frac{1}{2} x^T Q x + b^T x + q$.
-  5. Machine-precision agreement ($5.12 \times 10^{-16}$ relative error) on authentic `QPLIB_8845` against published reference ($10,907,992.4939988$).
-  6. Original-model KKT verification (primal feasibility, dual stationarity, complementarity) on `QPLIB_8845` solution vector.
+  5. Machine-precision agreement on authentic `QPLIB_8845` against published reference ($10,907,992.4939988$).
+  6. Original-model KKT verification (primal feasibility, dual stationarity, complementarity) on `QPLIB_8845`.
   7. Strict allow-list enforcement: `CCL`, `DCL`, `CCB`, `DCB`, `LCL` admitted.
   8. Discrete variable rejection (`UNSUPPORTED_DISCRETE_VARIABLES`) on binary/integer variables.
   9. Quadratic constraint rejection (`UNSUPPORTED_QUADRATIC_CONSTRAINTS`) on QCQP instances.
@@ -185,9 +185,42 @@ The active test suite is split into nine modules (216 tests total, 214 passing, 
   14. Range constraints parsing and lossless slack mapping.
   15. One-sided inequality constraints and variable box bounds.
   16. Free variable handling and zero-bound preservation.
-  17. Linear objective fallback verification for `LCL` instances.
+  17. Independent sovereign solve of `QPLIB_8845` to `OPTIMAL_VERIFIED` with objective matching reference within $1.59 \times 10^{-10}$ relative error.
+  18. Verification of zero reference solution leakage: sovereign solve achieves identical `OPTIMAL_VERIFIED` result when `.sol` file is hidden.
 
-### 2.9 Public Benchmark Manifest & Provenance Integrity (`tests/test_benchmark_manifest.py` — 7 tests)
+### 2.9 Benchmark Evidence Integrity & Semantics (`tests/test_gate7_1.py` — 12 tests)
+- Rigorous validation of benchmark reporting semantics and evidence integrity:
+  1. Segregation of reference `.sol` files from sovereign solver executions.
+  2. Primal-only verification sets `kkt_evaluated = False` and `kkt_status = 'PRIMAL_FEASIBILITY_ONLY'`.
+  3. Full KKT verification requires all 4 conditions (primal feasibility, dual feasibility, stationarity, complementarity).
+  4. Programmatic assertion of Netlib LP candidate counts: 9 `OPTIMAL_VERIFIED` + 7 `NUMERICAL_FAILURE` = 16 instances.
+  5. Manifest amendment logging for post-freeze capability reclassifications (`QPLIB_8938`).
+  6. Nested wallclock deadline propagation in MILP inner simplex and branching loops.
+
+### 2.10 QP Internal Mathematical Unit Fixtures (`tests/test_qp_internal.py` — 20 tests)
+- 20 dedicated unit fixtures validating the native equality-aware interior-point solver (`sovopt/qp.py`) across all mathematical edge cases (strictly labeled `[INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA]`):
+  1. Unconstrained positive-definite QP.
+  2. One equality QP.
+  3. Multiple equalities QP.
+  4. Equality + $\le$ inequality.
+  5. Equality + $\ge$ inequality.
+  6. Equality + ranged row.
+  7. Equality + lower variable bounds.
+  8. Equality + upper variable bounds.
+  9. Equality + box bounds.
+  10. Fixed variable equality partitioning.
+  11. Redundant equality row handling.
+  12. Near-dependent equality rows with regularized KKT system.
+  13. Zero-row valid equality handling.
+  14. Infeasible equality detection.
+  15. Semidefinite $Q$ matrix handling.
+  16. Diagonal $Q$ matrix structure.
+  17. Off-diagonal symmetric $Q$ matrix structure.
+  18. Nonzero objective constant preservation.
+  19. Infeasible-start IPM initialization convergence.
+  20. Equality multiplier unrestricted sign verification.
+
+### 2.11 Public Benchmark Manifest & Provenance Integrity (`tests/test_benchmark_manifest.py` — 7 tests)
 - Verification of frozen benchmark datasets and provenance integrity:
   1. Master manifest schema and cryptographic SHA-256 integrity checks.
   2. Netlib LP collection manifest verification (16 candidate instances + `WOODINFE`).
@@ -197,7 +230,7 @@ The active test suite is split into nine modules (216 tests total, 214 passing, 
   6. Strict segregation of quarantined datasets (`AVGAS` strictly excluded from active manifests).
   7. Prohibition of synthetic benchmarks in public manifest collections.
 
-*(Note: Synthetic unit fixtures in `tests/test_presolve.py`, `tests/test_numerical_stress.py`, `tests/test_dual_simplex.py`, and `tests/test_milp.py` are strictly marked `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are excluded from benchmark reports).*
+*(Note: Synthetic unit fixtures in `tests/test_presolve.py`, `tests/test_numerical_stress.py`, `tests/test_dual_simplex.py`, `tests/test_milp.py`, and `tests/test_qp_internal.py` are strictly marked `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are excluded from benchmark reports).*
 
 ---
 
@@ -321,9 +354,12 @@ Measured on Apple Silicon ARM64 (Python 3.11.16, NumPy 2.3.5) with maximum node 
    - No authorized MRPL refinery dataset is available in this project.
    - Fictional refinery numbers are prohibited. Netlib refinery LP `BLEND` is provided as an authentic blending problem.
 
-4. **Industrial Convex QP Data (Empty State):**
-   - No authentic public industrial convex QP benchmark is currently admitted. Synthetic toy models have been removed.
-   - Convex QP solving is validated via continuous KKT conditions on positive semi-definite matrices.
+4. **Public Convex QP Benchmarks (Gate 7 Complete):**
+   - Authentic public continuous convex quadratic programming instances from QPLIB 2018 (`https://qplib.zib.de/`) are admitted and frozen in `data/manifests/qplib_convex_qp.json`.
+   - `QPLIB_8845` (1546 variables, 777 constraints) is solved independently to `OPTIMAL_VERIFIED` by SOV-OPT's equality-aware primal-dual interior point solver with full original-model KKT verification (residuals $< 10^{-10}$) and objective matching official published reference ($10,907,992.4957$ vs $10,907,992.4940$, $1.59 \times 10^{-10}$ relative discrepancy).
+   - `QPLIB_9002` (2890 variables, 1649 constraints) is solved independently to `OPTIMAL_VERIFIED` in 25 iterations.
+   - Reference `.sol` vectors are segregated strictly to differential comparisons and are never accessed by the sovereign solver.
+   - Instances exceeding the 250 MB memory guard (`QPLIB_8938`) and nonconvex models (`QPLIB_0018`) are cleanly rejected with typed error classes.
 
 5. **AVGAS Historical Provenance (Quarantined):**
    - `avgas.mps` is sourced from the HiGHS repository (SHA-256 verified).

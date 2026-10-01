@@ -521,6 +521,45 @@ class TestQPLIBSupport(unittest.TestCase):
         self.assertIsNotNone(m.Q)
         self.assertEqual(m.Q.shape, (1546, 1546))
 
+        # Sovereign solve via production solve() API
+        res = solve(m, backend="cpu", max_iter=30, tol=1e-7)
+        self.assertEqual(res["status"], "OPTIMAL_VERIFIED")
+        self.assertTrue(res["verification"]["kkt_passed"])
+        self.assertTrue(res["solver_generated_x"])
+        self.assertFalse(res["reference_solution_used_as_initialization"])
+
+        # Reference objective comparison (from official QPLIB published benchmark)
+        ref_obj = 10907992.4939988
+        sov_obj = res["objective"]
+        rel_diff = abs(sov_obj - ref_obj) / abs(ref_obj)
+        self.assertLess(rel_diff, 1e-7, f"Relative discrepancy {rel_diff:.2e} exceeds 1e-7")
+
+    # ------------------------------------------------------------------
+    # 18. Reference solution leakage prevention (Step 22)
+    # ------------------------------------------------------------------
+    def test_18_no_reference_leakage_when_sol_file_hidden(self):
+        """Proves production solve does not read QPLIB_8845.sol to solve or initialize."""
+        qplib_file = ROOT / "data/qplib/QPLIB_8845.qplib"
+        sol_file = ROOT / "data/qplib/QPLIB_8845.sol"
+        if not qplib_file.exists() or not sol_file.exists():
+            self.skipTest("QPLIB_8845 files not present")
+
+        backup_sol = sol_file.with_suffix(".sol.hidden_test_bak")
+        try:
+            sol_file.rename(backup_sol)
+            self.assertFalse(sol_file.exists())
+
+            m = load(qplib_file)
+            res = solve(m, backend="cpu", max_iter=30, tol=1e-7)
+            self.assertEqual(res["status"], "OPTIMAL_VERIFIED")
+            self.assertTrue(res["verification"]["kkt_passed"])
+            self.assertTrue(res["solver_generated_x"])
+        finally:
+            if backup_sol.exists():
+                backup_sol.rename(sol_file)
+            self.assertTrue(sol_file.exists())
+
 
 if __name__ == "__main__":
     unittest.main()
+

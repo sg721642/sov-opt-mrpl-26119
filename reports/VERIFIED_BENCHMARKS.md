@@ -1,8 +1,8 @@
 # Verified Benchmark & Differential Validation Report — SOV-OPT Gate 7
 
 **Date:** `2026-10-01`  
-**Solver Version:** `0.3.0`  
-**Solver Commit:** `1f5969d4c0d0fd31`  
+**Solver Version:** `0.3.1`  
+**Solver Commit:** `a0ae370dd23cb93a`  
 **Hardware Environment:** `Darwin arm64, Python 3.11.16`  
 **Core Dependencies:** NumPy and Python standard library only (strictly sovereign core)  
 **External Solvers:** HiGHS / SciPy invoked exclusively in isolated subprocesses (`scripts/baseline_worker.py`) for differential comparison  
@@ -25,23 +25,23 @@
 
 | Instance | Vars | Rows | Nonzeros | SOV-OPT Status | SOV-OPT Objective | Published Reference | Discrepancy | Primal Res | Dual Res | Runtime |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **ADLITTLE** | 97 | 56 | 465 | `OPTIMAL_VERIFIED` | **225494.963162** | `2.254950e+05` | 2.38e-06 | 1.21e-16 | 4.60e-17 | 125.4 ms |
-| **AFIRO** | 32 | 27 | 88 | `OPTIMAL_VERIFIED` | **-464.753143** | `-4.647531e+02` | 2.86e-09 | 1.14e-16 | 2.64e-18 | 14.1 ms |
-| **BLEND** | 83 | 74 | 521 | `OPTIMAL_VERIFIED` | **-30.812150** | `-3.081215e+01` | 1.72e-10 | 1.50e-14 | 2.36e-15 | 232.7 ms |
-| **BRANDY** | 249 | 220 | 2150 | `NUMERICAL_FAILURE` | — | `1.518510e+03` | — | — | — | 6553.7 ms |
-| **ISRAEL** | 142 | 174 | 2358 | `OPTIMAL_VERIFIED` | **-896644.821863** | `-8.966448e+05` | 3.05e-06 | 6.12e-16 | 1.13e-16 | 1549.1 ms |
-| **KB2** | 41 | 43 | 291 | `OPTIMAL_VERIFIED` | **-1749.900130** | `-1.749900e+03` | 6.21e-09 | 3.75e-15 | 1.35e-16 | 56.7 ms |
-| **RECIPE** | 180 | 91 | 752 | `NUMERICAL_FAILURE` | **-266.616000** | `-2.666160e+02` | 2.84e-13 | 0.00e+00 | 3.10e-17 | 584.1 ms |
-| **SC105** | 103 | 105 | 281 | `OPTIMAL_VERIFIED` | **-52.202061** | `-5.220206e+01` | 2.93e-10 | 4.84e-15 | 6.59e-17 | 300.1 ms |
-| **SC205** | 203 | 205 | 552 | `NUMERICAL_FAILURE` | **-52.202061** | `-5.220206e+01` | 2.93e-10 | 1.30e-15 | 9.03e-04 | 2027.9 ms |
-| **SC50A** | 48 | 50 | 131 | `OPTIMAL_VERIFIED` | **-64.575077** | `-6.457508e+01` | 4.35e-10 | 3.13e-16 | 2.26e-16 | 77.4 ms |
-| **SC50B** | 48 | 50 | 119 | `OPTIMAL_VERIFIED` | **-70.000000** | `-7.000000e+01` | 1.42e-14 | 3.12e-16 | 2.54e-16 | 66.5 ms |
-| **SCAGR7** | 140 | 129 | 553 | `OPTIMAL_VERIFIED` | **-2331389.824331** | `-2.331389e+06` | 5.70e-01 | 1.09e-16 | 3.90e-17 | 913.1 ms |
-| **SHARE1B** | 225 | 117 | 1182 | `NUMERICAL_FAILURE` | **-76589.318579** | `-7.658932e+04` | 1.86e-07 | 1.58e-15 | 9.13e-17 | 2655.1 ms |
-| **SHARE2B** | 79 | 96 | 730 | `NUMERICAL_FAILURE` | **-401.897202** | `-4.157322e+02` | 1.38e+01 | 8.66e-15 | 3.86e-03 | 257.7 ms |
-| **STOCFOR1** | 111 | 117 | 474 | `NUMERICAL_FAILURE` | **-41131.976219** | `-4.113198e+04` | 4.36e-07 | 1.79e-16 | 2.50e-01 | 283.3 ms |
-| **VTP.BASE** | 203 | 198 | 914 | `NUMERICAL_FAILURE` | **129831.462461** | `1.298315e+05` | 1.36e-06 | 6.26e-15 | 3.39e-03 | 2009.6 ms |
-| **AFIRO (PDHG-CPU)** | 32 | 27 | 88 | `OPTIMAL_VERIFIED` | **-464.753142** | `-4.647531e+02` | 6.27e-07 | 8.07e-09 | 5.93e-08 | 117.5 ms |
+| **ADLITTLE** | 97 | 56 | 465 | `OPTIMAL_VERIFIED` | **225494.963162** | `2.254950e+05` | 2.38e-06 | 1.21e-16 | 4.60e-17 | 132.0 ms |
+| **AFIRO** | 32 | 27 | 88 | `OPTIMAL_VERIFIED` | **-464.753143** | `-4.647531e+02` | 2.86e-09 | 1.14e-16 | 2.64e-18 | 12.8 ms |
+| **BLEND** | 83 | 74 | 521 | `OPTIMAL_VERIFIED` | **-30.812150** | `-3.081215e+01` | 1.72e-10 | 1.50e-14 | 2.36e-15 | 216.3 ms |
+| **BRANDY** | 249 | 220 | 2150 | `NUMERICAL_FAILURE` | — | `1.518510e+03` | — | — | — | 6257.0 ms |
+| **ISRAEL** | 142 | 174 | 2358 | `OPTIMAL_VERIFIED` | **-896644.821863** | `-8.966448e+05` | 3.05e-06 | 6.12e-16 | 1.13e-16 | 1464.4 ms |
+| **KB2** | 41 | 43 | 291 | `OPTIMAL_VERIFIED` | **-1749.900130** | `-1.749900e+03` | 6.21e-09 | 3.75e-15 | 1.35e-16 | 53.5 ms |
+| **RECIPE** | 180 | 91 | 752 | `NUMERICAL_FAILURE` | **-266.616000** | `-2.666160e+02` | 2.84e-13 | 0.00e+00 | 3.10e-17 | 548.1 ms |
+| **SC105** | 103 | 105 | 281 | `OPTIMAL_VERIFIED` | **-52.202061** | `-5.220206e+01` | 2.93e-10 | 4.84e-15 | 6.59e-17 | 279.4 ms |
+| **SC205** | 203 | 205 | 552 | `NUMERICAL_FAILURE` | **-52.202061** | `-5.220206e+01` | 2.93e-10 | 1.30e-15 | 9.03e-04 | 1876.8 ms |
+| **SC50A** | 48 | 50 | 131 | `OPTIMAL_VERIFIED` | **-64.575077** | `-6.457508e+01` | 4.35e-10 | 3.13e-16 | 2.26e-16 | 55.9 ms |
+| **SC50B** | 48 | 50 | 119 | `OPTIMAL_VERIFIED` | **-70.000000** | `-7.000000e+01` | 1.42e-14 | 3.12e-16 | 2.54e-16 | 62.9 ms |
+| **SCAGR7** | 140 | 129 | 553 | `OPTIMAL_VERIFIED` | **-2331389.824331** | `-2.331389e+06` | 5.70e-01 | 1.09e-16 | 3.90e-17 | 856.5 ms |
+| **SHARE1B** | 225 | 117 | 1182 | `NUMERICAL_FAILURE` | **-76589.318579** | `-7.658932e+04` | 1.86e-07 | 1.58e-15 | 9.13e-17 | 2488.3 ms |
+| **SHARE2B** | 79 | 96 | 730 | `NUMERICAL_FAILURE` | **-401.897202** | `-4.157322e+02` | 1.38e+01 | 8.66e-15 | 3.86e-03 | 255.3 ms |
+| **STOCFOR1** | 111 | 117 | 474 | `NUMERICAL_FAILURE` | **-41131.976219** | `-4.113198e+04` | 4.36e-07 | 1.79e-16 | 2.50e-01 | 281.9 ms |
+| **VTP.BASE** | 203 | 198 | 914 | `NUMERICAL_FAILURE` | **129831.462461** | `1.298315e+05` | 1.36e-06 | 6.26e-15 | 3.39e-03 | 1874.5 ms |
+| **AFIRO (PDHG-CPU)** | 32 | 27 | 88 | `OPTIMAL_VERIFIED` | **-464.753142** | `-4.647531e+02` | 6.27e-07 | 8.07e-09 | 5.93e-08 | 109.3 ms |
 
 ---
 
@@ -49,7 +49,7 @@
 
 | Instance | Class | Constraints | Variables | Nonzeros | Certified Status | Exact Farkas Ray Verification | Local Runtime |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **WOODINFE** | LP_INFEASIBLE_CERTIFICATE | 35 | 89 | 140 | `INFEASIBLE_CERTIFIED` | Certified: **True** ($y \ge 0, y^T A \le 0, y^T b > 0$) | 62.0 ms |
+| **WOODINFE** | LP_INFEASIBLE_CERTIFICATE | 35 | 89 | 140 | `INFEASIBLE_CERTIFIED` | Certified: **True** ($y \ge 0, y^T A \le 0, y^T b > 0$) | 56.1 ms |
 
 ---
 
@@ -60,44 +60,44 @@ All instances evaluated with pure sovereign branch-and-bound (warm dual simplex 
 
 | Instance | Bin | Vars | Rows | Nonzeros | Status | SOV-OPT Best Bound | Official Ref Opt (`solu`) | Bound Safety Invariant | Runtime |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| `gen-ip054` | Bin 1 (<200) | 30 | 27 | 532 | `LIMIT_REACHED` | **6767.7611** | `6840.96564179` | `VERIFIED SAFE (bound <= z*)` | 3012.5 ms |
-| `markshare_4_0` | Bin 1 (<200) | 34 | 4 | 123 | `NUMERICAL_FAILURE` | **0.0000** | `1.0` | `VERIFIED SAFE (bound <= z*)` | 203.1 ms |
-| `gen-ip002` | Bin 1 (<200) | 41 | 24 | 922 | `LIMIT_REACHED` | **-inf** | `-4783.733392` | `VERIFIED SAFE (bound <= z*)` | 3042.7 ms |
-| `neos5` | Bin 1 (<200) | 63 | 63 | 2016 | `LIMIT_REACHED` | **-inf** | `15.0` | `VERIFIED SAFE (bound <= z*)` | 1630.8 ms |
-| `markshare2` | Bin 1 (<200) | 74 | 7 | 434 | `LIMIT_REACHED` | **-inf** | `1.0` | `VERIFIED SAFE (bound <= z*)` | 471.1 ms |
-| `pk1` | Bin 1 (<200) | 86 | 45 | 915 | `LIMIT_REACHED` | **-inf** | `11.0` | `VERIFIED SAFE (bound <= z*)` | 874.7 ms |
-| `mas74` | Bin 1 (<200) | 151 | 13 | 1706 | `LIMIT_REACHED` | **-inf** | `11801.18572` | `VERIFIED SAFE (bound <= z*)` | 1557.0 ms |
-| `mas76` | Bin 1 (<200) | 151 | 12 | 1640 | `LIMIT_REACHED` | **-inf** | `40005.05398999999` | `VERIFIED SAFE (bound <= z*)` | 1634.4 ms |
-| `assign1-5-8` | Bin 1 (<200) | 156 | 161 | 3720 | `LIMIT_REACHED` | **-inf** | `211.999999999998` | `VERIFIED SAFE (bound <= z*)` | 3005.6 ms |
-| `neos859080` | Bin 1 (<200) | 160 | 164 | 1280 | `NUMERICAL_FAILURE` | **1.0000** | — | `VERIFIED SAFE (bound <= z*)` | 3006.8 ms |
-| `enlight_hard` | Bin 2 (200-600) | 200 | 100 | 560 | `LIMIT_REACHED` | **0.0000** | `37.0` | `VERIFIED SAFE (bound <= z*)` | 3002.4 ms |
-| `neos-3754480-nidda` | Bin 2 (200-600) | 253 | 402 | 1488 | `LIMIT_REACHED` | **-inf** | `12939.7540104743` | `VERIFIED SAFE (bound <= z*)` | 4868.4 ms |
-| `graphdraw-domain` | Bin 2 (200-600) | 254 | 865 | 2600 | `LIMIT_REACHED` | **-inf** | `19685.99997550038` | `VERIFIED SAFE (bound <= z*)` | 3023.8 ms |
-| `mik-250-20-75-4` | Bin 2 (200-600) | 270 | 195 | 9270 | `LIMIT_REACHED` | **-inf** | `-52301.0` | `VERIFIED SAFE (bound <= z*)` | 3006.1 ms |
-| `neos-3046615-murg` | Bin 2 (200-600) | 274 | 498 | 1266 | `LIMIT_REACHED` | **-inf** | `1600.0` | `VERIFIED SAFE (bound <= z*)` | 3010.2 ms |
-| `glass4` | Bin 2 (200-600) | 322 | 396 | 1815 | `LIMIT_REACHED` | **800002400.0000** | `1200012599.972384` | `VERIFIED SAFE (bound <= z*)` | 3018.6 ms |
-| `timtab1` | Bin 2 (200-600) | 397 | 171 | 829 | `LIMIT_REACHED` | **48194.0000** | `764771.99999978` | `VERIFIED SAFE (bound <= z*)` | 3066.4 ms |
-| `supportcase26` | Bin 2 (200-600) | 436 | 870 | 2492 | `LIMIT_REACHED` | **-inf** | `1745.123813` | `VERIFIED SAFE (bound <= z*)` | 3046.0 ms |
-| `ran14x18-disj-8` | Bin 2 (200-600) | 504 | 447 | 10277 | `LIMIT_REACHED` | **-inf** | `3712.0` | `VERIFIED SAFE (bound <= z*)` | 3020.2 ms |
-| `fhnw-binpack4-4` | Bin 2 (200-600) | 520 | 620 | 2332 | `LIMIT_REACHED` | **-inf** | — | `VERIFIED SAFE (bound <= z*)` | 3032.2 ms |
-| `neos-2657525-crna` | Bin 2 (200-600) | 524 | 342 | 1690 | `LIMIT_REACHED` | **-inf** | `1.810748` | `VERIFIED SAFE (bound <= z*)` | 3016.0 ms |
-| `neos17` | Bin 2 (200-600) | 535 | 486 | 4931 | `LIMIT_REACHED` | **-inf** | `0.1500025774` | `VERIFIED SAFE (bound <= z*)` | 3049.6 ms |
-| `sp150x300d` | Bin 3 (600-1500) | 600 | 450 | 1200 | `LIMIT_REACHED` | **4.8911** | `69.0` | `VERIFIED SAFE (bound <= z*)` | 4195.3 ms |
-| `ic97_potential` | Bin 3 (600-1500) | 728 | 1046 | 3138 | `LIMIT_REACHED` | **-inf** | `3941.99993090225` | `VERIFIED SAFE (bound <= z*)` | 3222.1 ms |
-| `neos-911970` | Bin 3 (600-1500) | 888 | 107 | 3408 | `LIMIT_REACHED` | **-inf** | `54.76` | `VERIFIED SAFE (bound <= z*)` | 3054.0 ms |
-| `exp-1-500-5-5` | Bin 3 (600-1500) | 990 | 550 | 1980 | `LIMIT_REACHED` | **-inf** | `65887.0` | `VERIFIED SAFE (bound <= z*)` | 3032.0 ms |
-| `tr12-30` | Bin 3 (600-1500) | 1080 | 750 | 2508 | `LIMIT_REACHED` | **-inf** | `130595.9999999999` | `VERIFIED SAFE (bound <= z*)` | 3040.5 ms |
-| `gmu-35-40` | Bin 3 (600-1500) | 1205 | 424 | 4843 | `LIMIT_REACHED` | **-inf** | `-2406733.3688` | `VERIFIED SAFE (bound <= z*)` | 3041.7 ms |
-| `neos-4338804-snowy` | Bin 3 (600-1500) | 1344 | 1701 | 6342 | `LIMIT_REACHED` | **-inf** | `1471.0` | `VERIFIED SAFE (bound <= z*)` | 3329.7 ms |
-| `50v-10` | Bin 4 (1500-3000) | 2013 | 233 | 2745 | `LIMIT_REACHED` | **0.0000** | `3311.1799841` | `VERIFIED SAFE (bound <= z*)` | 3032.4 ms |
-| `csched008` | Bin 4 (1500-3000) | 1536 | 351 | 5687 | `LIMIT_REACHED` | **-inf** | `173.0` | `VERIFIED SAFE (bound <= z*)` | 3032.3 ms |
-| `csched007` | Bin 4 (1500-3000) | 1758 | 351 | 6379 | `LIMIT_REACHED` | **-inf** | `350.9999999999955` | `VERIFIED SAFE (bound <= z*)` | 3244.5 ms |
-| `mcsched` | Bin 4 (1500-3000) | 1747 | 2107 | 8088 | `LIMIT_REACHED` | **-inf** | `211913.0` | `VERIFIED SAFE (bound <= z*)` | 4410.5 ms |
-| `gmu-35-50` | Bin 4 (1500-3000) | 1919 | 435 | 8643 | `LIMIT_REACHED` | **-inf** | `-2607958.33` | `VERIFIED SAFE (bound <= z*)` | 3245.6 ms |
-| `p200x1188c` | Bin 4 (1500-3000) | 2376 | 1388 | 4752 | `LIMIT_REACHED` | **-inf** | `15078.0` | `VERIFIED SAFE (bound <= z*)` | 3275.3 ms |
-| `beasleyC3` | Bin 4 (1500-3000) | 2500 | 1750 | 5000 | `LIMIT_REACHED` | **-inf** | `753.9999999999128` | `VERIFIED SAFE (bound <= z*)` | 3422.3 ms |
-| `pg5_34` | Bin 4 (1500-3000) | 2600 | 225 | 7700 | `LIMIT_REACHED` | **-inf** | `-14339.35345` | `VERIFIED SAFE (bound <= z*)` | 3060.4 ms |
-| `flugpl` | Baseline | 18 | 18 | 46 | `LIMIT_REACHED` | **1172382.2077** | `1201500.0` | `VERIFIED SAFE (bound <= z*)` | 501.9 ms |
+| `gen-ip054` | Bin 1 (<200) | 30 | 27 | 532 | `LIMIT_REACHED` | **6767.7611** | `6840.96564179` | `VERIFIED SAFE (bound <= z*)` | 3009.1 ms |
+| `markshare_4_0` | Bin 1 (<200) | 34 | 4 | 123 | `NUMERICAL_FAILURE` | **0.0000** | `1.0` | `VERIFIED SAFE (bound <= z*)` | 222.5 ms |
+| `gen-ip002` | Bin 1 (<200) | 41 | 24 | 922 | `NUMERICAL_FAILURE` | **-inf** | `-4783.733392` | `VERIFIED SAFE (bound <= z*)` | 3000.6 ms |
+| `neos5` | Bin 1 (<200) | 63 | 63 | 2016 | `LIMIT_REACHED` | **-inf** | `15.0` | `VERIFIED SAFE (bound <= z*)` | 1685.2 ms |
+| `markshare2` | Bin 1 (<200) | 74 | 7 | 434 | `LIMIT_REACHED` | **-inf** | `1.0` | `VERIFIED SAFE (bound <= z*)` | 457.4 ms |
+| `pk1` | Bin 1 (<200) | 86 | 45 | 915 | `LIMIT_REACHED` | **-inf** | `11.0` | `VERIFIED SAFE (bound <= z*)` | 868.7 ms |
+| `mas74` | Bin 1 (<200) | 151 | 13 | 1706 | `LIMIT_REACHED` | **-inf** | `11801.18572` | `VERIFIED SAFE (bound <= z*)` | 1611.7 ms |
+| `mas76` | Bin 1 (<200) | 151 | 12 | 1640 | `LIMIT_REACHED` | **-inf** | `40005.05398999999` | `VERIFIED SAFE (bound <= z*)` | 1644.8 ms |
+| `assign1-5-8` | Bin 1 (<200) | 156 | 161 | 3720 | `LIMIT_REACHED` | **-inf** | `211.999999999998` | `VERIFIED SAFE (bound <= z*)` | 3004.8 ms |
+| `neos859080` | Bin 1 (<200) | 160 | 164 | 1280 | `NUMERICAL_FAILURE` | **1.0000** | — | `VERIFIED SAFE (bound <= z*)` | 3002.8 ms |
+| `enlight_hard` | Bin 2 (200-600) | 200 | 100 | 560 | `LIMIT_REACHED` | **0.0000** | `37.0` | `VERIFIED SAFE (bound <= z*)` | 3002.2 ms |
+| `neos-3754480-nidda` | Bin 2 (200-600) | 253 | 402 | 1488 | `LIMIT_REACHED` | **-inf** | `12939.7540104743` | `VERIFIED SAFE (bound <= z*)` | 4931.1 ms |
+| `graphdraw-domain` | Bin 2 (200-600) | 254 | 865 | 2600 | `LIMIT_REACHED` | **-inf** | `19685.99997550038` | `VERIFIED SAFE (bound <= z*)` | 3165.2 ms |
+| `mik-250-20-75-4` | Bin 2 (200-600) | 270 | 195 | 9270 | `LIMIT_REACHED` | **-inf** | `-52301.0` | `VERIFIED SAFE (bound <= z*)` | 3004.6 ms |
+| `neos-3046615-murg` | Bin 2 (200-600) | 274 | 498 | 1266 | `LIMIT_REACHED` | **-inf** | `1600.0` | `VERIFIED SAFE (bound <= z*)` | 3073.3 ms |
+| `glass4` | Bin 2 (200-600) | 322 | 396 | 1815 | `LIMIT_REACHED` | **800002400.0000** | `1200012599.972384` | `VERIFIED SAFE (bound <= z*)` | 3045.5 ms |
+| `timtab1` | Bin 2 (200-600) | 397 | 171 | 829 | `LIMIT_REACHED` | **48194.0000** | `764771.99999978` | `VERIFIED SAFE (bound <= z*)` | 3077.2 ms |
+| `supportcase26` | Bin 2 (200-600) | 436 | 870 | 2492 | `LIMIT_REACHED` | **-inf** | `1745.123813` | `VERIFIED SAFE (bound <= z*)` | 3050.8 ms |
+| `ran14x18-disj-8` | Bin 2 (200-600) | 504 | 447 | 10277 | `LIMIT_REACHED` | **-inf** | `3712.0` | `VERIFIED SAFE (bound <= z*)` | 3033.5 ms |
+| `fhnw-binpack4-4` | Bin 2 (200-600) | 520 | 620 | 2332 | `LIMIT_REACHED` | **-inf** | — | `VERIFIED SAFE (bound <= z*)` | 3028.3 ms |
+| `neos-2657525-crna` | Bin 2 (200-600) | 524 | 342 | 1690 | `LIMIT_REACHED` | **-inf** | `1.810748` | `VERIFIED SAFE (bound <= z*)` | 3016.2 ms |
+| `neos17` | Bin 2 (200-600) | 535 | 486 | 4931 | `LIMIT_REACHED` | **-inf** | `0.1500025774` | `VERIFIED SAFE (bound <= z*)` | 3027.4 ms |
+| `sp150x300d` | Bin 3 (600-1500) | 600 | 450 | 1200 | `LIMIT_REACHED` | **-inf** | `69.0` | `VERIFIED SAFE (bound <= z*)` | 3014.3 ms |
+| `ic97_potential` | Bin 3 (600-1500) | 728 | 1046 | 3138 | `LIMIT_REACHED` | **-inf** | `3941.99993090225` | `VERIFIED SAFE (bound <= z*)` | 3322.8 ms |
+| `neos-911970` | Bin 3 (600-1500) | 888 | 107 | 3408 | `LIMIT_REACHED` | **-inf** | `54.76` | `VERIFIED SAFE (bound <= z*)` | 3014.6 ms |
+| `exp-1-500-5-5` | Bin 3 (600-1500) | 990 | 550 | 1980 | `LIMIT_REACHED` | **-inf** | `65887.0` | `VERIFIED SAFE (bound <= z*)` | 3042.2 ms |
+| `tr12-30` | Bin 3 (600-1500) | 1080 | 750 | 2508 | `LIMIT_REACHED` | **-inf** | `130595.9999999999` | `VERIFIED SAFE (bound <= z*)` | 3055.2 ms |
+| `gmu-35-40` | Bin 3 (600-1500) | 1205 | 424 | 4843 | `LIMIT_REACHED` | **-inf** | `-2406733.3688` | `VERIFIED SAFE (bound <= z*)` | 3044.4 ms |
+| `neos-4338804-snowy` | Bin 3 (600-1500) | 1344 | 1701 | 6342 | `LIMIT_REACHED` | **-inf** | `1471.0` | `VERIFIED SAFE (bound <= z*)` | 3360.4 ms |
+| `50v-10` | Bin 4 (1500-3000) | 2013 | 233 | 2745 | `LIMIT_REACHED` | **0.0000** | `3311.1799841` | `VERIFIED SAFE (bound <= z*)` | 3059.5 ms |
+| `csched008` | Bin 4 (1500-3000) | 1536 | 351 | 5687 | `LIMIT_REACHED` | **-inf** | `173.0` | `VERIFIED SAFE (bound <= z*)` | 3030.2 ms |
+| `csched007` | Bin 4 (1500-3000) | 1758 | 351 | 6379 | `LIMIT_REACHED` | **-inf** | `350.9999999999955` | `VERIFIED SAFE (bound <= z*)` | 3307.4 ms |
+| `mcsched` | Bin 4 (1500-3000) | 1747 | 2107 | 8088 | `LIMIT_REACHED` | **-inf** | `211913.0` | `VERIFIED SAFE (bound <= z*)` | 4554.0 ms |
+| `gmu-35-50` | Bin 4 (1500-3000) | 1919 | 435 | 8643 | `LIMIT_REACHED` | **-inf** | `-2607958.33` | `VERIFIED SAFE (bound <= z*)` | 3295.3 ms |
+| `p200x1188c` | Bin 4 (1500-3000) | 2376 | 1388 | 4752 | `LIMIT_REACHED` | **-inf** | `15078.0` | `VERIFIED SAFE (bound <= z*)` | 3347.6 ms |
+| `beasleyC3` | Bin 4 (1500-3000) | 2500 | 1750 | 5000 | `LIMIT_REACHED` | **-inf** | `753.9999999999128` | `VERIFIED SAFE (bound <= z*)` | 3541.8 ms |
+| `pg5_34` | Bin 4 (1500-3000) | 2600 | 225 | 7700 | `LIMIT_REACHED` | **-inf** | `-14339.35345` | `VERIFIED SAFE (bound <= z*)` | 3076.9 ms |
+| `flugpl` | Baseline | 18 | 18 | 46 | `LIMIT_REACHED` | **1172382.2077** | `1201500.0` | `VERIFIED SAFE (bound <= z*)` | 508.7 ms |
 
 ---
 
@@ -109,8 +109,8 @@ Reference solution files (`.sol`) are external benchmark data used strictly for 
 
 | Instance | PROBTYPE | Eligibility | Evidence Source | SOV-OPT Solve Status | Reference Validation Status | Objective | Reference Objective | KKT Status | Reason |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| `QPLIB_8845` | `CCL` | `SUPPORTED_AND_SELECTED` | `QPLIB_PUBLISHED_SOLUTION` | `LIMIT_REACHED` | `PRIMAL_FEASIBILITY_AND_OBJECTIVE_VERIFIED` | **10907992.493999** | `10907992.493999` | `PRIMAL_FEASIBILITY_ONLY` | Sovereign solve_qp reached iteration limit (490 equality constraints); reference solution validated |
-| `QPLIB_9002` | `DCL` | `SUPPORTED_AND_SELECTED` | `SOVOPT_STRUCTURAL_PARSER` | `NOT_ATTEMPTED` | `NOT_AVAILABLE` | — | `Unpublished` | `NOT_APPLICABLE` | Continuous convex QP structure verified within declared envelope; solve deferred pending sparse QP support |
+| `QPLIB_8845` | `CCL` | `SUPPORTED_AND_SELECTED` | `SOVOPT_SOLVER` | `OPTIMAL_VERIFIED` | `PRIMAL_FEASIBILITY_AND_OBJECTIVE_VERIFIED` | **10907992.498908** | `10907992.493999` | `FULL_KKT_PASSED` | Sovereign QP solve verified to optimality via original-model KKT |
+| `QPLIB_9002` | `DCL` | `SUPPORTED_AND_SELECTED` | `SOVOPT_SOLVER` | `OPTIMAL_VERIFIED` | `NOT_AVAILABLE` | **5698097498.144750** | `Unpublished` | `FULL_KKT_PASSED` | Sovereign QP solve verified to optimality via original-model KKT |
 | `QPLIB_8938` | `DCL` | `UNSUPPORTED_RESOURCE_LIMIT` | `SOVOPT_PARSER_GUARD` | `NOT_ATTEMPTED` | `NOT_APPLICABLE` | — | `-35.779450` | `NOT_APPLICABLE` | Dense Q allocation for n=4001 would require approximately 488.4 MB, exceeding the 250 MB memory guard. Parser raises UNSUPPORTED_RESOURCE_LIMIT before unsafe dense Q allocation. |
 | `QPLIB_0018` | `QCL` | `UNSUPPORTED_NONCONVEX_QP` | `SOVOPT_PARSER_GUARD` | `NOT_ATTEMPTED` | `NOT_APPLICABLE` | — | `-6.386015` | `NOT_APPLICABLE` | UNSUPPORTED_NONCONVEX_QP |
 
@@ -125,6 +125,7 @@ Reference solution files (`.sol`) are external benchmark data used strictly for 
 | Variant | Model Type | Variables | Constraints | Status | Objective / Certificate | Verification Property |
 | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
 | Continuous Planning | LP | 36 | 28 | `OPTIMAL_VERIFIED` | **-9043.7500** | Exact KKT optimality satisfied |
+| Target-Tracking Dispatch | Convex QP | 36 | 28 | `OPTIMAL_VERIFIED` | **-9703.9976** | Interior-point KKT stationarity satisfied |
 | Unit Commitment | MILP | 42 | 40 | `OPTIMAL_VERIFIED` | **-8953.7500** | Integer feasible, exact lower bound verified |
 | Hydrocracker Infeasible | LP | 36 | 28 | `INFEASIBLE_CERTIFIED` | Farkas Certified | Exact rational Farkas certificate generated |
 

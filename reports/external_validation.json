@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-01T21:34:28.507275+00:00",
-  "git_revision": "1f5969d4c0d0fd31a2ef0072ebfb36a91ebb84a7+dirty",
+  "generated_at": "2026-10-01T22:05:08.606944+00:00",
+  "git_revision": "a0ae370dd23cb93ab2b6faeeb38e6d808388993b+dirty",
   "environment": "Darwin arm64, Python 3.11.16",
   "note": "External differential validation via scripts/baseline_worker.py in isolated subprocess.",
   "instances": {
@@ -23,7 +23,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 87,
       "ipm_iterations": 0,
-      "seconds": 0.0036616249999497086,
+      "seconds": 0.003650167000159854,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -59,7 +59,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 6,
       "ipm_iterations": 0,
-      "seconds": 0.00046337499952642247,
+      "seconds": 0.0004142079997109249,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -95,7 +95,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 80,
       "ipm_iterations": 0,
-      "seconds": 0.0010286669967172202,
+      "seconds": 0.0010153749972232617,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -131,7 +131,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 203,
       "ipm_iterations": 0,
-      "seconds": 0.003394958002900239,
+      "seconds": 0.0030217079984140582,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -166,7 +166,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 134,
       "ipm_iterations": 0,
-      "seconds": 0.0022629169980064034,
+      "seconds": 0.0022160840017022565,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -202,7 +202,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 31,
       "ipm_iterations": 0,
-      "seconds": 0.0005965830023342278,
+      "seconds": 0.0005900830001337454,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -238,7 +238,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 19,
       "ipm_iterations": 0,
-      "seconds": 0.0009485419977863785,
+      "seconds": 0.0008736670024518389,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -273,7 +273,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 37,
       "ipm_iterations": 0,
-      "seconds": 0.0007608749983774032,
+      "seconds": 0.0007067500009725336,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -309,7 +309,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 88,
       "ipm_iterations": 0,
-      "seconds": 0.0013549169998441357,
+      "seconds": 0.0012794159993063658,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -344,7 +344,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 18,
       "ipm_iterations": 0,
-      "seconds": 0.0005262500017124694,
+      "seconds": 0.0004993340007786173,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -380,7 +380,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 18,
       "ipm_iterations": 0,
-      "seconds": 0.000529125001776265,
+      "seconds": 0.0004833750026591588,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -416,7 +416,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 104,
       "ipm_iterations": 0,
-      "seconds": 0.0012799169999198057,
+      "seconds": 0.0011897080003109295,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -452,7 +452,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 160,
       "ipm_iterations": 0,
-      "seconds": 0.001884875000541797,
+      "seconds": 0.0017830840006354265,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -487,7 +487,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 99,
       "ipm_iterations": 0,
-      "seconds": 0.0011631250017671846,
+      "seconds": 0.0011500830005388707,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -522,7 +522,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 53,
       "ipm_iterations": 0,
-      "seconds": 0.0009272500028600916,
+      "seconds": 0.0009191249991999939,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
@@ -557,7 +557,7 @@
       "has_dual_solution": true,
       "simplex_iterations": 20,
       "ipm_iterations": 0,
-      "seconds": 0.0011224580011912622,
+      "seconds": 0.000999375002720626,
       "command": [
         ".venv-benchmark/bin/python",
         "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",

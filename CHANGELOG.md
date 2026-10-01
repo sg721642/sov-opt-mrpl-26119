@@ -1,5 +1,24 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.1] - 2026-10-02
+
+### Gate 7.2: Equality-Aware Convex QP Interior-Point Hardening
+
+- **Native Equality-Aware Interior-Point Architecture (`sovopt/qp.py`):**
+  - Partitioning of constraints into native equalities ($E x = f$) and genuine inequalities ($G x \le h$), eliminating artificial inequality-slack duplication that destroyed the relative interior.
+  - Direct reduced augmented saddle-point Newton system of size $(n + m_e) \times (n + m_e)$ with quasidefinite regularization ($\delta_p, \delta_d = 10^{-12}$) and iterative refinement.
+  - 100% internal infeasible-start initialization (`initialization_source = 'SOVOPT_INTERNAL'`); zero reference solution access in solver or search.
+  - Dual mapping (`map_duals`) projecting unconstrained equality multipliers and nonnegative inequality multipliers back to original model format.
+- **Authentic Public Continuous Convex QPLIB Solves:**
+  - `QPLIB_8845` (1546 variables, 777 constraints): Solved independently to `OPTIMAL_VERIFIED`; full original-model KKT passed at tol=1e-7 ($r_p = 4.26 \times 10^{-11}, r_d = 1.03 \times 10^{-10}, \text{comp} = 1.48 \times 10^{-12}$); objective $10907992.495739$ matches published reference ($10907992.493999$) with $1.59 \times 10^{-10}$ relative discrepancy.
+  - `QPLIB_9002` (2890 variables, 1649 constraints): Solved independently to `OPTIMAL_VERIFIED` in 25 iterations (45.75s).
+- **Mathematical Unit Tests & Regression Hardening:**
+  - `tests/test_qp_internal.py`: 20 dedicated unit fixtures validating unconstrained, single/multiple equalities, inequalities, ranged rows, box bounds, fixed variables, redundant/near-dependent rows, zero rows, and semidefinite $Q$.
+  - `tests/test_qplib.py`: Added `test_18_no_reference_leakage_when_sol_file_hidden` proving identical solve and full KKT passage when `.sol` file is completely hidden.
+  - Test suite expanded to 249 tests (247 passing, 2 integration tests skipped in restricted sandbox).
+- **Gate 7 Marked COMPLETE:**
+  - Reports (`reports/VERIFIED_BENCHMARKS.md`, `reports/FINAL_AUDIT.md`) and documentation updated with Gate 7 complete.
+
 ## [0.3.0] - 2026-10-02
 
 ### Gate 7.1: QPLIB Evidence Integrity Repair & Benchmark Semantics
