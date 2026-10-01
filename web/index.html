@@ -149,6 +149,7 @@ footer{padding:20px 5%;border-top:1px solid var(--line);font-size:12px;color:var
 const $=id=>document.getElementById(id);
 let manifest={}, examples={}, current={}, last=null;
 let currentSolveId = 0;
+let activeAbortController = null;
 
 const STATUS_MAP = {
   'OPTIMAL_VERIFIED': { cls: 'good', text: 'OPTIMAL VERIFIED' },
@@ -164,12 +165,19 @@ const fmt=v=>v==null?'—':Math.abs(v)>1e6?Number(v).toExponential(4):Number(v).
 const sci=v=>v==null?'—':Number(v).toExponential(2);
 
 function clearResult(){
+  currentSolveId++;
+  if(activeAbortController){
+    activeAbortController.abort();
+    activeAbortController=null;
+  }
   $('result').hidden=true;
   $('empty').hidden=false;
   $('status').textContent='AWAITING EXECUTION';
   $('status').className='status';
   $('live_badge').hidden=true;
   $('download').disabled=true;
+  $('solve').disabled=false;
+  $('message').textContent='';
   last=null;
 }
 
@@ -202,12 +210,13 @@ Promise.all([
       $('example').append(o);
     }
   }
-  if(examples['avgas'])$('example').value='avgas';
+  if(examples['afiro'])$('example').value='afiro';
   choose();
 }).catch(e=>$('message').textContent='Failed to load manifest or examples: '+e.message);
 
 $('example').onchange=choose;
 $('backend').onchange=clearResult;
+$('editor').oninput=clearResult;
 
 function cellRow(key,value){
   const tr=document.createElement('tr');
@@ -218,6 +227,10 @@ function cellRow(key,value){
 }
 
 $('solve').onclick=async()=>{
+  if(activeAbortController){
+    activeAbortController.abort();
+  }
+  activeAbortController=new AbortController();
   const solveId=++currentSolveId;
   const selectedKey=$('example').value;
   const selectedBackend=$('backend').value;
@@ -234,7 +247,8 @@ $('solve').onclick=async()=>{
     const resp=await fetch('/api/solve',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model,backend:selectedBackend})
+      body:JSON.stringify({model,backend:selectedBackend}),
+      signal:activeAbortController.signal
     });
     const r=await resp.json();
     if(solveId!==currentSolveId)return;
@@ -252,22 +266,18 @@ $('solve').onclick=async()=>{
     $('empty').hidden=true;
     $('result').hidden=false;
     $('live_badge').hidden=false;
-    // Never fall back to includes('VERIFIED') — unknown statuses show as bad (red) with raw status text
     const st=STATUS_MAP[r.status]||{cls:'bad',text:'UNKNOWN: '+r.status};
     $('status').textContent=st.text;
     $('status').className='status '+st.cls;
-    $('modelname').textContent=`${instMeta.name||selectedKey} (${instMeta.class||''}) solved via ${selectedBackend}`;
+    $('modelname').textContent=`${r.model_name||instMeta.name||selectedKey} (${instMeta.class||''}) solved via ${r.backend||selectedBackend}`;
 
     // Objective, bound, gap
     $('objective').textContent=r.objective!=null?fmt(r.objective):(r.incumbent!=null?fmt(r.incumbent):'—');
-    $('bound').textContent=r.best_bound!=null?fmt(r.best_bound):(r.status==='OPTIMAL_VERIFIED'?fmt(r.objective):'—');
+    $('bound').textContent=r.best_bound!=null?fmt(r.best_bound):'—';
     if(r.relative_gap!=null){
-      // gap===0.0 is floating-point equality, not a proven exact result; label it accordingly
       $('gap').textContent=r.relative_gap===0.0?'0.00% (float)':(r.relative_gap*100).toFixed(4)+'%';
-    }else if(r.status==='OPTIMAL_VERIFIED'){
-      $('gap').textContent='0.00% (KKT certified)';
     }else{
-      $('gap').textContent='—';
+      $('gap').textContent='— (LP/QP KKT)';
     }
 
     const pubRefText=instMeta.published_reference_text||(instMeta.reference_objective!=null?fmt(instMeta.reference_objective):null);
@@ -285,10 +295,10 @@ $('solve').onclick=async()=>{
     cellRow('KKT stationarity & complementarity',v.kkt_passed==null?'Not applicable':(v.kkt_passed?'PASSED':'NOT ESTABLISHED'));
     cellRow('Farkas certificate',r.farkas_certificate?'VERIFIED (exact rational certificate)':'None');
     cellRow('Absolute constraint violation',v.absolute_primal_violation!=null?sci(v.absolute_primal_violation):'—');
-    cellRow('Mantissa precision',v.precision_bits!=null?`${v.precision_bits} bits (IEEE 754)`:'IEEE 754 float64 (53-bit mantissa)');
+    cellRow('Mantissa precision',v.precision_bits!=null?`${v.precision_bits} bits (IEEE 754)`:'Unknown');
     cellRow('Hardware execution',r.gpu_executed?'GPU accelerated':'CPU only (gpu_executed: false)');
     cellRow('Model SHA256',(r.model_sha256||'—').slice(0,24)+'...');
-    cellRow('Solver backend',selectedBackend);
+    cellRow('Solver backend',r.backend||selectedBackend);
     cellRow('Timestamp',last.solve_timestamp);
     
     $('variables').replaceChildren();
@@ -311,13 +321,14 @@ $('solve').onclick=async()=>{
     $('raw').textContent=JSON.stringify(last,null,2);
     $('download').disabled=false;
   }catch(e){
-    if(solveId!==currentSolveId)return;
+    if(e.name==='AbortError'||solveId!==currentSolveId)return;
     $('message').textContent=e.message;
     $('status').textContent='FAILED';
     $('status').className='status bad';
   }finally{
     if(solveId===currentSolveId){
       $('solve').disabled=false;
+      activeAbortController=null;
     }
   }
 };

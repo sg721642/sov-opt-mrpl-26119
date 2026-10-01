@@ -81,24 +81,55 @@ def parse_mps_standalone(path):
     }
 
 def run_highspy(target):
-    import highspy
+    import highspy, importlib.metadata
+    try:
+        version = importlib.metadata.version("highspy")
+    except Exception:
+        try:
+            version = f"{highspy.HIGHS_VERSION_MAJOR}.{highspy.HIGHS_VERSION_MINOR}.{highspy.HIGHS_VERSION_PATCH}"
+        except Exception:
+            version = "unknown"
+
     h = highspy.Highs()
     h.setOptionValue("output_flag", False)
     t0 = time.perf_counter()
     status = h.readModel(str(target))
     if status != highspy.HighsStatus.kOk:
-        return {'backend': 'highspy (C++ core)', 'status': 'READ_ERROR', 'objective': None}
+        return {'backend': f'highspy {version} (native C++ HiGHS)', 'solver_version': version, 'status': 'READ_ERROR', 'objective': None}
+    
+    lp = h.getLp()
+    num_cols = h.getNumCol()
+    num_rows = h.getNumRow()
+    int_count = sum(1 for x in lp.integrality_ if x != highspy.HighsVarType.kContinuous) if hasattr(lp, "integrality_") else 0
+    sense = "MAXIMIZE" if h.getObjectiveSense()[1] == highspy.ObjSense.kMaximize else "MINIMIZE"
+
     h.run()
     elapsed = time.perf_counter() - t0
     info = h.getInfo()
     model_status = str(h.getModelStatus())
-    obj = float(info.objective_function_value) if info.primal_solution_status == 2 else None
+    has_primal = (info.primal_solution_status == 2)
+    obj = float(info.objective_function_value) if has_primal else None
+    best_bound = None
+    if int_count > 0 and hasattr(info, "mip_dual_bound") and abs(info.mip_dual_bound) < 1e20:
+        best_bound = float(info.mip_dual_bound)
+
     return {
-        'backend': 'highspy 1.15.1 (native C++ HiGHS)',
+        'backend': f'highspy {version} (native C++ HiGHS)',
+        'solver_name': 'HiGHS',
+        'solver_version': version,
         'input_source': str(target),
+        'parsed_dimensions': {
+            'variables': num_cols,
+            'constraints': num_rows,
+            'integers': int_count
+        },
+        'objective_sense': sense,
         'model_status': model_status,
         'success': 'kOptimal' in model_status,
         'objective': obj,
+        'best_bound': best_bound,
+        'has_primal_solution': has_primal,
+        'has_dual_solution': (info.dual_solution_status == 2),
         'simplex_iterations': info.simplex_iteration_count,
         'ipm_iterations': info.ipm_iteration_count,
         'seconds': elapsed

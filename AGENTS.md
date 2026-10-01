@@ -164,8 +164,8 @@ When a real dataset is added to tests/fixtures/:
 
 ## Reporting requirements
 
-After completing a development phase, update docs/IMPLEMENTATION_STATUS.md with:
-- Which gates from docs/04_IMPLEMENTATION_PLAN.md are satisfied
+After completing a development phase, update docs/ARCHITECTURE.md and docs/VALIDATION.md with:
+- Which roadmap gates are satisfied
 - What was tested and what the test results were
 - What remains unsupported or unimplemented
 - Any synthetic content that was removed and where it now lives in history

@@ -1,6 +1,40 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
-## [0.1.3] - 2026-10-01
+## [0.1.4] - 2026-10-01
+
+### Documentation Consolidation
+- Consolidated all documentation into a concise, professional structure:
+  - `README.md`: Concise project overview, quick-start commands, algorithm descriptions, and honest limitation disclosures.
+  - `docs/ARCHITECTURE.md`: Complete mathematical specifications, module boundaries, objective conventions, trust semantics, and roadmap implementation gates.
+  - `docs/VALIDATION.md`: Reproducible validation procedures, test suite structure, external benchmark guide, evidence locations, and coverage gap disclosures.
+  - `data/CATALOGUE.md`: Comprehensive dataset provenance, cryptographic hashes, source links, and empty state declarations.
+  - `CHANGELOG.md`: Factual release and development history.
+  - `AGENTS.md`: Maintained contributor and repository integrity instructions.
+- Removed 12 redundant and narrative documents after consolidating unique technical content:
+  - `docs/ANTIGRAVITY_PROMPT.md`, `BASELINE_STATUS.md`, `reports/FINAL_AUDIT.md`, `docs/IMPLEMENTATION_STATUS.md`, `docs/01_SETUP.md`, `docs/02_ARCHITECTURE_AND_MATH.md`, `docs/03_MODEL_AND_REFINERY.md`, `docs/04_IMPLEMENTATION_PLAN.md`, `docs/05_GPU_AND_DEPLOYMENT.md`, `docs/06_BENCHMARKS.md`, `docs/07_REFERENCES.md`, and `reports/VALIDATION.md`.
+- Updated all internal links and documentation references in `START_HERE.html` and `AGENTS.md`.
+
+### Dataset Provenance & Quarantining
+- Quarantined `AVGAS` (`avgas.mps`, `avgas.json`) under `data/quarantined/` with explicit explanation: while the file source (HiGHS repository) and SHA-256 are verified, historical attribution to Charnes et al. (1952) / Symonds (1955) has not been verified against primary literature. Excluded from the active verified benchmark suite and default demonstrations.
+- Active verified benchmark suite confirmed as: Netlib LP (`AFIRO`, `SC50A`, `SC50B`, `BLEND`) and MIPLIB MILP (`FLUGPL`).
+- Made `AFIRO` the default demonstration model across the dashboard, tests, and CLI.
+
+### Test Suite Corrections
+- Removed synthetic `replace(m, integer=(0,))` modification on AVGAS.
+- Explicitly disclosed the MILP `OPTIMAL_VERIFIED` coverage gap: no admitted original MILP benchmark solves to full tree closure within short automated test timeouts on this machine.
+- Updated `test_flugpl_honest_metadata` to enforce mathematical invariants (bounds, node limit, termination state, incumbent feasibility) without requiring fixed status.
+- Evaluated `safe_lower_bound` on FLUGPL LP relaxation node using exact rational basis duals.
+- Separated `test_server.py` into `HandlerUnitTests` (in-process handler testing) and `ServerIntegrationTests` (loopback socket testing with honest skip when sandbox limits sockets).
+
+### External Differential Validation
+- Created `scripts/create_benchmark_env.sh` to provision an isolated virtual environment (`.venv-benchmark`) with `highspy` (1.15.1) and `scipy` (1.17.1).
+- Implemented dynamic solver version and dimension detection in `scripts/baseline_worker.py`.
+- Updated `scripts/generate_reports.py` to support `SOVOPT_BENCHMARK_PYTHON` environment variable and dynamically iterate over active manifest instances.
+- Successfully executed differential comparisons against native HiGHS across all active instances (`MATCH` on LP instances, `BOUND_ONLY` on FLUGPL).
+
+### Web Dashboard & Server
+- Completed stale-response UI fix: added `AbortController` to cancel in-flight requests, incremented `currentSolveId` on dataset, backend, and editor input changes to discard late responses, restored button states, and tied displayed model name and backend strictly to returned model metadata.
+- Replaced invented zero gap on continuous LP/QP with `— (LP/QP KKT)`. Displayed mantissa precision as `Unknown` when not available.
 
 ### Fixed
 - **`scripts/generate_reports.py`:** Replaced hardcoded `EXTERNAL_HIGHS_RESULTS` dict with a real subprocess invocation of `baseline_worker.py`. Tries multiple Python interpreters (system, conda, venv). Records `NOT_RUN` or `FAILED` with actual error when highspy/scipy is unavailable; never manufactures a successful comparison. Removes instance-specific hardcoded discrepancies.

@@ -1,62 +1,174 @@
 {
-  "generated_at": "2026-10-01T13:01:43.886520+00:00",
-  "git_revision": "531bc7c198eae6918e2336dc0d0e10d9ce118da6+dirty",
+  "generated_at": "2026-10-01T13:26:50.063042+00:00",
+  "git_revision": "b8b0124f8e050e2ae0539ecdbf2f6805786df1f0+dirty",
   "environment": "Darwin arm64, Python 3.11.16",
   "note": "External validation run by invoking scripts/baseline_worker.py in an isolated subprocess. Comparison results reflect actual subprocess output. If highspy is unavailable in the subprocess Python, baseline_worker falls back to scipy.optimize.linprog/milp. If both fail, status is FAILED with actual_error recorded.",
   "instances": {
-    "avgas": {
-      "status": "FAILED",
-      "actual_error": "/Users/satyamgupta/Documents/sov-opt/.venv/bin/python exited 1; stderr: Traceback (most recent call last):\n  File \"/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py\", line 148, in <module>\n    import highspy\nModuleNotFoundError: No module named 'highspy'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py\", line 151, in <module>\n    res = run_scipy(target)\n          ^^^^^^^^^^^^^^^^^\n  File \"/Users/satyamgupta/Documents/sov-opt/s; stdout: ",
-      "objective": null,
-      "instance": "avgas",
-      "input_source": "data/verified/avgas.mps",
-      "input_sha256": "10d0e68381321ee9b6a22a53a33d07f7740070b0a077a78ef742a9e88eca8213",
-      "comparison_status": "FAILED"
-    },
     "afiro": {
-      "status": "FAILED",
-      "actual_error": "/Users/satyamgupta/Documents/sov-opt/.venv/bin/python exited 1; stderr: Traceback (most recent call last):\n  File \"/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py\", line 148, in <module>\n    import highspy\nModuleNotFoundError: No module named 'highspy'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py\", line 151, in <module>\n    res = run_scipy(target)\n          ^^^^^^^^^^^^^^^^^\n  File \"/Users/satyamgupta/Documents/sov-opt/s; stdout: ",
-      "objective": null,
-      "instance": "afiro",
+      "backend": "highspy 1.15.1 (native C++ HiGHS)",
+      "solver_name": "HiGHS",
+      "solver_version": "1.15.1",
       "input_source": "data/verified/afiro.mps",
+      "parsed_dimensions": {
+        "variables": 32,
+        "constraints": 27,
+        "integers": 0
+      },
+      "objective_sense": "MINIMIZE",
+      "model_status": "HighsModelStatus.kOptimal",
+      "success": true,
+      "objective": -464.75314285714285,
+      "best_bound": null,
+      "has_primal_solution": true,
+      "has_dual_solution": true,
+      "simplex_iterations": 6,
+      "ipm_iterations": 0,
+      "seconds": 0.0004087499996785482,
+      "command": [
+        ".venv-benchmark/bin/python",
+        "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
+        "/Users/satyamgupta/Documents/sov-opt/data/verified/afiro.mps"
+      ],
+      "exit_code": 0,
+      "_worker_python": ".venv-benchmark/bin/python",
+      "_worker_returncode": 0,
+      "instance": "afiro",
       "input_sha256": "fd3562804ff19382a9cd8bcb22ec81bffd24a4143a2290783831d8c64516a24b",
-      "comparison_status": "FAILED"
+      "discrepancy_vs_sovopt": 0.0,
+      "comparison_status": "MATCH"
     },
     "sc50a": {
-      "status": "FAILED",
-      "actual_error": "/Users/satyamgupta/Documents/sov-opt/.venv/bin/python exited 1; stderr: Traceback (most recent call last):\n  File \"/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py\", line 148, in <module>\n    import highspy\nModuleNotFoundError: No module named 'highspy'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py\", line 151, in <module>\n    res = run_scipy(target)\n          ^^^^^^^^^^^^^^^^^\n  File \"/Users/satyamgupta/Documents/sov-opt/s; stdout: ",
-      "objective": null,
-      "instance": "sc50a",
+      "backend": "highspy 1.15.1 (native C++ HiGHS)",
+      "solver_name": "HiGHS",
+      "solver_version": "1.15.1",
       "input_source": "data/verified/sc50a.mps",
+      "parsed_dimensions": {
+        "variables": 48,
+        "constraints": 50,
+        "integers": 0
+      },
+      "objective_sense": "MINIMIZE",
+      "model_status": "HighsModelStatus.kOptimal",
+      "success": true,
+      "objective": -64.5750770585645,
+      "best_bound": null,
+      "has_primal_solution": true,
+      "has_dual_solution": true,
+      "simplex_iterations": 18,
+      "ipm_iterations": 0,
+      "seconds": 0.0004825419996450364,
+      "command": [
+        ".venv-benchmark/bin/python",
+        "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
+        "/Users/satyamgupta/Documents/sov-opt/data/verified/sc50a.mps"
+      ],
+      "exit_code": 0,
+      "_worker_python": ".venv-benchmark/bin/python",
+      "_worker_returncode": 0,
+      "instance": "sc50a",
       "input_sha256": "c4571004af37a0c7d49099f8fcc513885401784d32f712bf44e014e40348c521",
-      "comparison_status": "FAILED"
+      "discrepancy_vs_sovopt": 0.0,
+      "comparison_status": "MATCH"
     },
     "sc50b": {
-      "status": "FAILED",
-      "actual_error": "/Users/satyamgupta/Documents/sov-opt/.venv/bin/python exited 1; stderr: Traceback (most recent call last):\n  File \"/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py\", line 148, in <module>\n    import highspy\nModuleNotFoundError: No module named 'highspy'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py\", line 151, in <module>\n    res = run_scipy(target)\n          ^^^^^^^^^^^^^^^^^\n  File \"/Users/satyamgupta/Documents/sov-opt/s; stdout: ",
-      "objective": null,
-      "instance": "sc50b",
+      "backend": "highspy 1.15.1 (native C++ HiGHS)",
+      "solver_name": "HiGHS",
+      "solver_version": "1.15.1",
       "input_source": "data/verified/sc50b.mps",
+      "parsed_dimensions": {
+        "variables": 48,
+        "constraints": 50,
+        "integers": 0
+      },
+      "objective_sense": "MINIMIZE",
+      "model_status": "HighsModelStatus.kOptimal",
+      "success": true,
+      "objective": -69.99999999999999,
+      "best_bound": null,
+      "has_primal_solution": true,
+      "has_dual_solution": true,
+      "simplex_iterations": 18,
+      "ipm_iterations": 0,
+      "seconds": 0.0004793749999407737,
+      "command": [
+        ".venv-benchmark/bin/python",
+        "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
+        "/Users/satyamgupta/Documents/sov-opt/data/verified/sc50b.mps"
+      ],
+      "exit_code": 0,
+      "_worker_python": ".venv-benchmark/bin/python",
+      "_worker_returncode": 0,
+      "instance": "sc50b",
       "input_sha256": "15c9d96e1d518dddc197e8e107febce590d0ae94594c676ff0d135b5642c1be5",
-      "comparison_status": "FAILED"
+      "discrepancy_vs_sovopt": 1.4210854715202004e-14,
+      "comparison_status": "MATCH"
     },
     "blend": {
-      "status": "FAILED",
-      "actual_error": "/Users/satyamgupta/Documents/sov-opt/.venv/bin/python exited 1; stderr: Traceback (most recent call last):\n  File \"/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py\", line 148, in <module>\n    import highspy\nModuleNotFoundError: No module named 'highspy'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py\", line 151, in <module>\n    res = run_scipy(target)\n          ^^^^^^^^^^^^^^^^^\n  File \"/Users/satyamgupta/Documents/sov-opt/s; stdout: ",
-      "objective": null,
-      "instance": "blend",
+      "backend": "highspy 1.15.1 (native C++ HiGHS)",
+      "solver_name": "HiGHS",
+      "solver_version": "1.15.1",
       "input_source": "data/verified/blend.mps",
+      "parsed_dimensions": {
+        "variables": 83,
+        "constraints": 74,
+        "integers": 0
+      },
+      "objective_sense": "MINIMIZE",
+      "model_status": "HighsModelStatus.kOptimal",
+      "success": true,
+      "objective": -30.812149845828237,
+      "best_bound": null,
+      "has_primal_solution": true,
+      "has_dual_solution": true,
+      "simplex_iterations": 80,
+      "ipm_iterations": 0,
+      "seconds": 0.0010101249999934225,
+      "command": [
+        ".venv-benchmark/bin/python",
+        "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
+        "/Users/satyamgupta/Documents/sov-opt/data/verified/blend.mps"
+      ],
+      "exit_code": 0,
+      "_worker_python": ".venv-benchmark/bin/python",
+      "_worker_returncode": 0,
+      "instance": "blend",
       "input_sha256": "c8bb193f8af5dcff735a3b8db62077db93625e93cfb26e2b01f83ca3039cbf7d",
-      "comparison_status": "FAILED"
+      "discrepancy_vs_sovopt": 0.0,
+      "comparison_status": "MATCH"
     },
     "flugpl": {
-      "status": "FAILED",
-      "actual_error": "/Users/satyamgupta/Documents/sov-opt/.venv/bin/python exited 1; stderr: Traceback (most recent call last):\n  File \"/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py\", line 148, in <module>\n    import highspy\nModuleNotFoundError: No module named 'highspy'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py\", line 151, in <module>\n    res = run_scipy(target)\n          ^^^^^^^^^^^^^^^^^\n  File \"/Users/satyamgupta/Documents/sov-opt/s; stdout: ",
-      "objective": null,
-      "instance": "flugpl",
+      "backend": "highspy 1.15.1 (native C++ HiGHS)",
+      "solver_name": "HiGHS",
+      "solver_version": "1.15.1",
       "input_source": "data/verified/flugpl.mps",
+      "parsed_dimensions": {
+        "variables": 18,
+        "constraints": 18,
+        "integers": 11
+      },
+      "objective_sense": "MINIMIZE",
+      "model_status": "HighsModelStatus.kOptimal",
+      "success": true,
+      "objective": 1201500.0,
+      "best_bound": 1201500.0,
+      "has_primal_solution": true,
+      "has_dual_solution": false,
+      "simplex_iterations": 858,
+      "ipm_iterations": -1,
+      "seconds": 0.0380427499999314,
+      "command": [
+        ".venv-benchmark/bin/python",
+        "/Users/satyamgupta/Documents/sov-opt/scripts/baseline_worker.py",
+        "/Users/satyamgupta/Documents/sov-opt/data/verified/flugpl.mps"
+      ],
+      "exit_code": 0,
+      "_worker_python": ".venv-benchmark/bin/python",
+      "_worker_returncode": 0,
+      "instance": "flugpl",
       "input_sha256": "a1f0cb79a95639450dd984473a00efca24365457153d7fcb859c6581ddab4c2c",
-      "comparison_status": "FAILED"
+      "sovopt_status": "LIMIT_REACHED",
+      "sovopt_best_bound": 1173644.9999999998,
+      "comparison_status": "BOUND_ONLY"
     }
   }
 }

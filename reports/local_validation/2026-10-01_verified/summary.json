@@ -1,14 +1,4 @@
 {
-  "avgas": {
-    "status": "OPTIMAL_VERIFIED",
-    "objective": -7.75,
-    "best_bound": null,
-    "iterations": 31,
-    "primal_residual": 5.551115123125783e-17,
-    "dual_residual": 2.880578658486892e-17,
-    "kkt_passed": true,
-    "seconds": 0.010086374999900727
-  },
   "afiro": {
     "status": "OPTIMAL_VERIFIED",
     "objective": -464.75314285714285,
@@ -17,7 +7,7 @@
     "primal_residual": 1.4210854715201802e-14,
     "dual_residual": 1.7193502857276608e-17,
     "kkt_passed": true,
-    "seconds": 0.022440334000066287
+    "seconds": 0.0252787909998915
   },
   "sc50a": {
     "status": "OPTIMAL_VERIFIED",
@@ -27,7 +17,7 @@
     "primal_residual": 5.367434915118819e-16,
     "dual_residual": 4.0893641093287975e-17,
     "kkt_passed": true,
-    "seconds": 0.049974875000089014
+    "seconds": 0.05062591700016128
   },
   "sc50b": {
     "status": "OPTIMAL_VERIFIED",
@@ -37,7 +27,7 @@
     "primal_residual": 2.493132406175791e-16,
     "dual_residual": 3.9650822308041306e-17,
     "kkt_passed": true,
-    "seconds": 0.046319541999992
+    "seconds": 0.04715870800009725
   },
   "blend": {
     "status": "OPTIMAL_VERIFIED",
@@ -47,7 +37,7 @@
     "primal_residual": 1.7763568394002473e-15,
     "dual_residual": 1.227694079519073e-16,
     "kkt_passed": true,
-    "seconds": 0.9085629169999265
+    "seconds": 0.918436957999802
   },
   "flugpl": {
     "status": "LIMIT_REACHED",
@@ -57,15 +47,15 @@
     "primal_residual": null,
     "dual_residual": null,
     "kkt_passed": null,
-    "seconds": 1.0220469589999084
+    "seconds": 1.0332122910003818
   },
-  "avgas_pdhg": {
+  "afiro_pdhg": {
     "status": "OPTIMAL_VERIFIED",
-    "objective": -7.749999888911532,
-    "iterations": 500,
-    "primal_residual": 1.3064950580199562e-08,
-    "dual_residual": 1.901111838150597e-09,
+    "objective": -464.7531422334188,
+    "iterations": 12000,
+    "primal_residual": 8.069888712327982e-09,
+    "dual_residual": 5.931405140274168e-08,
     "kkt_passed": true,
-    "seconds": 0.0040246249998290295
+    "seconds": 0.11394812500020635
   }
 }

@@ -61,34 +61,33 @@ def run_external_validation(mps_path):
             'objective': None
         }
 
-    # Candidate Python interpreters: system python3 first (more likely to have highspy),
-    # then venv python, then the current interpreter.
     candidates = []
-    # System python3 (may have highspy via Anaconda or system install)
-    system_py = '/usr/bin/python3'
-    if Path(system_py).exists():
-        candidates.append(system_py)
-    # Anaconda python (common on macOS)
-    for conda_py in ['/opt/anaconda3/bin/python3', '/opt/homebrew/anaconda3/bin/python3',
-                     '/opt/homebrew/opt/python@3.11/bin/python3',
-                     os.path.expanduser('~/opt/anaconda3/bin/python3')]:
-        if Path(conda_py).exists():
-            candidates.append(conda_py)
-    # Current interpreter (venv — likely no highspy, but baseline_worker falls back to scipy)
-    candidates.append(sys.executable)
+    # 1. User environment variable
+    if os.environ.get('SOVOPT_BENCHMARK_PYTHON'):
+        candidates.append(os.environ['SOVOPT_BENCHMARK_PYTHON'])
+    # 2. Benchmark virtual environment
+    bench_py = ROOT / '.venv-benchmark' / 'bin' / 'python'
+    if bench_py.exists():
+        candidates.append(str(bench_py))
+    # 3. System interpreters as fallback
+    for p in ['/opt/homebrew/bin/python3.11', '/usr/bin/python3', sys.executable]:
+        if Path(p).exists() and p not in candidates:
+            candidates.append(p)
 
     last_error = None
     for py_exe in candidates:
         try:
             # Run without PYTHONHOME to avoid broken env isolation on macOS
+            cmd = [py_exe, str(worker), str(mps_path)]
             env = {k: v for k, v in os.environ.items() if k != 'PYTHONHOME'}
             proc = subprocess.run(
-                [py_exe, str(worker), str(mps_path)],
-                capture_output=True, text=True, timeout=120, env=env
+                cmd, capture_output=True, text=True, timeout=120, env=env
             )
             if proc.returncode == 0 and proc.stdout.strip():
                 try:
                     result = json.loads(proc.stdout)
+                    result['command'] = cmd
+                    result['exit_code'] = proc.returncode
                     result['_worker_python'] = py_exe
                     result['_worker_returncode'] = proc.returncode
                     return result
@@ -161,19 +160,19 @@ def main():
         }
         print(f"Solved {key} in {elapsed*1000.0:.1f} ms: {r['status']}", flush=True)
 
-    # Solve AVGAS on PDHG-CPU
-    avgas_m = load(ROOT / 'data/verified/avgas.mps')
+    # Solve AFIRO on PDHG-CPU (authoritative Netlib LP instance)
+    afiro_m = load(ROOT / 'data/verified/afiro.mps')
     t0 = time.perf_counter()
-    r_pdhg = solve(avgas_m, backend='pdhg-cpu')
+    r_pdhg = solve(afiro_m, backend='pdhg-cpu', max_iter=20000)
     elapsed_pdhg = time.perf_counter() - t0
     r_pdhg['measured_duration_seconds'] = elapsed_pdhg
     r_pdhg['git_revision'] = git_rev
-    (dated_dir / 'avgas_pdhg.json').write_text(json.dumps(r_pdhg, indent=2))
-    print(f"Solved AVGAS (PDHG-CPU) in {elapsed_pdhg*1000.0:.1f} ms: {r_pdhg['status']}", flush=True)
+    (dated_dir / 'afiro_pdhg.json').write_text(json.dumps(r_pdhg, indent=2))
+    print(f"Solved AFIRO (PDHG-CPU) in {elapsed_pdhg*1000.0:.1f} ms: {r_pdhg['status']}", flush=True)
 
     # Build summary.json
     summary_data = {}
-    for k in ['avgas', 'afiro', 'sc50a', 'sc50b', 'blend', 'flugpl']:
+    for k in instances.keys():
         if k not in results:
             continue
         res = results[k]['result']
@@ -189,7 +188,7 @@ def main():
             'seconds': res.get('measured_duration_seconds')
         }
     v_pdhg = r_pdhg.get('verification', {})
-    summary_data['avgas_pdhg'] = {
+    summary_data['afiro_pdhg'] = {
         'status': r_pdhg['status'],
         'objective': r_pdhg.get('objective'),
         'iterations': r_pdhg.get('iterations'),
@@ -204,7 +203,7 @@ def main():
     # --- External validation via baseline_worker.py subprocess ---
     print('\nRunning external validation via isolated baseline_worker.py subprocess...', flush=True)
     ext_instances = {}
-    for k in ['avgas', 'afiro', 'sc50a', 'sc50b', 'blend', 'flugpl']:
+    for k in instances.keys():
         if k not in results:
             continue
         mps_path = ROOT / results[k]['meta']['mps_file']
@@ -275,7 +274,7 @@ def main():
         "|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|"
     ]
 
-    order = ['avgas', 'afiro', 'sc50a', 'sc50b', 'blend', 'flugpl']
+    order = list(instances.keys())
     for k in order:
         if k not in results:
             continue
@@ -312,12 +311,12 @@ def main():
 
         bench_md.append(f"| **{m['name']}** | {m['class']} | {dims} | {status} | {obj_str} | {ref_text} | {diff_str} | {pr} | {dr} | {time_str} |")
 
-    # Add PDHG row
+    # Add PDHG row for AFIRO
     v_pdhg = r_pdhg.get('verification', {})
     pr_pdhg = f"{v_pdhg.get('primal_residual', 0.0):.2e}"
     dr_pdhg = f"{v_pdhg.get('dual_residual', 0.0):.2e}"
-    diff_pdhg = abs(r_pdhg['objective'] - (-7.75))
-    bench_md.append(f"| **AVGAS (PDHG-CPU)** | LP | 10 x 8 | `{r_pdhg['status']}` | **{r_pdhg['objective']:.6f}** | -7.75 (Symonds 1955) | {diff_pdhg:.1e} | {pr_pdhg} | {dr_pdhg} | {elapsed_pdhg*1000.0:.1f} ms |")
+    diff_pdhg = abs(r_pdhg['objective'] - (-464.75314286))
+    bench_md.append(f"| **AFIRO (PDHG-CPU)** | LP | 27 x 32 | `{r_pdhg['status']}` | **{r_pdhg['objective']:.6f}** | -464.75314286 (Netlib) | {diff_pdhg:.1e} | {pr_pdhg} | {dr_pdhg} | {elapsed_pdhg*1000.0:.1f} ms |")
 
     # Section 2: External validation
     bench_md.extend([
@@ -362,17 +361,14 @@ def main():
         "",
         "### Notes on External Differential Comparison:",
         "1. **Netlib BLEND:** Both SOV-OPT and the external solver (if available) read `blend.mps` directly. "
-        "Agreement between them shows they parse the same file. The Netlib MINOS 5.3 README reference "
-        "(-3.0812149846E+01, 11 significant digits) differs from the full-precision result; the source "
-        "of this discrepancy (truncation in historical text, or solver difference) is not independently "
-        "confirmed here — do not assert a specific cause.",
+        "Agreement between them shows they compute the same objective on the same model. The Netlib MINOS 5.3 README reference "
+        "(-3.0812149846E+01, 11 significant digits) differs by ~1.72e-10 from the full-precision result.",
         "2. **MIPLIB FLUGPL Bound:** MIPLIB integer optimum is 1201500.0. SOV-OPT produces a conservative "
         "lower bound of approximately 1173644.9999999998 (floating-point display) at 50 nodes with "
         "no incumbent found. Status: LIMIT_REACHED. This is not a completed MILP solve.",
-        "3. **AVGAS Provenance Note:** The MPS file is sourced from the HiGHS test suite "
-        "(https://github.com/ERGO-Code/HiGHS). Primary historical attribution to Charnes, Cooper, Mellon "
-        "(1952) *Econometrica* and Symonds (1955) has not been independently verified against the primary "
-        "sources in this session. Treat provenance as plausible but unverified against primary literature.",
+        "3. **Quarantined Instance (AVGAS):** `avgas.mps` is quarantined under `data/quarantined/` pending "
+        "independent primary literature verification of its historical attribution (Charnes et al. 1952 / Symonds 1955). "
+        "It is excluded from the active verified suite above.",
         "",
         "---",
         "",
@@ -380,7 +376,7 @@ def main():
         "",
         "1. **Proprietary MRPL Production Data (Empty State):**",
         "   - No authorized MRPL dataset is available in this project. Confidential refinery operational LP matrices are not public. Fictional refinery parameters are strictly prohibited.",
-        "   - Documented historical petroleum blending benchmark `AVGAS` (Symonds 1955) and Netlib refinery problem `BLEND` (Murtagh) are provided instead.",
+        "   - Netlib refinery blending benchmark `BLEND` (Murtagh) is provided as an authentic benchmark problem.",
         "",
         "2. **Industrial Convex QP Data (Empty State):**",
         "   - No authentic public industrial convex QP benchmark is currently admitted in the verified active suite. Toy synthetic QP instances have been removed.",

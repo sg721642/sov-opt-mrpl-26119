@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-01  
 **Environment:** Darwin arm64, Python 3.11.16  
-**Solver Revision:** `531bc7c198eae691` (includes +dirty if uncommitted changes)  
+**Solver Revision:** `b8b0124f8e050e2a` (includes +dirty if uncommitted changes)  
 **Core Dependencies:** NumPy and Python standard library only (strictly sovereign core)  
 **External Validation:** via `scripts/baseline_worker.py` isolated subprocess (highspy or scipy fallback)  
 
@@ -15,13 +15,12 @@ No synthetic or fabricated instances are used as performance evidence.
 
 | Instance | Problem Class | Dimensions (m x n) | SOV-OPT Status | SOV-OPT Objective | Published Reference Text | Discrepancy | Primal Residual | Stationarity (Dual) | Runtime |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **AVGAS** | LP | 10 x 8 | `OPTIMAL_VERIFIED` | **-7.750000** | -7.75 | 0.0 | 5.55e-17 | 2.88e-17 | 10.1 ms |
-| **AFIRO** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753143** | -4.6475314286E+02 | 2.86e-09 | 1.42e-14 | 1.72e-17 | 22.4 ms |
-| **SC50A** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-64.575077** | -6.4575077059E+01 | 4.35e-10 | 5.37e-16 | 4.09e-17 | 50.0 ms |
-| **SC50B** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000** | -7.0000000000E+01 | 0.0 | 2.49e-16 | 3.97e-17 | 46.3 ms |
-| **BLEND** | LP | 74 x 83 | `OPTIMAL_VERIFIED` | **-30.812150** | -3.0812149846E+01 | 1.72e-10 | 1.78e-15 | 1.23e-16 | 908.6 ms |
-| **FLUGPL** | MILP | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **1173645** | 1201500 (integer optimal); 769500.0 (LP relaxation root bound) | N/A | N/A | N/A | 1022.0 ms |
-| **AVGAS (PDHG-CPU)** | LP | 10 x 8 | `OPTIMAL_VERIFIED` | **-7.750000** | -7.75 (Symonds 1955) | 1.1e-07 | 1.31e-08 | 1.90e-09 | 4.0 ms |
+| **AFIRO** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753143** | -4.6475314286E+02 | 2.86e-09 | 1.42e-14 | 1.72e-17 | 25.3 ms |
+| **SC50A** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-64.575077** | -6.4575077059E+01 | 4.35e-10 | 5.37e-16 | 4.09e-17 | 50.6 ms |
+| **SC50B** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000** | -7.0000000000E+01 | 0.0 | 2.49e-16 | 3.97e-17 | 47.2 ms |
+| **BLEND** | LP | 74 x 83 | `OPTIMAL_VERIFIED` | **-30.812150** | -3.0812149846E+01 | 1.72e-10 | 1.78e-15 | 1.23e-16 | 918.4 ms |
+| **FLUGPL** | MILP | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **1173645** | 1201500 (integer optimal); 769500.0 (LP relaxation root bound) | N/A | N/A | N/A | 1033.2 ms |
+| **AFIRO (PDHG-CPU)** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753142** | -464.75314286 (Netlib) | 6.3e-07 | 8.07e-09 | 5.93e-08 | 113.9 ms |
 
 ---
 
@@ -33,17 +32,16 @@ If neither is available, status is `NOT_RUN` or `FAILED` with the actual error r
 
 | Instance | Input MPS File | External Status | External Objective | SOV-OPT Objective / Bound | Discrepancy | Comparison |
 |:---|:---|:---:|:---:|:---:|:---:|:---:|
-| **AVGAS** | `data/verified/avgas.mps` | `FAILED` | — | — | — | `FAILED` |
-| **AFIRO** | `data/verified/afiro.mps` | `FAILED` | — | — | — | `FAILED` |
-| **SC50A** | `data/verified/sc50a.mps` | `FAILED` | — | — | — | `FAILED` |
-| **SC50B** | `data/verified/sc50b.mps` | `FAILED` | — | — | — | `FAILED` |
-| **BLEND** | `data/verified/blend.mps` | `FAILED` | — | — | — | `FAILED` |
-| **FLUGPL** | `data/verified/flugpl.mps` | `FAILED` | — | Bound: 1173644.9999999998 | Bound vs optimum only | `FAILED` |
+| **AFIRO** | `data/verified/afiro.mps` | `HighsModelStatus.kOptimal` | -464.753143 | -464.753143 | 0.0 | `MATCH` |
+| **SC50A** | `data/verified/sc50a.mps` | `HighsModelStatus.kOptimal` | -64.575077 | -64.575077 | 0.0 | `MATCH` |
+| **SC50B** | `data/verified/sc50b.mps` | `HighsModelStatus.kOptimal` | -70.000000 | -70.000000 | 1.42e-14 | `MATCH` |
+| **BLEND** | `data/verified/blend.mps` | `HighsModelStatus.kOptimal` | -30.812150 | -30.812150 | 0.0 | `MATCH` |
+| **FLUGPL** | `data/verified/flugpl.mps` | `HighsModelStatus.kOptimal` | 1201500.000000 | Bound: 1173644.9999999998 | Bound vs optimum only | `BOUND_ONLY` |
 
 ### Notes on External Differential Comparison:
-1. **Netlib BLEND:** Both SOV-OPT and the external solver (if available) read `blend.mps` directly. Agreement between them shows they parse the same file. The Netlib MINOS 5.3 README reference (-3.0812149846E+01, 11 significant digits) differs from the full-precision result; the source of this discrepancy (truncation in historical text, or solver difference) is not independently confirmed here — do not assert a specific cause.
+1. **Netlib BLEND:** Both SOV-OPT and the external solver (if available) read `blend.mps` directly. Agreement between them shows they compute the same objective on the same model. The Netlib MINOS 5.3 README reference (-3.0812149846E+01, 11 significant digits) differs by ~1.72e-10 from the full-precision result.
 2. **MIPLIB FLUGPL Bound:** MIPLIB integer optimum is 1201500.0. SOV-OPT produces a conservative lower bound of approximately 1173644.9999999998 (floating-point display) at 50 nodes with no incumbent found. Status: LIMIT_REACHED. This is not a completed MILP solve.
-3. **AVGAS Provenance Note:** The MPS file is sourced from the HiGHS test suite (https://github.com/ERGO-Code/HiGHS). Primary historical attribution to Charnes, Cooper, Mellon (1952) *Econometrica* and Symonds (1955) has not been independently verified against the primary sources in this session. Treat provenance as plausible but unverified against primary literature.
+3. **Quarantined Instance (AVGAS):** `avgas.mps` is quarantined under `data/quarantined/` pending independent primary literature verification of its historical attribution (Charnes et al. 1952 / Symonds 1955). It is excluded from the active verified suite above.
 
 ---
 
@@ -51,7 +49,7 @@ If neither is available, status is `NOT_RUN` or `FAILED` with the actual error r
 
 1. **Proprietary MRPL Production Data (Empty State):**
    - No authorized MRPL dataset is available in this project. Confidential refinery operational LP matrices are not public. Fictional refinery parameters are strictly prohibited.
-   - Documented historical petroleum blending benchmark `AVGAS` (Symonds 1955) and Netlib refinery problem `BLEND` (Murtagh) are provided instead.
+   - Netlib refinery blending benchmark `BLEND` (Murtagh) is provided as an authentic benchmark problem.
 
 2. **Industrial Convex QP Data (Empty State):**
    - No authentic public industrial convex QP benchmark is currently admitted in the verified active suite. Toy synthetic QP instances have been removed.

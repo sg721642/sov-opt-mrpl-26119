@@ -7,29 +7,6 @@
     "real_convex_qp": "No authentic public industrial convex QP instance is currently verified in the active suite. Numerical eigenvalue checks are floating-point checks, not exact rational PSD certificates."
   },
   "instances": {
-    "avgas": {
-      "name": "AVGAS",
-      "class": "LP",
-      "category": "Academic solver benchmark",
-      "domain": "Aviation gasoline blending formulation (Symonds 1955 / Charnes et al. 1952)",
-      "source_url": "https://github.com/ERGO-Code/HiGHS/blob/master/check/instances/avgas.mps",
-      "file_url": "https://raw.githubusercontent.com/ERGO-Code/HiGHS/master/check/instances/avgas.mps",
-      "retrieval_date": "2026-10-01",
-      "mps_file": "data/verified/avgas.mps",
-      "json_file": "examples/avgas.json",
-      "objective_sense": "MINIMIZE",
-      "objective_offset": 0.0,
-      "published_reference_text": "-7.75",
-      "reference_source": "Symonds (1955) analytical optimum",
-      "reference_objective": -7.75,
-      "total_mps_nonzeros": 38,
-      "expected_status": "OPTIMAL_VERIFIED",
-      "sha256": "10d0e68381321ee9b6a22a53a33d07f7740070b0a077a78ef742a9e88eca8213",
-      "variables": 8,
-      "constraints": 10,
-      "integers": 0,
-      "matrix_nonzeros": 30
-    },
     "afiro": {
       "name": "AFIRO",
       "class": "LP",
@@ -148,6 +125,32 @@
       "constraints": 18,
       "integers": 11,
       "matrix_nonzeros": 46
+    }
+  },
+  "quarantined_instances": {
+    "avgas": {
+      "name": "AVGAS",
+      "class": "LP",
+      "category": "Academic solver benchmark",
+      "domain": "Aviation gasoline blending formulation (Symonds 1955 / Charnes et al. 1952)",
+      "source_url": "https://github.com/ERGO-Code/HiGHS/blob/master/check/instances/avgas.mps",
+      "file_url": "https://raw.githubusercontent.com/ERGO-Code/HiGHS/master/check/instances/avgas.mps",
+      "retrieval_date": "2026-10-01",
+      "mps_file": "data/quarantined/avgas.mps",
+      "json_file": "data/quarantined/avgas.json",
+      "objective_sense": "MINIMIZE",
+      "objective_offset": 0.0,
+      "published_reference_text": "-7.75",
+      "reference_source": "Symonds (1955) analytical optimum",
+      "reference_objective": -7.75,
+      "total_mps_nonzeros": 38,
+      "expected_status": "OPTIMAL_VERIFIED",
+      "sha256": "10d0e68381321ee9b6a22a53a33d07f7740070b0a077a78ef742a9e88eca8213",
+      "variables": 8,
+      "constraints": 10,
+      "integers": 0,
+      "matrix_nonzeros": 30,
+      "quarantine_reason": "Historical petroleum blending attribution (Charnes et al. 1952 / Symonds 1955) has not been independently verified against primary literature in this project. MPS file source (HiGHS repository check/instances/avgas.mps) and SHA-256 are verified. Quarantined outside active runtime paths."
     }
   }
 }

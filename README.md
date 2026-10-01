@@ -1,75 +1,103 @@
-# SOV-OPT Reference Prototype for MRPL PS 26119
+# SOV-OPT — Sovereign Numerical Optimization Prototype
 
-Start with **START_HERE.html** or **docs/01_SETUP.md**. This repository contains a working, reproducible numerical optimization research prototype developed for MRPL SIH Problem Statement 26119.
+**MRPL SIH Problem Statement 26119**  
+**Repository:** https://github.com/sg721642/sov-opt-mrpl-26119 (Private)  
+**Solver Core Dependencies:** Python standard library and NumPy 2.3.5 only.
 
-**Scope:** A finite-box continuous and mixed-integer numerical optimization engine built from first principles. It uses dense revised simplex with exact rational dual and Farkas certification, branch-and-bound with exact rational lower bounding, and interior-point QP. Zero third-party optimization libraries (HiGHS, SCIP, CBC, OR-Tools, CVXPY, PuLP, Gurobi, CPLEX, cuOpt) are imported in the solver core.
+SOV-OPT is an original numerical optimization research prototype developed for linear programming (LP), mixed-integer linear programming (MILP), and convex quadratic programming (QP). The solver core (\`sovopt/\`) is strictly sovereign: it does not import or depend on HiGHS, SCIP, CBC, OR-Tools, CVXPY, PuLP, Gurobi, CPLEX, or any other optimization package.
 
-All models in the active suite are authentic, public benchmarks from authoritative sources (Netlib LP, MIPLIB, and published operations research literature).
+External solvers are permitted solely in isolated subprocess workers (\`scripts/baseline_worker.py\`) to produce differential validation comparisons.
 
 ---
 
 ## Quick Start
 
-Use Python 3.11 or 3.12. In a terminal opened in this repository:
+### 1. Installation
+Requires Python 3.11+ on Linux, macOS, or Windows:
 
 ```bash
+# Create and activate a project-local virtual environment
 python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-python -m unittest discover -s tests -v
-python server.py
+source .venv/bin/activate    # On Windows: .venv\Scripts\activate
+
+# Install core runtime dependencies
+pip install -r requirements.txt
 ```
 
-Open **http://127.0.0.1:8000** to launch the interactive verification dashboard.
-
-Solve verified instances via CLI:
-
+### 2. Run Unit Tests
 ```bash
-python -m sovopt examples/avgas.json --output reports/local_validation/avgas.json
-python -m sovopt examples/afiro.json --output reports/local_validation/afiro.json
-python -m sovopt examples/blend.json --output reports/local_validation/blend.json
-python -m sovopt examples/flugpl.json --output reports/local_validation/flugpl.json
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+### 3. Launch Local Dashboard
+```bash
+.venv/bin/python server.py --port 8000
+```
+Open http://127.0.0.1:8000 in your browser to view the interactive dashboard, load genuine Netlib benchmarks, and execute solves.
+
+### 4. Solve from the Command Line
+```bash
+# Solve a canonical JSON model
+.venv/bin/python -m sovopt examples/afiro.json
+
+# Solve via first-order Primal-Dual Hybrid Gradient (PDHG)
+.venv/bin/python -m sovopt examples/afiro.json --backend pdhg-cpu
+```
+
+### 5. Automated Reports & Differential Validation
+```bash
+# Run local solve benchmarks and regenerate reports
+.venv/bin/python scripts/generate_reports.py
+
+# Optional: Run with external HiGHS differential validation
+bash scripts/create_benchmark_env.sh .venv-benchmark
+SOVOPT_BENCHMARK_PYTHON=.venv-benchmark/bin/python .venv/bin/python scripts/generate_reports.py
 ```
 
 ---
 
-## What is Included
+## Implemented Algorithms
 
-| Location | Contents |
-|---|---|
-| `sovopt/` | Sovereign LU factorization, revised simplex, branch-and-bound, predictor-corrector QP, independent verifier, MPS parser, and PDHG |
-| `server.py`, `web/` | Local interactive dashboard, live solve API, trust reports, and audit export |
-| `data/verified/` | Authentic MPS benchmark instances with cryptographic hashes (`avgas.mps`, `afiro.mps`, `sc50a.mps`, `sc50b.mps`, `blend.mps`, `flugpl.mps`) |
-| `examples/` | Canonical JSON versions of verified instances |
-| `tests/` | Regression tests, exact Farkas certificates, rational bounds, LU residuals, and HTTP endpoints |
-| `scripts/` | Benchmark generators, report tools, and isolated baseline comparison workers |
-| `docs/` | Architecture, mathematics, setup, and implementation status |
-| `reports/` | Test logs, verified benchmark tables, and master audit documentation |
+- **Linear Programming (LP):** Two-phase primal revised simplex with dense LU factorization, partial row pivoting, iterative refinement, and reversible canonical variable transformations (box, free, one-sided, and fixed variables).
+- **Mixed-Integer Linear Programming (MILP):** Branch-and-bound with best-bound queue and most-fractional branching. Lower bounds are evaluated using exact rational basis dual calculations (\`_exact_dual_from_basis\`) and Neumaier-Shcherbina Lagrangian bounds in exact arithmetic (\`fractions.Fraction\`). Infeasible nodes are pruned via exact binary-rational Farkas certificates.
+- **Convex Quadratic Programming (QP):** Infeasible-start Mehrotra predictor-corrector primal-dual interior point algorithm for convex objectives ($\min \frac{1}{2} x^T Q x + c^T x$) with linear constraints.
+- **Experimental First-Order LP (PDHG):** Primal-Dual Hybrid Gradient method (Chambolle-Pock) with diagonal preconditioning and periodic restart. Includes CPU SpMV and CUDA RawKernel source.
 
 ---
 
-## Verified Benchmark Results (Apple Silicon ARM64 CPU)
+## Active Verified Datasets
 
-| Instance | Class | Dimensions | Status | SOV-OPT Objective | Published Reference | Reference Source |
-|:---|:---:|:---:|:---:|:---:|:---:|:---|
-| **AVGAS** | LP | 10 x 8 | `OPTIMAL_VERIFIED` | **-7.750000** | -7.75 | Symonds (1955) |
-| **AFIRO** | LP | 27 x 32 | `OPTIMAL_VERIFIED` | **-464.753143** | -4.6475314286E+02 | Netlib / MINOS 5.3 |
-| **SC50A** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-64.575077** | -6.4575077059E+01 | Netlib / MINOS 5.3 |
-| **SC50B** | LP | 50 x 48 | `OPTIMAL_VERIFIED` | **-70.000000** | -7.0000000000E+01 | Netlib / MINOS 5.3 |
-| **BLEND** | LP | 74 x 83 | `OPTIMAL_VERIFIED` | **-30.812150** | -3.0812149846E+01 | Netlib / MINOS 5.3 |
-| **FLUGPL** | MILP | 18 x 18 (11 int) | `LIMIT_REACHED` | Bound: **1173645.0** | 1201500 (opt) / 769500 (root) | MIPLIB 1.0 / 2017 |
+All models in the active benchmark suite (\`data/verified/\`) are genuine, provenance-verified instances from authoritative sources:
+
+| Dataset | Problem Class | Origin | Reference Objective / Bound |
+|:---|:---:|:---|:---|
+| **AFIRO** | LP | Netlib / Stanford Systems Optimization Lab | -464.75314286 (MINOS 5.3) |
+| **SC50A** | LP | Netlib staircase dynamic production LP | -64.575077059 (MINOS 5.3) |
+| **SC50B** | LP | Netlib staircase dynamic production LP | -70.000000000 (MINOS 5.3) |
+| **BLEND** | LP | Netlib petroleum refinery blending LP (Murtagh) | -30.812149846 (MINOS 5.3) |
+| **FLUGPL** | MILP | MIPLIB airline fleet allocation model (Wagner et al.) | 1201500.0 (integer optimum) |
+
+*Full provenance, hashes, and redistribution terms are recorded in [\`data/CATALOGUE.md\`](data/CATALOGUE.md).*
 
 ---
 
-## Disclosures & Empty States
+## Honest Limitations & Boundaries
 
-1. **Proprietary MRPL Refinery Data (Empty State):**
-   - *No authorized MRPL dataset is available in this project.* Fictional refinery parameters or placeholder economic numbers are strictly prohibited. Genuine historical petroleum blending benchmarks (`AVGAS` and `BLEND`) are provided instead.
+- **Dense Linear Algebra:** The solver core uses dense LU factorization. Size caps are enforced: 250 variables / 1000 rows (CLI), 100 variables / 150 rows (web). Problems exceeding limits report \`LIMIT_REACHED\` or \`NUMERICAL_FAILURE\`. Sparse LU is planned.
+- **Primal Simplex Only:** The current LP implementation is primal revised simplex. Dual simplex, Devex pricing, and basis warm-starts are not yet implemented.
+- **MILP Scale:** Branch-and-bound uses cold-start LP relaxations. Large integer problems reach node limits. FLUGPL terminates at \`LIMIT_REACHED\` at 50 nodes with a valid conservative lower bound ($\approx 1173644.9999999998$), but no incumbent found.
+- **QP Conditioning:** The interior-point method solves normal equations via dense Cholesky/LU; severely ill-conditioned matrices may encounter numerical failure.MIQP is rejected.
+- **CUDA / GPU Acceleration:** The development environment is macOS Apple Silicon (ARM64), which lacks NVIDIA CUDA hardware. \`gpu_executed\` is strictly \`false\` on all local runs. CUDA source exists in \`sovopt/pdhg.py\` but requires physical NVIDIA hardware to execute.
+- **Disclosed Empty States:**
+  - *No MRPL Production Data:* Confidential operational refinery data is proprietary. Fictional numbers are prohibited; Netlib \`BLEND\` is provided as an authentic benchmark.
+  - *No Industrial QP Data:* No authentic public industrial convex QP instance is currently admitted. Synthetic toy models have been removed.
 
-2. **Industrial Convex QP Data (Empty State):**
-   - *No authentic public industrial convex QP benchmark is currently verified in the active suite.* Synthetic toy QP instances have been removed.
+---
 
-3. **Hardware Execution:**
-   - All benchmark solves execute on the CPU (`gpu_executed: false`).
-   - The experimental CUDA PDHG backend is not executable on Apple Silicon macOS; no GPU speedup claims are made.
+## Documentation Index
 
+- [Architecture & Mathematics](docs/ARCHITECTURE.md): Implemented algorithms, variable transformations, objective conventions, verification semantics, and roadmap gates.
+- [Validation Guide & Evidence](docs/VALIDATION.md): Reproducible test and benchmark commands, differential comparisons, evidence file locations, and coverage gaps.
+- [Dataset Catalogue](data/CATALOGUE.md): Dataset provenance, cryptographic hashes, source links, and empty state declarations.
+- [Changelog](CHANGELOG.md): Complete release history and development record.
+- [Contributor Workflow](AGENTS.md): Dataset integrity, Git workflow, and sovereign core requirements.
