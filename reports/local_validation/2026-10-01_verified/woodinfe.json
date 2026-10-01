@@ -1,0 +1,657 @@
+{
+  "status": "INFEASIBLE_CERTIFIED",
+  "message": "Singleton row 34 contradicts bounds on variable DMOSE1",
+  "certificate": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "certificate_exact": [
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "1/1",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "1/1",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "1/1",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "1/1",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0"
+  ],
+  "verification": {
+    "feasible": false,
+    "farkas_verified": true,
+    "kkt_passed": false
+  },
+  "farkas_certificate": true,
+  "algorithm": "two-phase primal revised simplex",
+  "iterations": 58,
+  "history": [
+    {
+      "iteration": 0,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 1,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 2,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 3,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 4,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 5,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 6,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 7,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 8,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 9,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 10,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 11,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 12,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 13,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 14,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 15,
+      "objective_transformed": 1490.0
+    },
+    {
+      "iteration": 16,
+      "objective_transformed": 1290.0
+    },
+    {
+      "iteration": 17,
+      "objective_transformed": 1290.0
+    },
+    {
+      "iteration": 18,
+      "objective_transformed": 1090.0
+    },
+    {
+      "iteration": 19,
+      "objective_transformed": 1010.0
+    },
+    {
+      "iteration": 20,
+      "objective_transformed": 1000.0
+    },
+    {
+      "iteration": 21,
+      "objective_transformed": 910.0
+    },
+    {
+      "iteration": 22,
+      "objective_transformed": 900.0
+    },
+    {
+      "iteration": 23,
+      "objective_transformed": 850.0
+    },
+    {
+      "iteration": 24,
+      "objective_transformed": 840.0
+    },
+    {
+      "iteration": 25,
+      "objective_transformed": 640.0
+    },
+    {
+      "iteration": 26,
+      "objective_transformed": 640.0
+    },
+    {
+      "iteration": 27,
+      "objective_transformed": 540.0
+    },
+    {
+      "iteration": 28,
+      "objective_transformed": 500.0
+    },
+    {
+      "iteration": 29,
+      "objective_transformed": 495.0
+    },
+    {
+      "iteration": 30,
+      "objective_transformed": 415.0
+    },
+    {
+      "iteration": 31,
+      "objective_transformed": 410.0
+    },
+    {
+      "iteration": 32,
+      "objective_transformed": 320.0
+    },
+    {
+      "iteration": 33,
+      "objective_transformed": 310.0
+    },
+    {
+      "iteration": 34,
+      "objective_transformed": 305.0
+    },
+    {
+      "iteration": 35,
+      "objective_transformed": 300.0
+    },
+    {
+      "iteration": 36,
+      "objective_transformed": 280.0
+    },
+    {
+      "iteration": 37,
+      "objective_transformed": 270.0
+    },
+    {
+      "iteration": 38,
+      "objective_transformed": 260.0
+    },
+    {
+      "iteration": 39,
+      "objective_transformed": 220.0
+    },
+    {
+      "iteration": 40,
+      "objective_transformed": 210.0
+    },
+    {
+      "iteration": 41,
+      "objective_transformed": 200.0
+    },
+    {
+      "iteration": 42,
+      "objective_transformed": 150.0
+    },
+    {
+      "iteration": 43,
+      "objective_transformed": 150.0
+    },
+    {
+      "iteration": 44,
+      "objective_transformed": 145.0
+    },
+    {
+      "iteration": 45,
+      "objective_transformed": 140.0
+    },
+    {
+      "iteration": 46,
+      "objective_transformed": 130.0
+    },
+    {
+      "iteration": 47,
+      "objective_transformed": 120.0
+    },
+    {
+      "iteration": 48,
+      "objective_transformed": 110.0
+    },
+    {
+      "iteration": 49,
+      "objective_transformed": 110.0
+    },
+    {
+      "iteration": 50,
+      "objective_transformed": 105.0
+    },
+    {
+      "iteration": 51,
+      "objective_transformed": 100.0
+    },
+    {
+      "iteration": 52,
+      "objective_transformed": 95.0
+    },
+    {
+      "iteration": 53,
+      "objective_transformed": 80.0
+    },
+    {
+      "iteration": 54,
+      "objective_transformed": 75.0
+    },
+    {
+      "iteration": 55,
+      "objective_transformed": 60.0
+    },
+    {
+      "iteration": 56,
+      "objective_transformed": 60.0
+    },
+    {
+      "iteration": 57,
+      "objective_transformed": 45.0
+    }
+  ],
+  "linear_algebra_requested": "auto",
+  "linear_algebra_used": "sparse",
+  "matrix_storage_used": "csc",
+  "basis_storage_used": "sparse",
+  "full_dense_matrix_materialized": false,
+  "basis_factorization": "sovereign_sparse_lu_pfi",
+  "sparse_basis_nnz": 86,
+  "sparse_basis_density": 0.03581840899625156,
+  "refactorizations": 3,
+  "eta_updates": 56,
+  "ftran_count": 117,
+  "btran_count": 59,
+  "max_eta_depth": 25,
+  "iterative_refinement_steps": 0,
+  "method_used": "presolve",
+  "method_requested": "auto",
+  "presolve_applied": true,
+  "scaling_applied": true,
+  "fixed_variables": 0,
+  "empty_rows": 0,
+  "empty_columns": 0,
+  "singleton_rows": 0,
+  "redundant_rows": 0,
+  "passes": 1,
+  "model_name": "WOODINFE",
+  "model_sha256": "8fff4510f22cbe4103546c62f82ba530fd1379284b718ed3e78fab813e2182ba",
+  "solver_version": "0.3.0",
+  "elapsed_seconds": 0.058030000000144355,
+  "backend": "cpu",
+  "gpu_executed": false,
+  "timestamp_utc": "2026-10-01T21:15:10.559345+00:00",
+  "variables": 89,
+  "rows": 35,
+  "nonzeros": 140,
+  "dispatch": {
+    "method": "dual-simplex",
+    "backend": "cpu",
+    "problem_class": "LP",
+    "inspection": {
+      "variables": 89,
+      "constraints": 35,
+      "nonzeros": 140,
+      "density": 0.0449438202247191,
+      "integer_variables": 0,
+      "has_quadratic_objective": false,
+      "min_nonzero_coeff": 1.0,
+      "max_nonzero_coeff": 60.0,
+      "dynamic_range": 60.0
+    },
+    "rationale": "Continuous LP dispatched to Bounded-Variable Revised Dual Simplex with sparse LU refactorization, Markowitz pivoting, Devex pricing, and exact KKT certification."
+  },
+  "machine": {
+    "system": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11.16"
+  },
+  "method_selected": "dual-simplex",
+  "selection_reason": "Continuous LP dispatched to Bounded-Variable Revised Dual Simplex with sparse LU refactorization, Markowitz pivoting, Devex pricing, and exact KKT certification.",
+  "fallback_reason": null,
+  "exact_farkas_certified": true,
+  "measured_duration_seconds": 0.05806720799955656
+}

@@ -977,10 +977,10 @@
   "model_name": "SC50A",
   "model_sha256": "a22e7a93dd11db1ed0d239e0ca4bf7d1a0a99b58845ad438f62cb0a7d5642dc0",
   "solver_version": "0.2.0",
-  "elapsed_seconds": 0.05474845799835748,
+  "elapsed_seconds": 0.06272491599884233,
   "backend": "cpu",
   "gpu_executed": false,
-  "timestamp_utc": "2026-10-01T19:20:39.963159+00:00",
+  "timestamp_utc": "2026-10-01T19:28:19.685131+00:00",
   "variables": 48,
   "rows": 50,
   "nonzeros": 130,
@@ -1009,7 +1009,7 @@
   "method_selected": "dual-simplex",
   "selection_reason": "Continuous LP dispatched to Bounded-Variable Revised Dual Simplex with sparse LU refactorization, Markowitz pivoting, Devex pricing, and exact KKT certification.",
   "fallback_reason": null,
-  "measured_duration_seconds": 0.05478337499880581,
-  "git_revision": "40800987f4a36de59f240a8dd55ed1bdcd575bac+dirty",
+  "measured_duration_seconds": 0.0627556250001362,
+  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f",
   "input_mps_sha256": "c4571004af37a0c7d49099f8fcc513885401784d32f712bf44e014e40348c521"
 }

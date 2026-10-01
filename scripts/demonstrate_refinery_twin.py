@@ -20,8 +20,9 @@ def header(title):
 
 def main():
     print("=" * 78)
-    print("  SOV-OPT: MRPL REFINERY PLANNING DIGITAL TWIN DEMONSTRATION")
-    print("  A Verified Sovereign Optimization Core for MRPL PS 26119")
+    print("  SOV-OPT: REPRESENTATIVE REFINERY PLANNING FORMULATION DEMO")
+    print("  Representative open-literature refinery planning formulation.")
+    print("  No proprietary MRPL operating data is used.")
     print("  Core Principle: GPU accelerates. CPU verifies. No result trusted unverified.")
     print("=" * 78)
 

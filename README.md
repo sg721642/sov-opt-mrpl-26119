@@ -94,6 +94,7 @@ SOVOPT_BENCHMARK_PYTHON=.venv-benchmark/bin/python .venv/bin/python scripts/gene
   - **Mixed-Integer Linear Programming (MILP):** Branch-and-bound engine with parent/child LP basis warm starts (`DualBasisState`), pseudocost branching with history tracking, limited strong-branching bootstrap on unreliable candidates, hybrid best-bound/depth node selection, verified incumbent propagation against untouched original models, safe rounding and conservative diving heuristics, and exact rational Lagrangian lower bounds (`safe_lower_bound`).
   - **Convex Quadratic Programming (QP):** Infeasible-start Mehrotra predictor-corrector primal-dual interior point algorithm for convex objectives ($\min \frac{1}{2} x^T Q x + c^T x$) with linear constraints.
   - **First-Order LP (PDHG):** Primal-Dual Hybrid Gradient method (Chambolle-Pock) with diagonal preconditioning and periodic restart. Includes CPU SpMV and CUDA RawKernel source.
+  - **QPLIB 2018 Native Parser (`sovopt/qplib.py`):** Sovereign parser for the QPLIB benchmark format conforming to the official `qplib.zib.de/doc.html` objective convention ($\min \frac{1}{2} x^T Q^0 x + (b^0)^T x + q^0$). Enforces a strict continuous convex allow-list (`CCL`, `DCL`, `CCB`, `DCB`, `LCL`); explicitly rejects discrete, quadratically constrained, and nonconvex instances with typed `UnsupportedQPLIBError` before any unsafe dense allocation.
 
 ---
 
@@ -167,6 +168,8 @@ $$\text{LP} \longrightarrow \text{MILP} \longrightarrow \text{QP} \longrightarro
 ## Documentation Index
 
 - [Architecture & Mathematics](docs/ARCHITECTURE.md): Implemented algorithms, variable transformations, objective conventions, verification semantics, and roadmap gates.
+- [QPLIB Format Support](docs/QPLIB_SUPPORT.md): Official QPLIB convention, PROBTYPE allow-list and rejection classes, convexity verification, Mehrotra IPM, and KKT residuals.
+- [Benchmark Methodology](docs/BENCHMARK_METHODOLOGY.md): Benchmark selection principles, MIPLIB stratification, ground-truth grounding, resource limits, differential comparison rules.
 - [Bounded-Variable Dual Simplex](docs/DUAL_SIMPLEX.md): Dual simplex engine, Devex pricing, Harris ratio test, and basis state dynamics.
 - [Reversible Presolve & Scaling](docs/PRESOLVE_AND_SCALING.md): Reversible reductions, matrix equilibration, dynamic-range diagnostics, and postsolve guarantees.
 - [Validation Guide & Evidence](docs/VALIDATION.md): Reproducible test and benchmark commands, differential comparisons, evidence file locations, and coverage gaps.

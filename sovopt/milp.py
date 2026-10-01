@@ -155,28 +155,46 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
     up_sum: Dict[int, float] = defaultdict(float)
 
     # LP solver helper with warm start and fallbacks
+    deadline = start_time + time_limit
+
     def solve_node_lp(node_model: Model, basis_state: Optional[DualBasisState],
-                      max_iter: int = 5000) -> Dict[str, Any]:
+                      max_iter: Optional[int] = None) -> Dict[str, Any]:
+        if time.perf_counter() >= deadline:
+            return {'status': 'LIMIT_REACHED', 'message': 'Time limit reached'}
+
+        n_total = len(node_model.A) + len(node_model.c)
+        effective_iter = max_iter if max_iter is not None else min(1500, max(250, 3 * n_total))
+
         attempted_warm = use_warm_starts and (basis_state is not None)
         if attempted_warm:
             telemetry['warm_starts_attempted'] += 1
             res = solve_dual_simplex(node_model, basis_state=basis_state,
-                                     presolve=False, scaling=False, tol=tol, max_iter=max_iter)
+                                     presolve=False, scaling=False, tol=tol,
+                                     max_iter=effective_iter, deadline=deadline)
             if res.get('warm_start_accepted', False) and res['status'] in ('OPTIMAL_VERIFIED', 'INFEASIBLE_CERTIFIED'):
                 telemetry['warm_starts_accepted'] += 1
                 telemetry['warm_start_pivots_total'] += res.get('iterations', 0)
                 return res
+            if res.get('status') == 'LIMIT_REACHED':
+                return res
             telemetry['warm_starts_rejected'] += 1
+
+        if time.perf_counter() >= deadline:
+            return {'status': 'LIMIT_REACHED', 'message': 'Time limit reached'}
 
         # Cold dual simplex solve
         res = solve_dual_simplex(node_model, basis_state=None,
-                                 presolve=False, scaling=False, tol=tol, max_iter=max_iter)
-        if res['status'] in ('OPTIMAL_VERIFIED', 'INFEASIBLE_CERTIFIED'):
+                                 presolve=False, scaling=False, tol=tol,
+                                 max_iter=effective_iter, deadline=deadline)
+        if res['status'] in ('OPTIMAL_VERIFIED', 'INFEASIBLE_CERTIFIED', 'LIMIT_REACHED'):
             telemetry['cold_start_pivots_total'] += res.get('iterations', 0)
             return res
 
+        if time.perf_counter() >= deadline:
+            return {'status': 'LIMIT_REACHED', 'message': 'Time limit reached'}
+
         # Cold primal simplex fallback
-        res_primal = solve_lp(node_model, tol=tol, max_iter=max_iter)
+        res_primal = solve_lp(node_model, tol=tol, max_iter=effective_iter, deadline=deadline)
         telemetry['cold_start_pivots_total'] += res_primal.get('iterations', 0)
         return res_primal
 
@@ -195,6 +213,18 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
             'algorithm': 'rational-bound branch-and-bound',
             'nodes': 1,
             'message': 'Root LP relaxation is infeasible',
+            'best_bound': math.inf,
+            'telemetry': telemetry,
+        }
+
+    if res_root['status'] == 'LIMIT_REACHED':
+        return {
+            'status': 'LIMIT_REACHED',
+            'algorithm': 'rational-bound branch-and-bound',
+            'nodes': 1,
+            'message': 'Time limit reached during root LP relaxation',
+            'best_bound': -math.inf,
+            'telemetry': telemetry,
         }
 
     if res_root['status'] != 'OPTIMAL_VERIFIED':
@@ -203,6 +233,8 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
             'algorithm': 'rational-bound branch-and-bound',
             'nodes': 1,
             'message': 'Root LP relaxation could not be solved: ' + res_root.get('message', res_root['status']),
+            'best_bound': -math.inf,
+            'telemetry': telemetry,
         }
 
     slb_root = safe_lower_bound(root_model, res_root.get('dual_exact_fraction', res_root.get('dual')))

@@ -49,3 +49,8 @@ data/raw/*.zip
 
 # Temporary server log
 /tmp/sovopt_server.log
+
+# Compiled utility binaries
+scripts/emps
+*.o
+*.a

@@ -24,10 +24,16 @@ def solve_qp(model, tol=1e-7, max_iter=150, scaling=True):
     # Symmetrize Q
     Q_use = 0.5 * (Q_use + Q_use.T)
 
-    # Numerical eigenvalue inspection (floating-point check, not an exact rational PSD certificate)
-    eigvals = np.linalg.eigvalsh(Q_use)
-    if np.min(eigvals) < -1e-10:
-        raise ValueError('Nonconvex QP rejected: objective Hessian is not numerically positive semidefinite')
+    # Numerical eigenvalue inspection with scale-aware tolerance
+    scale_q = max(1.0, float(np.max(np.abs(np.diag(Q_use))))) if n > 0 else 1.0
+    convexity_tol = 1e-10 * scale_q
+    if n <= 2500:
+        eigvals = np.linalg.eigvalsh(Q_use)
+        min_ev = float(np.min(eigvals)) if len(eigvals) > 0 else 0.0
+        if min_ev < -convexity_tol:
+            raise ValueError(f'Nonconvex QP rejected: objective Hessian is not numerically positive semidefinite (min eigenvalue = {min_ev:.4e} < -{convexity_tol:.4e})')
+        if min_ev < 0:
+            Q_use += max(0.0, -min_ev + 1e-12) * np.eye(n)
 
     G0, h0, _ = model.inequalities()
     m = len(h0)

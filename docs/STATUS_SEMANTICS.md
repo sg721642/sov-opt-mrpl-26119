@@ -1,7 +1,7 @@
 # SOV-OPT Solver Status Semantics
 
-**Version:** 0.2.0  
-**Applies to:** `sovopt/simplex.py`, `sovopt/dual_simplex.py`, `sovopt/milp.py`, `sovopt/qp.py`, `sovopt/pdhg.py`
+**Version:** 0.3.0  
+**Applies to:** `sovopt/simplex.py`, `sovopt/dual_simplex.py`, `sovopt/milp.py`, `sovopt/qp.py`, `sovopt/qplib.py`, `sovopt/pdhg.py`
 
 Every result dict returned by `solve()`, `solve_lp()`, `solve_milp()`, `solve_qp()`,
 and `solve_pdhg()` contains a `status` field. This document defines precisely what

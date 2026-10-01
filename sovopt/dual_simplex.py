@@ -6,6 +6,7 @@ Zero external solver dependencies.
 """
 from dataclasses import dataclass
 from typing import Optional, Tuple, List, Dict, Any
+import time
 import numpy as np
 
 from .model import Model
@@ -331,6 +332,7 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                        max_iter: int = 5000, tol: float = 1e-7,
                        max_eta_depth: int = 25, pivot_threshold: float = 0.1,
                        presolve: bool = True, scaling: bool = True,
+                       deadline: Optional[float] = None,
                        **options) -> Dict[str, Any]:
     """Solve LP via sovereign bounded-variable revised dual simplex.
 
@@ -344,6 +346,9 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
     - Reusable DualBasisState for warm reoptimization.
     - Honest fallback hierarchy to primal simplex if dual Phase I fails.
     """
+    if deadline is None and 'time_limit' in options and options['time_limit'] is not None:
+        deadline = time.perf_counter() + options['time_limit']
+
     if presolve or scaling:
         from .presolve import presolve_and_scale, reconstruct_dual_kkt
         pres_res = presolve_and_scale(model, presolve=presolve, scaling=scaling, tol=tol)
@@ -361,7 +366,8 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                                         tol=tol, max_iter=max_iter,
                                         max_eta_depth=max_eta_depth,
                                         pivot_threshold=pivot_threshold,
-                                        presolve=False, scaling=False, **options)
+                                        presolve=False, scaling=False,
+                                        deadline=deadline, **options)
 
         if res_scaled['status'] == 'OPTIMAL_VERIFIED':
             x_red = np.array(res_scaled['x'])
@@ -419,7 +425,7 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
 
         elif res_scaled['status'] == 'INFEASIBLE_CERTIFIED':
             from .simplex import solve_lp
-            res = solve_lp(model, tol=tol, max_iter=max_iter)
+            res = solve_lp(model, tol=tol, max_iter=max_iter, deadline=deadline)
             res['method_requested'] = 'dual-simplex'
             res['method_used'] = 'dual-simplex'
             res['presolve_applied'] = presolve
@@ -447,7 +453,7 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
     # Handle box-only / unconstrained model
     if m == 0:
         from .simplex import solve_lp
-        res = solve_lp(model, tol=tol, max_iter=max_iter)
+        res = solve_lp(model, tol=tol, max_iter=max_iter, deadline=deadline)
         res['method_requested'] = 'dual-simplex'
         res['method_used'] = 'primal-simplex'
         res['fallback_reason'] = 'box_only_model'
@@ -553,7 +559,7 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                     # Genuinely free variable with d_init[j] != 0 is dual infeasible in slack basis
                     if abs(d_init[j]) > 1e-7:
                         from .simplex import solve_lp
-                        res = solve_lp(model, tol=tol, max_iter=max_iter)
+                        res = solve_lp(model, tol=tol, max_iter=max_iter, deadline=deadline)
                         res['method_requested'] = 'dual-simplex'
                         res['method_used'] = 'primal-simplex'
                         res['fallback_reason'] = 'free_variable_dual_infeasible'
@@ -572,7 +578,7 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                 elif np.isneginf(lower[j]):
                     # Genuinely free variable with negative cost
                     from .simplex import solve_lp
-                    res = solve_lp(model, tol=tol, max_iter=max_iter)
+                    res = solve_lp(model, tol=tol, max_iter=max_iter, deadline=deadline)
                     res['method_requested'] = 'dual-simplex'
                     res['method_used'] = 'primal-simplex'
                     res['fallback_reason'] = 'free_variable_dual_infeasible'
@@ -594,7 +600,7 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
             engine.initialize(M_csc, basis)
         except (NumericalError, Exception) as e:
             from .simplex import solve_lp
-            res = solve_lp(model, tol=tol, max_iter=max_iter)
+            res = solve_lp(model, tol=tol, max_iter=max_iter, deadline=deadline)
             res['method_requested'] = 'dual-simplex'
             res['method_used'] = 'primal-simplex'
             res['fallback_reason'] = f"initial_basis_factorization_failed: {e}"
@@ -618,6 +624,13 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
 
     try:
         while it < max_iter:
+            if deadline is not None and time.perf_counter() >= deadline:
+                return {
+                    'status': 'LIMIT_REACHED',
+                    'message': 'Dual simplex deadline reached',
+                    'iterations': it,
+                    'algorithm': 'dual-simplex',
+                }
             # 1. Compute x_B = B^{-1} (rhs - A_N x_N)
             Ax_N = np.zeros(m, dtype=np.float64)
             for j in nonbasic:
@@ -696,7 +709,7 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                     # Artificial bound was capping a finite optimum beyond art_upper_bound!
                     # Restore original bounds and fall back to primal simplex to solve true problem honestly:
                     from .simplex import solve_lp
-                    res = solve_lp(model, tol=tol, max_iter=max_iter)
+                    res = solve_lp(model, tol=tol, max_iter=max_iter, deadline=deadline)
                     res['method_requested'] = 'dual-simplex'
                     res['method_used'] = 'primal-simplex'
                     res['fallback_reason'] = 'phase1_artificial_bound_hit_finite_optimum'
@@ -786,7 +799,7 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                 # Primal infeasible certified
                 # Obtain exact rational Farkas certificate from primal Phase I
                 from .simplex import solve_lp
-                res = solve_lp(model, tol=tol, max_iter=max_iter)
+                res = solve_lp(model, tol=tol, max_iter=max_iter, deadline=deadline)
                 if res.get('status') == 'INFEASIBLE_CERTIFIED':
                     res['method_requested'] = 'dual-simplex'
                     res['method_used'] = 'dual-simplex'
@@ -848,7 +861,7 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
                     consecutive_flips += 1
                     if consecutive_flips > 20:
                         from .simplex import solve_lp
-                        res = solve_lp(model, tol=tol, max_iter=max_iter)
+                        res = solve_lp(model, tol=tol, max_iter=max_iter, deadline=deadline)
                         res['method_requested'] = 'dual-simplex'
                         res['method_used'] = 'primal-simplex'
                         res['fallback_reason'] = 'dual_simplex_bound_flip_cycling'
@@ -964,9 +977,11 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
         return res_dict
 
     except (NumericalError, FloatingPointError, OverflowError, Exception) as e:
+        if 'deadline' in str(e).lower() or 'time limit' in str(e).lower():
+            return {'status': 'LIMIT_REACHED', 'message': str(e), 'algorithm': 'dual-simplex'}
         # Fallback hierarchy: retry with primal simplex
         from .simplex import solve_lp
-        res = solve_lp(model, tol=tol, max_iter=max_iter)
+        res = solve_lp(model, tol=tol, max_iter=max_iter, deadline=deadline)
         res['method_requested'] = 'dual-simplex'
         res['method_used'] = 'primal-simplex'
         res['fallback_reason'] = f"dual_simplex_exception: {e}"

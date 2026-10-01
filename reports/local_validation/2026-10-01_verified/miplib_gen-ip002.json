@@ -1,0 +1,146 @@
+{
+  "algorithm": "rational-bound branch-and-bound",
+  "nodes": 25,
+  "history": [
+    {
+      "nodes": 3,
+      "open_nodes": 2,
+      "incumbent": null,
+      "node_bound": null
+    },
+    {
+      "nodes": 5,
+      "open_nodes": 3,
+      "incumbent": null,
+      "node_bound": null
+    },
+    {
+      "nodes": 7,
+      "open_nodes": 4,
+      "incumbent": null,
+      "node_bound": null
+    },
+    {
+      "nodes": 9,
+      "open_nodes": 5,
+      "incumbent": null,
+      "node_bound": null
+    },
+    {
+      "nodes": 11,
+      "open_nodes": 6,
+      "incumbent": null,
+      "node_bound": null
+    },
+    {
+      "nodes": 13,
+      "open_nodes": 7,
+      "incumbent": null,
+      "node_bound": null
+    },
+    {
+      "nodes": 15,
+      "open_nodes": 8,
+      "incumbent": null,
+      "node_bound": null
+    },
+    {
+      "nodes": 17,
+      "open_nodes": 9,
+      "incumbent": null,
+      "node_bound": null
+    },
+    {
+      "nodes": 19,
+      "open_nodes": 10,
+      "incumbent": null,
+      "node_bound": null
+    },
+    {
+      "nodes": 21,
+      "open_nodes": 11,
+      "incumbent": null,
+      "node_bound": null
+    },
+    {
+      "nodes": 23,
+      "open_nodes": 12,
+      "incumbent": null,
+      "node_bound": null
+    },
+    {
+      "nodes": 25,
+      "open_nodes": 13,
+      "incumbent": null,
+      "node_bound": null
+    }
+  ],
+  "bound_kind": "exact rational Lagrangian bounds of binary64 input",
+  "open_nodes": 13,
+  "tolerance_closed_nodes": 0,
+  "pruned_nodes": 0,
+  "incumbent_history": [],
+  "selection_strategy": "hybrid best-bound/depth",
+  "branching_strategy": "pseudocost with strong branching bootstrap",
+  "warm_starts_attempted": 0,
+  "warm_starts_accepted": 0,
+  "warm_starts_rejected": 0,
+  "warm_start_pivots_total": 0,
+  "cold_start_pivots_total": 2902,
+  "strong_branching_evaluations": 0,
+  "heuristics_attempted": 2,
+  "heuristics_found_incumbent": 0,
+  "pruned_by_bound": 0,
+  "pruned_by_infeasibility": 0,
+  "pruned_by_integrality": 0,
+  "root_lp_iterations": 99,
+  "root_lp_time": 0.11084762500104262,
+  "root_lp_bound": -Infinity,
+  "best_bound": -Infinity,
+  "status": "NUMERICAL_FAILURE",
+  "message": "Unresolved child LP relaxation: Simplex deadline reached",
+  "model_name": "gen-ip002",
+  "model_sha256": "385a17dbfaa4701dc918a8363bca956336765d75dae06d2d787df62343b0db70",
+  "solver_version": "0.3.0",
+  "elapsed_seconds": 3.0007128340002964,
+  "backend": "cpu",
+  "gpu_executed": false,
+  "timestamp_utc": "2026-10-01T21:15:16.981742+00:00",
+  "variables": 41,
+  "rows": 24,
+  "nonzeros": 922,
+  "dispatch": {
+    "method": "bb",
+    "backend": "cpu",
+    "problem_class": "MILP",
+    "inspection": {
+      "variables": 41,
+      "constraints": 24,
+      "nonzeros": 922,
+      "density": 0.9369918699186992,
+      "integer_variables": 41,
+      "has_quadratic_objective": false,
+      "min_nonzero_coeff": 0.0032113497,
+      "max_nonzero_coeff": 292.975139,
+      "dynamic_range": 91231.15399110848
+    },
+    "rationale": "Model has 41 integer variables; dispatched to exact rational-bound Branch-and-Bound solver."
+  },
+  "machine": {
+    "system": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11.16"
+  },
+  "method_requested": "auto",
+  "method_selected": "bb",
+  "selection_reason": "Model has 41 integer variables; dispatched to exact rational-bound Branch-and-Bound solver.",
+  "method_used": "bb",
+  "fallback_reason": null,
+  "linear_algebra_used": "dense",
+  "presolve_applied": false,
+  "scaling_applied": false,
+  "measured_duration_seconds": 3.0007466669994756,
+  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty",
+  "input_mps_sha256": "30ed071e531beea561b330dd8e590eb641a5ec6d4e3f41a8d54735ce27db01b6",
+  "bound_direction_safe": true
+}

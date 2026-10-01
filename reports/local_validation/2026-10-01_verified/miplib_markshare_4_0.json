@@ -1,0 +1,170 @@
+{
+  "algorithm": "rational-bound branch-and-bound",
+  "nodes": 30,
+  "history": [
+    {
+      "nodes": 3,
+      "open_nodes": 2,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 5,
+      "open_nodes": 3,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 7,
+      "open_nodes": 4,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 9,
+      "open_nodes": 5,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 11,
+      "open_nodes": 6,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 13,
+      "open_nodes": 7,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 15,
+      "open_nodes": 8,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 17,
+      "open_nodes": 9,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 19,
+      "open_nodes": 10,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 21,
+      "open_nodes": 11,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 23,
+      "open_nodes": 12,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 25,
+      "open_nodes": 13,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 27,
+      "open_nodes": 14,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 28,
+      "open_nodes": 14,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 29,
+      "open_nodes": 14,
+      "incumbent": null,
+      "node_bound": 0.0
+    },
+    {
+      "nodes": 30,
+      "open_nodes": 15,
+      "incumbent": null,
+      "node_bound": 0.0
+    }
+  ],
+  "bound_kind": "exact rational Lagrangian bounds of binary64 input",
+  "open_nodes": 15,
+  "tolerance_closed_nodes": 0,
+  "pruned_nodes": 1,
+  "incumbent_history": [],
+  "selection_strategy": "hybrid best-bound/depth",
+  "branching_strategy": "pseudocost with strong branching bootstrap",
+  "warm_starts_attempted": 28,
+  "warm_starts_accepted": 27,
+  "warm_starts_rejected": 0,
+  "warm_start_pivots_total": 76,
+  "cold_start_pivots_total": 67,
+  "strong_branching_evaluations": 37,
+  "heuristics_attempted": 2,
+  "heuristics_found_incumbent": 0,
+  "pruned_by_bound": 0,
+  "pruned_by_infeasibility": 1,
+  "pruned_by_integrality": 0,
+  "root_lp_iterations": 17,
+  "root_lp_time": 0.002893832999689039,
+  "root_lp_bound": 0.0,
+  "best_bound": 0.0,
+  "status": "NUMERICAL_FAILURE",
+  "message": "Unresolved child LP relaxation: Dual simplex iteration limit reached",
+  "model_name": "markshare_4_0",
+  "model_sha256": "4464ccac41394b75bf463b3befeb9ce152554c441ee509db7a5cd2cad5d6b89c",
+  "solver_version": "0.3.0",
+  "elapsed_seconds": 0.2059680419988581,
+  "backend": "cpu",
+  "gpu_executed": false,
+  "timestamp_utc": "2026-10-01T21:15:13.980020+00:00",
+  "variables": 34,
+  "rows": 4,
+  "nonzeros": 123,
+  "dispatch": {
+    "method": "bb",
+    "backend": "cpu",
+    "problem_class": "MILP",
+    "inspection": {
+      "variables": 34,
+      "constraints": 4,
+      "nonzeros": 123,
+      "density": 0.9044117647058824,
+      "integer_variables": 30,
+      "has_quadratic_objective": false,
+      "min_nonzero_coeff": 1.0,
+      "max_nonzero_coeff": 99.0,
+      "dynamic_range": 99.0
+    },
+    "rationale": "Model has 30 integer variables; dispatched to exact rational-bound Branch-and-Bound solver."
+  },
+  "machine": {
+    "system": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11.16"
+  },
+  "method_requested": "auto",
+  "method_selected": "bb",
+  "selection_reason": "Model has 30 integer variables; dispatched to exact rational-bound Branch-and-Bound solver.",
+  "method_used": "bb",
+  "fallback_reason": null,
+  "linear_algebra_used": "dense",
+  "presolve_applied": false,
+  "scaling_applied": false,
+  "measured_duration_seconds": 0.20599700000093435,
+  "git_revision": "fc5b537d98a952f01183ae83aea0056e2f9c747f+dirty",
+  "input_mps_sha256": "a05d1c8c1a1e0646ea31965fd5e05af7a41801db3cb1820b2ab4cd95c7bc32db",
+  "bound_direction_safe": true
+}

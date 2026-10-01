@@ -9,7 +9,7 @@ This document records the exact procedures for reproducing all numerical benchma
 All commands below assume execution from the project root with the project-local virtual environment active:
 
 ```bash
-# 1. Run full unit and regression test suite (192 tests: 190 passing, 2 integration tests skipped in restricted sandbox)
+# 1. Run full unit and regression test suite (216 tests: 214 passing, 2 integration tests skipped in restricted sandbox)
 .venv/bin/python -m unittest discover -s tests -v
 
 # 2. Run automated report and benchmark generator
@@ -26,7 +26,7 @@ SOVOPT_BENCHMARK_PYTHON=.venv-benchmark/bin/python .venv/bin/python scripts/gene
 
 ## 2. Test Suite Organization
 
-The active test suite is split into seven modules (192 tests total, 190 passing, 2 integration tests skipped in restricted sandbox):
+The active test suite is split into nine modules (216 tests total, 214 passing, 2 integration tests skipped in restricted sandbox):
 
 ### 2.1 Solver Correctness (`tests/test_solver.py` — 45 tests)
 - Core solver tests for LU pivot refinement, verified Netlib instances (AFIRO, SC50A, SC50B, BLEND), FLUGPL MILP lower bounding and Farkas certificate generation, bad candidate rejection, affine coordinate transformations, PDHG first-order convergence, and limits enforcement.
@@ -166,6 +166,36 @@ The active test suite is split into seven modules (192 tests total, 190 passing,
   36. 4-way FLUGPL ablation (baseline vs pseudocosts vs warm starts vs heuristics).
   37. Refinery twin MILP determinism across repeated solves.
   38. Full presence of all Gate 6 MILP telemetry keys.
+
+### 2.8 QPLIB Format Parser & Convexity Verification (`tests/test_qplib.py` — 17 tests)
+- Comprehensive test matrix validating Gate 7 QPLIB support:
+  1. Header and metadata parsing across official QPLIB test cases.
+  2. Diagonal quadratic objective function evaluation matching $\frac{1}{2} x^T Q x + b^T x + q$.
+  3. Off-diagonal symmetric quadratic objective evaluation with equal splitting ($Q_{ij} = Q_{ji} = 0.5 Q^0_{ij}$).
+  4. Parsed objective equivalence against manual formula $\frac{1}{2} x^T Q x + b^T x + q$.
+  5. Machine-precision agreement ($5.12 \times 10^{-16}$ relative error) on authentic `QPLIB_8845` against published reference ($10,907,992.4939988$).
+  6. Original-model KKT verification (primal feasibility, dual stationarity, complementarity) on `QPLIB_8845` solution vector.
+  7. Strict allow-list enforcement: `CCL`, `DCL`, `CCB`, `DCB`, `LCL` admitted.
+  8. Discrete variable rejection (`UNSUPPORTED_DISCRETE_VARIABLES`) on binary/integer variables.
+  9. Quadratic constraint rejection (`UNSUPPORTED_QUADRATIC_CONSTRAINTS`) on QCQP instances.
+  10. Nonconvex objective rejection (`UNSUPPORTED_NONCONVEX_QP`) via scale-aware PSD eigenvalue test ($\tau = 10^{-10} \times \max(1, \max_i |Q_{ii}|)$).
+  11. Authentic negative rejection test on official nonconvex instance `QPLIB_0018`.
+  12. Large model rejection (`DIMENSION_LIMIT_EXCEEDED`) preventing unsafe dense $Q$ memory allocation ($n > 5000$).
+  13. Memory limit enforcement ($> 250$ MB) before allocating $n \times n$ dense matrices.
+  14. Range constraints parsing and lossless slack mapping.
+  15. One-sided inequality constraints and variable box bounds.
+  16. Free variable handling and zero-bound preservation.
+  17. Linear objective fallback verification for `LCL` instances.
+
+### 2.9 Public Benchmark Manifest & Provenance Integrity (`tests/test_benchmark_manifest.py` — 7 tests)
+- Verification of frozen benchmark datasets and provenance integrity:
+  1. Master manifest schema and cryptographic SHA-256 integrity checks.
+  2. Netlib LP collection manifest verification (16 candidate instances + `WOODINFE`).
+  3. MIPLIB 2017 stratified collection manifest verification (38 instances across 4 size bins + `flugpl`).
+  4. MIPLIB ground-truth solution parsing and verification against official `miplib2017-v37.solu`.
+  5. QPLIB continuous convex QP manifest verification (`QPLIB_8845`, `9002`, `8938` + `0018` negative test).
+  6. Strict segregation of quarantined datasets (`AVGAS` strictly excluded from active manifests).
+  7. Prohibition of synthetic benchmarks in public manifest collections.
 
 *(Note: Synthetic unit fixtures in `tests/test_presolve.py`, `tests/test_numerical_stress.py`, `tests/test_dual_simplex.py`, and `tests/test_milp.py` are strictly marked `INTERNAL MATHEMATICAL UNIT FIXTURE — NOT BENCHMARK DATA` and are excluded from benchmark reports).*
 

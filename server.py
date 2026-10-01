@@ -14,7 +14,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_HEAD(self):
         return self.do_GET()
     def do_GET(self):
-        if self.path=='/health':return self.send(200,{'status':'ok','version':'0.2.0'})
+        if self.path=='/health':return self.send(200,{'status':'ok','version':'0.3.0'})
         if self.path=='/api/manifest':return self.send(200,json.loads((ROOT/'data/manifest.json').read_text()))
         if self.path=='/api/examples':return self.send(200,{k:json.loads(p.read_text()) for k,p in EXAMPLES.items()})
         if self.path in ('/','/index.html'):return self.send(200,(ROOT/'web/index.html').read_bytes(),'text/html; charset=utf-8')

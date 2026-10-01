@@ -8,6 +8,7 @@ Features:
 """
 from fractions import Fraction as F
 from math import lcm
+import time
 import numpy as np
 from .linalg import LU, NumericalError
 from .sparse import csc_from_dense, CSCMatrix, csc_from_triplets
@@ -369,8 +370,10 @@ def _dual_for_separable_box(model):
             z[var_upper_idx[j]] = -c_j
     return z
 
-def _iterate_dense(M, b, c, basis, allowed, limit, history):
+def _iterate_dense(M, b, c, basis, allowed, limit, history, deadline=None):
     for k in range(limit):
+        if deadline is not None and time.perf_counter() >= deadline:
+            raise NumericalError('Simplex deadline reached')
         B = M[:, basis]
         lu = LU(B)
         xb = lu.solve(b)
@@ -400,10 +403,12 @@ _iterate = _iterate_dense
 
 def _iterate_sparse(M_csc: CSCMatrix, b: np.ndarray, c: np.ndarray, basis: list[int],
                     allowed: int, limit: int, history: list, engine: SparseBasisEngine,
-                    pivot_tol: float = 1e-8):
+                    pivot_tol: float = 1e-8, deadline=None):
     """Sovereign sparse primal revised simplex iteration with Threshold Markowitz LU and PFI eta updates."""
     m = M_csc.n_rows
     for k in range(limit):
+        if deadline is not None and time.perf_counter() >= deadline:
+            raise NumericalError('Simplex deadline reached')
         xb = engine.ftran(b)
         y = engine.btran(c[basis])
         rc = c - M_csc.rmatvec(y)
@@ -515,10 +520,13 @@ def _attach_telemetry(res_dict: dict, requested: str, used: str,
         res_dict['fallback_reason'] = fallback_reason
 
 
-def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto', method='auto'):
+def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto', method='auto',
+             deadline=None, time_limit=None, **options):
+    if deadline is None and time_limit is not None:
+        deadline = time.perf_counter() + time_limit
     if method == 'dual-simplex':
         from .dual_simplex import solve_dual_simplex
-        return solve_dual_simplex(model, tol=tol, max_iter=max_iter)
+        return solve_dual_simplex(model, tol=tol, max_iter=max_iter, deadline=deadline)
     if method not in ('auto', 'primal-simplex', 'simplex'):
         raise ValueError(f"Unknown method '{method}' for solve_lp. Supported: 'auto', 'primal-simplex', 'dual-simplex'.")
     if linear_algebra not in ('auto', 'dense', 'sparse'):
@@ -763,7 +771,7 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
                 M_csc = _build_sparse_csc_system(A_all, row_signs, m_eq, m_le, m_total, n_trans, slack_start, art_start, total_cols)
                 engine = SparseBasisEngine(max_eta_depth=25, pivot_threshold=0.1)
                 engine.initialize(M_csc, basis)
-                xb, y, it1 = _iterate_sparse(M_csc, rhs_all, phase_cost, basis, total_cols, max_iter, history, engine)
+                xb, y, it1 = _iterate_sparse(M_csc, rhs_all, phase_cost, basis, total_cols, max_iter, history, engine, deadline=deadline)
             except _UnboundedError:
                 raise
             except (NumericalError, FloatingPointError, OverflowError) as e:
@@ -775,12 +783,12 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
                     M = _build_dense_system(A_all, row_signs, m_eq, m_le, m_total, n_trans)
                     basis = list(range(art_start, art_start + m_total))
                     history.clear()
-                    xb, y, it1 = _iterate_dense(M, rhs_all, phase_cost, basis, total_cols, max_iter, history)
+                    xb, y, it1 = _iterate_dense(M, rhs_all, phase_cost, basis, total_cols, max_iter, history, deadline=deadline)
                 else:
                     raise
         else:
             M = _build_dense_system(A_all, row_signs, m_eq, m_le, m_total, n_trans)
-            xb, y, it1 = _iterate_dense(M, rhs_all, phase_cost, basis, total_cols, max_iter, history)
+            xb, y, it1 = _iterate_dense(M, rhs_all, phase_cost, basis, total_cols, max_iter, history, deadline=deadline)
 
         sum_art = float(phase_cost[basis] @ xb)
 
@@ -835,7 +843,7 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
         phase2_cost = np.r_[trans.c, np.zeros(m_le + m_total)]
         if linear_algebra_used == 'sparse' and engine is not None:
             try:
-                xb, y, it2 = _iterate_sparse(M_csc, rhs_all, phase2_cost, basis, art_start, max_iter - it1, history, engine)
+                xb, y, it2 = _iterate_sparse(M_csc, rhs_all, phase2_cost, basis, art_start, max_iter - it1, history, engine, deadline=deadline)
             except _UnboundedError:
                 raise
             except (NumericalError, FloatingPointError, OverflowError) as e:
@@ -845,11 +853,11 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
                     engine = None
                     if M is None:
                         M = _build_dense_system(A_all, row_signs, m_eq, m_le, m_total, n_trans)
-                    xb, y, it2 = _iterate_dense(M, rhs_all, phase2_cost, basis, art_start, max_iter - it1, history)
+                    xb, y, it2 = _iterate_dense(M, rhs_all, phase2_cost, basis, art_start, max_iter - it1, history, deadline=deadline)
                 else:
                     raise
         else:
-            xb, y, it2 = _iterate_dense(M, rhs_all, phase2_cost, basis, art_start, max_iter - it1, history)
+            xb, y, it2 = _iterate_dense(M, rhs_all, phase2_cost, basis, art_start, max_iter - it1, history, deadline=deadline)
 
         # Reconstruct transformed primal vector t
         t_sol = np.zeros(total_cols, dtype=float)
@@ -939,14 +947,14 @@ def solve_lp(model, tol=1e-7, max_iter=10000, scaling=True, linear_algebra='auto
 
     except (NumericalError, FloatingPointError, OverflowError) as e:
         mat = M_csc if linear_algebra_used == 'sparse' else M
-        if 'iteration limit' in str(e).lower():
-            res = dict(status='LIMIT_REACHED', message='Simplex iteration limit reached',
+        if 'iteration limit' in str(e).lower() or 'deadline' in str(e).lower() or 'time limit' in str(e).lower():
+            res = dict(status='LIMIT_REACHED', message=str(e),
                         algorithm='two-phase primal revised simplex', history=history)
             _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, mat, basis, len(history), fallback_reason)
             return res
         if scaling:
             # Fallback to unscaled solve if equilibration caused an unsafe basis pivot
-            return solve_lp(model, tol=tol, max_iter=max_iter, scaling=False, linear_algebra=linear_algebra)
+            return solve_lp(model, tol=tol, max_iter=max_iter, scaling=False, linear_algebra=linear_algebra, deadline=deadline)
         res = dict(status='NUMERICAL_FAILURE', message=str(e),
                     algorithm='two-phase primal revised simplex', history=history)
         _attach_telemetry(res, linear_algebra_requested, linear_algebra_used, engine, mat, basis, len(history), fallback_reason)

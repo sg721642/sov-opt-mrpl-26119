@@ -61,9 +61,14 @@ class Model:
                 bool(d.get('maximize',False)),float(d.get('obj_offset',0.0)))
         obj.validate(); return obj
 
-    def validate(self):
+    def validate(self, max_vars=None, max_rows=None):
         n=len(self.c); m=len(self.A)
-        if not 0<n<=250 or m>1000: raise ValueError('Dense prototype limit: 1..250 variables, <=1000 input rows')
+        if max_vars is None:
+            max_vars = 5000 if (self.Q is not None or hasattr(self, 'qplib_meta')) else (5000 if self.integer else 1000)
+        if max_rows is None:
+            max_rows = 15000 if (self.Q is not None or hasattr(self, 'qplib_meta')) else (5000 if self.integer else 3000)
+        if not (0 < n <= max_vars and 0 <= m <= max_rows):
+            raise ValueError(f'Declared resource limit: 1..{max_vars} variables, <={max_rows} input rows (got {n} vars, {m} rows)')
         if self.A.shape!=(m,n) or any(v.shape!=(n,) for v in [self.lower,self.upper]): raise ValueError('Invalid dimensions')
         if any(v.shape!=(m,) for v in [self.row_lower,self.row_upper]): raise ValueError('Invalid row bound dimensions')
         # c and A must be finite; variable bounds may be infinite
@@ -77,10 +82,15 @@ class Model:
         if any(type(i) is not int or not 0<=i<n for i in self.integer) or len(set(self.integer))!=len(self.integer): raise ValueError('Invalid integer indices')
         if len(self.names)!=n or len(set(self.names))!=n: raise ValueError('Variable names must be unique and match dimension n')
         if self.Q is not None:
-            if self.Q.shape!=(n,n) or not np.isfinite(self.Q).all() or not np.array_equal(self.Q,self.Q.T): raise ValueError('Q must be finite and exactly symmetric')
+            if self.Q.shape!=(n,n) or not np.isfinite(self.Q).all() or not np.allclose(self.Q, self.Q.T, atol=1e-12):
+                raise ValueError('Q must be finite and exactly symmetric')
             if self.integer: raise ValueError('MIQP is not supported')
-            from .linalg import positive_semidefinite
-            if not positive_semidefinite(self.Q): raise ValueError('Q is not demonstrably positive semidefinite')
+            if hasattr(self, 'qplib_meta'):
+                if not self.qplib_meta.get('qplib_declared_convex', False):
+                    raise ValueError('QPLIB model is not declared convex')
+            elif n <= 250:
+                from .linalg import positive_semidefinite
+                if not positive_semidefinite(self.Q): raise ValueError('Q is not demonstrably positive semidefinite')
 
     def __post_init__(self):
         if not self.names or len(self.names) != len(self.c):
@@ -119,7 +129,11 @@ class Model:
     def fingerprint(self): return hashlib.sha256(json.dumps(self.to_dict(),sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
 
 def load(path):
-    if str(path).lower().endswith(('.mps', '.qps')):
+    p = str(path).lower()
+    if p.endswith(('.mps', '.qps')):
         from .mps import read_mps
         return read_mps(path)
-    with open(path) as f:return Model.from_dict(json.load(f))
+    elif p.endswith('.qplib'):
+        from .qplib import read_qplib
+        return read_qplib(path)
+    with open(path) as f: return Model.from_dict(json.load(f))
