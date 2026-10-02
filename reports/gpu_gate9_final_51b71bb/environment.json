@@ -1,0 +1,17 @@
+{
+  "timestamp_utc": "2026-10-02T13:41:22.432704+00:00",
+  "gate9_validated_source_sha": "51b71bb8468bd4375e572b2537d69e30a0e60684",
+  "provenance_statement": "All performance measurements in this directory were executed from a clean working tree at the exact committed source SHA shown above.",
+  "machine": {
+    "system": "Windows",
+    "architecture": "AMD64",
+    "python": "3.11.17"
+  },
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "compute_capability": "12.0",
+    "vram_total_gb": 7.96,
+    "cuda_runtime_version": "12090"
+  },
+  "power_source": "AC_CONNECTED_FULL"
+}
