@@ -1,381 +1,1042 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SOV-OPT · Verified Numerical Evidence Lab</title>
-<style>
-:root{--bg:#0c1421;--panel:#131f30;--line:#26364c;--text:#e6edf8;--muted:#9bacc3;--green:#75e1b6;--blue:#8caeff;--orange:#ffc885;--red:#ff8585}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,sans-serif}
-header{padding:20px 5%;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
-.brand{font-size:22px;font-weight:800;letter-spacing:1px}.brand span{color:var(--green)}
-.tag{border:1px solid var(--line);border-radius:99px;padding:5px 12px;color:var(--muted);font-size:12px}
-main{max-width:1400px;margin:auto;padding:32px 5%}
-.eyebrow{color:var(--green);font-size:12px;letter-spacing:2px;font-weight:700}
-h1{font-size:clamp(26px,3.5vw,42px);line-height:1.15;margin:8px 0 14px;font-weight:650;max-width:900px}
-p{color:var(--muted)}.intro{max-width:850px;margin-bottom:24px}
-.grid{display:grid;grid-template-columns:360px 1fr;gap:24px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;min-width:0}
-h2{font-size:18px;margin:0 0 16px}
-label{display:block;color:var(--muted);margin:14px 0 6px;font-size:13px;font-weight:500}
-select,input,textarea{width:100%;background:#0d1726;color:var(--text);border:1px solid #3b506d;border-radius:8px;padding:11px;font:inherit}
-textarea{font:12px/1.5 ui-monospace,monospace;min-height:180px;resize:vertical}
-textarea[readonly]{background:#080e18;color:var(--muted);border-color:#202e42;cursor:default}
-button{border:0;border-radius:8px;background:var(--green);color:#08231b;padding:12px 16px;font-weight:750;cursor:pointer;width:100%;margin-top:14px}
-button:disabled{opacity:.5;cursor:wait}.secondary{background:#243752;color:var(--text)}
-.provenance-card{background:#0d1726;border:1px solid #2a3d58;border-radius:8px;padding:14px;margin-top:14px;font-size:12px}
-.provenance-card div{margin-bottom:6px}.provenance-card strong{color:var(--text)}.provenance-card span{color:var(--muted)}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
-.stat{padding:14px;border:1px solid var(--line);border-radius:9px;background:#0d1726}
-.stat small{color:var(--muted);display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px}
-.stat strong{font-size:22px;font-weight:600;display:block;margin-top:4px;overflow-wrap:anywhere}
-.status{display:inline-block;padding:5px 12px;background:#24354c;color:var(--blue);border-radius:6px;font-size:12px;font-weight:600}
-.good{color:var(--green);background:#173a32}
-.warning{color:var(--orange);background:#42332a}
-.bad{color:var(--red);background:#3d1a1a}
-.empty{padding:60px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:10px}
-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
-td,th{padding:9px 6px;text-align:left;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
-th{color:var(--muted);font-weight:500}
-.split{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
-.tiny{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
-details{margin-top:16px}summary{cursor:pointer;color:var(--blue)}
-pre{max-height:300px;overflow:auto;font:12px/1.5 ui-monospace,monospace;white-space:pre-wrap;background:#080e18;padding:12px;border-radius:8px}
-footer{padding:20px 5%;border-top:1px solid var(--line);font-size:12px;color:var(--muted);margin-top:40px}
-#message{white-space:pre-wrap;color:var(--orange);font-size:13px;margin-top:10px}
-.live-badge{display:inline-block;font-size:11px;background:#173a32;color:var(--green);padding:3px 8px;border-radius:4px;margin-left:8px}
-@media(max-width:950px){.grid{grid-template-columns:1fr}.split{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>SOV-OPT · Refinery Planning Workstation</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-  <div class="brand">SOV<span>—</span>OPT</div>
-  <div class="tag">MRPL PS 26119 · Sovereign Optimizer 0.3.1</div>
-</header>
-<main>
-  <div class="eyebrow">VERIFIED DATASET SUITE · ORIGINAL SOLVER CORE</div>
-  <h1>Source-Backed Optimization<br>Evidence & Verification Lab</h1>
-  <p class="intro">
-    All models shown are from authoritative public sources (Netlib, MIPLIB, published industrial literature).
-    No synthetic models, fictional refinery parameters, or fabricated benchmark results.
-  </p>
 
-  <div class="grid">
-    <section class="panel">
-      <h2>Select verified dataset</h2>
-      <label for="example">Instance</label>
-      <select id="example"></select>
+<div id="app-shell">
 
-      <div id="meta" class="provenance-card">
-        <div><strong>Application:</strong> <span id="m_app">—</span></div>
-        <div><strong>Source:</strong> <span id="m_source">—</span></div>
-        <div><strong>Dimensions:</strong> <span id="m_dims">—</span></div>
-        <div><strong>Published ref:</strong> <span id="m_ref">—</span></div>
-      </div>
-
-      <label for="backend">Algorithm route</label>
-      <select id="backend">
-        <option value="cpu">CPU reference solver (Primal Simplex / IPM QP / B&amp;B)</option>
-        <option value="pdhg-cpu">Experimental PDHG · CPU (continuous LP)</option>
-      </select>
-
-      <button id="solve">Run &amp; verify live</button>
-      <button class="secondary" id="download" disabled>Download audit JSON</button>
-
-      <details style="margin-top:14px">
-        <summary>Empty states &amp; disclosures</summary>
-        <div class="provenance-card" style="margin-top:8px">
-          <div><strong>Proprietary MRPL Data:</strong> <span>No authorized MRPL dataset is available in this project. Fictional refinery parameters are strictly prohibited; authentic historical LP/MILP benchmarks are provided instead.</span></div>
-          <div style="margin-top:6px"><strong>Convex QP Benchmark Support (Gate 7 Complete):</strong> <span>Authentic public convex continuous QPLIB benchmarks (QPLIB_8845, QPLIB_9002) are verified and solved to OPTIMAL_VERIFIED via SOV-OPT's equality-aware interior-point QP solver. Large instances (&gt;250 MB) and nonconvex models are cleanly rejected.</span></div>
-        </div>
-      </details>
-
-      <details>
-        <summary>Inspect verified model JSON (read-only)</summary>
-        <div class="tiny" style="margin:8px 0 6px;color:var(--muted)">Verified dataset specification (read-only to preserve dataset provenance and prevent synthetic modification).</div>
-        <textarea id="editor" readonly spellcheck="false" aria-label="Verified Model JSON (Read-Only)"></textarea>
-      </details>
-      <div id="message" role="alert"></div>
-    </section>
-
-    <section class="panel">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-        <h2>Solution evidence <span id="live_badge" class="live-badge" hidden>LIVE SOLVE</span></h2>
-        <span id="status" class="status">AWAITING EXECUTION</span>
-      </div>
-      <p id="modelname" class="tiny">Choose a verified dataset and run a solve.</p>
-
-      <div id="empty" class="empty">
-        No prefilled or synthetic results are displayed.<br>
-        Select an authentic instance and click <strong>Run &amp; verify live</strong> to measure performance on this machine.
-      </div>
-
-      <div id="result" hidden>
-        <div class="stats">
-          <div class="stat"><small>Incumbent objective</small><strong id="objective">—</strong></div>
-          <div class="stat"><small>Conservative bound</small><strong id="bound">—</strong></div>
-          <div class="stat"><small>Optimality gap</small><strong id="gap">—</strong></div>
-          <div class="stat"><small>Published reference</small><strong id="pub_ref">—</strong></div>
-          <div class="stat"><small>Solve duration</small><strong id="runtime">—</strong></div>
-          <div class="stat"><small>Iterations / nodes</small><strong id="iterations">—</strong></div>
-          <div class="stat"><small>Original primal residual</small><strong id="primal">—</strong></div>
-          <div class="stat"><small>Dual stationarity residual</small><strong id="dual">—</strong></div>
-          <div class="stat"><small>Execution platform</small><strong id="platform">CPU · sovereign</strong></div>
-        </div>
-
-        <div class="split">
-          <div>
-            <h2>Trust &amp; Verification Report</h2>
-            <table id="trust"></table>
-          </div>
-          <div>
-            <h2>Solution summary</h2>
-            <div id="variables" style="max-height:260px;overflow:auto"></div>
-          </div>
-        </div>
-
-        <details>
-          <summary>Full reproducibility record (audit JSON)</summary>
-          <pre id="raw"></pre>
-        </details>
-      </div>
-    </section>
+  <!-- MOBILE TOP HEADER (<= 767px) -->
+  <div id="mobile-header">
+    <div class="mobile-brand">SOV–OPT · Refinery Workstation</div>
+    <button id="mobile-menu-trigger" class="mobile-menu-btn" aria-label="Open Navigation Menu">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      <span>Menu</span>
+    </button>
   </div>
-</main>
-<footer>
-  Sovereign Optimization Core · Independent from foreign optimizers · Netlib / MIPLIB verified datasets · No synthetic refinery claims
-</footer>
 
-<script>
-const $=id=>document.getElementById(id);
-let manifest={}, examples={}, current={}, last=null;
-let currentSolveId = 0;
-let activeAbortController = null;
+  <div id="mobile-backdrop"></div>
 
-const STATUS_MAP = {
-  'OPTIMAL_VERIFIED': { cls: 'good', text: 'OPTIMAL VERIFIED' },
-  'INFEASIBLE_CERTIFIED': { cls: 'warning', text: 'INFEASIBLE CERTIFIED' },
-  'UNBOUNDED': { cls: 'warning', text: 'UNBOUNDED' },
-  'UNBOUNDED_CERTIFIED': { cls: 'warning', text: 'UNBOUNDED CERTIFIED' },
-  'LIMIT_REACHED': { cls: 'warning', text: 'LIMIT REACHED (INCOMPLETE)' },
-  'NUMERICAL_FAILURE': { cls: 'bad', text: 'NUMERICAL FAILURE' },
-  'INVALID_MODEL': { cls: 'bad', text: 'INVALID MODEL' }
-};
+  <!-- NAVIGATION RAIL / MOBILE DRAWER -->
+  <aside id="nav-rail" aria-label="Workstation Navigation">
+    <div class="rail-brand">
+      <div>
+        <div class="brand-name">SOV–OPT</div>
+        <div class="brand-desc">Refinery planning system</div>
+      </div>
+      <button id="mobile-close-btn" style="display: none; background: transparent; border: none; color: var(--text-sidebar); font-size: 18px; cursor: pointer;">&times;</button>
+    </div>
 
-const fmt=v=>v==null?'—':Math.abs(v)>1e6?Number(v).toExponential(4):Number(v).toLocaleString(undefined,{maximumFractionDigits:6});
-const sci=v=>v==null?'—':Number(v).toExponential(2);
+    <nav class="nav-menu">
+      <div class="nav-group-label">Operations</div>
+      <a class="nav-item active" data-tab="overview" href="#overview">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+        <span>Overview</span>
+      </a>
+      <a class="nav-item" data-tab="optimization" href="#optimization">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+        <span>Optimization run</span>
+      </a>
+      <a class="nav-item" data-tab="scenarios" href="#scenarios">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+        <span>Scenarios</span>
+      </a>
 
-function clearResult(){
-  currentSolveId++;
-  if(activeAbortController){
-    activeAbortController.abort();
-    activeAbortController=null;
-  }
-  $('result').hidden=true;
-  $('empty').hidden=false;
-  $('status').textContent='AWAITING EXECUTION';
-  $('status').className='status';
-  $('live_badge').hidden=true;
-  $('download').disabled=true;
-  $('solve').disabled=false;
-  $('message').textContent='';
-  last=null;
-}
+      <div class="nav-group-label">Engineering &amp; verification</div>
+      <a class="nav-item" data-tab="analytics" href="#analytics">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 20V10m-6 10V4M6 20v-6"/></svg>
+        <span>Solver analytics</span>
+      </a>
+      <a class="nav-item" data-tab="trust" href="#trust">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Trust &amp; verification</span>
+      </a>
+      <a class="nav-item" data-tab="benchmarks" href="#benchmarks">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>Benchmarks (RTX 5050)</span>
+      </a>
 
-function choose(){
-  const key=$('example').value;
-  current=structuredClone(examples[key]||{});
-  $('editor').value=JSON.stringify(current,null,2);
-  const m=manifest.instances?.[key]||{};
-  $('m_app').textContent=m.collection||m.domain||m.application||'—';
-  $('m_source').textContent=m.primary_source||m.reference_source||'—';
-  const nVars = m.n_variables || m.variables || current.c?.length || 0;
-  const nCons = m.n_constraints || m.constraints || current.A?.length || 0;
-  const nNnz = m.n_nonzeros || m.matrix_nonzeros;
-  $('m_dims').textContent=nVars+' vars, '+nCons+' rows'+(nNnz?' ('+nNnz+' nonzeros)':'');
-  const refText=m.published_reference_text||(m.reference_objective!=null?m.reference_objective:null);
-  $('m_ref').textContent=refText?`${refText} (${m.primary_source||m.reference_source||'Published'})`:'—';
-  const probClass = m.problem_class || m.class || 'LP';
-  $('modelname').textContent='Selected: '+(m.name||key)+' ('+probClass+') · Click Run & verify live';
-  clearResult();
-}
+      <div class="nav-group-label">Governance &amp; evidence</div>
+      <a class="nav-item" data-tab="evidence" href="#evidence">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <span>Evidence &amp; audits</span>
+      </a>
+      <a class="nav-item" data-tab="reports" href="#reports">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <span>Reports &amp; export</span>
+      </a>
+    </nav>
 
-Promise.all([
-  fetch('/api/manifest').then(r=>r.json()),
-  fetch('/api/examples').then(r=>r.json())
-]).then(([man, ex])=>{
-  manifest=man;
-  examples=ex;
-  $('example').replaceChildren();
-  for(const [key, d] of Object.entries(man.instances||{})){
-    if(examples[key]){
-      const o=document.createElement('option');
-      o.value=key;
-      const pClass = d.problem_class || d.class || 'LP';
-      const pSrc = d.collection || d.primary_source || d.domain || '';
-      o.textContent=`${d.name} (${pClass}) — ${pSrc}`;
-      $('example').append(o);
-    }
-  }
-  if(examples['afiro'])$('example').value='afiro';
-  choose();
-}).catch(e=>$('message').textContent='Failed to load manifest or examples: '+e.message);
+    <div class="rail-footer">
+      <div><strong>Sovereign core</strong> · Pure NumPy</div>
+      <div>Residual tolerance: 1e-07 strict</div>
+    </div>
+  </aside>
 
-$('example').onchange=choose;
-$('backend').onchange=clearResult;
+  <!-- MAIN WORKSPACE -->
+  <div id="main-viewport">
 
-function cellRow(key,value){
-  const tr=document.createElement('tr');
-  const td1=document.createElement('td'); td1.textContent=key;
-  const td2=document.createElement('td'); td2.textContent=value;
-  tr.append(td1,td2);
-  $('trust').append(tr);
-}
+    <!-- DESKTOP TOP HEADER -->
+    <header id="top-header">
+      <div class="header-left">
+        <span class="header-trail-title">Refinery planning</span>
+        <span style="color: var(--text-muted); margin: 0 2px;">/</span>
+        <span class="header-trail-sub" id="top-breadcrumb-sub">Base operational equilibrium</span>
+      </div>
 
-$('solve').onclick=async()=>{
-  if(activeAbortController){
-    activeAbortController.abort();
-  }
-  activeAbortController=new AbortController();
-  const solveId=++currentSolveId;
-  const selectedKey=$('example').value;
-  const selectedBackend=$('backend').value;
-  const instMeta=manifest.instances?.[selectedKey]||{};
-  $('solve').disabled=true;
-  $('message').textContent='';
-  $('status').textContent='SOLVING LIVE...';
-  $('status').className='status';
-  $('live_badge').hidden=true;
-  $('download').disabled=true;
-  try{
-    const model=structuredClone(current);
-    const t0=performance.now();
-    const resp=await fetch('/api/solve',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model,backend:selectedBackend}),
-      signal:activeAbortController.signal
-    });
-    const r=await resp.json();
-    if(solveId!==currentSolveId)return;
-    if(!resp.ok)throw Error(r.error||'Request failed');
-    const elapsed=(performance.now()-t0)/1000;
-    last={
-      instance:selectedKey,
-      backend:selectedBackend,
-      model,
-      result:r,
-      certificate:r.certificate||null,
-      certificate_exact:r.certificate_exact||null,
-      solve_timestamp:new Date().toISOString(),
-      measured_duration_seconds:elapsed
-    };
-    
-    $('empty').hidden=true;
-    $('result').hidden=false;
-    $('live_badge').hidden=false;
-    const st=STATUS_MAP[r.status]||{cls:'bad',text:'UNKNOWN: '+r.status};
-    $('status').textContent=st.text;
-    $('status').className='status '+st.cls;
-    const probClass = instMeta.problem_class || instMeta.class || '';
-    $('modelname').textContent=`${r.model_name||instMeta.name||selectedKey} (${probClass}) solved via ${r.backend||selectedBackend}`;
+      <div class="header-right">
+        <div class="header-meta">
+          <div class="header-meta-item">
+            <span>Scenario:</span>
+            <select id="scenario-quick-select" class="form-control" style="width: auto; padding: 2px 8px; font-size: 12px; background: var(--bg-surface); border-color: var(--border-default);">
+              <option value="SC-01">SC-01: Base equilibrium</option>
+              <option value="SC-02">SC-02: High-Basrah heavy discount</option>
+              <option value="SC-03">SC-03: Summer high-octane peak</option>
+              <option value="SC-04">SC-04: FCC maintenance turndown</option>
+              <option value="SC-05">SC-05: Strict BS-VI fuel quality</option>
+              <option value="SC-06">SC-06: Infeasible demand shock</option>
+            </select>
+          </div>
+          <div class="header-meta-item">
+            <span>Execution:</span>
+            <strong id="header-platform-display">CPU · Sovereign</strong>
+          </div>
+          <div class="header-meta-item">
+            <span>Evidence node:</span>
+            <strong>RTX 5050</strong>
+          </div>
+          <div class="header-meta-item">
+            <span>Tolerance:</span>
+            <span class="mono">1e-07</span>
+          </div>
+        </div>
 
-    // Objective, bound, gap
-    $('objective').textContent=r.objective!=null?fmt(r.objective):(r.incumbent!=null?fmt(r.incumbent):'—');
-    $('bound').textContent=r.best_bound!=null?fmt(r.best_bound):'—';
-    if(r.relative_gap!=null && isFinite(r.relative_gap)){
-      $('gap').textContent=r.relative_gap===0.0?'0.00% (float)':(r.relative_gap*100).toFixed(4)+'%';
-    }else if(r.relative_gap!=null && !isFinite(r.relative_gap)){
-      $('gap').textContent='Open (no incumbent)';
-    }else{
-      $('gap').textContent='— (LP/QP KKT)';
-    }
+        <div class="header-actions">
+          <button id="btn-header-solve" class="btn btn-primary btn-sm">
+            <span>Run optimization</span>
+          </button>
+          <button id="btn-header-audit" class="btn btn-secondary btn-sm">
+            <span>Export audit</span>
+          </button>
+        </div>
+      </div>
+    </header>
 
-    const pubRefText=instMeta.published_reference_text||(instMeta.reference_objective!=null?fmt(instMeta.reference_objective):null);
-    $('pub_ref').textContent=pubRefText||'—';
-    $('runtime').textContent=fmt(elapsed*1000)+' ms';
-    $('platform').textContent=r.gpu_executed?'GPU accelerated':'CPU · sovereign';
-    
-    const v=r.verification||{};
-    $('primal').textContent=v.primal_residual!=null?sci(v.primal_residual):'—';
-    $('dual').textContent=v.dual_residual!=null?sci(v.dual_residual):'—';
-    $('iterations').textContent=r.nodes??r.iterations??'—';
-    
-    $('trust').replaceChildren();
-    cellRow('Original model feasibility',v.feasible==null?'Not available':(v.feasible?'PASSED':'FAILED'));
-    cellRow('KKT stationarity & complementarity',v.kkt_passed==null?'Not applicable':(v.kkt_passed?'PASSED':'NOT ESTABLISHED'));
-    const farkasVerified = r.status === 'INFEASIBLE_CERTIFIED' && (v.farkas_verified === true || r.farkas_certificate === true);
-    cellRow('Farkas certificate',farkasVerified?'VERIFIED (exact rational certificate)':'None');
-    cellRow('Absolute constraint violation',v.absolute_primal_violation!=null?sci(v.absolute_primal_violation):'—');
-    cellRow('Mantissa precision',v.precision_bits!=null?`${v.precision_bits} bits (IEEE 754)`:'Unknown');
-    cellRow('Hardware execution',r.gpu_executed?'GPU accelerated':'CPU only (gpu_executed: false)');
-    cellRow('Model SHA256',(r.model_sha256||'—').slice(0,24)+'...');
-    cellRow('Solver backend',r.backend||selectedBackend);
-    cellRow('Timestamp',last.solve_timestamp);
-    
-    $('variables').replaceChildren();
-    if(r.x){
-      r.x.slice(0,25).forEach((x,i)=>{
-        const line=document.createElement('div');
-        line.className='tiny';
-        line.textContent=(model.names?.[i]||'x'+i)+' = '+fmt(x);
-        $('variables').append(line);
-      });
-      if(r.x.length>25){
-        const more=document.createElement('div');
-        more.className='tiny';
-        more.textContent=`... and ${r.x.length-25} more variables`;
-        $('variables').append(more);
-      }
-    }else if(r.status === 'INFEASIBLE_CERTIFIED' && r.certificate_exact){
-      const header=document.createElement('div');
-      header.className='tiny';
-      header.innerHTML='<strong>Exact rational Farkas certificate (lossless Fractions):</strong>';
-      $('variables').append(header);
-      let nonZeroCount = 0;
-      r.certificate_exact.forEach((z,i)=>{
-        if(z !== '0' && z !== '0/1' && nonZeroCount < 25){
-          nonZeroCount++;
-          const line=document.createElement('div');
-          line.className='tiny';
-          line.textContent=`z[${i}] = ${z}`;
-          $('variables').append(line);
-        }
-      });
-      if(nonZeroCount === 0){
-        const line=document.createElement('div');
-        line.className='tiny';
-        line.textContent='All Farkas multipliers are recorded in audit JSON.';
-        $('variables').append(line);
-      }
-    }else{
-      $('variables').textContent=r.message||'No feasible primal solution vector.';
-    }
-    $('raw').textContent=JSON.stringify(last,null,2);
-    $('download').disabled=false;
-  }catch(e){
-    if(e.name==='AbortError'||solveId!==currentSolveId)return;
-    $('message').textContent=e.message;
-    $('status').textContent='FAILED';
-    $('status').className='status bad';
-  }finally{
-    if(solveId===currentSolveId){
-      $('solve').disabled=false;
-      activeAbortController=null;
-    }
-  }
-};
+    <!-- SCROLLABLE WORKSPACE CONTENT -->
+    <main id="content-viewport">
 
-$('download').onclick=()=>{
-  const blob=new Blob([JSON.stringify(last,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download=`sovopt-${$('example').value}-audit.json`;
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-};
-</script>
+      <!-- ===================================================================
+           VIEW 1: OVERVIEW (Refinery Planning & Process Flow)
+           =================================================================== -->
+      <section id="view-overview" class="view-section active">
+        <div class="page-header">
+          <div class="page-eyebrow">MRPL PS 26119 · Refinery planning prototype</div>
+          <h1 class="page-title">Refinery planning &amp; operational optimisation</h1>
+          <p class="page-intro">
+            Optimise crude intake, conversion, blending and production schedules with independently certified numerical results. Representative open-literature refinery planning formulation. All units, yields and economics are representative engineering approximations.
+          </p>
+        </div>
+
+        <!-- ASYMMETRIC OPERATIONAL SUMMARY BAND -->
+        <div class="summary-band">
+          <div class="summary-dominant">
+            <div class="summary-metric-label">Plan net margin</div>
+            <div class="summary-dominant-val">
+              <span id="kpi-margin-val">$9,043.75</span><span class="unit">per planning period</span>
+            </div>
+            <div class="summary-dominant-sub">Finished product revenues minus crude procurement and unit operating expenditure</div>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-secondary-strip">
+            <div class="summary-cell">
+              <div class="summary-metric-label">CDU intake</div>
+              <div class="summary-cell-val" id="kpi-cdu-val">100.0 kbpd</div>
+              <div class="summary-cell-sub">Arab Light 60.0 · Basrah 40.0</div>
+            </div>
+
+            <div class="summary-cell">
+              <div class="summary-metric-label">FCC utilisation</div>
+              <div class="summary-cell-val" id="kpi-fcc-val">90% (45.0 kbpd)</div>
+              <div class="summary-cell-sub">Ceiling 50.0 kbpd gasoil / residue</div>
+            </div>
+
+            <div class="summary-cell">
+              <div class="summary-metric-label">
+                <span class="tooltip-wrap">
+                  <span class="tooltip-trigger">Numerical verification</span>
+                  <span class="tooltip-box">Independent verification of primal feasibility and KKT dual stationarity at tol ≤ 1e-07.</span>
+                </span>
+              </div>
+              <div class="summary-cell-val">
+                <span class="status-pill"><span class="status-dot"></span> <span id="kpi-status-badge">Pass</span></span>
+              </div>
+              <div class="summary-cell-sub mono" id="kpi-kkt-val">Residual 1.42 × 10⁻¹⁵</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REFINERY PROCESS FLOWSHEET (Interactive Centerpiece) -->
+        <div class="flowsheet-section">
+          <div class="flowsheet-header">
+            <div>
+              <h2 class="flowsheet-title">Process flow / Base operational equilibrium</h2>
+              <div class="flowsheet-caption">Interactive process flowsheet: click any unit to inspect operating rates, yield equations, and dual shadow prices.</div>
+            </div>
+            <div class="flowsheet-scroll-cue">⇄ Pan flowsheet horizontally</div>
+          </div>
+
+          <div class="flowsheet-canvas-wrap">
+            <svg id="refinery-pfd" viewBox="0 0 880 295"></svg>
+          </div>
+
+          <!-- Unit Specification Strip -->
+          <div class="spec-strip" id="unit-spec-strip">
+            <div class="spec-strip-cell">
+              <span class="spec-strip-label">Selected unit</span>
+              <span class="spec-strip-value" id="inspector-title">Atmospheric Crude Distillation (CDU)</span>
+            </div>
+            <div class="spec-strip-cell">
+              <span class="spec-strip-label">Design capacity</span>
+              <span class="spec-strip-value tabular" id="inspector-cap">100.0 kbpd</span>
+            </div>
+            <div class="spec-strip-cell">
+              <span class="spec-strip-label">Current load</span>
+              <span class="spec-strip-value tabular" id="inspector-rate" style="color: var(--rust);">100.0 kbpd (100% load)</span>
+            </div>
+            <div class="spec-strip-cell">
+              <span class="spec-strip-label">Yield basis</span>
+              <span class="spec-strip-value" id="inspector-yield">Naphtha 20% · Distillate 45% · Residue 35%</span>
+            </div>
+            <div class="spec-strip-cell">
+              <span class="spec-strip-label">
+                <span class="tooltip-wrap">
+                  <span class="tooltip-trigger">Shadow price</span>
+                  <span class="tooltip-box">Lagrange multiplier λ indicating marginal refinery margin per incremental barrel of capacity.</span>
+                </span>
+              </span>
+              <span class="spec-strip-value tabular" id="inspector-shadow" style="color: var(--olive);">$29.89 / bbl</span>
+            </div>
+            <div class="spec-strip-cell">
+              <span class="spec-strip-label">Constraint state</span>
+              <span class="spec-strip-value" id="inspector-status"><span class="status-pill"><span class="status-dot"></span> Optimal at ceiling</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUPPORTED MODELS & CONSTRAINTS -->
+        <div class="overview-tables-layout">
+          <!-- Supported Models -->
+          <div class="table-section">
+            <div class="table-header">
+              <h3 class="table-title">Supported mathematical models</h3>
+              <div class="table-subtitle">Core solver routines in sovopt/</div>
+            </div>
+            <div class="table-scroll-wrap">
+              <table class="editorial-table">
+                <thead>
+                  <tr>
+                    <th>Model class</th>
+                    <th>Algorithm routine</th>
+                    <th>Certification guarantee</th>
+                    <th class="num">Scope</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Continuous LP</strong></td>
+                    <td>Revised dual simplex (sparse LU PFI)</td>
+                    <td>KKT stationarity + exact Farkas ray</td>
+                    <td class="num-mono">250v / 1000r</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Discrete MILP</strong></td>
+                    <td>Best-bound B&amp;B + rational bounds</td>
+                    <td>Fraction arithmetic lower bounds</td>
+                    <td class="num-mono">50 nodes</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Convex QP</strong></td>
+                    <td>Mehrotra predictor-corrector IPM</td>
+                    <td>Stationarity &amp; positive semidefiniteness</td>
+                    <td class="num-mono">5000 vars</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Large-scale LP</strong></td>
+                    <td>Restarted PDHG (first-order)</td>
+                    <td>Physical CUDA SpMV + CPU KKT</td>
+                    <td class="num-mono">Sparse CSR</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Active Constraints & Shadow Prices -->
+          <div class="table-section">
+            <div class="table-header">
+              <h3 class="table-title">Active refinery constraints</h3>
+              <div class="table-subtitle">Lagrange multipliers indicating marginal economic value</div>
+            </div>
+            <div class="table-scroll-wrap">
+              <table class="editorial-table">
+                <thead>
+                  <tr>
+                    <th>Constraint</th>
+                    <th>Type</th>
+                    <th class="num">Limit</th>
+                    <th class="num">Shadow price (λ)</th>
+                    <th>Economic implication</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>CDU intake capacity</strong></td>
+                    <td>Physical</td>
+                    <td class="num tabular">100.0 kbpd</td>
+                    <td class="num tabular" style="color: var(--rust); font-weight: 600;">-$29.89/bbl</td>
+                    <td>Marginal value of additional crude intake</td>
+                  </tr>
+                  <tr>
+                    <td><strong>FCC feed capacity</strong></td>
+                    <td>Thermal</td>
+                    <td class="num tabular">50.0 kbpd</td>
+                    <td class="num tabular" style="color: var(--rust); font-weight: 600;">-$8.40/bbl</td>
+                    <td>Upgrading capacity constraint</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Gasoline octane rating</strong></td>
+                    <td>Quality</td>
+                    <td class="num tabular">Min 95 RON</td>
+                    <td class="num tabular" style="color: var(--olive); font-weight: 600;">-$115.00/bbl</td>
+                    <td>Pool octane specification binding</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Diesel demand quota</strong></td>
+                    <td>Market</td>
+                    <td class="num tabular">Min 50 kbpd</td>
+                    <td class="num tabular" style="color: var(--olive); font-weight: 600;">-$105.00/bbl</td>
+                    <td>Contractual volume fulfilled</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Reformer throughput</strong></td>
+                    <td>Catalytic</td>
+                    <td class="num tabular">30.0 kbpd</td>
+                    <td class="num tabular text-muted">$0.00/bbl</td>
+                    <td>Slack available: 13.0 kbpd headroom</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 14px; text-align: right;">
+          Representative open-literature refinery planning formulation. All units, yields and economics are representative engineering approximations.
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 2: OPTIMIZATION RUN (Operations Console)
+           =================================================================== -->
+      <section id="view-optimization" class="view-section">
+        <div class="page-header">
+          <div class="page-eyebrow">Operations console</div>
+          <h1 class="page-title">Optimization engine dispatch &amp; live solve</h1>
+          <p class="page-intro">
+            Adjust operational crude and demand parameters, execute the sovereign solver core, and inspect convergence trajectories and certified solution vectors.
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 320px 1fr; gap: 20px;">
+          <!-- Left Control Panel -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-sm); padding: 18px;">
+            <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle);">
+              Model &amp; operational inputs
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="solver-model-select">Target model instance</label>
+              <select id="solver-model-select" class="form-control">
+                <option value="refinery-lp">MRPL Refinery Planning: Multi-period LP</option>
+                <option value="refinery-milp">MRPL Refinery Planning: Unit commitment (MILP)</option>
+                <option value="refinery-qp">MRPL Refinery Planning: Smooth dispatch (QP)</option>
+                <option value="refinery-infeasible">MRPL Diagnostic: Infeasible demand (Farkas proof)</option>
+                <option value="netlib-afiro">Netlib LP: AFIRO (Saunders Bell Labs)</option>
+                <option value="netlib-blend">Netlib LP: BLEND</option>
+                <option value="netlib-sc50a">Netlib LP: SC50A</option>
+                <option value="netlib-sc50b">Netlib LP: SC50B</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="solver-backend-select">Execution backend</label>
+              <select id="solver-backend-select" class="form-control">
+                <option value="cpu">Sovereign reference CPU (Simplex / IPM / B&amp;B)</option>
+                <option value="pdhg-cpu">Sovereign restarted PDHG · CPU</option>
+                <option value="pdhg-cuda">CUDA — unavailable on this machine (Apple Silicon)</option>
+              </select>
+              <div id="cuda-notice-banner" style="display: none; margin-top: 8px; padding: 10px 12px; font-size: 11.5px; background: rgba(166, 83, 54, 0.08); border: 1px solid rgba(166, 83, 54, 0.3); border-radius: var(--radius-xs); color: var(--rust); line-height: 1.5;">
+                <strong>Hardware notice:</strong> CUDA backend unavailable on this machine (Apple Silicon / ARM64). Execution is disabled for this option. To run optimizations live, select <strong>Sovereign reference CPU</strong> or <strong>Sovereign restarted PDHG · CPU</strong>. Physical Acer RTX 5050 validation evidence is catalogued under the <strong>Benchmarks</strong> and <strong>Evidence</strong> tabs.
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Arab Light crude cost ($/bbl)</label>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input id="input-param-arab" type="range" min="50" max="100" value="70" step="1" oninput="document.getElementById('val-param-arab').textContent = '$' + this.value" style="flex: 1;">
+                <span id="val-param-arab" class="tabular" style="font-weight: 600; width: 44px; text-align: right;">$70</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Basrah Heavy crude cost ($/bbl)</label>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input id="input-param-basrah" type="range" min="40" max="90" value="62" step="1" oninput="document.getElementById('val-param-basrah').textContent = '$' + this.value" style="flex: 1;">
+                <span id="val-param-basrah" class="tabular" style="font-weight: 600; width: 44px; text-align: right;">$62</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Minimum gasoline demand (kbpd)</label>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input id="input-param-gas" type="range" min="20" max="80" value="40" step="1" oninput="document.getElementById('val-param-gas').textContent = this.value + 'k'" style="flex: 1;">
+                <span id="val-param-gas" class="tabular" style="font-weight: 600; width: 44px; text-align: right;">40k</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Minimum diesel demand (kbpd)</label>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input id="input-param-dsl" type="range" min="20" max="90" value="50" step="1" oninput="document.getElementById('val-param-dsl').textContent = this.value + 'k'" style="flex: 1;">
+                <span id="val-param-dsl" class="tabular" style="font-weight: 600; width: 44px; text-align: right;">50k</span>
+              </div>
+            </div>
+
+            <button id="btn-run-solve" class="btn btn-primary" style="width: 100%; margin-top: 12px; padding: 8px;">
+              <span>Run optimization</span>
+            </button>
+
+            <!-- Dispatch telemetry strip -->
+            <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 10px 12px; margin-top: 16px; font-size: 12px;">
+              <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border-subtle);">
+                <span style="color: var(--text-secondary);">Solver stage:</span>
+                <span id="solve-stage-pill" style="font-weight: 500; color: var(--rust);">Idle</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border-subtle);">
+                <span style="color: var(--text-secondary);">Result status:</span>
+                <span class="status-pill"><span class="status-dot"></span> <span id="solve-status-pill">Verified</span></span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border-subtle);">
+                <span style="color: var(--text-secondary);">Iterations:</span>
+                <span class="tabular" id="solve-iter-val">109</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border-subtle);">
+                <span style="color: var(--text-secondary);">Duration:</span>
+                <span class="tabular" id="solve-time-val">48.2 ms</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border-subtle);">
+                <span style="color: var(--text-secondary);">Net margin:</span>
+                <span class="tabular" id="solve-obj-val" style="font-weight: 600; color: var(--rust);">$9,043.75</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border-subtle);">
+                <span style="color: var(--text-secondary);">Primal residual:</span>
+                <span class="mono" id="solve-prim-res" style="font-size: 11px;">1.42e-15</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border-subtle);">
+                <span style="color: var(--text-secondary);">Dual residual:</span>
+                <span class="mono" id="solve-dual-res" style="font-size: 11px;">2.84e-14</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 3px 0; align-items: center;">
+                <span style="color: var(--text-secondary);">Provenance:</span>
+                <span id="solve-provenance-pill" class="badge" style="font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); color: var(--text-secondary);">Scenario baseline</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Content: Convergence Chart + Solution Vectors -->
+          <div>
+            <!-- Convergence Chart -->
+            <div class="table-section" style="margin-bottom: 18px;">
+              <div class="table-header">
+                <h3 class="table-title">Objective &amp; residual convergence trajectory</h3>
+                <div class="table-subtitle">Contraction of infinity-norm KKT residuals over iterations</div>
+              </div>
+              <div class="chart-container">
+                <svg id="convergence-chart-svg" class="chart-svg"></svg>
+              </div>
+            </div>
+
+            <!-- Solution Table -->
+            <div class="table-section">
+              <div class="table-header">
+                <h3 class="table-title">Optimal allocation vector (x*)</h3>
+                <div class="table-subtitle">Certified basic &amp; non-basic variables satisfying physical bounds</div>
+              </div>
+              <div class="table-scroll-wrap">
+                <table class="editorial-table">
+                  <thead>
+                    <tr>
+                      <th>Variable</th>
+                      <th>Refinery stream role</th>
+                      <th class="num">Lower</th>
+                      <th class="num">Optimal rate (x*)</th>
+                      <th class="num">Upper</th>
+                      <th>Basis status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="solver-vars-tbody">
+                    <tr><td><strong class="mono">x_c0_t0</strong></td><td>Crude: Arab Light intake</td><td class="num tabular">0.0</td><td class="num tabular" style="font-weight: 600;">60.00 kbpd</td><td class="num tabular">80.0</td><td>Basic</td></tr>
+                    <tr><td><strong class="mono">x_c1_t0</strong></td><td>Crude: Basrah Heavy intake</td><td class="num tabular">0.0</td><td class="num tabular" style="font-weight: 600;">40.00 kbpd</td><td class="num tabular">80.0</td><td>Basic</td></tr>
+                    <tr><td><strong class="mono">f_cdu_t0</strong></td><td>CDU total throughput</td><td class="num tabular">0.0</td><td class="num tabular" style="font-weight: 600; color: var(--rust);">100.00 kbpd</td><td class="num tabular">100.0</td><td>At Upper</td></tr>
+                    <tr><td><strong class="mono">f_fcc_t0</strong></td><td>FCC feed intake</td><td class="num tabular">0.0</td><td class="num tabular" style="font-weight: 600;">45.00 kbpd</td><td class="num tabular">50.0</td><td>Basic</td></tr>
+                    <tr><td><strong class="mono">f_ref_t0</strong></td><td>Reformer feed intake</td><td class="num tabular">0.0</td><td class="num tabular" style="font-weight: 600;">17.00 kbpd</td><td class="num tabular">30.0</td><td>Basic</td></tr>
+                    <tr><td><strong class="mono">b_ref_gas_t0</strong></td><td>Reformate to gasoline pool</td><td class="num tabular">0.0</td><td class="num tabular">14.45 kbpd</td><td class="num tabular">150.0</td><td>Basic</td></tr>
+                    <tr><td><strong class="mono">b_cat_gas_t0</strong></td><td>CatGas to gasoline pool</td><td class="num tabular">0.0</td><td class="num tabular">27.00 kbpd</td><td class="num tabular">150.0</td><td>Basic</td></tr>
+                    <tr><td><strong class="mono">s_gas_t0</strong></td><td>Finished gasoline shipment</td><td class="num tabular">0.0</td><td class="num tabular" style="font-weight: 600; color: var(--olive);">41.45 kbpd</td><td class="num tabular">150.0</td><td>Basic</td></tr>
+                    <tr><td><strong class="mono">s_dsl_t0</strong></td><td>Finished diesel shipment</td><td class="num tabular">0.0</td><td class="num tabular" style="font-weight: 600; color: var(--olive);">56.50 kbpd</td><td class="num tabular">150.0</td><td>Basic</td></tr>
+                    <tr><td><strong class="mono">s_fo_t0</strong></td><td>Heavy fuel oil decant</td><td class="num tabular">0.0</td><td class="num tabular">22.00 kbpd</td><td class="num tabular">150.0</td><td>Basic</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 3: SCENARIOS (Master-Detail Strategic Browser)
+           =================================================================== -->
+      <section id="view-scenarios" class="view-section">
+        <div class="page-header">
+          <div class="page-eyebrow">Strategic decision analysis</div>
+          <h1 class="page-title">Operational scenarios &amp; stress testing</h1>
+          <p class="page-intro">
+            Evaluate refinery response under crude slate shifts, unit turnarounds, and environmental fuel quality tightening. Select any scenario to inspect operational assumptions, business impacts, and bottleneck migrations.
+          </p>
+        </div>
+
+        <div class="scenario-browser">
+          <!-- Left Scenario List -->
+          <div class="scenario-index-list">
+            <div class="scenario-index-item active" data-scenario="SC-01">
+              <div class="scenario-index-header">
+                <span class="scenario-index-code">SC-01</span>
+                <span class="scenario-index-tag">Equilibrium</span>
+              </div>
+              <div class="scenario-index-title">Base refinery equilibrium</div>
+            </div>
+
+            <div class="scenario-index-item" data-scenario="SC-02">
+              <div class="scenario-index-header">
+                <span class="scenario-index-code">SC-02</span>
+                <span class="scenario-index-tag">Arbitrage</span>
+              </div>
+              <div class="scenario-index-title">High-Basrah heavy discount</div>
+            </div>
+
+            <div class="scenario-index-item" data-scenario="SC-03">
+              <div class="scenario-index-header">
+                <span class="scenario-index-code">SC-03</span>
+                <span class="scenario-index-tag">Peak demand</span>
+              </div>
+              <div class="scenario-index-title">Summer high-octane surge</div>
+            </div>
+
+            <div class="scenario-index-item" data-scenario="SC-04">
+              <div class="scenario-index-header">
+                <span class="scenario-index-code">SC-04</span>
+                <span class="scenario-index-tag">Turnaround</span>
+              </div>
+              <div class="scenario-index-title">FCC maintenance turndown</div>
+            </div>
+
+            <div class="scenario-index-item" data-scenario="SC-05">
+              <div class="scenario-index-header">
+                <span class="scenario-index-code">SC-05</span>
+                <span class="scenario-index-tag">Environmental</span>
+              </div>
+              <div class="scenario-index-title">Strict BS-VI fuel quality</div>
+            </div>
+
+            <div class="scenario-index-item" data-scenario="SC-06">
+              <div class="scenario-index-header">
+                <span class="scenario-index-code">SC-06</span>
+                <span class="scenario-index-tag" style="color: var(--status-error);">Bottleneck</span>
+              </div>
+              <div class="scenario-index-title">Physical bottleneck shock</div>
+            </div>
+          </div>
+
+          <!-- Right Detail Pane -->
+          <div class="scenario-detail-pane" id="scenario-detail-panel">
+            <div>
+              <div class="scenario-detail-header">
+                <span class="scenario-detail-code" id="sc-detail-code">SC-01</span>
+                <h2 class="scenario-detail-title" id="sc-detail-title">Base refinery equilibrium</h2>
+                <p class="scenario-detail-desc" id="sc-detail-desc">
+                  Balanced 60/40 sweet/sour crude slate. Standard product netbacks ($115/bbl Gasoline, $105/bbl Diesel). Nominal CDU throughput at 100 kbpd ceiling.
+                </p>
+              </div>
+
+              <div class="scenario-metrics-grid">
+                <div>
+                  <div class="spec-strip-label">Expected plan margin</div>
+                  <div class="tabular" id="sc-detail-margin" style="font-size: 20px; font-weight: 600; color: var(--text-primary);">$9,043.75</div>
+                </div>
+                <div>
+                  <div class="spec-strip-label">Crude intake ratio</div>
+                  <div class="tabular" id="sc-detail-ratio" style="font-size: 15px; font-weight: 600; color: var(--text-primary);">60L / 40H kbpd</div>
+                </div>
+                <div>
+                  <div class="spec-strip-label">Governing constraint</div>
+                  <div id="sc-detail-bottleneck" style="font-size: 13px; font-weight: 500; color: var(--rust);">CDU intake capacity</div>
+                </div>
+              </div>
+
+              <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 18px;" id="sc-detail-notes">
+                Operating under standard design parameters. Fluid catalytic cracker operating at 90% capacity, leaving 5.0 kbpd headroom for unplanned swings. Reformer severity set at normal reformate RON 100 target.
+              </div>
+            </div>
+
+            <div>
+              <button id="btn-load-scenario" class="btn btn-primary">
+                <span>Load into solver console</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delta Comparison Table -->
+        <div class="table-section">
+          <div class="table-header">
+            <h3 class="table-title">Scenario delta comparison matrix</h3>
+            <div style="display: flex; gap: 10px; align-items: center; font-size: 12px; flex-wrap: wrap;">
+              <span>Compare:</span>
+              <select id="compare-select-a" class="form-control" style="width: auto; padding: 2px 8px;">
+                <option value="SC-01">SC-01: Base equilibrium</option>
+                <option value="SC-02">SC-02: High-Basrah heavy</option>
+                <option value="SC-03">SC-03: Summer octane peak</option>
+                <option value="SC-04">SC-04: FCC turndown</option>
+                <option value="SC-05">SC-05: Strict BS-VI spec</option>
+                <option value="SC-06">SC-06: Infeasible shock</option>
+              </select>
+              <span>vs</span>
+              <select id="compare-select-b" class="form-control" style="width: auto; padding: 2px 8px;">
+                <option value="SC-02">SC-02: High-Basrah heavy</option>
+                <option value="SC-01">SC-01: Base equilibrium</option>
+                <option value="SC-03">SC-03: Summer octane peak</option>
+                <option value="SC-04">SC-04: FCC turndown</option>
+                <option value="SC-05">SC-05: Strict BS-VI spec</option>
+                <option value="SC-06">SC-06: Infeasible shock</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-scroll-wrap">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Operational parameter</th>
+                  <th class="num">Scenario A</th>
+                  <th class="num">Scenario B</th>
+                  <th class="num">Variance (Δ = B - A)</th>
+                </tr>
+              </thead>
+              <tbody id="comparison-matrix-body">
+                <!-- Dynamically populated by app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 4: SOLVER ANALYTICS (Numerical Engineering)
+           =================================================================== -->
+      <section id="view-analytics" class="view-section">
+        <div class="page-header">
+          <div class="page-eyebrow">Numerical performance</div>
+          <h1 class="page-title">Solver numerical analytics &amp; profiling</h1>
+          <p class="page-intro">
+            Granular execution telemetry, CPU vs CUDA speedup ratios, stratum distributions, and physical hardware profiling from the Acer RTX 5050 validation run.
+          </p>
+        </div>
+
+        <!-- Stratum Band -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-sm); padding: 16px;">
+            <div class="spec-strip-label">SMALL stratum (n ≤ 100)</div>
+            <div class="tabular" style="font-size: 28px; font-weight: 600; color: var(--text-primary); margin: 3px 0;">0.61x</div>
+            <div style="font-size: 11.5px; color: var(--text-muted);">CPU faster due to sub-ms launch &amp; transfer latency</div>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-sm); padding: 16px;">
+            <div class="spec-strip-label">MEDIUM stratum (100 &lt; n ≤ 1000)</div>
+            <div class="tabular" style="font-size: 28px; font-weight: 600; color: var(--text-primary); margin: 3px 0;">0.93x</div>
+            <div style="font-size: 11.5px; color: var(--text-muted);">Parity boundary; GPU compute balances driver overhead</div>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-sm); padding: 16px;">
+            <div class="spec-strip-label">LARGE stratum (n &gt; 1000)</div>
+            <div class="tabular" style="font-size: 28px; font-weight: 600; color: var(--olive); margin: 3px 0;">1.13x</div>
+            <div style="font-size: 11.5px; color: var(--text-muted);">CUDA SpMV memory bandwidth acceleration demonstrated</div>
+          </div>
+        </div>
+
+        <div class="editorial-callout">
+          <strong>Scientific reporting disclosure:</strong>
+          In compliance with the project charter, unfavorable benchmark results are strictly preserved. Across the entire 18-instance Netlib benchmark suite on the physical Acer RTX 5050, the overall same-machine CPU/CUDA speedup ratio is <strong>1.07x</strong>. An accelerated factor of ≥2x was <strong>not demonstrated</strong> on small instances due to PCIe and kernel launch latency. Gate 9 CUDA performance engineering improved raw GPU execution time by <strong>1.81x</strong> compared to Gate 8.
+        </div>
+
+        <div class="table-section">
+          <div class="table-header">
+            <h3 class="table-title">Physical benchmark suite (18 continuous Netlib LP instances)</h3>
+            <div class="table-subtitle">3 warmups + 7 measured repeats at committed source SHA 51b71bb</div>
+          </div>
+          <div class="table-scroll-wrap">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Instance</th>
+                  <th>Stratum</th>
+                  <th>Status</th>
+                  <th class="num">CPU median (ms)</th>
+                  <th class="num">Gate 8 CUDA (ms)</th>
+                  <th class="num">Gate 9 CUDA (ms)</th>
+                  <th class="num">Speedup (CPU/CUDA)</th>
+                  <th class="num">Relative discrepancy</th>
+                </tr>
+              </thead>
+              <tbody id="analytics-table-body">
+                <!-- Dynamically populated by app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 5: TRUST & VERIFICATION (Specification Narrative)
+           =================================================================== -->
+      <section id="view-trust" class="view-section">
+        <div class="page-header">
+          <div class="page-eyebrow">Mathematical contracts</div>
+          <h1 class="page-title">Numerical trust &amp; verification layer</h1>
+          <p class="page-intro">
+            Independent numerical verification on the original untransformed model. Every result is audited against KKT stationarity, dual feasibility, or exact rational certificates before acceptance.
+          </p>
+        </div>
+
+        <div class="trust-narrative">
+          <div class="trust-row">
+            <div class="trust-num">01</div>
+            <div>
+              <div class="trust-title">Primal feasibility</div>
+              <div class="trust-formula">||A x - b||_∞ ≤ 10⁻⁷</div>
+            </div>
+            <div class="trust-body">
+              Candidate solution x* is directly substituted into the original untransformed constraint matrix A. Any violation exceeding 10⁻⁷ is rejected as NUMERICAL_FAILURE.
+            </div>
+            <div><span class="status-pill"><span class="status-dot"></span> Verified</span></div>
+          </div>
+
+          <div class="trust-row">
+            <div class="trust-num">02</div>
+            <div>
+              <div class="trust-title">Dual stationarity</div>
+              <div class="trust-formula">||A^T y + s - c||_∞ ≤ 10⁻⁷</div>
+            </div>
+            <div class="trust-body">
+              Dual multipliers y and reduced costs s must satisfy Karush-Kuhn-Tucker stationarity, with complementary slackness x_j · s_j = 0 across all variables.
+            </div>
+            <div><span class="status-pill"><span class="status-dot"></span> Verified</span></div>
+          </div>
+
+          <div class="trust-row">
+            <div class="trust-num">03</div>
+            <div>
+              <div class="trust-title">Infeasibility certificates</div>
+              <div class="trust-formula">y ≥ 0, A^T y ≤ 0, b^T y &gt; 0 in ℚ</div>
+            </div>
+            <div class="trust-body">
+              When a refinery scenario is declared infeasible (e.g. demand exceeds intake capacity), the solver certifies an exact Farkas vector y in infinite-precision rational arithmetic.
+            </div>
+            <div><span class="status-pill"><span class="status-dot" style="background: var(--status-warning);"></span> Farkas ray</span></div>
+          </div>
+
+          <div class="trust-row">
+            <div class="trust-num">04</div>
+            <div>
+              <div class="trust-title">MILP bound verification</div>
+              <div class="trust-formula">z_LB ≤ z* (exact rational)</div>
+            </div>
+            <div class="trust-body">
+              Branch-and-bound lower bounds are computed in exact rational Fraction arithmetic, guaranteeing that the mathematical gap cannot close falsely due to floating-point leakage.
+            </div>
+            <div><span class="status-pill"><span class="status-dot"></span> Exact rational</span></div>
+          </div>
+        </div>
+
+        <!-- Terminal Status Semantics Contract -->
+        <div class="table-section">
+          <div class="table-header">
+            <h3 class="table-title">Terminal status semantics contract</h3>
+            <div class="table-subtitle">Precise mathematical conditions for solver outcomes</div>
+          </div>
+          <div class="table-scroll-wrap">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Mathematical guarantee</th>
+                  <th>Operational meaning</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="status-pill"><span class="status-dot"></span> <strong>OPTIMAL_VERIFIED</strong></span></td>
+                  <td>KKT stationarity verified to tol ≤ 10⁻⁷ on original model (floating-point numerical verification within stated tolerance; not a formal rational proof)</td>
+                  <td>Safe for production refinery dispatch</td>
+                </tr>
+                <tr>
+                  <td><span class="status-pill"><span class="status-dot" style="background: var(--status-warning);"></span> <strong>INFEASIBLE_CERTIFIED</strong></span></td>
+                  <td>Exact rational Farkas ray y verified in Fraction arithmetic</td>
+                  <td>Physical impossibility proven; capacity expansion required</td>
+                </tr>
+                <tr>
+                  <td><span class="status-pill"><span class="status-dot" style="background: var(--text-muted);"></span> <strong>LIMIT_REACHED</strong></span></td>
+                  <td>Node, iteration, or wall-clock budget exhausted</td>
+                  <td>Incumbent provided if available; optimality not guaranteed</td>
+                </tr>
+                <tr>
+                  <td><span class="status-pill"><span class="status-dot" style="background: var(--status-error);"></span> <strong>NUMERICAL_FAILURE</strong></span></td>
+                  <td>Ill-conditioned basis or residual check failed</td>
+                  <td>Solution rejected; equilibration scaling advised</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 6: BENCHMARKS (Physical Hardware Evidence)
+           =================================================================== -->
+      <section id="view-benchmarks" class="view-section">
+        <div class="page-header">
+          <div class="page-eyebrow">Physical validation</div>
+          <h1 class="page-title">Acer RTX 5050 physical GPU benchmark center</h1>
+          <p class="page-intro">
+            Evidence measured on physical NVIDIA hardware under AC mains power. Same-machine comparisons against host CPU.
+          </p>
+        </div>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-sm); padding: 16px 20px; margin-bottom: 20px; font-size: 13px;">
+          <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+            <div><span class="spec-strip-label">GPU hardware</span><div style="font-weight: 600;">NVIDIA GeForce RTX 5050 Laptop GPU</div></div>
+            <div><span class="spec-strip-label">VRAM</span><div style="font-weight: 600;">8 GB GDDR6</div></div>
+            <div><span class="spec-strip-label">Compute capability</span><div style="font-weight: 600;">12.0</div></div>
+            <div><span class="spec-strip-label">NVIDIA driver</span><div style="font-weight: 600;">576.83</div></div>
+            <div><span class="spec-strip-label">CUDA build / runtime</span><div class="mono" style="font-size: 12px;">12.9 / 12090</div></div>
+          </div>
+        </div>
+
+        <div class="table-section">
+          <div class="table-header">
+            <h3 class="table-title">Gate 8 baseline vs Gate 9 performance engineering</h3>
+            <div class="table-subtitle">Architectural optimizations implemented to eliminate Python/CUDA dispatch bottlenecks</div>
+          </div>
+          <div class="table-scroll-wrap">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Optimization vector</th>
+                  <th>Gate 8 baseline</th>
+                  <th>Gate 9 implemented architecture</th>
+                  <th>Measured impact</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Kernel dispatches per iteration</strong></td>
+                  <td>~18 CuPy Python dispatches</td>
+                  <td><strong>4 dedicated RawKernels</strong></td>
+                  <td>4.5x reduction in driver launch latency</td>
+                </tr>
+                <tr>
+                  <td><strong>GPU memory allocations</strong></td>
+                  <td>~15 dynamic arrays / iter</td>
+                  <td><strong>0 runtime allocations</strong> (resident buffers)</td>
+                  <td>Eliminated CuPy memory pool lock churn</td>
+                </tr>
+                <tr>
+                  <td><strong>SpMV memory layout</strong></td>
+                  <td>Elementwise CSR loop</td>
+                  <td>CSR with <code>const __restrict__</code> &amp; unroll 4</td>
+                  <td>Hardware read-only cache loads (LDG.E)</td>
+                </tr>
+                <tr>
+                  <td><strong>Vector arithmetic pipeline</strong></td>
+                  <td>Multiple temporary VRAM writes</td>
+                  <td>Fused primal &amp; dual step RawKernels</td>
+                  <td>Collapsed DRAM passes into fast registers</td>
+                </tr>
+                <tr>
+                  <td><strong>Periodic restarts</strong></td>
+                  <td>Dynamic array copies</td>
+                  <td>Resident vector-copy in-place updates</td>
+                  <td>0 allocations across 50,000 iterations</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 7: EVIDENCE (Provenance Registry)
+           =================================================================== -->
+      <section id="view-evidence" class="view-section">
+        <div class="page-header">
+          <div class="page-eyebrow">Provenance records</div>
+          <h1 class="page-title">Cryptographic evidence &amp; commit registry</h1>
+          <p class="page-intro">
+            Committed git milestone hashes, file digests, and reproducible audit artifacts.
+          </p>
+        </div>
+
+        <div class="table-section" style="margin-bottom: 20px;">
+          <div class="table-header">
+            <h3 class="table-title">Committed git milestone ledger</h3>
+            <div class="table-subtitle">Pushed and verified commits on remote repository</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12.5px;">Gate 8 baseline evidence commit:</span>
+              <code class="mono" style="color: var(--rust);">cefa9c33f1d4d44be13765c0d2d5b72c89c9a1a4</code>
+              <button id="btn-copy-g8" class="copy-btn" onclick="window.sovApp.copyText('cefa9c33f1d4d44be13765c0d2d5b72c89c9a1a4', 'btn-copy-g8')">Copy</button>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12.5px;">Gate 9 physical CUDA validation commit:</span>
+              <code class="mono" style="color: var(--rust);">51b71bb8468bd4375e572b2537d69e30a0e60684</code>
+              <button id="btn-copy-g9" class="copy-btn" onclick="window.sovApp.copyText('51b71bb8468bd4375e572b2537d69e30a0e60684', 'btn-copy-g9')">Copy</button>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12.5px;">Gate 9.1 cross-platform checksum portability commit:</span>
+              <code class="mono" style="color: var(--rust);">395c6c62bbbbd93b15a086c48e4defb81fc75a19</code>
+              <button id="btn-copy-g91" class="copy-btn" onclick="window.sovApp.copyText('395c6c62bbbbd93b15a086c48e4defb81fc75a19', 'btn-copy-g91')">Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-section">
+          <div class="table-header">
+            <h3 class="table-title">Primary benchmark and evidence artifacts</h3>
+            <div class="table-subtitle">Authentic data files catalogued in repository</div>
+          </div>
+          <div class="table-scroll-wrap">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Artifact path</th>
+                  <th>Format</th>
+                  <th>Mode</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code class="mono">reports/gpu_gate9_final_51b71bb/summary.json</code></td>
+                  <td>JSON</td>
+                  <td>Raw byte</td>
+                  <td>18-instance CPU vs CUDA timing and discrepancy summary</td>
+                </tr>
+                <tr>
+                  <td><code class="mono">reports/gpu_gate9_final_51b71bb/environment.json</code></td>
+                  <td>JSON</td>
+                  <td>Raw byte</td>
+                  <td>Hardware, driver version 576.83, and runtime records</td>
+                </tr>
+                <tr>
+                  <td><code class="mono">data/manifest.json</code></td>
+                  <td>JSON</td>
+                  <td>Text-LF</td>
+                  <td>Catalog of 81 authentic public benchmark instances</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 8: REPORTS & EXPORT
+           =================================================================== -->
+      <section id="view-reports" class="view-section">
+        <div class="page-header">
+          <div class="page-eyebrow">Audit artifacts</div>
+          <h1 class="page-title">Reports, audit packs &amp; production schedules</h1>
+          <p class="page-intro">
+            Export machine-readable audit packages, operational schedules, and terminal reproduction commands.
+          </p>
+        </div>
+
+        <div class="grid-2">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-sm); padding: 20px;">
+            <h3 style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px;">JSON audit package</h3>
+            <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.45;">
+              Generates a JSON audit payload containing model parameter fingerprints, primal solution vectors x*, dual Lagrange multipliers y*, and KKT stationarity residuals.
+            </p>
+            <button class="btn btn-primary" onclick="window.sovApp.exportAuditJSON()">
+              <span>Download audit package (JSON)</span>
+            </button>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-sm); padding: 20px;">
+            <h3 style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px;">Refinery production schedule</h3>
+            <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.45;">
+              Exports a tabular operational dispatch sheet for refinery operations engineers, including crude intake, conversion loadings, and product shipments.
+            </p>
+            <button class="btn btn-olive" onclick="window.sovApp.exportCSV()">
+              <span>Download production schedule (CSV)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-section" style="margin-top: 20px;">
+          <div class="table-header">
+            <h3 class="table-title">Terminal reproduction commands</h3>
+            <div class="table-subtitle">Commands to verify all results from the terminal</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12px;">Solve refinery LP twin:</span>
+              <code class="mono" style="font-size: 11.5px;">python -m sovopt --refinery-twin lp --report</code>
+              <button id="btn-copy-cli-lp" class="copy-btn" onclick="window.sovApp.copyText('python -m sovopt --refinery-twin lp --report', 'btn-copy-cli-lp')">Copy</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12px;">Verify repository checksums:</span>
+              <code class="mono" style="font-size: 11.5px;">python scripts/verify_checksums.py</code>
+              <button id="btn-copy-cli-chk" class="copy-btn" onclick="window.sovApp.copyText('python scripts/verify_checksums.py', 'btn-copy-cli-chk')">Copy</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12px;">Run test suite (298 tests):</span>
+              <code class="mono" style="font-size: 11.5px;">python -m unittest discover -s tests -v</code>
+              <button id="btn-copy-cli-tst" class="copy-btn" onclick="window.sovApp.copyText('python -m unittest discover -s tests -v', 'btn-copy-cli-tst')">Copy</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>

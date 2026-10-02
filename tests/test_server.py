@@ -89,6 +89,29 @@ class HandlerUnitTests(unittest.TestCase):
                                    {"Content-Length": str(len(payload)), "Content-Type": "application/json"})
         self.assertEqual(status, 400)
 
+    def test_get_refinery_twin(self):
+        status, body = self._invoke("GET", "/api/refinery_twin?variant=lp")
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertEqual(data["name"], "MRPL_Refinery_Twin_LP")
+        self.assertEqual(len(data["c"]), 36)
+        self.assertEqual(data["c"][0], 70.0)
+
+    def test_get_refinery_twin_parameterized(self):
+        status, body = self._invoke("GET", "/api/refinery_twin?variant=lp&c_arab=85.5&c_basrah=58.0&min_gas=45.0&min_dsl=55.0")
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertEqual(data["name"], "MRPL_Refinery_Twin_LP")
+        self.assertEqual(data["c"][0], 85.5)
+        self.assertEqual(data["c"][1], 58.0)
+
+    def test_get_gpu_summary(self):
+        status, body = self._invoke("GET", "/api/gpu_summary")
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertIn("gpu_device", data)
+        self.assertIn("suite_totals", data)
+
 
 class ServerIntegrationTests(unittest.TestCase):
     # Integration tests communicating with a live HTTP server over loopback socket.
