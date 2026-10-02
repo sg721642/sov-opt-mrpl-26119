@@ -1,5 +1,23 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.4] - 2026-10-02
+
+### Gate 9: GPU Performance Engineering for Restarted PDHG
+
+- **perf(gpu): Reduce PDHG CUDA execution overhead via fused RawKernels and zero-allocation pipeline:**
+  - Implemented fused sovereign CUDA RawKernels in `sovopt/cuda_backend.py`:
+    - `spmv`: grid-stride CSR matrix-vector product with `const __restrict__` pointers, `#pragma unroll 4`, and direct writing to destination buffer.
+    - `dual_step_fused`: single-launch dual proximal projection and running ergodic average accumulation ($y_{new} = \max(0, y + \sigma \odot (Ax_{bar} - h))$, $y_{avg} += (y_{new} - y_{avg}) / \text{count}$).
+    - `primal_step_fused`: single-launch gradient step, box projection, extrapolation, and running ergodic average accumulation ($x_{new} = \text{clamp}(x - \tau \odot (c + A^Ty), l, u)$, $\bar{x} = 2 x_{new} - x_{old}$, $x_{avg} += (x_{new} - x_{avg}) / \text{count}$) using hardware `fmin`/`fmax` intrinsics.
+    - `vector_copy`: in-place device vector copy for zero-allocation periodic restarts.
+  - Eliminated intermediate GPU DRAM traffic and memory pool allocation churn, dropping kernel launches from 18 to 4 per iteration with 0 dynamic allocations during iterations.
+  - Preallocated resident device buffers `Ax_bar` and `ATy` and cached launch configurations (`grid_m`, `grid_n`, `block`, `m_int32`, `n_int32`).
+  - Unified D2H downloads at $k \equiv 0 \pmod{100}$ checkpoints to minimize PCIe transfer overhead.
+  - Added granular timing breakdown (`setup_seconds`, `iteration_seconds`, `verification_seconds`, `total_elapsed_seconds`) and solver telemetry (`kernel_launches_count`, `restarts_count`, `convergence_checks_count`) in `sovopt/pdhg.py`.
+  - Added `data/manifests/gpu_pdhg_large_public.json` framework manifest for large public continuous LP benchmark instances.
+  - Added regression test suite `tests/test_gpu_performance_gate9.py` verifying mathematical equivalence, buffer immutability, timing breakdown, and non-CUDA truthful reporting.
+  - Authored comprehensive documentation in `docs/GATE9_GPU_OPTIMIZATION.md`.
+
 ## [0.3.3] - 2026-10-02
 
 ### Gate 8 Phase B: Physical RTX 5050 CUDA Validation

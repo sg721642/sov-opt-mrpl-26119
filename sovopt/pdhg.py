@@ -21,8 +21,11 @@ class CSRMatrix:
         self.a = np.asarray(A[r, j], dtype=np.float64)
         self.p = np.asarray(np.r_[0, np.cumsum(np.bincount(r, minlength=self.m))], dtype=np.int32)
 
-    def dot(self, x):
-        out = np.zeros(self.m, dtype=np.float64)
+    def dot(self, x, out=None):
+        if out is None:
+            out = np.zeros(self.m, dtype=np.float64)
+        else:
+            out.fill(0.0)
         if len(self.r) > 0:
             np.add.at(out, self.r, self.a * x[self.j])
         return out
@@ -41,7 +44,7 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
         scaling: If True, use Pock-Chambolle diagonal l1 preconditioning.
 
     Returns:
-        dict: Standardized solver result dictionary.
+        dict: Standardized solver result dictionary with granular timing & telemetry.
     """
     if backend is not None:
         device = 'cuda' if backend == 'pdhg-cuda' else 'cpu'
@@ -59,7 +62,15 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
                 'verification': {'kkt_passed': False, 'primal_residual': float('nan'), 'dual_residual': float('nan')},
                 'iterations': 0,
                 'setup_seconds': 0.0,
+                'iteration_seconds': 0.0,
+                'verification_seconds': 0.0,
                 'iteration_and_verification_seconds': 0.0,
+                'total_elapsed_seconds': 0.0,
+                'telemetry': {
+                    'kernel_launches_count': 0,
+                    'restarts_count': 0,
+                    'convergence_checks_count': 0,
+                },
             }
         cuda = CUDABackend()
         xp = cuda.xp
@@ -81,9 +92,6 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
     if cuda is not None:
         r_G, j_G = np.nonzero(G)
         a_G = G[r_G, j_G]
-        # Sort COO by row before building CSR row pointer; without this, p
-        # describes grouped rows while j_G/a_G remain in column-major COO
-        # order, causing the custom RawKernel SpMV to produce wrong results.
         ord_G = np.argsort(r_G, kind="stable")
         r_G = r_G[ord_G].astype(np.int32)
         j_G = j_G[ord_G].astype(np.int32)
@@ -134,7 +142,15 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
             'verification': {'kkt_passed': False, 'primal_residual': float('nan'), 'dual_residual': float('nan')},
             'iterations': 0,
             'setup_seconds': time.perf_counter() - setup_start,
+            'iteration_seconds': 0.0,
+            'verification_seconds': 0.0,
             'iteration_and_verification_seconds': 0.0,
+            'total_elapsed_seconds': time.perf_counter() - setup_start,
+            'telemetry': {
+                'kernel_launches_count': 0,
+                'restarts_count': 0,
+                'convergence_checks_count': 0,
+            },
         }
 
     # Initial point: midpoint for finite bounds, or lower+1 / upper-1 / 0
@@ -150,13 +166,22 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
     count = 0
     history = []
 
+    # Preallocated work buffers to eliminate memory churn during iterations
+    Ax_bar = xp.zeros(m, dtype=xp.float64)
+    ATy = xp.zeros(n, dtype=xp.float64)
+
+    if cuda is not None:
+        grid_m = (min(65535, max(1, (m + 127) // 128)),)
+        grid_n = (min(65535, max(1, (n + 127) // 128)),)
+        block = (128,)
+        m_int32 = np.int32(m)
+        n_int32 = np.int32(n)
+
     sync()
     setup_seconds = time.perf_counter() - setup_start
     compute_start = time.perf_counter()
 
-    def checked(xx, yy):
-        xc = to_cpu(xx)
-        yc = to_cpu(yy)
+    def checked_cpu(xc, yc):
         grad = model.c + G.T @ yc
         z = list(yc)
         for j_idx in range(n):
@@ -175,45 +200,78 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
     do_restart = bool(restart is not False and restart is not None and int(restart) > 0)
     restart_interval = int(restart) if do_restart else 0
 
+    kernel_launches_count = 0
+    restarts_count = 0
+    convergence_checks_count = 0
+    verification_seconds = 0.0
+
     k = 0
     for k in range(1, max_iter + 1):
-        # Dual proximal update
-        y = xp.maximum(0.0, y + sigma * (A.dot(bar) - hh))
-        # Primal proximal update
-        new_x = xp.clip(x - tau * (c + AT.dot(y)), lo, hi)
-        # Extrapolation
-        bar = 2.0 * new_x - x
-        x = new_x
-        count += 1
-        avg += (x - avg) / count
-        avgy += (y - avgy) / count
+        if cuda is not None:
+            # 1. SpMV Ax_bar = A * bar
+            A.dot(bar, out=Ax_bar)
+            # 2. Fused dual step + projection + running average
+            count += 1
+            inv_count = 1.0 / count
+            cuda.dual_step_kernel(grid_m, block, (Ax_bar, hh, sigma, y, avgy, np.float64(inv_count), m_int32))
+            # 3. SpMV ATy = AT * y
+            AT.dot(y, out=ATy)
+            # 4. Fused primal step + projection + extrapolation + running average
+            cuda.primal_step_kernel(grid_n, block, (ATy, c, tau, lo, hi, x, bar, avg, np.float64(inv_count), n_int32))
+            kernel_launches_count += 4
+        else:
+            A.dot(bar, out=Ax_bar)
+            y = np.maximum(0.0, y + sigma * (Ax_bar - hh))
+            AT.dot(y, out=ATy)
+            new_x = np.clip(x - tau * (c + ATy), lo, hi)
+            bar = 2.0 * new_x - x
+            x = new_x
+            count += 1
+            inv_count = 1.0 / count
+            avg += (x - avg) * inv_count
+            avgy += (y - avgy) * inv_count
 
-        # Numerical guard: check for NaN/Inf in iterates
-        if k % 100 == 0:
-            if not (np.isfinite(to_cpu(x)).all() and np.isfinite(to_cpu(y)).all()):
+        # Periodic KKT check & numerical guard
+        if k % 100 == 0 or k == max_iter:
+            xc = to_cpu(x)
+            yc = to_cpu(y)
+            if not (np.isfinite(xc).all() and np.isfinite(yc).all()):
                 sync()
+                tot_t = time.perf_counter() - compute_start
                 return {
                     'status': 'NUMERICAL_FAILURE',
                     'algorithm': 'diagonal PDHG with periodic averaging restart' if do_restart else 'diagonal PDHG without restart',
                     'message': f'NaN or Inf detected in PDHG iterates at iteration {k}',
-                    'x': to_cpu(x).tolist(),
-                    'dual': to_cpu(y).tolist(),
+                    'x': xc.tolist(),
+                    'dual': yc.tolist(),
                     'objective': None,
                     'verification': {'kkt_passed': False, 'primal_residual': float('nan'), 'dual_residual': float('nan')},
                     'iterations': k,
                     'history': history,
                     'setup_seconds': setup_seconds,
-                    'iteration_and_verification_seconds': time.perf_counter() - compute_start,
+                    'iteration_seconds': max(0.0, tot_t - verification_seconds),
+                    'verification_seconds': verification_seconds,
+                    'iteration_and_verification_seconds': tot_t,
+                    'total_elapsed_seconds': setup_seconds + tot_t,
+                    'telemetry': {
+                        'kernel_launches_count': kernel_launches_count,
+                        'restarts_count': restarts_count,
+                        'convergence_checks_count': convergence_checks_count,
+                    },
                     'gpu_executed': (device == 'cuda'),
                 }
 
-        # Periodic KKT check
-        if k % 100 == 0 or k == max_iter:
-            xc, z, vr = checked(x, y)
+            t_v0 = time.perf_counter()
+            xc, z, vr = checked_cpu(xc, yc)
             if not vr.get('kkt_passed', False):
-                xa, za, va = checked(avg, avgy)
+                xa = to_cpu(avg)
+                ya = to_cpu(avgy)
+                xa, za, va = checked_cpu(xa, ya)
                 if va.get('kkt_passed', False):
                     xc, z, vr = xa, za, va
+            verification_seconds += (time.perf_counter() - t_v0)
+            convergence_checks_count += 1
+
             history.append(dict(
                 iteration=k,
                 primal_residual=vr.get('primal_residual'),
@@ -225,15 +283,21 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
 
         # Deterministic periodic restart
         if do_restart and (k % restart_interval == 0):
-            x = avg.copy()
-            y = avgy.copy()
-            bar = x.copy()
+            restarts_count += 1
+            if cuda is not None:
+                cuda.copy_kernel(grid_n, block, (avg, x, n_int32))
+                cuda.copy_kernel(grid_n, block, (avg, bar, n_int32))
+                cuda.copy_kernel(grid_m, block, (avgy, y, m_int32))
+                kernel_launches_count += 3
+            else:
+                x[:] = avg
+                bar[:] = avg
+                y[:] = avgy
             count = 0
-            avg = x.copy()
-            avgy = y.copy()
 
     sync()
     total_compute_seconds = time.perf_counter() - compute_start
+    pure_iteration_seconds = max(0.0, total_compute_seconds - verification_seconds)
 
     return {
         'status': 'OPTIMAL_VERIFIED' if vr.get('kkt_passed', False) else 'LIMIT_REACHED',
@@ -245,6 +309,14 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
         'iterations': k,
         'history': history,
         'setup_seconds': setup_seconds,
+        'iteration_seconds': pure_iteration_seconds,
+        'verification_seconds': verification_seconds,
         'iteration_and_verification_seconds': total_compute_seconds,
+        'total_elapsed_seconds': setup_seconds + total_compute_seconds,
+        'telemetry': {
+            'kernel_launches_count': kernel_launches_count,
+            'restarts_count': restarts_count,
+            'convergence_checks_count': convergence_checks_count,
+        },
         'gpu_executed': (device == 'cuda'),
     }

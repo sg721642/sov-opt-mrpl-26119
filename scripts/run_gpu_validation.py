@@ -125,6 +125,10 @@ def run_validation(backend="pdhg-cpu", stratum="ALL", instance_filter=None, warm
             "reference_objective": ref_obj,
             "objective_discrepancy": disc,
             "relative_discrepancy": rel_disc,
+            "setup_seconds": last_res.get("setup_seconds"),
+            "iteration_seconds": last_res.get("iteration_seconds"),
+            "verification_seconds": last_res.get("verification_seconds"),
+            "telemetry": last_res.get("telemetry"),
             "verification": last_res.get("verification"),
         }
 
