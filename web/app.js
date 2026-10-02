@@ -15,7 +15,9 @@
     activeBackend: 'cpu',
     selectedUnit: 'CDU',
     isSolving: false,
+    isStale: false,
     solveResult: null,
+    solveGen: 0,
     resultSource: 'scenario-preset', // 'scenario-preset' | 'live'
     compareA: 'SC-01',
     compareB: 'SC-02',
@@ -281,15 +283,7 @@
       kkt_passed: true,
       feasible: true
     },
-    convergence_history: [
-      { iter: 1, res: 1.0, obj: 0.0 },
-      { iter: 15, res: 4.5e-1, obj: -1200.0 },
-      { iter: 35, res: 1.2e-2, obj: -4500.0 },
-      { iter: 60, res: 8.6e-5, obj: -7200.0 },
-      { iter: 85, res: 3.4e-9, obj: -8850.0 },
-      { iter: 100, res: 5.1e-13, obj: -9043.75 },
-      { iter: 109, res: 1.42e-15, obj: -9043.75 }
-    ]
+    history: null
   };
 
   // Initialize Application
@@ -391,6 +385,14 @@
       sec.classList.toggle('active', isTarget);
     });
 
+    if (tabId === 'overview') {
+      renderRefineryPFD();
+    } else if (tabId === 'optimization') {
+      renderConvergenceChart(STATE.solveResult);
+    } else if (tabId === 'scenarios') {
+      renderComparison();
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -446,6 +448,9 @@
     let dslRate = isInfeasible ? 0.0 : s.dieselShipment;
     let foRate = isInfeasible ? 0.0 : s.fuelOilShipment;
 
+    let arabPrice = s.crudeArabPrice;
+    let basrahPrice = s.crudeBasrahPrice;
+
     // If live solve result available for a refinery model
     if (!isInfeasible && STATE.resultSource === 'live' && STATE.solveResult && STATE.solveResult.x && STATE.solveResult.x.length >= 12) {
       const x = STATE.solveResult.x;
@@ -457,6 +462,11 @@
       gasRate = x[9];
       dslRate = x[10];
       foRate = x[11];
+    }
+
+    if (STATE.resultSource === 'live' && STATE.solveResult && STATE.solveResult.inputs) {
+      if (STATE.solveResult.inputs.c_arab !== undefined) arabPrice = STATE.solveResult.inputs.c_arab;
+      if (STATE.solveResult.inputs.c_basrah !== undefined) basrahPrice = STATE.solveResult.inputs.c_basrah;
     }
 
     svg.innerHTML = `
@@ -485,10 +495,10 @@
 
       <!-- Feed Labels -->
       <text class="pfd-unit-title" x="72" y="55" text-anchor="middle">Arab Light</text>
-      <text class="pfd-unit-stat" x="72" y="77" text-anchor="middle">${arabRate.toFixed(1)} kbpd · $${s.crudeArabPrice.toFixed(0)}</text>
+      <text class="pfd-unit-stat" x="72" y="77" text-anchor="middle">${arabRate.toFixed(1)} kbpd · $${arabPrice.toFixed(0)}</text>
 
       <text class="pfd-unit-title" x="72" y="155" text-anchor="middle">Basrah Heavy</text>
-      <text class="pfd-unit-stat" x="72" y="177" text-anchor="middle">${basrahRate.toFixed(1)} kbpd · $${s.crudeBasrahPrice.toFixed(0)}</text>
+      <text class="pfd-unit-stat" x="72" y="177" text-anchor="middle">${basrahRate.toFixed(1)} kbpd · $${basrahPrice.toFixed(0)}</text>
 
       <!-- UNIT 1: CDU -->
       <g id="unit-cdu" class="pfd-unit ${activeUnit === 'CDU' ? 'selected' : ''}" onclick="window.sovApp.inspectUnit('CDU')" transform="translate(150, 35)">
@@ -682,80 +692,200 @@
     const svg = document.getElementById('convergence-chart-svg');
     if (!svg) return;
 
-    let history = null;
-    if (res && res.history && res.history.length > 0) {
-      history = res.history;
-    } else if (res && res.convergence_history && res.convergence_history.length > 0) {
-      history = res.convergence_history;
+    const subEl = document.querySelector('#view-optimization .chart-container')?.previousElementSibling?.querySelector('.table-subtitle');
+
+    if (STATE.isStale) {
+      markStateAsStale();
+      return;
     }
 
-    if (!history || history.length < 2) {
-      svg.setAttribute('viewBox', '0 0 600 180');
-      svg.innerHTML = `
-        <rect width="600" height="180" fill="transparent"/>
-        <text x="300" y="90" fill="#8C8578" font-family="sans-serif" font-size="12" text-anchor="middle">
-          Iteration history not exposed for revised simplex (KKT residuals verified at final basis)
-        </text>
-      `;
-      return;
+    let history = null;
+    if (res && Array.isArray(res.history) && res.history.length > 0) {
+      history = res.history;
+    } else if (res && Array.isArray(res.convergence_history) && res.convergence_history.length > 0) {
+      history = res.convergence_history;
     }
 
     const width = 600;
     const height = 180;
-    const padL = 60;
-    const padR = 20;
-    const padT = 16;
-    const padB = 26;
-
+    const padL = 62;
+    const padR = 24;
+    const padT = 18;
+    const padB = 28;
     const plotW = width - padL - padR;
     const plotH = height - padT - padB;
 
-    const isObjHistory = history[0].objective_transformed !== undefined;
+    if (!history || history.length < 2) {
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      if (res && res.status === 'INFEASIBLE_CERTIFIED') {
+        if (subEl) subEl.textContent = 'Proof of primal infeasibility via Farkas ray certificate';
+        svg.innerHTML = `
+          <rect width="${width}" height="${height}" fill="transparent"/>
+          <g transform="translate(${width / 2}, ${height / 2 - 8})">
+            <text x="0" y="0" fill="var(--rust)" font-family="var(--font-sans)" font-size="12" font-weight="600" text-anchor="middle">
+              Infeasible model — no iterative trajectory (Exact Farkas ray certified in ℚ)
+            </text>
+            <text x="0" y="20" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="10.5" text-anchor="middle">
+              Certificate vector y satisfies: y ≥ 0, Aᵀy ≤ 0, bᵀy &gt; 0
+            </text>
+          </g>
+        `;
+      } else {
+        if (subEl) subEl.textContent = 'Contraction of infinity-norm KKT residuals over iterations';
+        svg.innerHTML = `
+          <rect width="${width}" height="${height}" fill="transparent"/>
+          <g transform="translate(${width / 2}, ${height / 2 - 8})">
+            <text x="0" y="0" fill="var(--text-secondary)" font-family="var(--font-sans)" font-size="12" font-weight="500" text-anchor="middle">
+              Baseline scenario loaded — click &quot;Run optimisation&quot; to generate certified convergence trajectory
+            </text>
+            <text x="0" y="20" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="10.5" text-anchor="middle">
+              Sparse LU revised simplex verifies feasibility &amp; KKT optimality at final basis
+            </text>
+          </g>
+        `;
+      }
+      return;
+    }
 
-    if (isObjHistory) {
-      const maxIter = history.length - 1;
-      const objs = history.map(h => h.objective_transformed);
+    const first = history[0];
+    const isLP = first.objective_transformed !== undefined || (first.objective !== undefined && first.primal_residual === undefined);
+    const isMILP = first.nodes !== undefined;
+    const isQP = first.primal_residual !== undefined && first.complementarity !== undefined;
+    const isPDHG = first.primal_residual !== undefined && !isQP;
+
+    if (isLP) {
+      const iterKey = first.iteration !== undefined ? 'iteration' : 'iter';
+      const objKey = first.objective_transformed !== undefined ? 'objective_transformed' : 'objective';
+
+      const pts = history.filter(h => Number.isFinite(h[objKey]));
+      if (pts.length < 2) return;
+
+      const maxIter = pts[pts.length - 1][iterKey] || (pts.length - 1) || 1;
+      if (subEl) subEl.textContent = `Primal simplex objective progression across ${maxIter} pivot iterations`;
+
+      const objs = pts.map(h => Number(h[objKey]));
       const minObj = Math.min(...objs);
       const maxObj = Math.max(...objs);
       const range = (maxObj - minObj) || 1.0;
 
       let pathD = '';
-      history.forEach((pt, idx) => {
-        const x = padL + (idx / maxIter) * plotW;
-        const normY = (pt.objective_transformed - minObj) / range;
+      pts.forEach((pt, idx) => {
+        const iterVal = pt[iterKey] !== undefined ? pt[iterKey] : idx;
+        const x = padL + (iterVal / maxIter) * plotW;
+        const normY = (pt[objKey] - minObj) / range;
         const y = padT + (1.0 - normY) * plotH;
         pathD += (idx === 0 ? `M ${x.toFixed(1)},${y.toFixed(1)}` : ` L ${x.toFixed(1)},${y.toFixed(1)}`);
       });
 
+      let gridLines = '';
+      const gridTicks = 3;
+      for (let i = 0; i <= gridTicks; i++) {
+        const y = padT + (i / gridTicks) * plotH;
+        const val = maxObj - (i / gridTicks) * range;
+        gridLines += `
+          <line class="chart-grid-line" x1="${padL}" y1="${y}" x2="${width - padR}" y2="${y}" stroke="var(--border-subtle)" stroke-width="0.75" stroke-dasharray="2,3"/>
+          <text class="chart-tick-label" x="${padL - 8}" y="${y + 3}" text-anchor="end">$${val.toFixed(0)}</text>
+        `;
+      }
+
       svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
       svg.innerHTML = `
-        <line class="chart-axis-line" x1="${padL}" y1="${height - padB}" x2="${width - padR}" y2="${height - padB}" />
-        <line class="chart-axis-line" x1="${padL}" y1="${padT}" x2="${padL}" y2="${height - padB}" />
-        <path class="chart-curve drawing" d="${pathD}" />
+        ${gridLines}
+        <line class="chart-axis-line" x1="${padL}" y1="${height - padB}" x2="${width - padR}" y2="${height - padB}" stroke="var(--border-strong)" stroke-width="1"/>
+        <line class="chart-axis-line" x1="${padL}" y1="${padT}" x2="${padL}" y2="${height - padB}" stroke="var(--border-strong)" stroke-width="1"/>
+        <path class="chart-curve drawing" d="${pathD}" fill="none" stroke="var(--rust)" stroke-width="2"/>
         <text class="chart-tick-label" x="${padL}" y="${height - 8}">Iter 0</text>
         <text class="chart-tick-label" x="${width - padR}" y="${height - 8}" text-anchor="end">Iter ${maxIter}</text>
-        <text class="chart-tick-label" x="${padL - 8}" y="${padT + 8}" text-anchor="end">$${maxObj.toFixed(0)}</text>
-        <text class="chart-tick-label" x="${padL - 8}" y="${height - padB}" text-anchor="end">$${minObj.toFixed(0)}</text>
       `;
-    } else {
-      const maxIter = history[history.length - 1].iter || 100;
-      const minLog = -16;
-      const maxLog = 0;
 
-      let pathD = '';
-      history.forEach((pt, idx) => {
-        const x = padL + (pt.iter / maxIter) * plotW;
-        const logRes = Math.max(minLog, Math.min(maxLog, Math.log10(Math.max(1e-16, pt.res))));
-        const y = padT + ((maxLog - logRes) / (maxLog - minLog)) * plotH;
-        pathD += (idx === 0 ? `M ${x.toFixed(1)},${y.toFixed(1)}` : ` L ${x.toFixed(1)},${y.toFixed(1)}`);
+    } else if (isMILP) {
+      const pts = history.filter(h => h.nodes !== undefined);
+      if (pts.length < 2) return;
+
+      const maxNodes = pts[pts.length - 1].nodes || pts.length;
+      if (subEl) subEl.textContent = `Branch-and-bound node bounds across ${maxNodes} explored nodes`;
+
+      const bounds = pts.map(h => h.node_bound).filter(v => v !== null && Number.isFinite(v));
+      const incs = pts.map(h => h.incumbent).filter(v => v !== null && Number.isFinite(v));
+      const allVals = [...bounds, ...incs];
+      const minV = allVals.length ? Math.min(...allVals) : -10000;
+      const maxV = allVals.length ? Math.max(...allVals) : 0;
+      const range = (maxV - minV) || 1.0;
+
+      let pathBound = '';
+      pts.forEach((pt) => {
+        if (pt.node_bound === null || !Number.isFinite(pt.node_bound)) return;
+        const x = padL + (pt.nodes / maxNodes) * plotW;
+        const normY = (pt.node_bound - minV) / range;
+        const y = padT + (1.0 - normY) * plotH;
+        pathBound += (pathBound === '' ? `M ${x.toFixed(1)},${y.toFixed(1)}` : ` L ${x.toFixed(1)},${y.toFixed(1)}`);
+      });
+
+      let pathInc = '';
+      pts.forEach((pt) => {
+        if (pt.incumbent === null || !Number.isFinite(pt.incumbent)) return;
+        const x = padL + (pt.nodes / maxNodes) * plotW;
+        const normY = (pt.incumbent - minV) / range;
+        const y = padT + (1.0 - normY) * plotH;
+        pathInc += (pathInc === '' ? `M ${x.toFixed(1)},${y.toFixed(1)}` : ` L ${x.toFixed(1)},${y.toFixed(1)}`);
+      });
+
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      svg.innerHTML = `
+        <line class="chart-axis-line" x1="${padL}" y1="${height - padB}" x2="${width - padR}" y2="${height - padB}" stroke="var(--border-strong)" stroke-width="1"/>
+        <line class="chart-axis-line" x1="${padL}" y1="${padT}" x2="${padL}" y2="${height - padB}" stroke="var(--border-strong)" stroke-width="1"/>
+        ${pathBound ? `<path class="chart-curve drawing" d="${pathBound}" fill="none" stroke="var(--rust)" stroke-width="2"/>` : ''}
+        ${pathInc ? `<path class="chart-curve drawing" d="${pathInc}" fill="none" stroke="var(--olive)" stroke-width="2" stroke-dasharray="3,2"/>` : ''}
+        <text class="chart-tick-label" x="${padL}" y="${height - 8}">Node 0</text>
+        <text class="chart-tick-label" x="${width - padR}" y="${height - 8}" text-anchor="end">Nodes ${maxNodes}</text>
+        <text class="chart-tick-label" x="${padL - 8}" y="${padT + 8}" text-anchor="end">$${maxV.toFixed(0)}</text>
+        <text class="chart-tick-label" x="${padL - 8}" y="${height - padB}" text-anchor="end">$${minV.toFixed(0)}</text>
+      `;
+
+    } else {
+      // QP or PDHG (Log-Scale KKT Residuals)
+      const modeLabel = isQP ? 'Mehrotra IPM KKT residual contraction' : 'First-order PDHG residual contraction';
+      if (subEl) subEl.textContent = `${modeLabel} (log scale)`;
+
+      const iterKey = first.iteration !== undefined ? 'iteration' : 'iter';
+      const pts = history.filter(h => (h.primal_residual !== undefined || h.res !== undefined));
+      if (pts.length < 2) return;
+
+      const maxIter = pts[pts.length - 1][iterKey] || (pts.length - 1) || 1;
+      const minLog = -16;
+      const maxLog = 4;
+
+      const calcLog = (v) => {
+        const num = Number(v);
+        if (!Number.isFinite(num) || num <= 0) return minLog;
+        return Math.max(minLog, Math.min(maxLog, Math.log10(num)));
+      };
+
+      let pathPrimal = '';
+      let pathDual = '';
+
+      pts.forEach((pt, idx) => {
+        const iterVal = pt[iterKey] !== undefined ? pt[iterKey] : idx;
+        const x = padL + (iterVal / maxIter) * plotW;
+
+        const pVal = pt.primal_residual !== undefined ? pt.primal_residual : pt.res;
+        const logP = calcLog(pVal);
+        const yP = padT + ((maxLog - logP) / (maxLog - minLog)) * plotH;
+        pathPrimal += (idx === 0 ? `M ${x.toFixed(1)},${yP.toFixed(1)}` : ` L ${x.toFixed(1)},${yP.toFixed(1)}`);
+
+        if (pt.dual_residual !== undefined) {
+          const logD = calcLog(pt.dual_residual);
+          const yD = padT + ((maxLog - logD) / (maxLog - minLog)) * plotH;
+          pathDual += (idx === 0 ? `M ${x.toFixed(1)},${yD.toFixed(1)}` : ` L ${x.toFixed(1)},${yD.toFixed(1)}`);
+        }
       });
 
       let gridLines = '';
-      const ticks = [0, -4, -8, -12, -16];
+      const ticks = [4, 0, -4, -8, -12, -16];
       ticks.forEach(t => {
         const y = padT + ((maxLog - t) / (maxLog - minLog)) * plotH;
         gridLines += `
-          <line class="chart-grid-line" x1="${padL}" y1="${y}" x2="${width - padR}" y2="${y}" />
+          <line class="chart-grid-line" x1="${padL}" y1="${y}" x2="${width - padR}" y2="${y}" stroke="var(--border-subtle)" stroke-width="0.75" stroke-dasharray="2,3"/>
           <text class="chart-tick-label" x="${padL - 8}" y="${y + 3}" text-anchor="end">1e${t}</text>
         `;
       });
@@ -763,11 +893,21 @@
       svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
       svg.innerHTML = `
         ${gridLines}
-        <line class="chart-axis-line" x1="${padL}" y1="${height - padB}" x2="${width - padR}" y2="${height - padB}" />
-        <line class="chart-axis-line" x1="${padL}" y1="${padT}" x2="${padL}" y2="${height - padB}" />
-        <path class="chart-curve drawing" d="${pathD}" />
+        <line class="chart-axis-line" x1="${padL}" y1="${height - padB}" x2="${width - padR}" y2="${height - padB}" stroke="var(--border-strong)" stroke-width="1"/>
+        <line class="chart-axis-line" x1="${padL}" y1="${padT}" x2="${padL}" y2="${height - padB}" stroke="var(--border-strong)" stroke-width="1"/>
+        ${pathDual ? `<path class="chart-curve drawing" d="${pathDual}" fill="none" stroke="var(--olive)" stroke-width="1.75" stroke-dasharray="3,2"/>` : ''}
+        <path class="chart-curve drawing" d="${pathPrimal}" fill="none" stroke="var(--rust)" stroke-width="2"/>
         <text class="chart-tick-label" x="${padL}" y="${height - 8}">Iter 0</text>
         <text class="chart-tick-label" x="${width - padR}" y="${height - 8}" text-anchor="end">Iter ${maxIter}</text>
+        <!-- Legend -->
+        <g transform="translate(${width - padR - 170}, ${padT + 8})">
+          <line x1="0" y1="0" x2="16" y2="0" stroke="var(--rust)" stroke-width="2"/>
+          <text x="22" y="3.5" fill="var(--text-secondary)" font-size="9.5" font-family="var(--font-sans)">Primal residual</text>
+          ${pathDual ? `
+            <line x1="0" y1="12" x2="16" y2="12" stroke="var(--olive)" stroke-width="1.75" stroke-dasharray="3,2"/>
+            <text x="22" y="15.5" fill="var(--text-secondary)" font-size="9.5" font-family="var(--font-sans)">Dual residual</text>
+          ` : ''}
+        </g>
       `;
     }
   }
@@ -1043,6 +1183,7 @@
       }
       return;
     }
+    const thisGen = ++STATE.solveGen;
     STATE.isSolving = true;
     STATE.isStale = false;
 
@@ -1083,6 +1224,8 @@
         }
       }
 
+      if (thisGen !== STATE.solveGen) return;
+
       if (stagePill) stagePill.textContent = 'Executing sparse LU solver…';
 
       let resultData = null;
@@ -1101,7 +1244,18 @@
         }
       }
 
+      if (thisGen !== STATE.solveGen) return;
+
       if (resultData) {
+        resultData.inputs = {
+          c_arab: Number(pArab),
+          c_basrah: Number(pBasrah),
+          min_gas: Number(dGas),
+          min_dsl: Number(dDsl),
+          scenario: STATE.activeScenario,
+          model: STATE.activeModel,
+          backend: STATE.activeBackend
+        };
         STATE.solveResult = resultData;
         STATE.resultSource = 'live';
 
@@ -1126,10 +1280,12 @@
       console.error('Solve error:', err);
       if (stagePill) stagePill.textContent = 'Execution error';
     } finally {
-      STATE.isSolving = false;
-      if (solveBtn) {
-        solveBtn.disabled = false;
-        solveBtn.innerHTML = '<span>Run optimization</span>';
+      if (thisGen === STATE.solveGen) {
+        STATE.isSolving = false;
+        if (solveBtn) {
+          solveBtn.disabled = false;
+          solveBtn.innerHTML = '<span>Run optimisation</span>';
+        }
       }
     }
   }
@@ -1160,14 +1316,22 @@
       }
     }
     if (primResEl) {
-      primResEl.textContent = res.verification && res.verification.primal_residual !== undefined && res.verification.primal_residual !== null
-        ? res.verification.primal_residual.toExponential(2)
-        : (res.status === 'INFEASIBLE_CERTIFIED' ? 'Certified ray' : '1.42e-15');
+      if (res.verification && res.verification.primal_residual !== undefined && res.verification.primal_residual !== null) {
+        primResEl.textContent = res.verification.primal_residual.toExponential(2);
+      } else if (res.status === 'INFEASIBLE_CERTIFIED') {
+        primResEl.textContent = 'Certified ray';
+      } else {
+        primResEl.textContent = '-';
+      }
     }
     if (dualResEl) {
-      dualResEl.textContent = res.verification && res.verification.dual_residual !== undefined && res.verification.dual_residual !== null
-        ? res.verification.dual_residual.toExponential(2)
-        : (res.status === 'INFEASIBLE_CERTIFIED' ? 'Certified ray' : '2.84e-14');
+      if (res.verification && res.verification.dual_residual !== undefined && res.verification.dual_residual !== null) {
+        dualResEl.textContent = res.verification.dual_residual.toExponential(2);
+      } else if (res.status === 'INFEASIBLE_CERTIFIED') {
+        dualResEl.textContent = 'Certified ray';
+      } else {
+        dualResEl.textContent = '-';
+      }
     }
 
     const provPill = document.getElementById('solve-provenance-pill');
@@ -1267,7 +1431,12 @@
     if (marginEl) marginEl.textContent = '$' + margin.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     if (cduEl) cduEl.textContent = `${cduIntake.toFixed(1)} kbpd`;
     if (fccEl) fccEl.textContent = `${fccFeed.toFixed(1)} kbpd (${((fccFeed / 50) * 100).toFixed(0)}%)`;
-    if (kktEl) kktEl.textContent = `Residual ${res.verification?.primal_residual ? res.verification.primal_residual.toExponential(2) : '1.19e-16'}`;
+    if (kktEl) {
+      const resVal = res.verification?.primal_residual;
+      kktEl.textContent = (resVal !== undefined && resVal !== null)
+        ? `Residual ${resVal.toExponential(2)}`
+        : 'Residual verified';
+    }
     if (statusEl) statusEl.textContent = 'Live verified';
 
     renderRefineryPFD();
@@ -1349,7 +1518,6 @@
     if (!container) return;
 
     const isIdentical = STATE.compareA === STATE.compareB;
-    const deltaMargin = (scB.netMargin || 0) - (scA.netMargin || 0);
     const deltaArab = (scB.cduArab || 0) - (scA.cduArab || 0);
     const deltaBasrah = (scB.cduBasrah || 0) - (scA.cduBasrah || 0);
     const deltaFCC = (scB.fccThroughput || 0) - (scA.fccThroughput || 0);
@@ -1366,12 +1534,16 @@
       return `<span style="color: ${color}; font-weight: 600;" class="tabular">${sign}${prefix}${val.toFixed(1)}${suffix}</span>`;
     };
 
+    const deltaMarginHtml = (scA.netMargin !== null && scB.netMargin !== null)
+      ? fmtDelta(scB.netMargin - scA.netMargin, '$')
+      : `<span style="color: var(--text-muted); font-weight: 500;">N/A (Infeasible)</span>`;
+
     container.innerHTML = `
       <tr>
         <td><strong>Net operational plan margin</strong></td>
         <td class="num tabular">${scA.netMargin !== null ? '$' + scA.netMargin.toFixed(2) : 'Infeasible'}</td>
         <td class="num tabular">${scB.netMargin !== null ? '$' + scB.netMargin.toFixed(2) : 'Infeasible'}</td>
-        <td class="num tabular">${fmtDelta(deltaMargin, '$')}</td>
+        <td class="num tabular">${deltaMarginHtml}</td>
       </tr>
       <tr>
         <td>Arab Light crude intake</td>
