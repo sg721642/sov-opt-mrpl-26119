@@ -219,8 +219,8 @@ Ablation evaluated 4 configurations on `afiro`, `sc50a`, `blend`, and `sc105` (m
 4. `no_scaling_no_restart`: Restart=False, Scaling=False
 
 ### Findings:
-- On `afiro`, `no_restart` converged in **6,500 iterations** (245.5 ms) vs **12,000 iterations** (457.5 ms) for `baseline_restarted_scaled`. This demonstrates that ergodic restarting is **not universally necessary or faster** for all LP instances.
-- On `blend`, Pock-Chambolle diagonal scaling is essential: disabling scaling (`no_scaling`) causes the solver to hit `LIMIT_REACHED` at 30,000 iterations without reaching target KKT tolerance.
+- On `afiro`, `no_restart` converged in **6,500 iterations** (245.5 ms) vs **12,000 iterations** (457.5 ms) for `baseline_restarted_scaled`. This demonstrates that ergodic restart benefit is instance-dependent and not universally necessary or faster for all LP instances.
+- Diagonal scaling was necessary for convergence on BLEND under the tested Gate 9 ablation configuration (disabling scaling caused the solver to hit `LIMIT_REACHED` at 30,000 iterations without reaching target KKT tolerance).
 
 ---
 
