@@ -1,0 +1,489 @@
+{
+  "timestamp_utc": "2026-10-02T13:04:30.101691+00:00",
+  "backend": "pdhg-cuda",
+  "max_iter": 30000,
+  "tolerance": 1e-07,
+  "machine_metadata": {
+    "system": "Windows",
+    "architecture": "AMD64",
+    "python": "3.11.17"
+  },
+  "device_info": {
+    "cuda_available": true,
+    "device_count": 1,
+    "device_name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "compute_capability": "12.0",
+    "total_memory_bytes": 8546484224,
+    "free_memory_bytes": 7314866176,
+    "runtime_version": "12090"
+  },
+  "experiments": [
+    {
+      "name": "baseline_restarted_scaled",
+      "scaling": true,
+      "restart": 1000
+    },
+    {
+      "name": "no_scaling",
+      "scaling": false,
+      "restart": 1000
+    },
+    {
+      "name": "no_restart",
+      "scaling": true,
+      "restart": false
+    },
+    {
+      "name": "no_scaling_no_restart",
+      "scaling": false,
+      "restart": false
+    }
+  ],
+  "results": {
+    "afiro": {
+      "instance": "afiro",
+      "dimensions": {
+        "n": 32,
+        "m": 27,
+        "nnz": 83
+      },
+      "reference_objective": -464.75314286,
+      "configurations": {
+        "baseline_restarted_scaled": {
+          "config": {
+            "name": "baseline_restarted_scaled",
+            "scaling": true,
+            "restart": 1000
+          },
+          "status": "OPTIMAL_VERIFIED",
+          "gpu_executed": true,
+          "iterations": 12000,
+          "elapsed_seconds": 0.4574750000028871,
+          "setup_seconds": 0.02873869999893941,
+          "iteration_seconds": 0.3440635000151815,
+          "verification_seconds": 0.08452639998722589,
+          "telemetry": {
+            "kernel_launches_count": 48033,
+            "restarts_count": 11,
+            "convergence_checks_count": 120
+          },
+          "objective": -464.7531422334188,
+          "relative_discrepancy": 1.3482021740353703e-09,
+          "primal_residual": 8.06988852481012e-09,
+          "dual_residual": 5.9314049828193317e-08,
+          "relative_gap": 6.702910760546615e-10,
+          "kkt_passed": true
+        },
+        "no_scaling": {
+          "config": {
+            "name": "no_scaling",
+            "scaling": false,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.1134070999978576,
+          "setup_seconds": 0.020489199996518437,
+          "iteration_seconds": 0.8696217000106117,
+          "verification_seconds": 0.22301469998637913,
+          "telemetry": {
+            "kernel_launches_count": 120090,
+            "restarts_count": 30,
+            "convergence_checks_count": 300
+          },
+          "objective": -428.4205749167573,
+          "relative_discrepancy": 0.07817605647518425,
+          "primal_residual": 7.729230054199285e-17,
+          "dual_residual": 0.008026301561555817,
+          "relative_gap": 1.7532092617105607e-17,
+          "kkt_passed": false
+        },
+        "no_restart": {
+          "config": {
+            "name": "no_restart",
+            "scaling": true,
+            "restart": false
+          },
+          "status": "OPTIMAL_VERIFIED",
+          "gpu_executed": true,
+          "iterations": 6500,
+          "elapsed_seconds": 0.24546720000216737,
+          "setup_seconds": 0.0010276000029989518,
+          "iteration_seconds": 0.19813739999517566,
+          "verification_seconds": 0.0461803000071086,
+          "telemetry": {
+            "kernel_launches_count": 26000,
+            "restarts_count": 0,
+            "convergence_checks_count": 65
+          },
+          "objective": -464.7531436946866,
+          "relative_discrepancy": 1.7959783926703323e-09,
+          "primal_residual": 1.0408155414676096e-08,
+          "dual_residual": 9.452128390186047e-09,
+          "relative_gap": 9.000971908222655e-10,
+          "kkt_passed": true
+        },
+        "no_scaling_no_restart": {
+          "config": {
+            "name": "no_scaling_no_restart",
+            "scaling": false,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.1057986999949208,
+          "setup_seconds": 0.0007467999967047945,
+          "iteration_seconds": 0.8856354999588802,
+          "verification_seconds": 0.21932020004169317,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -464.7531363005334,
+          "relative_discrepancy": 1.4113872522039977e-08,
+          "primal_residual": 5.090073446157905e-08,
+          "dual_residual": 5.802859433488847e-07,
+          "relative_gap": 7.0480243702488975e-09,
+          "kkt_passed": false
+        }
+      }
+    },
+    "sc50a": {
+      "instance": "sc50a",
+      "dimensions": {
+        "n": 48,
+        "m": 50,
+        "nnz": 130
+      },
+      "reference_objective": -64.575077059,
+      "configurations": {
+        "baseline_restarted_scaled": {
+          "config": {
+            "name": "baseline_restarted_scaled",
+            "scaling": true,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.1994756999993115,
+          "setup_seconds": 0.0007777999999234453,
+          "iteration_seconds": 0.9004041000298457,
+          "verification_seconds": 0.29812519996630726,
+          "telemetry": {
+            "kernel_launches_count": 120090,
+            "restarts_count": 30,
+            "convergence_checks_count": 300
+          },
+          "objective": -34.983362557567624,
+          "relative_discrepancy": 0.4582528716829165,
+          "primal_residual": 1.658988825825522e-16,
+          "dual_residual": 0.007466578961405317,
+          "relative_gap": 2.9214875312902423e-16,
+          "kkt_passed": false
+        },
+        "no_scaling": {
+          "config": {
+            "name": "no_scaling",
+            "scaling": false,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.1844037999981083,
+          "setup_seconds": 0.000967699998000171,
+          "iteration_seconds": 0.8764496999938274,
+          "verification_seconds": 0.30682250000973,
+          "telemetry": {
+            "kernel_launches_count": 120090,
+            "restarts_count": 30,
+            "convergence_checks_count": 300
+          },
+          "objective": -20.73568051985783,
+          "relative_discrepancy": 0.6788903480376437,
+          "primal_residual": 5.018977859661672e-16,
+          "dual_residual": 0.007425611164054069,
+          "relative_gap": 4.654282922500294e-16,
+          "kkt_passed": false
+        },
+        "no_restart": {
+          "config": {
+            "name": "no_restart",
+            "scaling": true,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.2059616999977152,
+          "setup_seconds": 0.0006790999977965839,
+          "iteration_seconds": 0.8998884999164147,
+          "verification_seconds": 0.3052330000864458,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -60.66677955054368,
+          "relative_discrepancy": 0.06052331156934493,
+          "primal_residual": 7.493262513301718e-07,
+          "dual_residual": 0.004364505940036502,
+          "relative_gap": 3.087000440874439e-06,
+          "kkt_passed": false
+        },
+        "no_scaling_no_restart": {
+          "config": {
+            "name": "no_scaling_no_restart",
+            "scaling": false,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.2201344999994035,
+          "setup_seconds": 0.0010334000035072677,
+          "iteration_seconds": 0.9138775000465102,
+          "verification_seconds": 0.3050762999555445,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -39.75956725963396,
+          "relative_discrepancy": 0.38428927892246983,
+          "primal_residual": 1.6951268704888706e-16,
+          "dual_residual": 0.007403224954177494,
+          "relative_gap": 1.836370000571252e-16,
+          "kkt_passed": false
+        }
+      }
+    },
+    "blend": {
+      "instance": "blend",
+      "dimensions": {
+        "n": 83,
+        "m": 74,
+        "nnz": 491
+      },
+      "reference_objective": -30.812149846,
+      "configurations": {
+        "baseline_restarted_scaled": {
+          "config": {
+            "name": "baseline_restarted_scaled",
+            "scaling": true,
+            "restart": 1000
+          },
+          "status": "OPTIMAL_VERIFIED",
+          "gpu_executed": true,
+          "iterations": 11500,
+          "elapsed_seconds": 0.511938800002099,
+          "setup_seconds": 0.0009922000026563182,
+          "iteration_seconds": 0.335942600024282,
+          "verification_seconds": 0.17480329998215893,
+          "telemetry": {
+            "kernel_launches_count": 46033,
+            "restarts_count": 11,
+            "convergence_checks_count": 115
+          },
+          "objective": -30.81215032045006,
+          "relative_discrepancy": 1.5398148466732463e-08,
+          "primal_residual": 8.791278894907408e-08,
+          "dual_residual": 1.5621243679583384e-08,
+          "relative_gap": 7.580219033194197e-09,
+          "kkt_passed": true
+        },
+        "no_scaling": {
+          "config": {
+            "name": "no_scaling",
+            "scaling": false,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.3622088999982225,
+          "setup_seconds": 0.0008401000013691373,
+          "iteration_seconds": 0.9062350999520277,
+          "verification_seconds": 0.45493150004767813,
+          "telemetry": {
+            "kernel_launches_count": 120090,
+            "restarts_count": 30,
+            "convergence_checks_count": 300
+          },
+          "objective": -22.38122035143395,
+          "relative_discrepancy": 0.27362353930848954,
+          "primal_residual": 0.011068976800219258,
+          "dual_residual": 0.0020891217445486382,
+          "relative_gap": 0.009866807793865867,
+          "kkt_passed": false
+        },
+        "no_restart": {
+          "config": {
+            "name": "no_restart",
+            "scaling": true,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.3562083000069833,
+          "setup_seconds": 0.0008061999978963286,
+          "iteration_seconds": 0.9036433999717701,
+          "verification_seconds": 0.45154750002984656,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -30.816847076233575,
+          "relative_discrepancy": 0.00015244733837306034,
+          "primal_residual": 0.0003565531298294403,
+          "dual_residual": 3.998148806920272e-05,
+          "relative_gap": 8.767031317948679e-05,
+          "kkt_passed": false
+        },
+        "no_scaling_no_restart": {
+          "config": {
+            "name": "no_scaling_no_restart",
+            "scaling": false,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.3609814000010374,
+          "setup_seconds": 0.0013305999964359216,
+          "iteration_seconds": 0.9055859000000055,
+          "verification_seconds": 0.45387099999788916,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -27.696130896046366,
+          "relative_discrepancy": 0.10112955329399556,
+          "primal_residual": 0.018222926362736744,
+          "dual_residual": 0.0019039346112701325,
+          "relative_gap": 0.014005214606746554,
+          "kkt_passed": false
+        }
+      }
+    },
+    "sc105": {
+      "instance": "sc105",
+      "dimensions": {
+        "n": 103,
+        "m": 105,
+        "nnz": 280
+      },
+      "reference_objective": -52.202061212,
+      "configurations": {
+        "baseline_restarted_scaled": {
+          "config": {
+            "name": "baseline_restarted_scaled",
+            "scaling": true,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.5033100000000559,
+          "setup_seconds": 0.0013307999979588203,
+          "iteration_seconds": 0.9336412000047858,
+          "verification_seconds": 0.5680693999966024,
+          "telemetry": {
+            "kernel_launches_count": 120090,
+            "restarts_count": 30,
+            "convergence_checks_count": 300
+          },
+          "objective": -2.6996642425840345,
+          "relative_discrepancy": 0.948284336290471,
+          "primal_residual": 1.0849297569791162e-16,
+          "dual_residual": 0.0017153868599064368,
+          "relative_gap": 1.4328991225380856e-16,
+          "kkt_passed": false
+        },
+        "no_scaling": {
+          "config": {
+            "name": "no_scaling",
+            "scaling": false,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.4977054999981192,
+          "setup_seconds": 0.0015442000003531575,
+          "iteration_seconds": 0.9323930999889853,
+          "verification_seconds": 0.5634947000144166,
+          "telemetry": {
+            "kernel_launches_count": 120090,
+            "restarts_count": 30,
+            "convergence_checks_count": 300
+          },
+          "objective": -1.712943809231791,
+          "relative_discrepancy": 0.9671862802069198,
+          "primal_residual": 1.404746228070558e-15,
+          "dual_residual": 0.0015770723879159271,
+          "relative_gap": 1.5472400634111482e-15,
+          "kkt_passed": false
+        },
+        "no_restart": {
+          "config": {
+            "name": "no_restart",
+            "scaling": true,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.4627937999975984,
+          "setup_seconds": 0.0008614999969722703,
+          "iteration_seconds": 0.9065617001033388,
+          "verification_seconds": 0.5551122998949722,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -5.0800084956331215,
+          "relative_discrepancy": 0.9026856722189094,
+          "primal_residual": 1.0690199931746688e-13,
+          "dual_residual": 0.0017110286051242023,
+          "relative_gap": 4.969843734085452e-13,
+          "kkt_passed": false
+        },
+        "no_scaling_no_restart": {
+          "config": {
+            "name": "no_scaling_no_restart",
+            "scaling": false,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.4917696999982581,
+          "setup_seconds": 0.0009588000029907562,
+          "iteration_seconds": 0.9327455999882659,
+          "verification_seconds": 0.5577969000078156,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -3.1796925454816503,
+          "relative_discrepancy": 0.9390887548947834,
+          "primal_residual": 1.066029217540647e-06,
+          "dual_residual": 0.0015679987124232186,
+          "relative_gap": 4.919306483918418e-06,
+          "kkt_passed": false
+        }
+      }
+    }
+  },
+  "total_elapsed_seconds": 18.28441659999953
+}

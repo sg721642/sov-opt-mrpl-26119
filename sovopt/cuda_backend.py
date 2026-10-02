@@ -12,6 +12,7 @@ RawKernel JIT kernels without requiring a system-level CUDA toolkit install.
 
 import os
 import sys
+import numpy as np
 
 
 def _ensure_cuda_path():
@@ -103,15 +104,85 @@ def get_device_info():
         }
 
 CUDA_SPMV_SOURCE = r'''
-extern "C" __global__ void spmv(const int* p, const int* j, const double* a,
-                                const double* x, double* out, int m) {
-    int r = blockDim.x * blockIdx.x + threadIdx.x;
-    if (r < m) {
+extern "C" __global__ void spmv(
+    const int* __restrict__ p,
+    const int* __restrict__ j,
+    const double* __restrict__ a,
+    const double* __restrict__ x,
+    double* __restrict__ out,
+    int m
+) {
+    int stride = blockDim.x * gridDim.x;
+    for (int r = blockDim.x * blockIdx.x + threadIdx.x; r < m; r += stride) {
         double v = 0.0;
-        for (int k = p[r]; k < p[r + 1]; ++k) {
+        int start = p[r];
+        int end = p[r + 1];
+        #pragma unroll 4
+        for (int k = start; k < end; ++k) {
             v += a[k] * x[j[k]];
         }
         out[r] = v;
+    }
+}
+'''
+
+CUDA_DUAL_STEP_SOURCE = r'''
+extern "C" __global__ void dual_step_fused(
+    const double* __restrict__ Ax_bar,
+    const double* __restrict__ hh,
+    const double* __restrict__ sigma,
+    double* __restrict__ y,
+    double* __restrict__ avgy,
+    double inv_count,
+    int m
+) {
+    int stride = blockDim.x * gridDim.x;
+    for (int i = blockDim.x * blockIdx.x + threadIdx.x; i < m; i += stride) {
+        double y_val = y[i];
+        double step = y_val + sigma[i] * (Ax_bar[i] - hh[i]);
+        double y_new = step > 0.0 ? step : 0.0;
+        avgy[i] += (y_new - avgy[i]) * inv_count;
+        y[i] = y_new;
+    }
+}
+'''
+
+CUDA_PRIMAL_STEP_SOURCE = r'''
+extern "C" __global__ void primal_step_fused(
+    const double* __restrict__ ATy,
+    const double* __restrict__ c,
+    const double* __restrict__ tau,
+    const double* __restrict__ lo,
+    const double* __restrict__ hi,
+    double* __restrict__ x,
+    double* __restrict__ bar,
+    double* __restrict__ avg,
+    double inv_count,
+    int n
+) {
+    int stride = blockDim.x * gridDim.x;
+    for (int j = blockDim.x * blockIdx.x + threadIdx.x; j < n; j += stride) {
+        double x_old = x[j];
+        double step = x_old - tau[j] * (c[j] + ATy[j]);
+        double l = lo[j];
+        double u = hi[j];
+        double x_new = fmin(fmax(step, l), u);
+        bar[j] = 2.0 * x_new - x_old;
+        avg[j] += (x_new - avg[j]) * inv_count;
+        x[j] = x_new;
+    }
+}
+'''
+
+CUDA_VECTOR_COPY_SOURCE = r'''
+extern "C" __global__ void vector_copy(
+    const double* __restrict__ src,
+    double* __restrict__ dst,
+    int n
+) {
+    int stride = blockDim.x * gridDim.x;
+    for (int i = blockDim.x * blockIdx.x + threadIdx.x; i < n; i += stride) {
+        dst[i] = src[i];
     }
 }
 '''
@@ -131,17 +202,15 @@ class CUDACSR:
         self.p = xp.asarray(p, dtype=xp.int32)
         self.j = xp.asarray(j, dtype=xp.int32)
         self.a = xp.asarray(a, dtype=xp.float64)
+        self.m_int32 = np.int32(self.m)
+        self.block = (128,)
+        self.grid = (min(65535, max(1, (self.m + 127) // 128)),)
 
     def dot(self, x, out=None):
-        xp = self.xp
         if out is None:
-            out = xp.zeros(self.m, dtype=xp.float64)
-        else:
-            out.fill(0.0)
+            out = self.xp.zeros(self.m, dtype=self.xp.float64)
         if self.m > 0:
-            block = 128
-            grid = (self.m + block - 1) // block
-            self.kernel((grid,), (block,), (self.p, self.j, self.a, x, out, self.xp.int32(self.m)))
+            self.kernel(self.grid, self.block, (self.p, self.j, self.a, x, out, self.m_int32))
         return out
 
 class CUDABackend:
@@ -153,13 +222,21 @@ class CUDABackend:
             raise RuntimeError("CUDA is not available on this machine.")
         import cupy as cp
         self.xp = cp
-        self.kernel = cp.RawKernel(CUDA_SPMV_SOURCE, "spmv")
+        self.spmv_kernel = cp.RawKernel(CUDA_SPMV_SOURCE, "spmv")
+        self.dual_step_kernel = cp.RawKernel(CUDA_DUAL_STEP_SOURCE, "dual_step_fused")
+        self.primal_step_kernel = cp.RawKernel(CUDA_PRIMAL_STEP_SOURCE, "primal_step_fused")
+        self.copy_kernel = cp.RawKernel(CUDA_VECTOR_COPY_SOURCE, "vector_copy")
+        # Compatibility alias
+        self.kernel = self.spmv_kernel
 
     def build_csr(self, p, j, a, shape):
-        return CUDACSR(p, j, a, shape, self.kernel, self.xp)
+        return CUDACSR(p, j, a, shape, self.spmv_kernel, self.xp)
 
     def asarray(self, a, dtype=None):
         return self.xp.asarray(a, dtype=dtype if dtype is not None else self.xp.float64)
+
+    def zeros(self, shape, dtype=None):
+        return self.xp.zeros(shape, dtype=dtype if dtype is not None else self.xp.float64)
 
     def to_cpu(self, a):
         return self.xp.asnumpy(a)
