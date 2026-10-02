@@ -1,12 +1,14 @@
 """SOV-OPT reference prototype 0.3.2."""
+__version__ = '0.3.2'
+
 import platform, time
 from datetime import datetime, timezone
 from .model import Model, load
 from .dispatcher import auto_dispatch, inspect_model
-from .refinery_twin import build_refinery_twin
+from .refinery_twin import build_refinery_twin, validate_refinery_physical_solution
 from .qplib import read_qplib, parse_probtype, QPLIBError, UnsupportedQPLIBError, QPLIBFormatError
-
-__version__ = '0.3.2'
+from .trust_passport import generate_trust_passport
+from .farkas_lens import rank_farkas_contributions
 
 def solve(model, backend='cpu', tol=1e-7, method='auto', presolve=True, scaling=True, **options):
     model.validate()

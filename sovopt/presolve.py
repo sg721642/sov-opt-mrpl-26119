@@ -192,8 +192,8 @@ class PresolveStack:
         # Recover singleton row multipliers to satisfy stationarity on original variables
         for op in singleton_ops:
             info = op.info
-            orig_i = info['orig_i']
-            col_j = info['col_j']
+            orig_i = info.get('true_orig_i', info['orig_i'])
+            col_j = info.get('true_col_j', info['col_j'])
             coeff = info['coeff']
             imp_l = info.get('imp_l', -np.inf)
             imp_u = info.get('imp_u', np.inf)
@@ -274,6 +274,8 @@ def presolve_model(model: Model, tol: float = 1e-8, max_passes: int = 5) -> Pres
     }
 
     dyn_initial = compute_dynamic_range(A, c)
+    orig_row_indices = list(range(len(model.A)))
+    orig_col_indices = list(range(len(model.c)))
 
     for pass_num in range(max_passes):
         counts['passes'] += 1
@@ -297,7 +299,8 @@ def presolve_model(model: Model, tol: float = 1e-8, max_passes: int = 5) -> Pres
                     return _certify_infeasibility(model, tol, f'Empty row {i} violates bounds: {rl} <= 0 <= {ru}', counts)
                 else:
                     # Redundant empty row: remove it
-                    stack.push('empty_row', orig_i=i)
+                    true_i = orig_row_indices.pop(i)
+                    stack.push('empty_row', orig_i=i, true_orig_i=true_i)
                     A = np.delete(A, i, axis=0)
                     row_lower = np.delete(row_lower, i)
                     row_upper = np.delete(row_upper, i)
@@ -330,7 +333,9 @@ def presolve_model(model: Model, tol: float = 1e-8, max_passes: int = 5) -> Pres
                     return _certify_infeasibility(model, tol, f'Singleton row {i} contradicts bounds on variable {names[j]}', counts)
 
                 # Tighten and remove row
-                stack.push('singleton_row', orig_i=i, col_j=j, coeff=a,
+                true_j = orig_col_indices[j]
+                true_i = orig_row_indices.pop(i)
+                stack.push('singleton_row', orig_i=i, col_j=j, true_orig_i=true_i, true_col_j=true_j, coeff=a,
                            row_l=rl, row_u=ru, imp_l=imp_l, imp_u=imp_u,
                            old_l=lower[j], old_u=upper[j])
                 lower[j] = new_l
@@ -378,7 +383,8 @@ def presolve_model(model: Model, tol: float = 1e-8, max_passes: int = 5) -> Pres
 
             # Redundancy check
             if (np.isneginf(rl) or L_i >= rl - tol) and (np.isposinf(ru) or U_i <= ru + tol):
-                stack.push('redundant_row', orig_i=i)
+                true_i = orig_row_indices.pop(i)
+                stack.push('redundant_row', orig_i=i, true_orig_i=true_i)
                 A = np.delete(A, i, axis=0)
                 row_lower = np.delete(row_lower, i)
                 row_upper = np.delete(row_upper, i)
@@ -394,7 +400,8 @@ def presolve_model(model: Model, tol: float = 1e-8, max_passes: int = 5) -> Pres
                 val = float(lower[j])
                 col_coeff = A[:, j].copy() if len(A) > 0 else np.zeros(0)
                 c_val = float(c[j])
-                stack.push('fixed_var', orig_j=j, val=val, coeff_col=col_coeff, c_j=c_val)
+                true_j = orig_col_indices.pop(j)
+                stack.push('fixed_var', orig_j=j, true_orig_j=true_j, val=val, coeff_col=col_coeff, c_j=c_val)
                 if len(A) > 0:
                     row_lower -= col_coeff * val
                     row_upper -= col_coeff * val
@@ -428,7 +435,8 @@ def presolve_model(model: Model, tol: float = 1e-8, max_passes: int = 5) -> Pres
                 else:
                     val = max(lj, min(0.0, uj))
 
-                stack.push('empty_col', orig_j=j, val=val, c_j=cj)
+                true_j = orig_col_indices.pop(j)
+                stack.push('empty_col', orig_j=j, true_orig_j=true_j, val=val, c_j=cj)
                 obj_offset += cj * val
                 A = np.delete(A, j, axis=1) if len(A) > 0 else A[:, :0]
                 c = np.delete(c, j)

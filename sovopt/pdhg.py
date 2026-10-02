@@ -59,7 +59,7 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
                 'x': [],
                 'dual': [],
                 'objective': None,
-                'verification': {'kkt_passed': False, 'primal_residual': float('nan'), 'dual_residual': float('nan')},
+                'verification': {'kkt_passed': False, 'primal_residual': None, 'dual_residual': None},
                 'iterations': 0,
                 'setup_seconds': 0.0,
                 'iteration_seconds': 0.0,

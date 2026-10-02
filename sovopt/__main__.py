@@ -1,4 +1,4 @@
-import argparse, json, sys
+import argparse, json, math, sys
 from pathlib import Path
 from . import load, solve, build_refinery_twin, __version__
 
@@ -44,6 +44,7 @@ def format_trust_report(r):
 
 def main():
     p = argparse.ArgumentParser(description='SOV-OPT Sovereign Numerical Optimization Core (MRPL PS 26119)')
+    p.add_argument('--version', action='version', version=f'sovopt {__version__}')
     p.add_argument('model', nargs='?', default=None, help='Path to model JSON/MPS file')
     p.add_argument('--refinery-twin', choices=['lp', 'milp', 'qp', 'infeasible'], default=None, help='Run built-in MRPL refinery planning twin variant')
     p.add_argument('--backend', choices=['cpu', 'pdhg-cpu', 'pdhg-cuda'], default='cpu', help='Solver hardware/execution backend')
@@ -69,13 +70,26 @@ def main():
 
     try:
         r = solve(model, backend=a.backend, tol=a.tol, method=a.method, scaling=not a.no_scaling)
-    except (ValueError, KeyError, OSError) as e:
+    except (ValueError, KeyError, OSError, RuntimeError) as e:
         r = {'status': 'INVALID_MODEL', 'message': str(e)}
+
+    def _sanitize(o):
+        if isinstance(o, float):
+            return None if not math.isfinite(o) else o
+        if isinstance(o, dict):
+            return {k: _sanitize(v) for k, v in o.items()}
+        if isinstance(o, (list, tuple)):
+            return [_sanitize(v) for v in o]
+        if hasattr(o, 'item'):
+            v = o.item()
+            return None if isinstance(v, float) and not math.isfinite(v) else v
+        if hasattr(o, 'tolist'):
+            return _sanitize(o.tolist())
+        return o
 
     use_report = a.report or (a.format == 'report')
     output_text = format_trust_report(r) if use_report else json.dumps(
-        r, indent=2, allow_nan=False,
-        default=lambda o: o.item() if hasattr(o, 'item') else (o.tolist() if hasattr(o, 'tolist') else str(o))
+        _sanitize(r), indent=2, allow_nan=False, default=str
     )
 
     if a.output:
