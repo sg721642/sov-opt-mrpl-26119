@@ -1,0 +1,81 @@
+{
+  "timestamp_utc": "2026-10-02T12:14:07.572696+00:00",
+  "backend_requested": "pdhg-cuda",
+  "stratum_requested": "ALL",
+  "warmups": 1,
+  "repeats": 2,
+  "tolerance": 1e-07,
+  "max_iter": 50000,
+  "machine_metadata": {
+    "system": "Windows",
+    "architecture": "AMD64",
+    "python": "3.11.17"
+  },
+  "device_info": {
+    "cuda_available": true,
+    "device_count": 1,
+    "device_name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "compute_capability": "12.0",
+    "total_memory_bytes": 8546484224,
+    "free_memory_bytes": 7314866176,
+    "runtime_version": "12090"
+  },
+  "summary": {
+    "total_instances": 1,
+    "optimal_verified": 1,
+    "limit_reached": 0,
+    "cuda_unavailable": 0,
+    "numerical_failure": 0
+  },
+  "results": {
+    "afiro": {
+      "instance": "afiro",
+      "stratum": "SMALL",
+      "status": "OPTIMAL_VERIFIED",
+      "gpu_executed": true,
+      "backend": "pdhg-cuda",
+      "iterations": 12000,
+      "median_elapsed_seconds": 0.43681125000148313,
+      "min_elapsed_seconds": 0.43677999999636086,
+      "max_elapsed_seconds": 0.4368425000066054,
+      "stdev_elapsed_seconds": 4.419418106814881e-05,
+      "raw_timings_seconds": [
+        0.43677999999636086,
+        0.4368425000066054
+      ],
+      "objective": -464.7531422334188,
+      "reference_objective": -464.75314286,
+      "objective_discrepancy": 6.265811975936231e-07,
+      "relative_discrepancy": 1.3482021740353703e-09,
+      "setup_seconds": 0.0011261999970884062,
+      "iteration_seconds": 0.34912639996036887,
+      "verification_seconds": 0.08650340003805468,
+      "telemetry": {
+        "kernel_launches_count": 48033,
+        "restarts_count": 11,
+        "convergence_checks_count": 120
+      },
+      "verification": {
+        "feasible": true,
+        "objective": -464.7531422334188,
+        "primal_residual": 8.06988852481012e-09,
+        "absolute_primal_violation": 5.822419595347128e-07,
+        "integrality_residual": 0.0,
+        "kkt_passed": true,
+        "precision_bits": 53,
+        "certification": "floating-point residual checks",
+        "dual_residual": 5.9314049828193317e-08,
+        "dual_sign_violation": 0.0,
+        "complementarity": 1.878545703003737e-09,
+        "relative_duality_gap": 6.702910760546615e-10,
+        "kkt_evaluated": true,
+        "kkt_status": "FULL_KKT_PASSED",
+        "primal_feasibility_passed": true,
+        "dual_feasibility_passed": true,
+        "stationarity_passed": true,
+        "complementarity_passed": true
+      }
+    }
+  },
+  "total_elapsed_seconds": 1.0171216000017012
+}

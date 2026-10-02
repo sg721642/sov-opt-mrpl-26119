@@ -148,8 +148,6 @@ extern "C" __global__ void dual_step_fused(
 '''
 
 CUDA_PRIMAL_STEP_SOURCE = r'''
-#include <math.h>
-
 extern "C" __global__ void primal_step_fused(
     const double* __restrict__ ATy,
     const double* __restrict__ c,

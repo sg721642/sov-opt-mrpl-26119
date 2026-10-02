@@ -1,0 +1,19 @@
+{
+  "timestamp_utc": "2026-10-02T12:09:40.651103+00:00",
+  "git_sha": "9407fb55322fdd0b651857d5f177b85409b4b8a4",
+  "machine": {
+    "system": "Windows",
+    "release": "10",
+    "architecture": "AMD64",
+    "processor": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+    "python": "3.11.17",
+    "numpy": "2.4.6"
+  },
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "compute_capability": "12.0",
+    "vram_total_gb": 7.96,
+    "cuda_runtime_version": "12090"
+  },
+  "power_source": "AC_CONNECTED_FULL"
+}

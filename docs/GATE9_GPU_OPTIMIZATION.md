@@ -2,10 +2,10 @@
 
 ## 1. Executive Summary & Context
 
-SOV-OPT is an original numerical optimization research prototype for MRPL SIH Problem Statement 26119. In Gate 8, physical execution on an NVIDIA GeForce RTX 5050 Laptop GPU (Ada/Blackwell architecture, 8GB VRAM) proved the mathematical correctness and end-to-end viability of sovereign CUDA restarted PDHG across 18 frozen continuous LP instances from the Netlib LP benchmark library (Git commit `c5788513e6a4517961652a3aa335f8f5243a16b8`, final evidence commit `cefa9c33f1d4d44be13765c0d2d5b72c89c9a1a4`).
+SOV-OPT is an original numerical optimization research prototype for MRPL SIH Problem Statement 26119. In Gate 8, physical execution on an NVIDIA GeForce RTX 5050 Laptop GPU (8GB VRAM) proved the mathematical correctness and end-to-end viability of sovereign CUDA restarted PDHG across 18 frozen continuous LP instances from the Netlib LP benchmark library (Git commit `c5788513e6a4517961652a3aa335f8f5243a16b8`, final evidence commit `cefa9c33f1d4d44be13765c0d2d5b72c89c9a1a4`).
 
 ### Gate 8 Baseline Measured Performance
-- **Overall geometric-mean E2E CPU/CUDA speedup:** 0.62x
+- **Overall full-suite aggregate E2E CPU/CUDA speedup:** 0.62x
 - **SMALL stratum aggregate:** 0.11x
 - **MEDIUM stratum aggregate:** 0.34x
 - **LARGE stratum aggregate:** 0.91x (with `grow22` reaching 1.00x parity)
@@ -39,7 +39,7 @@ Detailed profiling of the Gate 8 CUDA implementation revealed five distinct perf
 
 ## 3. Architecture of Gate 9 Optimizations
 
-Gate 9 re-engineers the GPU execution pipeline to achieve **4 kernel launches per iteration and ZERO dynamic memory allocations**:
+Gate 9 re-engineers the GPU execution pipeline to achieve **4 kernel launches per iteration and is designed to reuse preallocated work buffers to avoid dynamic memory allocation during iteration loops**:
 
 ### 3.1 Dedicated Sovereign RawKernels
 All core arithmetic and vector updates are implemented as dedicated CUDA C RawKernels:
@@ -87,8 +87,8 @@ Solver outputs now include:
 
 All Gate 9 performance optimizations preserve exact mathematical equivalence:
 1. **FP64 Precision:** All device computations strictly execute in IEEE 754 64-bit double precision (`double`, `float64`).
-2. **Algorithm Equivalence:** Chambolle-Pock first-order step sequence, Pock-Chambolle l1 diagonal preconditioning, and ergodic running average restart mechanics are bit-for-bit identical to the reference CPU solver.
-3. **Sovereign Verification:** GPU accelerates; CPU verifies. Every solution is verified on CPU against the original model KKT conditions using exact Fraction arithmetic where applicable.
+2. **Algorithm Equivalence:** Chambolle-Pock first-order step sequence, Pock-Chambolle l1 diagonal preconditioning, and ergodic running average restart mechanics are mathematically equivalent within verified FP64 numerical tolerances to the reference CPU solver.
+3. **Sovereign Verification:** GPU accelerates; CPU verifies. Every solution is verified on CPU against the original model KKT conditions using floating numerical verification within tolerance.
 4. **Honest Failure Paths:** Non-finite iterate detection, `NUMERICAL_FAILURE`, and `LIMIT_REACHED` statuses remain active and unmodified.
 5. **Truthful Non-CUDA Behavior:** On Apple Silicon and non-CUDA environments, `pdhg-cuda` cleanly reports `CUDA_UNAVAILABLE` with `gpu_executed = False`.
 6. **Gate 8 Evidence Immutability:** Gate 8 evidence in `reports/gpu_validation/rtx5050_2026-10-02_c5788513/` is preserved without modification.

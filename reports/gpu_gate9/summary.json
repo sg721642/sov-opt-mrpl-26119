@@ -1,0 +1,942 @@
+{
+  "candidate_sha": "9407fb55322fdd0b651857d5f177b85409b4b8a4",
+  "gate8_sha": "cefa9c33f1d4d44be13765c0d2d5b72c89c9a1a4",
+  "gpu_device": "NVIDIA GeForce RTX 5050 Laptop GPU",
+  "compute_capability": "12.0",
+  "vram_gb": 7.96,
+  "driver_version": "12090",
+  "performance_conclusion": "Gate 9 CUDA optimizations significantly improved CUDA PDHG performance on the physical RTX 5050 by an overall aggregate factor of 1.79x compared to Gate 8 CUDA (SMALL stratum CUDA speedup improved by 5.57x, MEDIUM stratum CUDA speedup improved by 3.67x). Overall suite Gate 9 CUDA E2E speedup relative to Gate 9 CPU is 1.08x (SMALL: 0.61x, MEDIUM: 0.91x, LARGE: 1.14x).",
+  "strata_note": "The repository's LARGE stratum is relative to this frozen Netlib suite subset.",
+  "status_matching_note": "CPU and CUDA produced matching solver statuses across all 18 instances, with small numerical objective discrepancies in the recorded candidates.",
+  "suite_totals": {
+    "total_instances": 18,
+    "optimal_verified_instances": 3,
+    "limit_reached_instances": 15,
+    "gate9_total_cpu_seconds": 206.5652,
+    "gate9_total_cuda_seconds": 191.864,
+    "gate8_total_cuda_seconds": 342.6352,
+    "overall_speedup_cpu_over_cuda": 1.0766,
+    "overall_cuda_improvement_factor": 1.7858
+  },
+  "stratum_aggregates": {
+    "SMALL": {
+      "gate9_total_cpu_seconds": 5.5393,
+      "gate9_total_cuda_seconds": 9.1463,
+      "gate8_total_cuda_seconds": 50.933,
+      "aggregate_speedup_cpu_over_cuda": 0.6056,
+      "aggregate_cuda_improvement_factor": 5.5687
+    },
+    "MEDIUM": {
+      "gate9_total_cpu_seconds": 25.8942,
+      "gate9_total_cuda_seconds": 28.5941,
+      "gate8_total_cuda_seconds": 105.0718,
+      "aggregate_speedup_cpu_over_cuda": 0.9056,
+      "aggregate_cuda_improvement_factor": 3.6746
+    },
+    "LARGE": {
+      "gate9_total_cpu_seconds": 175.1316,
+      "gate9_total_cuda_seconds": 154.1237,
+      "gate8_total_cuda_seconds": 186.6303,
+      "aggregate_speedup_cpu_over_cuda": 1.1363,
+      "aggregate_cuda_improvement_factor": 1.2109
+    }
+  },
+  "per_instance": {
+    "afiro": {
+      "instance": "afiro",
+      "stratum": "SMALL",
+      "status": "OPTIMAL_VERIFIED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 2749.82,
+      "gate9_cuda_median_ms": 443.88,
+      "gate9_cpu_median_ms": 225.62,
+      "gate9_speedup_cpu_over_cuda": 0.5083,
+      "cuda_optimization_improvement_factor": 6.1949,
+      "objective_cuda": -464.7531422334188,
+      "objective_cpu": -464.75314223341877,
+      "reference_objective": -464.75314286,
+      "objective_discrepancy": 5.684341886080802e-14,
+      "relative_discrepancy": 1.2230884230498093e-16,
+      "iterations": 12000,
+      "telemetry": {
+        "setup_seconds": 0.0013937000039732084,
+        "iteration_seconds": 0.3581711999795516,
+        "verification_seconds": 0.08943350001936778,
+        "kernel_launches_count": 48033,
+        "restarts_count": 11,
+        "convergence_checks_count": 120
+      }
+    },
+    "kb2": {
+      "instance": "kb2",
+      "stratum": "SMALL",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 11384.73,
+      "gate9_cuda_median_ms": 1929.66,
+      "gate9_cpu_median_ms": 1156.47,
+      "gate9_speedup_cpu_over_cuda": 0.5993,
+      "cuda_optimization_improvement_factor": 5.8999,
+      "objective_cuda": -325.5566231752414,
+      "objective_cpu": -325.55662317524127,
+      "reference_objective": -1749.9001299,
+      "objective_discrepancy": 1.1368683772161603e-13,
+      "relative_discrepancy": 6.496761488217777e-17,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.0007330000007641502,
+        "iteration_seconds": 1.4619787998963147,
+        "verification_seconds": 0.46672370009764563,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "sc50a": {
+      "instance": "sc50a",
+      "stratum": "SMALL",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 11293.8,
+      "gate9_cuda_median_ms": 1991.68,
+      "gate9_cpu_median_ms": 1113.48,
+      "gate9_speedup_cpu_over_cuda": 0.5591,
+      "cuda_optimization_improvement_factor": 5.6705,
+      "objective_cuda": -54.57267387792076,
+      "objective_cpu": -54.57267387792081,
+      "reference_objective": -64.575077059,
+      "objective_discrepancy": 5.684341886080802e-14,
+      "relative_discrepancy": 8.802686957519566e-16,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.0006957000005058944,
+        "iteration_seconds": 1.5070037999685155,
+        "verification_seconds": 0.5144925000349758,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "sc50b": {
+      "instance": "sc50b",
+      "stratum": "SMALL",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 11277.15,
+      "gate9_cuda_median_ms": 2005.08,
+      "gate9_cpu_median_ms": 1111.3,
+      "gate9_speedup_cpu_over_cuda": 0.5542,
+      "cuda_optimization_improvement_factor": 5.6243,
+      "objective_cuda": -61.753278159160516,
+      "objective_cpu": -61.753278159160516,
+      "reference_objective": -70.0,
+      "objective_discrepancy": 0.0,
+      "relative_discrepancy": 0.0,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.0008614999969722703,
+        "iteration_seconds": 1.4738380999988294,
+        "verification_seconds": 0.49529469999833964,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "adlittle": {
+      "instance": "adlittle",
+      "stratum": "SMALL",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 11549.81,
+      "gate9_cuda_median_ms": 2263.26,
+      "gate9_cpu_median_ms": 1556.95,
+      "gate9_speedup_cpu_over_cuda": 0.6879,
+      "cuda_optimization_improvement_factor": 5.1032,
+      "objective_cuda": 225285.6217838146,
+      "objective_cpu": 225285.6217838147,
+      "reference_objective": 225494.96316,
+      "objective_discrepancy": 1.1641532182693481e-10,
+      "relative_discrepancy": 5.162657302652578e-16,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.0011363000012352131,
+        "iteration_seconds": 1.5138669000007212,
+        "verification_seconds": 0.7398484000004828,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "blend": {
+      "instance": "blend",
+      "stratum": "SMALL",
+      "status": "OPTIMAL_VERIFIED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 2677.71,
+      "gate9_cuda_median_ms": 512.73,
+      "gate9_cpu_median_ms": 375.52,
+      "gate9_speedup_cpu_over_cuda": 0.7324,
+      "cuda_optimization_improvement_factor": 5.2224,
+      "objective_cuda": -30.81215032045006,
+      "objective_cpu": -30.81215032045,
+      "reference_objective": -30.812149846,
+      "objective_discrepancy": 5.684341886080802e-14,
+      "relative_discrepancy": 1.8448378040777106e-15,
+      "iterations": 11500,
+      "telemetry": {
+        "setup_seconds": 0.0008365999965462834,
+        "iteration_seconds": 0.33822690002125455,
+        "verification_seconds": 0.16989209997700527,
+        "kernel_launches_count": 46033,
+        "restarts_count": 11,
+        "convergence_checks_count": 115
+      }
+    },
+    "sc105": {
+      "instance": "sc105",
+      "stratum": "MEDIUM",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 11886.38,
+      "gate9_cuda_median_ms": 2468.89,
+      "gate9_cpu_median_ms": 1642.74,
+      "gate9_speedup_cpu_over_cuda": 0.6654,
+      "cuda_optimization_improvement_factor": 4.8145,
+      "objective_cuda": -4.344483399476433,
+      "objective_cpu": -4.344483399476441,
+      "reference_objective": -52.202061212,
+      "objective_discrepancy": 7.993605777301127e-15,
+      "relative_discrepancy": 1.531281637488979e-16,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.0010939999992842786,
+        "iteration_seconds": 1.5373613001138438,
+        "verification_seconds": 0.9301927998822066,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "stocfor1": {
+      "instance": "stocfor1",
+      "stratum": "MEDIUM",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 12053.5,
+      "gate9_cuda_median_ms": 2584.2,
+      "gate9_cpu_median_ms": 1916.92,
+      "gate9_speedup_cpu_over_cuda": 0.7418,
+      "cuda_optimization_improvement_factor": 4.6643,
+      "objective_cuda": -38236.263408359904,
+      "objective_cpu": -38236.26340835981,
+      "reference_objective": -41131.976219,
+      "objective_discrepancy": 9.458744898438454e-11,
+      "relative_discrepancy": 2.2996086665218868e-15,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.0009183000001939945,
+        "iteration_seconds": 1.5493989000024158,
+        "verification_seconds": 1.0376177999933134,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "scagr7": {
+      "instance": "scagr7",
+      "stratum": "MEDIUM",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 12590.66,
+      "gate9_cuda_median_ms": 2991.12,
+      "gate9_cpu_median_ms": 2265.04,
+      "gate9_speedup_cpu_over_cuda": 0.7573,
+      "cuda_optimization_improvement_factor": 4.2093,
+      "objective_cuda": -2330635.049593187,
+      "objective_cpu": -2330635.0495931865,
+      "reference_objective": -2331389.2548,
+      "objective_discrepancy": 4.656612873077393e-10,
+      "relative_discrepancy": 1.9973553809129413e-16,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.000992599998426158,
+        "iteration_seconds": 1.6012619999601156,
+        "verification_seconds": 1.3885501000404474,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "recipe": {
+      "instance": "recipe",
+      "stratum": "MEDIUM",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 13279.22,
+      "gate9_cuda_median_ms": 3361.16,
+      "gate9_cpu_median_ms": 2815.53,
+      "gate9_speedup_cpu_over_cuda": 0.8377,
+      "cuda_optimization_improvement_factor": 3.9508,
+      "objective_cuda": -266.6149457954093,
+      "objective_cpu": -266.6149457954092,
+      "reference_objective": -266.616,
+      "objective_discrepancy": 1.1368683772161603e-13,
+      "relative_discrepancy": 4.2640665872121715e-16,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.0010968999995384365,
+        "iteration_seconds": 1.6154395000485238,
+        "verification_seconds": 1.7449648999463534,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "israel": {
+      "instance": "israel",
+      "stratum": "MEDIUM",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 12347.19,
+      "gate9_cuda_median_ms": 3225.63,
+      "gate9_cpu_median_ms": 3197.5,
+      "gate9_speedup_cpu_over_cuda": 0.9913,
+      "cuda_optimization_improvement_factor": 3.8278,
+      "objective_cuda": -892092.784749925,
+      "objective_cpu": -892092.784749925,
+      "reference_objective": -896644.82186,
+      "objective_discrepancy": 0.0,
+      "relative_discrepancy": 0.0,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.0011368999985279515,
+        "iteration_seconds": 1.8307095999480225,
+        "verification_seconds": 1.372766800050158,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "sc205": {
+      "instance": "sc205",
+      "stratum": "MEDIUM",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 13719.23,
+      "gate9_cuda_median_ms": 4186.34,
+      "gate9_cpu_median_ms": 3536.56,
+      "gate9_speedup_cpu_over_cuda": 0.8448,
+      "cuda_optimization_improvement_factor": 3.2771,
+      "objective_cuda": -0.29880767804786834,
+      "objective_cpu": -0.2988076780478682,
+      "reference_objective": -52.202061212,
+      "objective_discrepancy": 1.6653345369377348e-16,
+      "relative_discrepancy": 3.1901700781020396e-18,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.001304699995671399,
+        "iteration_seconds": 1.6601504999925965,
+        "verification_seconds": 2.5000810000055935,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "share1b": {
+      "instance": "share1b",
+      "stratum": "MEDIUM",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 13852.87,
+      "gate9_cuda_median_ms": 4078.65,
+      "gate9_cpu_median_ms": 3992.45,
+      "gate9_speedup_cpu_over_cuda": 0.9789,
+      "cuda_optimization_improvement_factor": 3.3964,
+      "objective_cuda": -54874.78251044188,
+      "objective_cpu": -54874.78251044197,
+      "reference_objective": -76589.318579,
+      "objective_discrepancy": 8.731149137020111e-11,
+      "relative_discrepancy": 1.1399956676744871e-15,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.0013586999994004145,
+        "iteration_seconds": 1.6890336000942625,
+        "verification_seconds": 2.3886922999081435,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "brandy": {
+      "instance": "brandy",
+      "stratum": "MEDIUM",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 15342.75,
+      "gate9_cuda_median_ms": 5698.08,
+      "gate9_cpu_median_ms": 6527.44,
+      "gate9_speedup_cpu_over_cuda": 1.1456,
+      "cuda_optimization_improvement_factor": 2.6926,
+      "objective_cuda": 1521.6857845050845,
+      "objective_cpu": 1521.6857845050847,
+      "reference_objective": 1518.5098965,
+      "objective_discrepancy": 2.2737367544323206e-13,
+      "relative_discrepancy": 1.4973473400950736e-16,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.0022349000064423308,
+        "iteration_seconds": 1.7763819000465446,
+        "verification_seconds": 3.9983137999515748,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "grow15": {
+      "instance": "grow15",
+      "stratum": "LARGE",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 41372.3,
+      "gate9_cuda_median_ms": 30456.71,
+      "gate9_cpu_median_ms": 34209.37,
+      "gate9_speedup_cpu_over_cuda": 1.1232,
+      "cuda_optimization_improvement_factor": 1.3584,
+      "objective_cuda": -36895204.26787624,
+      "objective_cpu": -36895204.26787689,
+      "reference_objective": -106870941.29,
+      "objective_discrepancy": 6.556510925292969e-07,
+      "relative_discrepancy": 6.134980048038995e-15,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.007121900001948234,
+        "iteration_seconds": 2.007897400013462,
+        "verification_seconds": 26.654800799988152,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "grow22": {
+      "instance": "grow22",
+      "stratum": "LARGE",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 72325.93,
+      "gate9_cuda_median_ms": 62497.02,
+      "gate9_cpu_median_ms": 74819.76,
+      "gate9_speedup_cpu_over_cuda": 1.1972,
+      "cuda_optimization_improvement_factor": 1.1573,
+      "objective_cuda": -56662392.816172875,
+      "objective_cpu": -56662392.81617385,
+      "reference_objective": -160834336.48,
+      "objective_discrepancy": 9.760260581970215e-07,
+      "relative_discrepancy": 6.0685179518143e-15,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.01840960000117775,
+        "iteration_seconds": 2.4835853000186034,
+        "verification_seconds": 59.991591099977086,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "scfxm2": {
+      "instance": "scfxm2",
+      "stratum": "LARGE",
+      "status": "LIMIT_REACHED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 51342.82,
+      "gate9_cuda_median_ms": 40671.05,
+      "gate9_cpu_median_ms": 44934.6,
+      "gate9_speedup_cpu_over_cuda": 1.1048,
+      "cuda_optimization_improvement_factor": 1.2624,
+      "objective_cuda": 37248.93313642605,
+      "objective_cpu": 37248.93313642604,
+      "reference_objective": 36660.261565,
+      "objective_discrepancy": 7.275957614183426e-12,
+      "relative_discrepancy": 1.9846987728886995e-16,
+      "iterations": 50000,
+      "telemetry": {
+        "setup_seconds": 0.017192599996633362,
+        "iteration_seconds": 2.469302000004973,
+        "verification_seconds": 38.601892799997586,
+        "kernel_launches_count": 200150,
+        "restarts_count": 50,
+        "convergence_checks_count": 500
+      }
+    },
+    "sctap2": {
+      "instance": "sctap2",
+      "stratum": "LARGE",
+      "status": "OPTIMAL_VERIFIED",
+      "gpu_executed": true,
+      "gate8_cuda_median_ms": 21589.29,
+      "gate9_cuda_median_ms": 20498.9,
+      "gate9_cpu_median_ms": 21167.92,
+      "gate9_speedup_cpu_over_cuda": 1.0326,
+      "cuda_optimization_improvement_factor": 1.0532,
+      "objective_cuda": 1724.8071794478092,
+      "objective_cpu": 1724.80717944781,
+      "reference_objective": 1724.8071429,
+      "objective_discrepancy": 9.094947017729282e-13,
+      "relative_discrepancy": 5.27302258410034e-16,
+      "iterations": 6000,
+      "telemetry": {
+        "setup_seconds": 0.04269430000567809,
+        "iteration_seconds": 0.2674262999862549,
+        "verification_seconds": 20.065272100015136,
+        "kernel_launches_count": 24015,
+        "restarts_count": 5,
+        "convergence_checks_count": 60
+      }
+    }
+  },
+  "ablation_summary": {
+    "afiro": {
+      "instance": "afiro",
+      "dimensions": {
+        "n": 32,
+        "m": 27,
+        "nnz": 83
+      },
+      "reference_objective": -464.75314286,
+      "configurations": {
+        "baseline_restarted_scaled": {
+          "config": {
+            "name": "baseline_restarted_scaled",
+            "scaling": true,
+            "restart": 1000
+          },
+          "status": "OPTIMAL_VERIFIED",
+          "gpu_executed": true,
+          "iterations": 12000,
+          "elapsed_seconds": 0.4574750000028871,
+          "setup_seconds": 0.02873869999893941,
+          "iteration_seconds": 0.3440635000151815,
+          "verification_seconds": 0.08452639998722589,
+          "telemetry": {
+            "kernel_launches_count": 48033,
+            "restarts_count": 11,
+            "convergence_checks_count": 120
+          },
+          "objective": -464.7531422334188,
+          "relative_discrepancy": 1.3482021740353703e-09,
+          "primal_residual": 8.06988852481012e-09,
+          "dual_residual": 5.9314049828193317e-08,
+          "relative_gap": 6.702910760546615e-10,
+          "kkt_passed": true
+        },
+        "no_scaling": {
+          "config": {
+            "name": "no_scaling",
+            "scaling": false,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.1134070999978576,
+          "setup_seconds": 0.020489199996518437,
+          "iteration_seconds": 0.8696217000106117,
+          "verification_seconds": 0.22301469998637913,
+          "telemetry": {
+            "kernel_launches_count": 120090,
+            "restarts_count": 30,
+            "convergence_checks_count": 300
+          },
+          "objective": -428.4205749167573,
+          "relative_discrepancy": 0.07817605647518425,
+          "primal_residual": 7.729230054199285e-17,
+          "dual_residual": 0.008026301561555817,
+          "relative_gap": 1.7532092617105607e-17,
+          "kkt_passed": false
+        },
+        "no_restart": {
+          "config": {
+            "name": "no_restart",
+            "scaling": true,
+            "restart": false
+          },
+          "status": "OPTIMAL_VERIFIED",
+          "gpu_executed": true,
+          "iterations": 6500,
+          "elapsed_seconds": 0.24546720000216737,
+          "setup_seconds": 0.0010276000029989518,
+          "iteration_seconds": 0.19813739999517566,
+          "verification_seconds": 0.0461803000071086,
+          "telemetry": {
+            "kernel_launches_count": 26000,
+            "restarts_count": 0,
+            "convergence_checks_count": 65
+          },
+          "objective": -464.7531436946866,
+          "relative_discrepancy": 1.7959783926703323e-09,
+          "primal_residual": 1.0408155414676096e-08,
+          "dual_residual": 9.452128390186047e-09,
+          "relative_gap": 9.000971908222655e-10,
+          "kkt_passed": true
+        },
+        "no_scaling_no_restart": {
+          "config": {
+            "name": "no_scaling_no_restart",
+            "scaling": false,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.1057986999949208,
+          "setup_seconds": 0.0007467999967047945,
+          "iteration_seconds": 0.8856354999588802,
+          "verification_seconds": 0.21932020004169317,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -464.7531363005334,
+          "relative_discrepancy": 1.4113872522039977e-08,
+          "primal_residual": 5.090073446157905e-08,
+          "dual_residual": 5.802859433488847e-07,
+          "relative_gap": 7.0480243702488975e-09,
+          "kkt_passed": false
+        }
+      }
+    },
+    "sc50a": {
+      "instance": "sc50a",
+      "dimensions": {
+        "n": 48,
+        "m": 50,
+        "nnz": 130
+      },
+      "reference_objective": -64.575077059,
+      "configurations": {
+        "baseline_restarted_scaled": {
+          "config": {
+            "name": "baseline_restarted_scaled",
+            "scaling": true,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.1994756999993115,
+          "setup_seconds": 0.0007777999999234453,
+          "iteration_seconds": 0.9004041000298457,
+          "verification_seconds": 0.29812519996630726,
+          "telemetry": {
+            "kernel_launches_count": 120090,
+            "restarts_count": 30,
+            "convergence_checks_count": 300
+          },
+          "objective": -34.983362557567624,
+          "relative_discrepancy": 0.4582528716829165,
+          "primal_residual": 1.658988825825522e-16,
+          "dual_residual": 0.007466578961405317,
+          "relative_gap": 2.9214875312902423e-16,
+          "kkt_passed": false
+        },
+        "no_scaling": {
+          "config": {
+            "name": "no_scaling",
+            "scaling": false,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.1844037999981083,
+          "setup_seconds": 0.000967699998000171,
+          "iteration_seconds": 0.8764496999938274,
+          "verification_seconds": 0.30682250000973,
+          "telemetry": {
+            "kernel_launches_count": 120090,
+            "restarts_count": 30,
+            "convergence_checks_count": 300
+          },
+          "objective": -20.73568051985783,
+          "relative_discrepancy": 0.6788903480376437,
+          "primal_residual": 5.018977859661672e-16,
+          "dual_residual": 0.007425611164054069,
+          "relative_gap": 4.654282922500294e-16,
+          "kkt_passed": false
+        },
+        "no_restart": {
+          "config": {
+            "name": "no_restart",
+            "scaling": true,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.2059616999977152,
+          "setup_seconds": 0.0006790999977965839,
+          "iteration_seconds": 0.8998884999164147,
+          "verification_seconds": 0.3052330000864458,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -60.66677955054368,
+          "relative_discrepancy": 0.06052331156934493,
+          "primal_residual": 7.493262513301718e-07,
+          "dual_residual": 0.004364505940036502,
+          "relative_gap": 3.087000440874439e-06,
+          "kkt_passed": false
+        },
+        "no_scaling_no_restart": {
+          "config": {
+            "name": "no_scaling_no_restart",
+            "scaling": false,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.2201344999994035,
+          "setup_seconds": 0.0010334000035072677,
+          "iteration_seconds": 0.9138775000465102,
+          "verification_seconds": 0.3050762999555445,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -39.75956725963396,
+          "relative_discrepancy": 0.38428927892246983,
+          "primal_residual": 1.6951268704888706e-16,
+          "dual_residual": 0.007403224954177494,
+          "relative_gap": 1.836370000571252e-16,
+          "kkt_passed": false
+        }
+      }
+    },
+    "blend": {
+      "instance": "blend",
+      "dimensions": {
+        "n": 83,
+        "m": 74,
+        "nnz": 491
+      },
+      "reference_objective": -30.812149846,
+      "configurations": {
+        "baseline_restarted_scaled": {
+          "config": {
+            "name": "baseline_restarted_scaled",
+            "scaling": true,
+            "restart": 1000
+          },
+          "status": "OPTIMAL_VERIFIED",
+          "gpu_executed": true,
+          "iterations": 11500,
+          "elapsed_seconds": 0.511938800002099,
+          "setup_seconds": 0.0009922000026563182,
+          "iteration_seconds": 0.335942600024282,
+          "verification_seconds": 0.17480329998215893,
+          "telemetry": {
+            "kernel_launches_count": 46033,
+            "restarts_count": 11,
+            "convergence_checks_count": 115
+          },
+          "objective": -30.81215032045006,
+          "relative_discrepancy": 1.5398148466732463e-08,
+          "primal_residual": 8.791278894907408e-08,
+          "dual_residual": 1.5621243679583384e-08,
+          "relative_gap": 7.580219033194197e-09,
+          "kkt_passed": true
+        },
+        "no_scaling": {
+          "config": {
+            "name": "no_scaling",
+            "scaling": false,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.3622088999982225,
+          "setup_seconds": 0.0008401000013691373,
+          "iteration_seconds": 0.9062350999520277,
+          "verification_seconds": 0.45493150004767813,
+          "telemetry": {
+            "kernel_launches_count": 120090,
+            "restarts_count": 30,
+            "convergence_checks_count": 300
+          },
+          "objective": -22.38122035143395,
+          "relative_discrepancy": 0.27362353930848954,
+          "primal_residual": 0.011068976800219258,
+          "dual_residual": 0.0020891217445486382,
+          "relative_gap": 0.009866807793865867,
+          "kkt_passed": false
+        },
+        "no_restart": {
+          "config": {
+            "name": "no_restart",
+            "scaling": true,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.3562083000069833,
+          "setup_seconds": 0.0008061999978963286,
+          "iteration_seconds": 0.9036433999717701,
+          "verification_seconds": 0.45154750002984656,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -30.816847076233575,
+          "relative_discrepancy": 0.00015244733837306034,
+          "primal_residual": 0.0003565531298294403,
+          "dual_residual": 3.998148806920272e-05,
+          "relative_gap": 8.767031317948679e-05,
+          "kkt_passed": false
+        },
+        "no_scaling_no_restart": {
+          "config": {
+            "name": "no_scaling_no_restart",
+            "scaling": false,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.3609814000010374,
+          "setup_seconds": 0.0013305999964359216,
+          "iteration_seconds": 0.9055859000000055,
+          "verification_seconds": 0.45387099999788916,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -27.696130896046366,
+          "relative_discrepancy": 0.10112955329399556,
+          "primal_residual": 0.018222926362736744,
+          "dual_residual": 0.0019039346112701325,
+          "relative_gap": 0.014005214606746554,
+          "kkt_passed": false
+        }
+      }
+    },
+    "sc105": {
+      "instance": "sc105",
+      "dimensions": {
+        "n": 103,
+        "m": 105,
+        "nnz": 280
+      },
+      "reference_objective": -52.202061212,
+      "configurations": {
+        "baseline_restarted_scaled": {
+          "config": {
+            "name": "baseline_restarted_scaled",
+            "scaling": true,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.5033100000000559,
+          "setup_seconds": 0.0013307999979588203,
+          "iteration_seconds": 0.9336412000047858,
+          "verification_seconds": 0.5680693999966024,
+          "telemetry": {
+            "kernel_launches_count": 120090,
+            "restarts_count": 30,
+            "convergence_checks_count": 300
+          },
+          "objective": -2.6996642425840345,
+          "relative_discrepancy": 0.948284336290471,
+          "primal_residual": 1.0849297569791162e-16,
+          "dual_residual": 0.0017153868599064368,
+          "relative_gap": 1.4328991225380856e-16,
+          "kkt_passed": false
+        },
+        "no_scaling": {
+          "config": {
+            "name": "no_scaling",
+            "scaling": false,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.4977054999981192,
+          "setup_seconds": 0.0015442000003531575,
+          "iteration_seconds": 0.9323930999889853,
+          "verification_seconds": 0.5634947000144166,
+          "telemetry": {
+            "kernel_launches_count": 120090,
+            "restarts_count": 30,
+            "convergence_checks_count": 300
+          },
+          "objective": -1.712943809231791,
+          "relative_discrepancy": 0.9671862802069198,
+          "primal_residual": 1.404746228070558e-15,
+          "dual_residual": 0.0015770723879159271,
+          "relative_gap": 1.5472400634111482e-15,
+          "kkt_passed": false
+        },
+        "no_restart": {
+          "config": {
+            "name": "no_restart",
+            "scaling": true,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.4627937999975984,
+          "setup_seconds": 0.0008614999969722703,
+          "iteration_seconds": 0.9065617001033388,
+          "verification_seconds": 0.5551122998949722,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -5.0800084956331215,
+          "relative_discrepancy": 0.9026856722189094,
+          "primal_residual": 1.0690199931746688e-13,
+          "dual_residual": 0.0017110286051242023,
+          "relative_gap": 4.969843734085452e-13,
+          "kkt_passed": false
+        },
+        "no_scaling_no_restart": {
+          "config": {
+            "name": "no_scaling_no_restart",
+            "scaling": false,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 1.4917696999982581,
+          "setup_seconds": 0.0009588000029907562,
+          "iteration_seconds": 0.9327455999882659,
+          "verification_seconds": 0.5577969000078156,
+          "telemetry": {
+            "kernel_launches_count": 120000,
+            "restarts_count": 0,
+            "convergence_checks_count": 300
+          },
+          "objective": -3.1796925454816503,
+          "relative_discrepancy": 0.9390887548947834,
+          "primal_residual": 1.066029217540647e-06,
+          "dual_residual": 0.0015679987124232186,
+          "relative_gap": 4.919306483918418e-06,
+          "kkt_passed": false
+        }
+      }
+    }
+  }
+}
