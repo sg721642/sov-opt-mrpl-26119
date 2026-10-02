@@ -1,5 +1,19 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.5] - 2026-10-02
+
+### Gate 9.1: Cross-Platform Checksum Portability Hardening
+
+- **fix(integrity): Make checksum verification cross-platform via dual-mode policy:**
+  - Upgraded `scripts/verify_checksums.py` to support explicit dual-mode verification:
+    - `mode: "raw"`: Verifies raw disk bytes without modification. Applied to all optimization model files (`*.mps`, `*.qplib`, `*.sol`, `*.solu`, `*.lp`), benchmark datasets (`data/netlib/*`, `data/miplib/*`, etc.), and primary provenance manifests (`data/manifests/*.json`).
+    - `mode: "text-lf"`: Verifies canonical text with CRLF normalized to LF (`\r\n` -> `\n`). Applied to source code, documentation, scripts, tests, web files, and repository bookkeeping files subject to OS Git checkout EOL conversions.
+  - Upgraded `SHA256SUMS.json` schema to explicit dictionary entries (`{"sha256": "...", "mode": "raw" | "text-lf"}`), with full backward compatibility for legacy string-only hashes.
+  - Enhanced `.gitattributes` to explicitly mark all benchmark directories (`data/quarantined/*`, `data/raw/*`, `data/refinery/*`, `data/miplib2017-v37.solu`) with `-text`, guaranteeing byte immutability across Windows and POSIX systems.
+  - Guaranteed 100% preservation of all 81 public benchmark provenance SHA-256 digests across Netlib, MIPLIB, and QPLIB manifests without alteration.
+  - Added unit test suite `tests/test_checksum_portability.py` with 8 comprehensive cross-platform regression tests.
+  - Authored `docs/INTEGRITY.md` detailing the dual-mode checksum architecture, EOL normalization rationale, and provenance invariants.
+
 ## [0.3.4] - 2026-10-02
 
 ### Gate 9: GPU Performance Engineering for Restarted PDHG
