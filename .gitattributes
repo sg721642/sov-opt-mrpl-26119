@@ -1,30 +1,40 @@
 # SOV-OPT .gitattributes
-# Prevent CRLF line-ending conversion for benchmark data files.
-# These files must remain byte-stable across Windows/macOS so that
-# SHA256 provenance values recorded in the manifests remain valid.
+# Canonical line-ending and binary preservation policy.
+#
+# Provenance & Benchmark Invariant:
+# Optimization instances, model formulations, solutions, and cryptographic
+# provenance manifests must remain byte-for-byte frozen across all operating
+# systems (macOS, Linux, Windows). No line ending conversion may ever be applied
+# to these files, ensuring primary SHA-256 provenance digests remain authentic.
 
-# Benchmark data formats — never apply CRLF conversion
+# Benchmark data formats — byte-frozen canonical models & solutions
 *.mps       -text
 *.qplib     -text
 *.sol       -text
+*.solu      -text
 *.lp        -text
 
-# Manifest JSON files — binary-safe to preserve canonical SHA256 provenance
+# Primary provenance manifests — frozen cryptographic checksums
 data/manifests/*.json  -text
 
-# Verified / catalogue data
-data/verified/*        -text
-data/netlib/*          -text
-data/qplib/*           -text
-data/miplib/*          -text
+# Benchmark and mathematical test fixture directories — byte-frozen
+data/verified/*               -text
+data/netlib/*                 -text
+data/qplib/*                  -text
+data/miplib/*                 -text
 data/certificate_validation/* -text
+data/quarantined/*            -text
+data/raw/*                    -text
+data/refinery/*               -text
+data/miplib2017-v37.solu      -text
 
-# Normal text files — use system default (CRLF on Windows, LF elsewhere)
-*.py    text eol=lf
-*.md    text eol=lf
-*.json  text eol=lf
-*.html  text eol=lf
-*.sh    text eol=lf
-
-# Exception: manifest JSON files are already covered above with -text
-# The wildcard *.json rule below is overridden by the more specific rule above
+# Normal repository text files — canonical LF checkout
+*.py        text eol=lf
+*.md        text eol=lf
+*.json      text eol=lf
+*.html      text eol=lf
+*.sh        text eol=lf
+*.toml      text eol=lf
+*.txt       text eol=lf
+*.command   text eol=lf
+*.bat       text eol=crlf
