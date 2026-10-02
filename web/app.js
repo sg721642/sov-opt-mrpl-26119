@@ -1665,6 +1665,65 @@
         a.click();
         URL.revokeObjectURL(url);
       },
+      exportTrustPassportJSON: () => {
+        const isLive = STATE.resultSource === 'live' && STATE.solveResult;
+        const res = STATE.solveResult;
+        const v = (res && res.verification) || {};
+        const acceptedInputs = (res && res.inputs) ? res.inputs : {
+          scenario: STATE.activeScenario,
+          c_arab: STATE.crudeCostArab,
+          c_basrah: STATE.crudeCostBasrah,
+          min_gas: STATE.gasolineDemand,
+          min_dsl: STATE.dieselDemand
+        };
+        const isVerified = isLive ? (
+          res.status === 'OPTIMAL_VERIFIED' ? Boolean(v.kkt_passed || v.feasible) :
+          res.status === 'INFEASIBLE_CERTIFIED' ? Boolean(res.farkas_certificate || v.farkas_verified) :
+          res.status === 'UNBOUNDED_CERTIFIED' ? Boolean(v.verified) : false
+        ) : false;
+
+        const solPrec = (isLive && isVerified && (res.status === 'OPTIMAL_VERIFIED' || res.status === 'UNBOUNDED_CERTIFIED')) ? 'IEEE_754_double' : null;
+        const boundPrec = (isLive && isVerified && STATE.activeModel === 'milp' && res.status === 'OPTIMAL_VERIFIED') ? 'exact_rational_Q' : null;
+        const certPrec = (isLive && isVerified && res.status === 'INFEASIBLE_CERTIFIED') ? 'exact_rational_Q' : null;
+        const verPrec = certPrec || boundPrec || solPrec || null;
+
+        const passport = {
+          schema_version: '1.0.0',
+          model_sha256: res ? (res.model_sha256 || null) : null,
+          solver_version: res ? (res.solver_version || '0.3.2') : '0.3.2',
+          solver_commit: 'c44f1384',
+          model_type: STATE.activeModel ? STATE.activeModel.toUpperCase() : 'LP',
+          rows: res ? res.rows : null,
+          columns: res ? res.variables : null,
+          nnz: res ? res.nonzeros : null,
+          algorithm: res ? (res.method_used || res.algorithm || null) : null,
+          backend: STATE.activeBackend,
+          input_snapshot: acceptedInputs,
+          input_snapshot_stale: Boolean(STATE.isStale),
+          status: isLive ? res.status : 'NOT_EXECUTED',
+          objective: isLive ? res.objective : null,
+          verified: isVerified,
+          verification_precision: verPrec,
+          solution_verification_precision: solPrec,
+          bound_certificate_precision: boundPrec,
+          certificate_precision: certPrec,
+          primal_residual: (isLive && v.primal_residual !== undefined) ? v.primal_residual : null,
+          dual_residual: (isLive && v.dual_residual !== undefined) ? v.dual_residual : null,
+          bound_violation: (isLive && v.bound_violation !== undefined) ? v.bound_violation : null,
+          integrality_residual: (isLive && STATE.activeModel === 'milp' && v.integrality_residual !== undefined) ? v.integrality_residual : null,
+          kkt_residual: (isLive && v.primal_residual !== undefined && v.dual_residual !== undefined) ? Math.max(v.primal_residual, v.dual_residual) : null,
+          relative_gap: (isLive && res.relative_gap !== undefined) ? res.relative_gap : null,
+          certificate_type: (isLive && res.status === 'INFEASIBLE_CERTIFIED') ? 'Farkas_infeasibility_ray' : ((isLive && res.status === 'UNBOUNDED_CERTIFIED') ? 'Unbounded_recession_direction' : null),
+          certificate_verified: (isLive && isVerified && (res.status === 'INFEASIBLE_CERTIFIED' || res.status === 'UNBOUNDED_CERTIFIED')) ? true : null
+        };
+        const blob = new Blob([JSON.stringify(passport, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sovopt_trust_passport_${STATE.activeScenario}_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
       exportCSV: () => {
         const sc = SCENARIOS[STATE.activeScenario] || SCENARIOS['SC-01'];
         const res = STATE.solveResult;

@@ -131,8 +131,8 @@ summary_data = {
     "performance_conclusion": (
         "Gate 9 CUDA optimizations significantly improved CUDA PDHG performance on the physical RTX 5050 "
         f"by an overall aggregate factor of {overall_cuda_improvement:.2f}x compared to Gate 8 CUDA (SMALL stratum "
-        f"CUDA speedup improved by {stratum_aggregates['SMALL']['aggregate_cuda_improvement_factor']:.2f}x, MEDIUM stratum "
-        f"CUDA speedup improved by {stratum_aggregates['MEDIUM']['aggregate_cuda_improvement_factor']:.2f}x). "
+        f"CUDA implementation improved by {stratum_aggregates['SMALL']['aggregate_cuda_improvement_factor']:.2f}x, MEDIUM stratum "
+        f"CUDA implementation improved by {stratum_aggregates['MEDIUM']['aggregate_cuda_improvement_factor']:.2f}x). "
         f"Overall suite Gate 9 CUDA E2E speedup relative to Gate 9 CPU is {overall_speedup:.2f}x (SMALL: "
         f"{stratum_aggregates['SMALL']['aggregate_speedup_cpu_over_cuda']:.2f}x, MEDIUM: "
         f"{stratum_aggregates['MEDIUM']['aggregate_speedup_cpu_over_cuda']:.2f}x, LARGE: "

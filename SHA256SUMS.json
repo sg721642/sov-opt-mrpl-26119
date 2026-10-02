@@ -16,7 +16,7 @@
     "mode": "text-lf"
   },
   "CHANGELOG.md": {
-    "sha256": "1b0f6d5c38e91752ef01d68ea15f460712ffce0785a45a8201ff7ba059233ae2",
+    "sha256": "209a1754d3348330e07baf86a29d8a2964280e666ffdff0660991a1861bd1f2b",
     "mode": "text-lf"
   },
   "Dockerfile": {
@@ -428,7 +428,7 @@
     "mode": "raw"
   },
   "docs/ARCHITECTURE.md": {
-    "sha256": "964c55f9f20f57a50a0e8f8849e82975493cbb2869c12c01830b3cc82ae766b3",
+    "sha256": "0ad222af0407f03df3410dd442a410841f4fde77fec2990b042e9a113274adc0",
     "mode": "text-lf"
   },
   "docs/BENCHMARK_METHODOLOGY.md": {
@@ -976,7 +976,7 @@
     "mode": "text-lf"
   },
   "scripts/generate_gate9_summary.py": {
-    "sha256": "1f615f02f6a32c1ed67f9761a4124afca45b5b5baa59d40d0dac5367fe2f42fb",
+    "sha256": "699b43edb50401a3c8b7a2adb348ef2a5de2894570c4abdc87a5201a26cee1fa",
     "mode": "text-lf"
   },
   "scripts/generate_reports.py": {
@@ -1012,11 +1012,11 @@
     "mode": "text-lf"
   },
   "sovopt/__init__.py": {
-    "sha256": "9a70fad5c1c62ff81af7a6d0f9b6d361aed61409cbf73921f69e12b342c4bc82",
+    "sha256": "1b299f96edf07da8ab0e222314764000f0b081148ce2c3feeb7b1018c86e178f",
     "mode": "text-lf"
   },
   "sovopt/__main__.py": {
-    "sha256": "7031aaa263e1071207fa0a1c72c488faa578d6651a2c62c87fa0da305ab3f4de",
+    "sha256": "411683e232ea766df653df0f7e8c18026418ccef353053cf46348e18b38fb6a1",
     "mode": "text-lf"
   },
   "sovopt/cuda_backend.py": {
@@ -1029,6 +1029,10 @@
   },
   "sovopt/dual_simplex.py": {
     "sha256": "832994088a99b1cea4b09213d21b58c4c031511dfef12551ad7f3603aa764a42",
+    "mode": "text-lf"
+  },
+  "sovopt/farkas_lens.py": {
+    "sha256": "f44fbf2005c3bed0ea318419272d3b08f80d45442aa49472a862a336e04efae0",
     "mode": "text-lf"
   },
   "sovopt/linalg.py": {
@@ -1048,11 +1052,11 @@
     "mode": "text-lf"
   },
   "sovopt/pdhg.py": {
-    "sha256": "033edabd52a05b1847ded3fc147ea7469d69d099e9432d45fb45e4db2cdd5c00",
+    "sha256": "931cca337836dfbbab8336a7c53046eaedb8cde73e8fdae1424208e001513ac8",
     "mode": "text-lf"
   },
   "sovopt/presolve.py": {
-    "sha256": "d09e2969961fe0bddebaf82cac555526b9b4f4afe3ec389863e6f0bc0fdf04cd",
+    "sha256": "2dd1b1dcccc139910eb0e06753a3d62324b4a3e8962720ff3ba08fca3fb28581",
     "mode": "text-lf"
   },
   "sovopt/qp.py": {
@@ -1064,7 +1068,7 @@
     "mode": "text-lf"
   },
   "sovopt/refinery_twin.py": {
-    "sha256": "91291adf774e857d92ceec32978dbf08475b6115a3fc940ce71a92735ac8a7c8",
+    "sha256": "068f0cb05af518a9e3ac8d74328a445f9946db620f9bd58e723eba7b8fd0829a",
     "mode": "text-lf"
   },
   "sovopt/simplex.py": {
@@ -1083,6 +1087,10 @@
     "sha256": "21ddf831815696907950e7498dc473515bf9a2d8d97d506646e25d979e53e44f",
     "mode": "text-lf"
   },
+  "sovopt/trust_passport.py": {
+    "sha256": "64eef1362407d0777793706b82c9cc00c48a2098e2a7ca4a80d89fae9a5cbd9e",
+    "mode": "text-lf"
+  },
   "sovopt/verify.py": {
     "sha256": "fdb8bdebefe46c9b8d9aea7304b6ae900ae2034d26aa3125ae89e1e22862c7bc",
     "mode": "text-lf"
@@ -1093,6 +1101,10 @@
   },
   "start_windows.bat": {
     "sha256": "dff121e27f0076f45b4ca93e1c4b1bde203c22bc7f309729fda9e78ee0495c1e",
+    "mode": "text-lf"
+  },
+  "tests/test_audit_gate11.py": {
+    "sha256": "039891e064da7b620d80dc198c29ee8e76f5a028c95dbc5869d3373c5a60483e",
     "mode": "text-lf"
   },
   "tests/test_benchmark_manifest.py": {
@@ -1156,7 +1168,7 @@
     "mode": "text-lf"
   },
   "web/app.js": {
-    "sha256": "05e0c27509ace90f652679b035fbc4e0b68ebcf1792468ed8a0621796c30c3d5",
+    "sha256": "c1454286a69e6f0b87e4b1300b8afcc9711f7b32f637ec81c13e6bd3c35781be",
     "mode": "text-lf"
   },
   "web/index.html": {

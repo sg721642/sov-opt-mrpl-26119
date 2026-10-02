@@ -285,3 +285,72 @@ def build_refinery_twin(variant='lp', periods=2, finite_capacity=150.0,
         name=f'MRPL_Refinery_Twin_{v.upper()}',
         names=tuple(var_names)
     )
+
+
+def validate_refinery_physical_solution(model: Model, x, dual=None, tol: float = 1e-6):
+    """Compute physical engineering violations for a refinery twin solution.
+
+    Evaluates:
+    - max material-balance violation: max |A_i x - b_i| across all equality rows
+    - max capacity violation: max(0, x_j - upper_j) across all variables
+    - max demand violation: max(0, row_lower_i - A_i x) across demand rows
+    - max bound violation: max violation across lower and upper variable bounds
+    - max integrality violation: max |x_j - round(x_j)| across integer variables (MILP)
+    - KKT stationarity residual: stationarity norm on original model
+
+    Returns:
+        dict: Summary of physical violations and boolean pass flag.
+    """
+    x_arr = np.asarray(x, dtype=np.float64)
+    n = len(model.c)
+    m = len(model.A)
+
+    # 1. Row evaluations
+    Ax = model.A @ x_arr if m > 0 else np.zeros(0)
+
+    # Material balances are exact equality rows (row_lower == row_upper)
+    eq_mask = np.isclose(model.row_lower, model.row_upper, atol=1e-12)
+    mat_bal_viol = float(np.max(np.abs(Ax[eq_mask] - model.row_lower[eq_mask]))) if np.any(eq_mask) else 0.0
+
+    # Demand violations (rows where row_upper == inf, demand rows)
+    demand_mask = np.isposinf(model.row_upper) & np.isfinite(model.row_lower)
+    if np.any(demand_mask):
+        dem_viol = float(np.max(np.maximum(0.0, model.row_lower[demand_mask] - Ax[demand_mask])))
+    else:
+        dem_viol = 0.0
+
+    # 2. Variable bound violations
+    lower_viol = np.maximum(0.0, model.lower - x_arr)
+    upper_viol = np.maximum(0.0, x_arr - model.upper)
+    bound_viol = float(max(np.max(lower_viol), np.max(upper_viol)))
+    capacity_viol = float(np.max(upper_viol))
+
+    # 3. Integrality violation
+    if model.integer:
+        int_viol = float(max(abs(x_arr[j] - round(x_arr[j])) for j in model.integer))
+    else:
+        int_viol = 0.0
+
+    # 4. KKT verification via verify()
+    from .verify import verify
+    rep = verify(model, x_arr, z=dual, tol=tol, check_integer=bool(model.integer))
+    station_res = rep.get('stationarity_residual', rep.get('dual_residual', 0.0))
+
+    all_passed = (
+        mat_bal_viol <= tol and
+        capacity_viol <= tol and
+        dem_viol <= tol and
+        bound_viol <= tol and
+        (not model.integer or int_viol <= tol)
+    )
+
+    return {
+        'material_balance_violation': mat_bal_viol,
+        'capacity_violation': capacity_viol,
+        'demand_violation': dem_viol,
+        'bound_violation': bound_viol,
+        'integrality_violation': int_viol,
+        'stationarity_residual': float(station_res) if station_res is not None else 0.0,
+        'kkt_passed': bool(rep.get('kkt_passed', False)),
+        'passed': bool(all_passed),
+    }
