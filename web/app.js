@@ -657,7 +657,7 @@
       fccEl.textContent = `${s.fccThroughput.toFixed(1)} kbpd (90%)`;
     }
     if (kktEl) {
-      kktEl.textContent = s.variant === 'infeasible' ? 'Farkas certificate ray in ℚ (bᵀy > 0)' : (s.status === 'Pass' ? 'Residual 1.42 × 10⁻¹⁵' : s.status);
+      kktEl.textContent = s.variant === 'infeasible' ? 'Farkas certificate ray in ℚ (bᵀy > 0)' : (s.status === 'Pass' ? 'Run solver to verify' : s.status);
     }
     if (statusEl) {
       statusEl.textContent = s.status;
@@ -1337,7 +1337,8 @@
     const provPill = document.getElementById('solve-provenance-pill');
     if (provPill) {
       if (STATE.resultSource === 'live') {
-        provPill.textContent = 'Live engine solve (v0.3.1)';
+        const verStr = (res && res.solver_version) ? `v${res.solver_version}` : 'v0.3.2';
+        provPill.textContent = `Live engine solve (${verStr})`;
         provPill.style.color = 'var(--olive)';
         provPill.style.borderColor = 'var(--olive)';
       } else {
@@ -1640,23 +1641,20 @@
           formulation_provenance: 'Representative open-literature refinery planning formulation (Gary & Handwerk / Meyers)',
           problem_statement: 'MRPL SIH PS 26119',
           timestamp_utc: new Date().toISOString(),
-          solver_version: '0.3.1',
-          solver_commit: '395c6c62bbbbd93b15a086c48e4defb81fc75a19',
+          solver_version: '0.3.2',
           execution_backend: STATE.activeBackend,
-          result_source: isLive ? 'LIVE_OPTIMIZATION_RUN' : 'VALIDATED_SCENARIO_BASELINE',
+          result_source: isLive ? 'LIVE_OPTIMIZATION_RUN' : 'SCENARIO_PRESET_NO_LIVE_SOLVE',
           active_model: STATE.activeModel,
           active_scenario: STATE.activeScenario,
           scenario_metadata: sc,
           solve_result: STATE.solveResult || {
-            status: sc.status === 'Pass' ? 'OPTIMAL_VERIFIED' : 'INFEASIBLE_CERTIFIED',
-            objective: sc.netMargin !== null ? -sc.netMargin : null,
-            iterations: 109,
-            elapsed_seconds: 0.0482,
-            verification: {
-              kkt_passed: sc.status === 'Pass',
-              primal_residual: 1.42e-15,
-              dual_residual: 2.84e-14
-            }
+            status: 'NOT_EXECUTED',
+            message: 'No live solver run has been performed for this scenario. Click "Run optimisation" to obtain verified results.',
+            kkt_passed: null,
+            primal_residual: null,
+            dual_residual: null,
+            iterations: null,
+            elapsed_seconds: null
           }
         };
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });

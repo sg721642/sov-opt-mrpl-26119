@@ -9,7 +9,7 @@ This document records the exact procedures for reproducing all numerical benchma
 All commands below assume execution from the project root with the project-local virtual environment active:
 
 ```bash
-# 1. Run full unit and regression test suite (262 tests: 260 passing, 2 integration tests skipped in restricted sandbox)
+# 1. Run full unit and regression test suite (299 tests: 286 passing, 13 skipped in restricted sandbox)
 .venv/bin/python -m unittest discover -s tests -v
 
 # 2. Run automated report and benchmark generator
@@ -26,7 +26,7 @@ SOVOPT_BENCHMARK_PYTHON=.venv-benchmark/bin/python .venv/bin/python scripts/gene
 
 ## 2. Test Suite Organization
 
-The active test suite is split into 11 modules (249 tests total, 247 passing, 2 integration tests skipped in restricted sandbox):
+The active test suite is split into 15 modules (299 tests total, 286 passing, 13 skipped in restricted sandbox):
 
 ### 2.1 Solver Correctness (`tests/test_solver.py` — 45 tests)
 - Core solver tests for LU pivot refinement, verified Netlib instances (AFIRO, SC50A, SC50B, BLEND), FLUGPL MILP lower bounding and Farkas certificate generation, bad candidate rejection, affine coordinate transformations, PDHG first-order convergence, and limits enforcement.
