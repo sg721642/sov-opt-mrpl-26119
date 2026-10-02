@@ -1,0 +1,40 @@
+{
+  "timestamp_utc": "2026-10-02T10:16:09.122824+00:00",
+  "git_sha": "c5788513e6a4517961652a3aa335f8f5243a16b8",
+  "machine": {
+    "system": "Windows",
+    "release": "10",
+    "version": "10.0.26200",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+    "node": "LAPTOP-O0NPL009"
+  },
+  "ram": {
+    "total_bytes": 16785596416,
+    "total_gb": 15.63
+  },
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "compute_capability": "12.0",
+    "vram_total_bytes": 8546484224,
+    "vram_total_gb": 7.96,
+    "cuda_runtime_version": 12090,
+    "device_count": 1,
+    "driver_version": "576.83"
+  },
+  "software": {
+    "python": "3.11.17",
+    "numpy": "2.4.6",
+    "cupy": "14.2.0",
+    "conda_env": "sovopt-gpu"
+  },
+  "benchmark_config": {
+    "warmups": 3,
+    "repeats": 7,
+    "tolerance": 1e-07,
+    "max_iter": 50000,
+    "restart": 1000,
+    "scaling": true
+  },
+  "power_source": "AC_CONNECTED_FULL"
+}

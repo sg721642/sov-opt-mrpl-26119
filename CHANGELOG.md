@@ -4,6 +4,14 @@
 
 ### Gate 8 Phase B: Physical RTX 5050 CUDA Validation
 
+- **bench(cuda): Add physical RTX 5050 PDHG validation evidence:**
+  - Added physical evidence files in `reports/gpu_validation/rtx5050_2026-10-02_c5788513/`:
+    `environment.json`, `preflight.json`, `validation_cuda.json`, `validation_cpu.json`, `ablation_cuda.json`, `summary.json`, and `VALIDATION.md`.
+  - Audited 18 Netlib LP instances across SMALL, MEDIUM, and LARGE strata on `pdhg-cuda` and `pdhg-cpu` backends.
+  - Verified 100% solver status agreement between CPU and CUDA runs, with small objective discrepancies ($\le 10^{-11}$).
+  - Retained unfavorable speedup results truthfully (SMALL aggregate 0.11x, MEDIUM aggregate 0.34x, LARGE aggregate 0.91x, `grow22` parity @ 1.00x).
+  - Executed CUDA ablation on restarting and scaling; verified full test suite (281 tests, 0 failures, exit code 0) and updated `SHA256SUMS.json`.
+
 - **fix(gpu): Correct CUDA sparse preflight validation (`scripts/gpu_preflight.py`):**
   - Fixed mathematically incorrect CSR construction: COO entries (r, j, a) are now sorted
     stably by row index before building the `bincount`-based row pointer `p`. Without this

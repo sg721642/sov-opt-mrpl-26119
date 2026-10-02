@@ -1,0 +1,30 @@
+{
+  "timestamp_utc": "2026-10-02T10:16:19.267364+00:00",
+  "status": "NVIDIA_CUDA_READY",
+  "cuda_available": true,
+  "gpu_executed": true,
+  "device_info": {
+    "cuda_available": true,
+    "device_count": 1,
+    "device_name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "compute_capability": "12.0",
+    "total_memory_bytes": 8546484224,
+    "free_memory_bytes": 7314866176,
+    "runtime_version": "12090"
+  },
+  "machine_metadata": {
+    "system": "Windows",
+    "release": "10",
+    "architecture": "AMD64",
+    "processor": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+    "python": "3.11.17",
+    "numpy": "2.4.6"
+  },
+  "micro_spmv_test": {
+    "passed": true,
+    "max_discrepancy": 3.552713678800501e-15,
+    "avg_spmv_microseconds": 578.417999931844,
+    "memory_used_mb": 0.07763671875
+  },
+  "elapsed_seconds": 0.49937130000034813
+}

@@ -1,0 +1,361 @@
+{
+  "timestamp_utc": "2026-10-02T11:35:38.565895+00:00",
+  "backend": "pdhg-cuda",
+  "max_iter": 30000,
+  "tolerance": 1e-07,
+  "machine_metadata": {
+    "system": "Windows",
+    "architecture": "AMD64",
+    "python": "3.11.17"
+  },
+  "device_info": {
+    "cuda_available": true,
+    "device_count": 1,
+    "device_name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "compute_capability": "12.0",
+    "total_memory_bytes": 8546484224,
+    "free_memory_bytes": 7314866176,
+    "runtime_version": "12090"
+  },
+  "experiments": [
+    {
+      "name": "baseline_restarted_scaled",
+      "scaling": true,
+      "restart": 1000
+    },
+    {
+      "name": "no_scaling",
+      "scaling": false,
+      "restart": 1000
+    },
+    {
+      "name": "no_restart",
+      "scaling": true,
+      "restart": false
+    },
+    {
+      "name": "no_scaling_no_restart",
+      "scaling": false,
+      "restart": false
+    }
+  ],
+  "results": {
+    "afiro": {
+      "instance": "afiro",
+      "dimensions": {
+        "n": 32,
+        "m": 27,
+        "nnz": 83
+      },
+      "reference_objective": -464.75314286,
+      "configurations": {
+        "baseline_restarted_scaled": {
+          "config": {
+            "name": "baseline_restarted_scaled",
+            "scaling": true,
+            "restart": 1000
+          },
+          "status": "OPTIMAL_VERIFIED",
+          "gpu_executed": true,
+          "iterations": 12000,
+          "elapsed_seconds": 2.872659400003613,
+          "objective": -464.75314223341877,
+          "relative_discrepancy": 1.3482022963442127e-09,
+          "primal_residual": 8.069888729774348e-09,
+          "dual_residual": 5.9314049330967586e-08,
+          "relative_gap": 6.702911327793723e-10,
+          "kkt_passed": true
+        },
+        "no_scaling": {
+          "config": {
+            "name": "no_scaling",
+            "scaling": false,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 7.641734299999371,
+          "objective": -428.420574916758,
+          "relative_discrepancy": 0.07817605647518266,
+          "primal_residual": 8.826617835529194e-17,
+          "dual_residual": 0.008026301561555678,
+          "relative_gap": 1.3055694326715645e-17,
+          "kkt_passed": false
+        },
+        "no_restart": {
+          "config": {
+            "name": "no_restart",
+            "scaling": true,
+            "restart": false
+          },
+          "status": "OPTIMAL_VERIFIED",
+          "gpu_executed": true,
+          "iterations": 6500,
+          "elapsed_seconds": 1.4945344000007026,
+          "objective": -464.7531436946867,
+          "relative_discrepancy": 1.7959785149791746e-09,
+          "primal_residual": 1.0408155197870942e-08,
+          "dual_residual": 9.452130903289732e-09,
+          "relative_gap": 9.00097252089026e-10,
+          "kkt_passed": true
+        },
+        "no_scaling_no_restart": {
+          "config": {
+            "name": "no_scaling_no_restart",
+            "scaling": false,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 7.112722499994561,
+          "objective": -464.75313630053336,
+          "relative_discrepancy": 1.411387264434882e-08,
+          "primal_residual": 5.0900734549845225e-08,
+          "dual_residual": 5.802859435701052e-07,
+          "relative_gap": 7.048024431709419e-09,
+          "kkt_passed": false
+        }
+      }
+    },
+    "sc50a": {
+      "instance": "sc50a",
+      "dimensions": {
+        "n": 48,
+        "m": 50,
+        "nnz": 130
+      },
+      "reference_objective": -64.575077059,
+      "configurations": {
+        "baseline_restarted_scaled": {
+          "config": {
+            "name": "baseline_restarted_scaled",
+            "scaling": true,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 7.089083399994706,
+          "objective": -34.98336255756765,
+          "relative_discrepancy": 0.45825287168291606,
+          "primal_residual": 1.0012336550789499e-16,
+          "dual_residual": 0.0074665789614089435,
+          "relative_gap": 1.5500264246262804e-17,
+          "kkt_passed": false
+        },
+        "no_scaling": {
+          "config": {
+            "name": "no_scaling",
+            "scaling": false,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 7.065704200002074,
+          "objective": -20.735680519857862,
+          "relative_discrepancy": 0.6788903480376431,
+          "primal_residual": 4.182481549718051e-16,
+          "dual_residual": 0.0074256111640537146,
+          "relative_gap": 4.484227057137218e-16,
+          "kkt_passed": false
+        },
+        "no_restart": {
+          "config": {
+            "name": "no_restart",
+            "scaling": true,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 7.164748700000928,
+          "objective": -60.66677955054393,
+          "relative_discrepancy": 0.06052331156934108,
+          "primal_residual": 7.493262512427149e-07,
+          "dual_residual": 0.004364505940036683,
+          "relative_gap": 3.0870004406593035e-06,
+          "kkt_passed": false
+        },
+        "no_scaling_no_restart": {
+          "config": {
+            "name": "no_scaling_no_restart",
+            "scaling": false,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 7.063196800001606,
+          "objective": -39.7595672596345,
+          "relative_discrepancy": 0.3842892789224615,
+          "primal_residual": 1.0757309909456944e-16,
+          "dual_residual": 0.007403224954175636,
+          "relative_gap": 2.020336909516816e-16,
+          "kkt_passed": false
+        }
+      }
+    },
+    "blend": {
+      "instance": "blend",
+      "dimensions": {
+        "n": 83,
+        "m": 74,
+        "nnz": 491
+      },
+      "reference_objective": -30.812149846,
+      "configurations": {
+        "baseline_restarted_scaled": {
+          "config": {
+            "name": "baseline_restarted_scaled",
+            "scaling": true,
+            "restart": 1000
+          },
+          "status": "OPTIMAL_VERIFIED",
+          "gpu_executed": true,
+          "iterations": 11500,
+          "elapsed_seconds": 2.800179300000309,
+          "objective": -30.81215032045001,
+          "relative_discrepancy": 1.5398146852499387e-08,
+          "primal_residual": 8.791278863934175e-08,
+          "dual_residual": 1.5621243615267117e-08,
+          "relative_gap": 7.580218644285805e-09,
+          "kkt_passed": true
+        },
+        "no_scaling": {
+          "config": {
+            "name": "no_scaling",
+            "scaling": false,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 7.133218300004955,
+          "objective": -22.381220351433942,
+          "relative_discrepancy": 0.27362353930848976,
+          "primal_residual": 0.011068976800219942,
+          "dual_residual": 0.002089121744548597,
+          "relative_gap": 0.009866807793866433,
+          "kkt_passed": false
+        },
+        "no_restart": {
+          "config": {
+            "name": "no_restart",
+            "scaling": true,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 7.248579899998731,
+          "objective": -30.816847076233653,
+          "relative_discrepancy": 0.000152447338375597,
+          "primal_residual": 0.0003565531298294403,
+          "dual_residual": 3.99814880691852e-05,
+          "relative_gap": 8.767031318052541e-05,
+          "kkt_passed": false
+        },
+        "no_scaling_no_restart": {
+          "config": {
+            "name": "no_scaling_no_restart",
+            "scaling": false,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 7.25081389999832,
+          "objective": -27.69613089604663,
+          "relative_discrepancy": 0.10112955329398704,
+          "primal_residual": 0.018222926362734784,
+          "dual_residual": 0.0019039346112701724,
+          "relative_gap": 0.014005214606752033,
+          "kkt_passed": false
+        }
+      }
+    },
+    "sc105": {
+      "instance": "sc105",
+      "dimensions": {
+        "n": 103,
+        "m": 105,
+        "nnz": 280
+      },
+      "reference_objective": -52.202061212,
+      "configurations": {
+        "baseline_restarted_scaled": {
+          "config": {
+            "name": "baseline_restarted_scaled",
+            "scaling": true,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 7.55215809999936,
+          "objective": -2.6996642425840376,
+          "relative_discrepancy": 0.948284336290471,
+          "primal_residual": 1.3879244076291506e-16,
+          "dual_residual": 0.0017153868599079543,
+          "relative_gap": 2.2527978502266015e-16,
+          "kkt_passed": false
+        },
+        "no_scaling": {
+          "config": {
+            "name": "no_scaling",
+            "scaling": false,
+            "restart": 1000
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 7.354724400000123,
+          "objective": -1.7129438092317903,
+          "relative_discrepancy": 0.9671862802069198,
+          "primal_residual": 1.3545767199251803e-15,
+          "dual_residual": 0.0015770723879159653,
+          "relative_gap": 1.7807851919007382e-15,
+          "kkt_passed": false
+        },
+        "no_restart": {
+          "config": {
+            "name": "no_restart",
+            "scaling": true,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 7.370370999997249,
+          "objective": -5.080008495633124,
+          "relative_discrepancy": 0.9026856722189094,
+          "primal_residual": 1.0696315606764849e-13,
+          "dual_residual": 0.0017110286051263861,
+          "relative_gap": 4.97461942730035e-13,
+          "kkt_passed": false
+        },
+        "no_scaling_no_restart": {
+          "config": {
+            "name": "no_scaling_no_restart",
+            "scaling": false,
+            "restart": false
+          },
+          "status": "LIMIT_REACHED",
+          "gpu_executed": true,
+          "iterations": 30000,
+          "elapsed_seconds": 7.323048800004472,
+          "objective": -3.179692545481657,
+          "relative_discrepancy": 0.9390887548947833,
+          "primal_residual": 1.0660292177283364e-06,
+          "dual_residual": 0.0015679987124200133,
+          "relative_gap": 4.919306485321058e-06,
+          "kkt_passed": false
+        }
+      }
+    }
+  },
+  "total_elapsed_seconds": 101.54244440000184
+}
