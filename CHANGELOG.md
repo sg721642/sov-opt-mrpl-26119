@@ -1,5 +1,24 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.7] - 2026-10-03
+
+### Gate 11: Final System Audit, Dashboard Integrity & Provenance Documentation
+
+- **chore(audit): Eliminate fabricated metrics, enforce honest empty states, and synchronize documentation:**
+  - Removed static fabricated `'Residual 1.42 × 10⁻¹⁵'` string from overview KKT verification widget in `web/app.js`, replacing it with honest `'Run solver to verify'` placeholder when viewing un-executed scenario presets.
+  - Eliminated hardcoded fabricated solver metrics (`iterations: 109`, `elapsed_seconds: 0.0482`, `primal_residual: 1.42e-15`, `dual_residual: 2.84e-14`) from `exportAuditJSON` in `web/app.js` when no live solve has occurred, outputting explicit `status: 'NOT_EXECUTED'` and null metrics instead.
+  - Made live solve provenance pill dynamically display backend `solver_version`.
+  - Updated `docs/ARCHITECTURE.md` roadmap gate table to accurately record completed Gates 8 (GPU PDHG physical validation on RTX 5050), 9 (fused RawKernels and 1.81× speedup), 10 (editorial dashboard), 10.1 (graph correctness), and 11 (system audit), removing outdated planned cutting-planes entry.
+  - Synchronized test counts in `docs/VALIDATION.md` to reflect 299 tests across 15 modules (286 passing, 13 skipped in restricted sandbox).
+  - Verified 100% test suite pass rate (299 tests, 0 failures, 13 skipped) and 100% SHA-256 integrity match across all 292 entries in `SHA256SUMS.json`.
+
+### Gate 10.1: Dashboard Graph Data-Correctness and State Synchronization
+
+- **fix(dashboard): Make solver graphs data-correct and state-synchronized:**
+  - Connected convergence chart renderer directly to solver iteration/node arrays (`history`, `convergence_history`).
+  - Added support across all mathematical problem classes: LP simplex objective progression, MILP B&B dual bound and incumbent trajectories, and QP/PDHG log-scale KKT residual contraction.
+  - Synchronized state with `STATE.isStale` flag and `solveGen` race-condition fencing to prevent stale-data display during input adjustments.
+
 ## [0.3.6] - 2026-10-02
 
 ### Gate 10: Editorial Refinery Workstation UI, Functional QA & Responsive Layout

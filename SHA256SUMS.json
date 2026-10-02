@@ -16,7 +16,7 @@
     "mode": "text-lf"
   },
   "CHANGELOG.md": {
-    "sha256": "6b0b6101ce16be86fb253e556e586c7085a8ec83c1b89a421d0ff72d59162462",
+    "sha256": "1b0f6d5c38e91752ef01d68ea15f460712ffce0785a45a8201ff7ba059233ae2",
     "mode": "text-lf"
   },
   "Dockerfile": {
@@ -428,7 +428,7 @@
     "mode": "raw"
   },
   "docs/ARCHITECTURE.md": {
-    "sha256": "d30db918bf60572e46589005d658b4532791d9283812556d1a7e148f81c53443",
+    "sha256": "964c55f9f20f57a50a0e8f8849e82975493cbb2869c12c01830b3cc82ae766b3",
     "mode": "text-lf"
   },
   "docs/BENCHMARK_METHODOLOGY.md": {
@@ -476,7 +476,7 @@
     "mode": "text-lf"
   },
   "docs/VALIDATION.md": {
-    "sha256": "9f17773992757fc3ba63b276ebbcb27fd35ec46145a879a1e1cc722ea00f92f8",
+    "sha256": "e2002928e189384fc96e6d7cad95911ef256536bcd194a65ade345d173ec8672",
     "mode": "text-lf"
   },
   "examples/afiro.json": {
@@ -1156,7 +1156,7 @@
     "mode": "text-lf"
   },
   "web/app.js": {
-    "sha256": "9e5555aa7155f28a9923eb28276046e7c52dca078209666d10b0b6a68c87f956",
+    "sha256": "05e0c27509ace90f652679b035fbc4e0b68ebcf1792468ed8a0621796c30c3d5",
     "mode": "text-lf"
   },
   "web/index.html": {
