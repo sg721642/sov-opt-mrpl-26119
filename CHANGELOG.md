@@ -1,5 +1,20 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.6] - 2026-10-02
+
+### Gate 10: Editorial Refinery Workstation UI, Functional QA & Responsive Layout
+
+- **feat(ui): Complete high-end industrial editorial redesign and interaction polish:**
+  - Redesigned UI architecture from dark generic SaaS theme into a refined warm editorial refinery workstation.
+  - Resolved table clipping and viewport horizontal overflow on standard laptops (1366px, 1440px, 1512px) by decoupling `.overview-tables-layout`, eliminating global `white-space: nowrap` on descriptive table cells, and establishing strict viewport boundary constraints (`overflow-x: hidden`).
+  - Segregated execution platforms in the header: explicitly distinguished local CPU execution (`CPU · Sovereign`) from benchmark evidence node (`RTX 5050`).
+  - Added hardware notice banner and truthful auto-fallback for `pdhg-cuda` on Apple Silicon.
+  - Implemented dynamic stale state tracking across all parameter sliders and selectors, alerting users when inputs are modified pending optimization.
+  - Implemented mathematical infeasibility handling: certified rational Farkas proof display, primal vector nullification, zeroed stream flows on the interactive PFD, and explicit status communication.
+  - Bound all 8 views, interactive PFD components, scenario delta matrix, telemetry strips, and JSON/CSV export actions to live API responses.
+  - Parameterized `sovopt/refinery_twin.py` and `server.py` to support real-time user overrides for crude costs and fuel demand quotas.
+  - Passed all 299 repository unit tests and verified 0 missing DOM element IDs or unhandled JS exceptions.
+
 ## [0.3.5] - 2026-10-02
 
 ### Gate 9.1: Cross-Platform Checksum Portability Hardening

@@ -13,7 +13,7 @@ def inspect_model(model):
     nnz = int((model.A != 0).sum())
     density = float(nnz / (m * n)) if (m * n) > 0 else 0.0
     int_count = len(model.integer)
-    has_qp = model.Q is not None and np.any(model.Q != 0)
+    has_qp = bool(model.Q is not None and np.any(model.Q != 0))
 
     # Dynamic range of nonzero coefficients
     nonzeros = []

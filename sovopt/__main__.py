@@ -73,7 +73,10 @@ def main():
         r = {'status': 'INVALID_MODEL', 'message': str(e)}
 
     use_report = a.report or (a.format == 'report')
-    output_text = format_trust_report(r) if use_report else json.dumps(r, indent=2, allow_nan=False)
+    output_text = format_trust_report(r) if use_report else json.dumps(
+        r, indent=2, allow_nan=False,
+        default=lambda o: o.item() if hasattr(o, 'item') else (o.tolist() if hasattr(o, 'tolist') else str(o))
+    )
 
     if a.output:
         Path(a.output).parent.mkdir(parents=True, exist_ok=True)

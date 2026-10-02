@@ -16,7 +16,7 @@
     "mode": "text-lf"
   },
   "CHANGELOG.md": {
-    "sha256": "d32f0391e011424cc3592759d7180023d6109d54e92eef8bac1d4a2ab2c8f167",
+    "sha256": "6b0b6101ce16be86fb253e556e586c7085a8ec83c1b89a421d0ff72d59162462",
     "mode": "text-lf"
   },
   "Dockerfile": {
@@ -1008,7 +1008,7 @@
     "mode": "text-lf"
   },
   "server.py": {
-    "sha256": "92aa3417bfc02ac7bfd25f8556ebe479d18004464cf379d36008810d1f500f62",
+    "sha256": "ea82978e900a86e00cf4203cea79021a1d91f45485e4c854b7b368f98a957a37",
     "mode": "text-lf"
   },
   "sovopt/__init__.py": {
@@ -1016,7 +1016,7 @@
     "mode": "text-lf"
   },
   "sovopt/__main__.py": {
-    "sha256": "82e15f8395537609ce93b4655e433f3489f3a3167e81cfa779a4c874ee01e01d",
+    "sha256": "7031aaa263e1071207fa0a1c72c488faa578d6651a2c62c87fa0da305ab3f4de",
     "mode": "text-lf"
   },
   "sovopt/cuda_backend.py": {
@@ -1024,7 +1024,7 @@
     "mode": "text-lf"
   },
   "sovopt/dispatcher.py": {
-    "sha256": "776ea748ca5d69b734d57d4e65bac6df526821b59d1c3eb45de8cbc0f6d809f5",
+    "sha256": "501bfb735cccb23c448b95910ac90a2377f740eb209a013ceb01b415ce25d956",
     "mode": "text-lf"
   },
   "sovopt/dual_simplex.py": {
@@ -1064,7 +1064,7 @@
     "mode": "text-lf"
   },
   "sovopt/refinery_twin.py": {
-    "sha256": "3ad0721ed4b2c3cceee8cbaadf51b3069c4604ecfdd676b257e37a184424f875",
+    "sha256": "91291adf774e857d92ceec32978dbf08475b6115a3fc940ce71a92735ac8a7c8",
     "mode": "text-lf"
   },
   "sovopt/simplex.py": {
@@ -1144,7 +1144,7 @@
     "mode": "text-lf"
   },
   "tests/test_server.py": {
-    "sha256": "0b35af666bcaa5543cbe34eca6ac1acd431881e5dd7f74b55b517689f0817e3b",
+    "sha256": "a7e24c2d1f59409cfb53e4b2ed06b77e6269caca85fc464af3d3d6d32eb362b6",
     "mode": "text-lf"
   },
   "tests/test_solver.py": {
@@ -1155,8 +1155,16 @@
     "sha256": "52d49a27c5499bef894917b29eeed05ee45f66191dbc067a3724001a390b1244",
     "mode": "text-lf"
   },
+  "web/app.js": {
+    "sha256": "ea47c17a9ffb36200c09fa9ea323d937800baf155d3e5ff0eda6d7b397098fb0",
+    "mode": "text-lf"
+  },
   "web/index.html": {
-    "sha256": "f19fff3effcb20ac781b7e3b2ed488e93d15ab3426cef434ad8abdf8ce2d9cdd",
+    "sha256": "213d0136d0ca535e296f491b6bfd390dc3e806f48668fcb2b58b8bdee16742f4",
+    "mode": "text-lf"
+  },
+  "web/style.css": {
+    "sha256": "a993f502231de9d625396695be3ab624fc6ce9947fc17f0d1a2a2f2caab16a0c",
     "mode": "text-lf"
   }
 }

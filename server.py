@@ -17,6 +17,43 @@ class Handler(BaseHTTPRequestHandler):
         if self.path=='/health':return self.send(200,{'status':'ok','version':'0.3.1'})
         if self.path=='/api/manifest':return self.send(200,json.loads((ROOT/'data/manifest.json').read_text()))
         if self.path=='/api/examples':return self.send(200,{k:json.loads(p.read_text()) for k,p in EXAMPLES.items()})
+        if self.path.startswith('/api/refinery_twin'):
+            import urllib.parse
+            from sovopt import build_refinery_twin
+            q=urllib.parse.urlparse(self.path).query
+            params=urllib.parse.parse_qs(q)
+            variant=params.get('variant',['lp'])[0]
+            c_arab=params.get('c_arab',[None])[0]
+            c_basrah=params.get('c_basrah',[None])[0]
+            min_gas=params.get('min_gas',[None])[0]
+            min_dsl=params.get('min_dsl',[None])[0]
+            try:
+                m=build_refinery_twin(
+                    variant,
+                    c_arab=float(c_arab) if c_arab is not None else None,
+                    c_basrah=float(c_basrah) if c_basrah is not None else None,
+                    min_gas=float(min_gas) if min_gas is not None else None,
+                    min_dsl=float(min_dsl) if min_dsl is not None else None
+                )
+                return self.send(200,m.to_dict())
+            except Exception as e:return self.send(400,{'error':str(e)})
+        if self.path=='/api/gpu_summary':
+            p=ROOT/'reports/gpu_gate9_final_51b71bb/summary.json'
+            if p.exists():return self.send(200,json.loads(p.read_text()))
+            return self.send(404,{'error':'GPU summary not found'})
+        if self.path.startswith('/static/'):
+            rel=self.path[len('/static/'):]
+            fp=(ROOT/'web'/rel).resolve()
+            if fp.exists() and fp.is_file() and str(fp).startswith(str(ROOT/'web')):
+                ext=fp.suffix.lower()
+                mime={'.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.svg':'image/svg+xml','.json':'application/json','.png':'image/png','.ico':'image/x-icon'}.get(ext,'text/plain')
+                return self.send(200,fp.read_bytes(),mime)
+        if self.path in ('/style.css','/web/style.css'):
+            p=ROOT/'web/style.css'
+            if p.exists():return self.send(200,p.read_bytes(),'text/css; charset=utf-8')
+        if self.path in ('/app.js','/web/app.js'):
+            p=ROOT/'web/app.js'
+            if p.exists():return self.send(200,p.read_bytes(),'application/javascript; charset=utf-8')
         if self.path in ('/','/index.html'):return self.send(200,(ROOT/'web/index.html').read_bytes(),'text/html; charset=utf-8')
         self.send(404,{'error':'Not found'})
     def do_POST(self):
@@ -27,6 +64,7 @@ class Handler(BaseHTTPRequestHandler):
             length=int(self.headers.get('Content-Length','0'))
             if not 0<length<=300000:raise ValueError('Request must be 1..300000 bytes')
             payload=json.loads(self.rfile.read(length));backend=payload.get('backend','cpu')
+            method=payload.get('method','auto')
             if backend not in ('cpu','pdhg-cpu'):raise ValueError('Web demo supports CPU or CPU PDHG; use CLI for CUDA')
             from sovopt import Model
             model=Model.from_dict(payload['model'])
@@ -37,7 +75,9 @@ class Handler(BaseHTTPRequestHandler):
             with tempfile.TemporaryDirectory() as tmp:
                 p=Path(tmp)/'model.json';p.write_text(json.dumps(model.to_dict()))
                 env=dict(os.environ,OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1')
-                run=subprocess.run([sys.executable,'-m','sovopt',str(p),'--backend',backend],cwd=ROOT,env=env,capture_output=True,text=True,timeout=35)
+                cmd=[sys.executable,'-m','sovopt',str(p),'--backend',backend]
+                if method and method!='auto':cmd.extend(['--method',method])
+                run=subprocess.run(cmd,cwd=ROOT,env=env,capture_output=True,text=True,timeout=35)
                 try:r=json.loads(run.stdout)
                 except ValueError:r={'status':'NUMERICAL_FAILURE','message':f'Worker failed (code {run.returncode}): {run.stderr[:200].strip()}','gpu_executed':False}
                 r.setdefault('gpu_executed',False)

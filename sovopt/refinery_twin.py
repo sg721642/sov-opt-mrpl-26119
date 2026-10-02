@@ -21,13 +21,18 @@ The twin provides a single unified parameterised formulation with 4 operational 
 import numpy as np
 from .model import Model
 
-def build_refinery_twin(variant='lp', periods=2, finite_capacity=150.0):
+def build_refinery_twin(variant='lp', periods=2, finite_capacity=150.0,
+                        c_arab=None, c_basrah=None, min_gas=None, min_dsl=None):
     """Construct an MRPL Refinery Planning Twin instance.
     
     Args:
         variant: One of 'lp', 'milp', 'qp', 'infeasible'.
         periods: Number of planning periods (default 2).
         finite_capacity: Physical maximum bound on stream rates to ensure finite box bounds.
+        c_arab: Optional Arab Light crude cost ($/bbl) override.
+        c_basrah: Optional Basrah Heavy crude cost ($/bbl) override.
+        min_gas: Optional minimum gasoline demand (kbpd) override.
+        min_dsl: Optional minimum diesel demand (kbpd) override.
     
     Returns:
         Model: A sovereign sovopt.Model instance.
@@ -85,8 +90,8 @@ def build_refinery_twin(variant='lp', periods=2, finite_capacity=150.0):
     c = np.zeros(n_cont)
     for t in range(periods):
         b = t * N_PER_T
-        c[b + 0] = 70.0    # Arab Light cost ($/bbl)
-        c[b + 1] = 62.0    # Basrah cost ($/bbl)
+        c[b + 0] = 70.0 if c_arab is None else float(c_arab)    # Arab Light cost ($/bbl)
+        c[b + 1] = 62.0 if c_basrah is None else float(c_basrah)    # Basrah cost ($/bbl)
         c[b + 2] = 2.5     # CDU opex ($/bbl)
         c[b + 3] = 4.0     # FCC opex ($/bbl)
         c[b + 4] = 3.0     # Reformer opex ($/bbl)
@@ -180,8 +185,8 @@ def build_refinery_twin(variant='lp', periods=2, finite_capacity=150.0):
 
         # 5. Product demands:
         # Diagnostic infeasible scenario: gasoline demand set to 500.0 (max refinery intake is 100.0)
-        dem_gas = 500.0 if v == 'infeasible' else 20.0
-        dem_dsl = 30.0
+        dem_gas = 500.0 if v == 'infeasible' else (float(min_gas) if min_gas is not None else 20.0)
+        dem_dsl = float(min_dsl) if min_dsl is not None else 30.0
         dem_fo = 10.0
         add_row([(b + 9, 1.0)], dem_gas, np.inf)
         add_row([(b + 10, 1.0)], dem_dsl, np.inf)
