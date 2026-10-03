@@ -81,8 +81,139 @@
     resultSource: 'scenario-preset', // 'scenario-preset' | 'live'
     compareA: 'SC-01',
     compareB: 'SC-02',
-    isMobileMenuOpen: false
+    isMobileMenuOpen: false,
+    currentLanguage: 'en',
+    currentFontScale: '1.0'
   };
+
+  // Centralized Internationalization (English / हिन्दी)
+  const I18N = {
+    en: {
+      screen_reader: 'Screen Reader Access',
+      skip_to_content: 'Skip to main content',
+      nav_home: 'Home',
+      nav_about: 'About Us',
+      nav_solver: 'Solver Portal',
+      nav_overview: 'Overview & Process Flow',
+      nav_optimization: 'Optimization Run',
+      nav_analytics: 'Solver Analytics',
+      nav_planning: 'Refinery Planning',
+      nav_scenarios: 'Scenarios',
+      nav_twin_pfd: 'Refinery Twin & PFD',
+      nav_trust: 'Trust & Verification',
+      nav_benchmarks: 'Benchmarks',
+      nav_evidence: 'Evidence',
+      nav_evidence_audits: 'Evidence & Audits',
+      nav_reports: 'Reports & Export',
+      nav_contact: 'Contact Us',
+      nav_run_optimization: 'Run Optimization',
+      nav_export_audit: 'Export Audit',
+      latest_updates: 'Latest Updates',
+      enter_workspace: 'Enter Solver Workspace',
+      view_trust: 'View Trust & Verification',
+      opt_run_title: 'Optimization engine dispatch & live solve',
+      opt_run_intro: 'Adjust operational crude and demand parameters, execute the sovereign solver core, and inspect convergence trajectories and certified solution vectors.',
+      opt_controls_title: 'Model & operational inputs',
+      target_model: 'Target model instance',
+      exec_backend: 'Execution backend',
+      btn_run_solver: 'Run optimization',
+      running_optimization: 'Running optimization…',
+      opt_complete: 'Optimization Complete ✓',
+      about_us: 'About Us',
+      about_subtitle: 'SOV-OPT Team',
+      about_intro: 'We are a student team from Rajiv Gandhi Institute of Petroleum Technology developing SOV-OPT, a sovereign LP/MILP/convex-QP optimization core for the MRPL Smart India Hackathon problem statement.',
+      contact_us: 'Contact Us',
+      contact_intro: 'Connect with the SOV-OPT student development team from Rajiv Gandhi Institute of Petroleum Technology.',
+      lang_btn_text: 'हिन्दी',
+      lang_aria_label: 'Switch language to Hindi'
+    },
+    hi: {
+      screen_reader: 'स्क्रीन रीडर एक्सेस',
+      skip_to_content: 'मुख्य सामग्री पर जाएँ',
+      nav_home: 'होम',
+      nav_about: 'हमारे बारे में',
+      nav_solver: 'सॉल्वर पोर्टल',
+      nav_overview: 'अवलोकन एवं प्रक्रिया प्रवाह',
+      nav_optimization: 'ऑप्टिमाइज़ेशन रन',
+      nav_analytics: 'सॉल्वर एनालिटिक्स',
+      nav_planning: 'रिफाइनरी योजना',
+      nav_scenarios: 'परिदृश्य',
+      nav_twin_pfd: 'रिफाइनरी मॉडल एवं पीएफडी',
+      nav_trust: 'सत्यापन एवं विश्वसनीयता',
+      nav_benchmarks: 'बेंचमार्क',
+      nav_evidence: 'प्रमाण',
+      nav_evidence_audits: 'प्रमाण एवं ऑडिट',
+      nav_reports: 'रिपोर्ट एवं निर्यात',
+      nav_contact: 'संपर्क करें',
+      nav_run_optimization: 'ऑप्टिमाइज़ेशन चलाएँ',
+      nav_export_audit: 'ऑडिट निर्यात करें',
+      latest_updates: 'नवीनतम अपडेट',
+      enter_workspace: 'सॉल्वर वर्कस्पेस में प्रवेश करें',
+      view_trust: 'सत्यापन एवं विश्वसनीयता देखें',
+      opt_run_title: 'ऑप्टिमाइज़ेशन इंजन प्रेषण एवं लाइव सॉल्व',
+      opt_run_intro: 'परिचालन क्रूड एवं माँग मापदंड समायोजित करें, सॉवरेन सॉल्वर निष्पादित करें, और अभिसरण पथ एवं प्रमाणित समाधान देखें।',
+      opt_controls_title: 'मॉडल एवं परिचालन इनपुट',
+      target_model: 'लक्षित मॉडल',
+      exec_backend: 'निष्पादन बैकएंड',
+      btn_run_solver: 'ऑप्टिमाइज़ेशन चलाएँ',
+      running_optimization: 'ऑप्टिमाइज़ेशन चल रहा है…',
+      opt_complete: 'ऑप्टिमाइज़ेशन पूर्ण ✓',
+      about_us: 'हमारे बारे में',
+      about_subtitle: 'SOV-OPT टीम',
+      about_intro: 'हम राजीव गाँधी पेट्रोलियम प्रौद्योगिकी संस्थान के छात्र हैं जो MRPL स्मार्ट इंडिया हैकाथॉन समस्या विवरण हेतु SOV-OPT सॉवरेन LP/MILP/QP सॉल्वर विकसित कर रहे हैं।',
+      contact_us: 'संपर्क करें',
+      contact_intro: 'राजीव गाँधी पेट्रोलियम प्रौद्योगिकी संस्थान के SOV-OPT छात्र विकास दल से संपर्क करें।',
+      lang_btn_text: 'English',
+      lang_aria_label: 'Switch language to English'
+    }
+  };
+
+  function setLanguage(lang) {
+    if (!I18N[lang]) lang = 'en';
+    STATE.currentLanguage = lang;
+    try { localStorage.setItem('sovopt-language', lang); } catch (e) {}
+    document.documentElement.setAttribute('lang', lang);
+
+    const dict = I18N[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[key]) {
+        el.textContent = dict[key];
+      }
+    });
+
+    const langBtn = document.getElementById('btn-acc-lang');
+    if (langBtn) {
+      langBtn.textContent = dict.lang_btn_text;
+      langBtn.setAttribute('aria-label', dict.lang_aria_label);
+      langBtn.title = (lang === 'en' ? 'भाषा हिन्दी में बदलें' : 'Switch language to English');
+    }
+
+    if (!STATE.isSolving) {
+      const solveBtn = document.getElementById('btn-run-solve');
+      if (solveBtn) solveBtn.innerHTML = '<span>' + dict.btn_run_solver + '</span>';
+      const headerSolveBtn = document.getElementById('btn-header-solve');
+      if (headerSolveBtn) headerSolveBtn.innerHTML = '<span>' + dict.nav_run_optimization + '</span>';
+    }
+  }
+
+  function setFontScale(scaleStr) {
+    const valid = ['0.9', '1.0', '1.1'];
+    const scale = valid.includes(String(scaleStr)) ? String(scaleStr) : '1.0';
+    STATE.currentFontScale = scale;
+    try { localStorage.setItem('sovopt-font-scale', scale); } catch (e) {}
+
+    document.documentElement.style.setProperty('--accessibility-font-scale', scale);
+    document.body.style.setProperty('--accessibility-font-scale', scale);
+
+    const btnMinus = document.getElementById('btn-acc-font-minus');
+    const btnReset = document.getElementById('btn-acc-font-reset');
+    const btnPlus = document.getElementById('btn-acc-font-plus');
+
+    if (btnMinus) btnMinus.classList.toggle('active', scale === '0.9');
+    if (btnReset) btnReset.classList.toggle('active', scale === '1.0');
+    if (btnPlus) btnPlus.classList.toggle('active', scale === '1.1');
+  }
 
   // 1. Curated Industrial Scenarios
   const SCENARIOS = {
@@ -660,26 +791,40 @@
     const btnFontMinus = document.getElementById('btn-acc-font-minus');
     if (btnFontMinus) {
       btnFontMinus.addEventListener('click', () => {
-        document.body.classList.remove('large-text');
-        document.body.classList.add('small-text');
+        setFontScale('0.9');
       });
     }
 
     const btnFontReset = document.getElementById('btn-acc-font-reset');
     if (btnFontReset) {
       btnFontReset.addEventListener('click', () => {
-        document.body.classList.remove('small-text');
-        document.body.classList.remove('large-text');
+        setFontScale('1.0');
       });
     }
 
     const btnFontPlus = document.getElementById('btn-acc-font-plus');
     if (btnFontPlus) {
       btnFontPlus.addEventListener('click', () => {
-        document.body.classList.remove('small-text');
-        document.body.classList.add('large-text');
+        setFontScale('1.1');
       });
     }
+
+    const btnLang = document.getElementById('btn-acc-lang');
+    if (btnLang) {
+      btnLang.addEventListener('click', () => {
+        const nextLang = (STATE.currentLanguage === 'hi') ? 'en' : 'hi';
+        setLanguage(nextLang);
+      });
+    }
+
+    // Initialize persisted font scale and language preference
+    let initialScale = '1.0';
+    try { initialScale = localStorage.getItem('sovopt-font-scale') || '1.0'; } catch (e) {}
+    setFontScale(initialScale);
+
+    let initialLang = 'en';
+    try { initialLang = localStorage.getItem('sovopt-language') || 'en'; } catch (e) {}
+    setLanguage(initialLang);
   }
 
   // Mobile Drawer Logic
@@ -1616,13 +1761,56 @@
     STATE.isStale = false;
 
     const solveBtn = document.getElementById('btn-run-solve');
+    const headerSolveBtn = document.getElementById('btn-header-solve');
     const stagePill = document.getElementById('solve-stage-pill');
 
-    if (solveBtn) {
-      solveBtn.disabled = true;
-      solveBtn.innerHTML = '<span class="spinner-sm" aria-hidden="true"></span><span>Running optimization…</span>';
+    function setRunButtonsLoading(loading, status = null) {
+      const dict = I18N[STATE.currentLanguage || 'en'] || I18N.en;
+      if (loading) {
+        if (solveBtn) {
+          solveBtn.disabled = true;
+          solveBtn.innerHTML = '<span class="spinner-sm" aria-hidden="true"></span><span>' + dict.running_optimization + '</span>';
+        }
+        if (headerSolveBtn) {
+          headerSolveBtn.disabled = true;
+          headerSolveBtn.innerHTML = '<span class="spinner-sm" aria-hidden="true"></span><span>' + dict.running_optimization + '</span>';
+        }
+      } else {
+        if (status === 'OPTIMAL_VERIFIED') {
+          if (solveBtn) {
+            solveBtn.disabled = true;
+            solveBtn.innerHTML = '<span class="one-time-check" aria-hidden="true">✓</span><span>' + dict.opt_complete + '</span>';
+          }
+          if (headerSolveBtn) {
+            headerSolveBtn.disabled = true;
+            headerSolveBtn.innerHTML = '<span class="one-time-check" aria-hidden="true">✓</span><span>' + dict.opt_complete + '</span>';
+          }
+          setTimeout(() => {
+            if (!STATE.isSolving) {
+              if (solveBtn) {
+                solveBtn.disabled = false;
+                solveBtn.innerHTML = '<span>' + dict.btn_run_solver + '</span>';
+              }
+              if (headerSolveBtn) {
+                headerSolveBtn.disabled = false;
+                headerSolveBtn.innerHTML = '<span>' + dict.nav_run_optimization + '</span>';
+              }
+            }
+          }, 900);
+        } else {
+          if (solveBtn) {
+            solveBtn.disabled = false;
+            solveBtn.innerHTML = '<span>' + dict.btn_run_solver + '</span>';
+          }
+          if (headerSolveBtn) {
+            headerSolveBtn.disabled = false;
+            headerSolveBtn.innerHTML = '<span>' + dict.nav_run_optimization + '</span>';
+          }
+        }
+      }
     }
 
+    setRunButtonsLoading(true);
     if (stagePill) stagePill.textContent = 'Building model…';
 
     const pArab = document.getElementById('input-param-arab')?.value || 70;
@@ -1631,6 +1819,7 @@
     const dDsl = document.getElementById('input-param-dsl')?.value || 50;
 
     let modelData = null;
+    let resultData = null;
 
     try {
       if (STATE.activeModel.startsWith('refinery-')) {
@@ -1653,7 +1842,6 @@
 
       if (stagePill) stagePill.textContent = 'Executing sparse LU solver…';
 
-      let resultData = null;
       if (modelData) {
         const solveResp = await fetch('/api/solve', {
           method: 'POST',
@@ -1666,6 +1854,10 @@
 
         if (solveResp.ok) {
           resultData = await solveResp.json();
+        } else {
+          let errBody = null;
+          try { errBody = await solveResp.json(); } catch(e){}
+          console.error('Solve HTTP error:', solveResp.status, errBody);
         }
       }
 
@@ -1706,27 +1898,8 @@
       console.error('Solve error:', err);
       if (stagePill) stagePill.textContent = 'Execution error';
     } finally {
-      if (thisGen === STATE.solveGen) {
-        STATE.isSolving = false;
-        if (solveBtn) {
-          solveBtn.disabled = false;
-          if (resultData && resultData.status === 'OPTIMAL_VERIFIED') {
-            solveBtn.innerHTML = '<span class="one-time-check" aria-hidden="true">✓</span><span>Run optimization</span>';
-            if (stagePill) {
-              stagePill.classList.remove('status-reveal-250');
-              void stagePill.offsetWidth;
-              stagePill.classList.add('status-reveal-250');
-            }
-            setTimeout(() => {
-              if (!STATE.isSolving && solveBtn) {
-                solveBtn.innerHTML = '<span>Run optimization</span>';
-              }
-            }, 2500);
-          } else {
-            solveBtn.innerHTML = '<span>Run optimization</span>';
-          }
-        }
-      }
+      STATE.isSolving = false;
+      setRunButtonsLoading(false, resultData ? resultData.status : null);
     }
   }
 
@@ -2257,6 +2430,9 @@
     Object.assign(window.sovApp, {
       switchTab: switchTab,
       triggerSolve: triggerSolve,
+      setLanguage: setLanguage,
+      setFontScale: setFontScale,
+      I18N: I18N,
       getState: () => STATE,
       TEAM_MEMBERS: TEAM_MEMBERS,
       ASSET_VERSION: ASSET_VERSION,

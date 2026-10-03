@@ -1,5 +1,17 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.9] - 2026-10-03
+
+### Gate 13: Accessibility Controls and Solve Loading State Hotfix
+
+- **fix(web): Resolve accessibility controls and solve loading state:**
+  - Implemented real bidirectional English/Hindi UI language toggle with centralized `I18N` dictionary, `data-i18n` attributes, and `localStorage` persistence (`sovopt-language`). Preserved all technical identifiers (SOV-OPT, MRPL, LP, MILP, QP, PDHG, KKT, SHA-256, CUDA, RTX 5050, OPTIMAL_VERIFIED, INFEASIBLE_CERTIFIED, VarunNetra, 177365, personal names) and institutional masthead strings verbatim.
+  - Implemented bounded accessibility font scaling controls (A- = 90%, A = 100%, A+ = 110%) with `--accessibility-font-scale` root property, active state indicators, and `localStorage` persistence (`sovopt-font-scale`).
+  - Resolved Run Optimization button infinite loading defect by implementing a robust `try / finally` async lifecycle, guaranteeing that the button always resets to an enabled state on every exit path (optimal solve, infeasible certified, numerical failure, limit reached, HTTP error, timeout, JSON parse error). Allowed brief 900ms success confirmation state before restoring the enabled "Run Optimization" action.
+  - Synchronized navbar quick-action solve button (`btn-header-solve`) with operations console solve button (`btn-run-solve`).
+  - Added duplicate solve execution protection during active request processing.
+  - Zero solver mathematics changes; zero benchmark evidence alterations.
+
 ## [0.3.8] - 2026-10-03
 
 ### Gate 12: MRPL-Style SIH Portal UI Freeze
