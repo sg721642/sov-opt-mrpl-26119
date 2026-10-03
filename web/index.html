@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=5">
+  <link rel="stylesheet" href="/style.css?v=6">
 </head>
 <body>
 
@@ -17,12 +17,10 @@
   <div id="accessibility-strip" role="region" aria-label="Language controls">
     <div class="acc-container">
       <div class="acc-links">
-        <a href="#content-viewport" class="acc-link" title="Screen reader access" data-i18n="screen_reader">Screen Reader Access</a>
-        <span class="acc-sep" aria-hidden="true">|</span>
-        <a href="#content-viewport" class="acc-link" title="Skip to main content" data-i18n="skip_to_content">Skip to main content</a>
+        <a href="#main-content" class="acc-link skip-link" title="Skip to main content" data-i18n="skip_to_content">Skip to main content</a>
       </div>
       <div class="acc-controls">
-        <button id="btn-acc-lang" class="acc-btn acc-lang" title="भाषा हिन्दी में बदलें" aria-label="Switch language to Hindi">हिन्दी</button>
+        <button id="btn-acc-lang" class="acc-btn acc-lang" title="हिन्दी में बदलें" aria-label="हिन्दी में बदलें">हिन्दी</button>
       </div>
     </div>
   </div>
@@ -136,7 +134,7 @@
   <!-- =======================================================================
        MAIN CONTENT VIEWPORT
        ======================================================================= -->
-  <main id="content-viewport" class="page-container" tabindex="-1">
+  <main id="main-content" class="page-container" tabindex="-1">
 
       <!-- ===================================================================
            VIEW 0: HOME LANDING (Technical Portal)
@@ -2101,6 +2099,6 @@
     </div>
   </footer>
 
-  <script src="/app.js?v=5"></script>
+  <script src="/app.js?v=6"></script>
 </body>
 </html>

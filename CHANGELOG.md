@@ -1,5 +1,18 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.12] - 2026-10-03
+
+### Gate 16: Correct Language Toggle and Accessibility Links
+
+- **fix(web): Correct language toggle alternation and accessibility top-bar links:**
+  - Resolved root cause of language toggle getting stuck displaying "हिन्दी" in both English and Hindi modes: decoupled language button `#btn-acc-lang` from generic `applyDOMTranslations()` passes by excluding `#btn-acc-lang` from both the text NodeFilter TreeWalker and attribute translation selectors, removed conflicting circular words ("हिन्दी", "English") from `TRANSLATION_MAP`, and implemented a dedicated `updateLanguageToggle()` controller called after DOM translations.
+  - In English mode: page in English, button displays "हिन्दी", `aria-label` / `title` = "हिन्दी में बदलें", `document.documentElement.lang` = "en", `localStorage` = "en".
+  - In Hindi mode: page in Hindi, button displays "English", `aria-label` / `title` = "Switch to English", `document.documentElement.lang` = "hi", `localStorage` = "hi".
+  - Removed decorative/duplicate "Screen Reader Access" anchor from the top utility bar as it duplicated the skip link behavior without distinct content; retained dedicated "Skip to main content" link pointing to `<main id="main-content" tabindex="-1">` with guaranteed keyboard and programmatic focus.
+  - Bumped cache-busters on `style.css` and `app.js` to `?v=6`.
+  - Validated via CDP headless automation: 5-cycle back-and-forth alternation, refresh persistence in both English and Hindi, keyboard tab/focus navigation, solver execution without stuck spinner, and absence of removed font controls.
+  - 340 tests pass (0 failures, 0 errors, 14 skipped); zero changes to `sovopt/`, `data/`, or `reports/`.
+
 ## [0.3.11] - 2026-10-03
 
 ### Gate 15: Simplify Accessibility Controls to Language Toggle Only

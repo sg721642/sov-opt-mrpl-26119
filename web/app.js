@@ -169,18 +169,13 @@
 
   // Complete English to Hindi Translation Dictionary
   const TRANSLATION_MAP = {
-  "Screen Reader Access": "स्क्रीन रीडर एक्सेस",
+  "Screen Reader Access": "स्क्रीन रीडर सहायता",
   "Skip to main content": "मुख्य सामग्री पर जाएँ",
   "Toggle text spacing": "टेक्स्ट स्पेसिंग बदलें",
   "Toggle high contrast": "उच्च कंट्रास्ट बदलें",
   "Decrease font size": "फ़ॉन्ट का आकार घटाएँ",
   "Default font size": "सामान्य फ़ॉन्ट आकार",
   "Increase font size": "फ़ॉन्ट का आकार बढ़ाएँ",
-  "भाषा हिन्दी में बदलें": "Switch language to English",
-  "Switch language to Hindi": "भाषा हिन्दी में बदलें",
-  "Switch language to English": "अंग्रेज़ी में बदलें",
-  "हिन्दी": "English",
-  "English": "हिन्दी",
   "Smart India Hackathon 2026": "स्मार्ट इंडिया हैकाथॉन 2026",
   "TEAM NAME": "टीम का नाम",
   "TEAM ID": "टीम आईडी",
@@ -1052,7 +1047,7 @@
         const tag = parent.tagName.toLowerCase();
         if (tag === 'script' || tag === 'style' || tag === 'code' || tag === 'pre') return NodeFilter.FILTER_REJECT;
         if (parent.closest('#mrpl-masthead .mrpl-title-block')) return NodeFilter.FILTER_REJECT;
-        if (parent.closest('.notranslate')) return NodeFilter.FILTER_REJECT;
+        if (parent.closest('.notranslate') || parent.closest('#btn-acc-lang')) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }
     });
@@ -1085,7 +1080,7 @@
     // Translate common attributes
     const attrElements = root.querySelectorAll ? root.querySelectorAll('[placeholder], [title], [aria-label]') : [];
     attrElements.forEach(el => {
-      if (el.closest('#mrpl-masthead .mrpl-title-block') || el.closest('.notranslate')) return;
+      if (el.closest('#mrpl-masthead .mrpl-title-block') || el.closest('.notranslate') || el.closest('#btn-acc-lang') || el.id === 'btn-acc-lang') return;
       ['placeholder', 'title', 'aria-label'].forEach(attr => {
         const val = el.getAttribute(attr);
         if (!val || !val.trim()) return;
@@ -1108,6 +1103,20 @@
     });
   }
 
+  function updateLanguageToggle() {
+    const btn = document.getElementById('btn-acc-lang');
+    if (!btn) return;
+    if (STATE.currentLanguage === 'hi') {
+      btn.textContent = 'English';
+      btn.setAttribute('aria-label', 'Switch to English');
+      btn.setAttribute('title', 'Switch to English');
+    } else {
+      btn.textContent = 'हिन्दी';
+      btn.setAttribute('aria-label', 'हिन्दी में बदलें');
+      btn.setAttribute('title', 'हिन्दी में बदलें');
+    }
+  }
+
   function setLanguage(lang) {
     if (!I18N[lang]) lang = 'en';
     STATE.currentLanguage = lang;
@@ -1122,13 +1131,6 @@
       }
     });
 
-    const langBtn = document.getElementById('btn-acc-lang');
-    if (langBtn) {
-      langBtn.textContent = dict.lang_btn_text;
-      langBtn.setAttribute('aria-label', dict.lang_aria_label);
-      langBtn.title = (lang === 'en' ? 'भाषा हिन्दी में बदलें' : 'Switch language to English');
-    }
-
     if (!STATE.isSolving) {
       const solveBtn = document.getElementById('btn-run-solve');
       if (solveBtn) solveBtn.innerHTML = '<span>' + dict.btn_run_solver + '</span>';
@@ -1137,6 +1139,7 @@
     }
 
     applyDOMTranslations(document.body, lang);
+    updateLanguageToggle();
 
     // Refresh dynamic views if they have been initialized
     try {
@@ -1715,7 +1718,7 @@
     }
   }
 
-  // Accessibility Controls Setup — language toggle only
+  // Accessibility Controls Setup — language toggle and skip link
   function setupAccessibility() {
     const btnLang = document.getElementById('btn-acc-lang');
     if (btnLang) {
@@ -1725,10 +1728,21 @@
       });
     }
 
+    const skipLink = document.querySelector('.skip-link');
+    if (skipLink) {
+      skipLink.addEventListener('click', e => {
+        const main = document.getElementById('main-content');
+        if (main) {
+          main.focus({ preventScroll: false });
+        }
+      });
+    }
+
     // Initialize persisted language preference
     let initialLang = 'en';
     try { initialLang = localStorage.getItem('sovopt-language') || 'en'; } catch (e) {}
     setLanguage(initialLang);
+    updateLanguageToggle();
   }
 
   // Mobile Drawer Logic
@@ -3365,6 +3379,7 @@
       switchTab: switchTab,
       triggerSolve: triggerSolve,
       setLanguage: setLanguage,
+      updateLanguageToggle: updateLanguageToggle,
       I18N: I18N,
       getState: () => STATE,
       TEAM_MEMBERS: TEAM_MEMBERS,
@@ -3530,6 +3545,7 @@
   window.switchTab = switchTab;
   window.selectScenario = selectScenario;
   window.setLanguage = setLanguage;
+  window.updateLanguageToggle = updateLanguageToggle;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
