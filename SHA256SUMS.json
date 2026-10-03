@@ -16,7 +16,7 @@
     "mode": "text-lf"
   },
   "CHANGELOG.md": {
-    "sha256": "209a1754d3348330e07baf86a29d8a2964280e666ffdff0660991a1861bd1f2b",
+    "sha256": "d026a8d506dea34569ebd0ed953a3ac10ff0c103b0da3a6bd71348b0fcbe9701",
     "mode": "text-lf"
   },
   "Dockerfile": {
@@ -433,6 +433,10 @@
   },
   "docs/BENCHMARK_METHODOLOGY.md": {
     "sha256": "a44fde0e819d974028bc889fef9d350aa4a8b68d897ba3a38a7fd73ba729168d",
+    "mode": "text-lf"
+  },
+  "docs/DEPLOYMENT.md": {
+    "sha256": "c86df051e4d1023f15cf45a87a31f41084ec925dffb34f6b2a89635266140fcf",
     "mode": "text-lf"
   },
   "docs/DUAL_SIMPLEX.md": {
@@ -1008,7 +1012,7 @@
     "mode": "text-lf"
   },
   "server.py": {
-    "sha256": "ea82978e900a86e00cf4203cea79021a1d91f45485e4c854b7b368f98a957a37",
+    "sha256": "46bddf83ed608c99e3ff9d13eccb5dfa0fe56634f0957bb2be209e7d8b835347",
     "mode": "text-lf"
   },
   "sovopt/__init__.py": {
@@ -1156,7 +1160,7 @@
     "mode": "text-lf"
   },
   "tests/test_server.py": {
-    "sha256": "a7e24c2d1f59409cfb53e4b2ed06b77e6269caca85fc464af3d3d6d32eb362b6",
+    "sha256": "3a8cd02a01bb2006720e5bb561ed68d99387daa053b25ddf482cd4c0d4e7f8e8",
     "mode": "text-lf"
   },
   "tests/test_solver.py": {
@@ -1168,15 +1172,43 @@
     "mode": "text-lf"
   },
   "web/app.js": {
-    "sha256": "c1454286a69e6f0b87e4b1300b8afcc9711f7b32f637ec81c13e6bd3c35781be",
+    "sha256": "d649c997c8da996999967227b99d956e657bdb96278b046b2cfb0d2ffac753c7",
     "mode": "text-lf"
   },
+  "web/assets/MRPL_logo.jpg": {
+    "sha256": "de01dfc6e583ddf06d321294f41bd080e9beaf5057d5408ef7d433beba8bd2e7",
+    "mode": "raw"
+  },
+  "web/assets/team/ayush.png": {
+    "sha256": "e16d5a7d616334fabbd8010ed030fe4ae1787c49e04961d3103a17bc36ef29c4",
+    "mode": "raw"
+  },
+  "web/assets/team/khagesh.png": {
+    "sha256": "6d460189949fc400c909deeb2d4cce65373dd9583c5ad97d4271ed6d17a348ab",
+    "mode": "raw"
+  },
+  "web/assets/team/muskan.png": {
+    "sha256": "b93516356568859af0e15ea0dcf8de89c13487e6218ec518d5899f8afafb03af",
+    "mode": "raw"
+  },
+  "web/assets/team/satyam.png": {
+    "sha256": "ae3d79f88d23f4140c1a80d26dd7b2739cac7695b6da48c2e1a3799b7e3e31aa",
+    "mode": "raw"
+  },
+  "web/assets/team/shivanshu.png": {
+    "sha256": "e991de088d039736b15162021dcba8ddd35658e54759369097fb32038a437a88",
+    "mode": "raw"
+  },
+  "web/assets/team/sudipto.png": {
+    "sha256": "9c825abe143130ba52c0a177ec235f7ff0f1450abe76c79ea3c316d9571c9cdb",
+    "mode": "raw"
+  },
   "web/index.html": {
-    "sha256": "213d0136d0ca535e296f491b6bfd390dc3e806f48668fcb2b58b8bdee16742f4",
+    "sha256": "5477a006490c12b502d5750425493f36c32c4670e01361e988a8a0c9abd41064",
     "mode": "text-lf"
   },
   "web/style.css": {
-    "sha256": "a993f502231de9d625396695be3ab624fc6ce9947fc17f0d1a2a2f2caab16a0c",
+    "sha256": "1d2061fe841649bf3bbb7aa0755e92507b49d55c8c37483a493d3eb8d05dba85",
     "mode": "text-lf"
   }
 }

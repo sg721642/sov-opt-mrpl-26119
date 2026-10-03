@@ -14,7 +14,14 @@ class Handler(BaseHTTPRequestHandler):
     def do_HEAD(self):
         return self.do_GET()
     def do_GET(self):
-        if self.path=='/health':return self.send(200,{'status':'ok','version':'0.3.1'})
+        if self.path in ('/health', '/api/health'):
+            from sovopt import __version__
+            return self.send(200, {
+                'status': 'ok',
+                'service': 'sov-opt',
+                'version': __version__,
+                'solver_ready': True,
+            })
         if self.path=='/api/manifest':return self.send(200,json.loads((ROOT/'data/manifest.json').read_text()))
         if self.path=='/api/examples':return self.send(200,{k:json.loads(p.read_text()) for k,p in EXAMPLES.items()})
         if self.path.startswith('/api/refinery_twin'):
@@ -41,20 +48,32 @@ class Handler(BaseHTTPRequestHandler):
             p=ROOT/'reports/gpu_gate9_final_51b71bb/summary.json'
             if p.exists():return self.send(200,json.loads(p.read_text()))
             return self.send(404,{'error':'GPU summary not found'})
-        if self.path.startswith('/static/'):
-            rel=self.path[len('/static/'):]
-            fp=(ROOT/'web'/rel).resolve()
+        import urllib.parse
+        clean_path = urllib.parse.urlsplit(self.path).path
+        if clean_path.startswith('/static/') or clean_path.startswith('/assets/'):
+            rel = clean_path[len('/static/'):] if clean_path.startswith('/static/') else clean_path[1:]
+            fp = (ROOT/'web'/rel).resolve()
             if fp.exists() and fp.is_file() and str(fp).startswith(str(ROOT/'web')):
-                ext=fp.suffix.lower()
-                mime={'.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.svg':'image/svg+xml','.json':'application/json','.png':'image/png','.ico':'image/x-icon'}.get(ext,'text/plain')
-                return self.send(200,fp.read_bytes(),mime)
-        if self.path in ('/style.css','/web/style.css'):
-            p=ROOT/'web/style.css'
-            if p.exists():return self.send(200,p.read_bytes(),'text/css; charset=utf-8')
-        if self.path in ('/app.js','/web/app.js'):
-            p=ROOT/'web/app.js'
-            if p.exists():return self.send(200,p.read_bytes(),'application/javascript; charset=utf-8')
-        if self.path in ('/','/index.html'):return self.send(200,(ROOT/'web/index.html').read_bytes(),'text/html; charset=utf-8')
+                ext = fp.suffix.lower()
+                mime = {
+                    '.css': 'text/css; charset=utf-8',
+                    '.js': 'application/javascript; charset=utf-8',
+                    '.svg': 'image/svg+xml',
+                    '.json': 'application/json',
+                    '.png': 'image/png',
+                    '.jpg': 'image/jpeg',
+                    '.jpeg': 'image/jpeg',
+                    '.webp': 'image/webp',
+                    '.ico': 'image/x-icon'
+                }.get(ext, 'text/plain')
+                return self.send(200, fp.read_bytes(), mime)
+        if clean_path in ('/style.css', '/web/style.css'):
+            p = ROOT/'web/style.css'
+            if p.exists(): return self.send(200, p.read_bytes(), 'text/css; charset=utf-8')
+        if clean_path in ('/app.js', '/web/app.js'):
+            p = ROOT/'web/app.js'
+            if p.exists(): return self.send(200, p.read_bytes(), 'application/javascript; charset=utf-8')
+        if clean_path in ('/', '/index.html'): return self.send(200, (ROOT/'web/index.html').read_bytes(), 'text/html; charset=utf-8')
         self.send(404,{'error':'Not found'})
     def do_POST(self):
         if self.path!='/api/solve':return self.send(404,{'error':'Not found'})
@@ -84,10 +103,16 @@ class Handler(BaseHTTPRequestHandler):
                 r['model_sha256']=model.fingerprint()
                 r['model_name']=model.name
                 r['backend']=backend
+                r['solver_commit']=os.environ.get('SOVOPT_COMMIT_SHA') or r.get('solver_commit')
                 self.send(200,r)
-        except subprocess.TimeoutExpired:self.send(200,{'status':'LIMIT_REACHED','message':'35-second web worker deadline reached','gpu_executed':False,'model_sha256':model.fingerprint(),'model_name':model.name,'backend':backend})
+        except subprocess.TimeoutExpired:self.send(200,{'status':'LIMIT_REACHED','message':'35-second web worker deadline reached','gpu_executed':False,'model_sha256':model.fingerprint(),'model_name':model.name,'backend':backend,'solver_commit':os.environ.get('SOVOPT_COMMIT_SHA')})
         finally:SLOTS.release()
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--host',default='127.0.0.1');p.add_argument('--port',type=int,default=int(os.environ.get('PORT',8000)));a=p.parse_args()
+    default_host=os.environ.get('HOST','127.0.0.1')
+    default_port=int(os.environ.get('PORT',8000))
+    p=argparse.ArgumentParser()
+    p.add_argument('--host',default=default_host)
+    p.add_argument('--port',type=int,default=default_port)
+    a=p.parse_args()
     print(f'SOV-OPT demo at http://{a.host}:{a.port}',flush=True)
     ThreadingHTTPServer((a.host,a.port),Handler).serve_forever()

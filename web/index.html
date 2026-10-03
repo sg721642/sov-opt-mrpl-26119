@@ -3,136 +3,718 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>SOV-OPT · Refinery Planning Workstation</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Mangalore Refinery and Petrochemicals Limited · SOV-OPT Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css?v=3">
 </head>
 <body>
 
-<div id="app-shell">
-
-  <!-- MOBILE TOP HEADER (<= 767px) -->
-  <div id="mobile-header">
-    <div class="mobile-brand">SOV–OPT · Refinery Workstation</div>
-    <button id="mobile-menu-trigger" class="mobile-menu-btn" aria-label="Open Navigation Menu">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-      <span>Menu</span>
-    </button>
+  <!-- =======================================================================
+       TOP ACCESSIBILITY BAR (MRPL Standard Utility Strip)
+       ======================================================================= -->
+  <div id="accessibility-strip" role="region" aria-label="Accessibility and display controls">
+    <div class="acc-container">
+      <div class="acc-links">
+        <a href="#content-viewport" class="acc-link" title="Screen reader access">Screen Reader Access</a>
+        <span class="acc-sep" aria-hidden="true">|</span>
+        <a href="#content-viewport" class="acc-link" title="Skip to main content">Skip to main content</a>
+      </div>
+      <div class="acc-controls">
+        <button id="btn-acc-space" class="acc-btn" title="Toggle text spacing" aria-label="Toggle text spacing" aria-pressed="false">T↔</button>
+        <button id="btn-acc-contrast" class="acc-btn" title="Toggle high contrast" aria-label="Toggle high contrast" aria-pressed="false">A</button>
+        <button id="btn-acc-font-minus" class="acc-btn" title="Decrease font size" aria-label="Decrease font size">A-</button>
+        <button id="btn-acc-font-reset" class="acc-btn" title="Default font size" aria-label="Default font size">A</button>
+        <button id="btn-acc-font-plus" class="acc-btn" title="Increase font size" aria-label="Increase font size">A+</button>
+        <span class="acc-lang" title="Hindi Language Indicator" tabindex="0">हिन्दी</span>
+      </div>
+    </div>
   </div>
 
-  <div id="mobile-backdrop"></div>
-
-  <!-- NAVIGATION RAIL / MOBILE DRAWER -->
-  <aside id="nav-rail" aria-label="Workstation Navigation">
-    <div class="rail-brand">
-      <div>
-        <div class="brand-name">SOV–OPT</div>
-        <div class="brand-desc">Refinery planning system</div>
+  <!-- =======================================================================
+       MRPL WHITE MASTHEAD (Visual Authority)
+       ======================================================================= -->
+  <header id="mrpl-masthead" role="banner">
+    <div class="mrpl-masthead-inner">
+      <div class="mrpl-logo-block">
+        <a href="#home" class="nav-item" data-tab="home" title="MRPL Home">
+          <img src="/assets/MRPL_logo.jpg?v=3" alt="Mangalore Refinery and Petrochemicals Limited Logo" class="mrpl-logo" width="91" height="91" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+          <div class="mrpl-logo-fallback" style="display:none;">MRPL</div>
+        </a>
       </div>
-      <button id="mobile-close-btn" style="display: none; background: transparent; border: none; color: var(--text-sidebar); font-size: 18px; cursor: pointer;">&times;</button>
+      <div class="mrpl-title-block">
+        <h1 class="mrpl-masthead-title">Mangalore Refinery and Petrochemicals Limited</h1>
+        <div class="mrpl-masthead-subtitle">(A subsidiary of Oil and Natural Gas Corporation Limited)</div>
+      </div>
     </div>
+  </header>
 
-    <nav class="nav-menu">
-      <div class="nav-group-label">Operations</div>
-      <a class="nav-item active" data-tab="overview" href="#overview">
-        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-        <span>Overview</span>
-      </a>
-      <a class="nav-item" data-tab="optimization" href="#optimization">
-        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
-        <span>Optimization run</span>
-      </a>
-      <a class="nav-item" data-tab="scenarios" href="#scenarios">
-        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
-        <span>Scenarios</span>
-      </a>
+  <!-- =======================================================================
+       MRPL GREEN NAVIGATION BAR
+       ======================================================================= -->
+  <nav id="mrpl-nav" class="mrpl-navbar" role="navigation" aria-label="Main menu">
+    <div class="mrpl-nav-inner">
+      <!-- Mobile hamburger trigger -->
+      <button id="mobile-menu-trigger" class="mobile-nav-toggle" aria-label="Open Navigation Menu" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        <span>Menu</span>
+      </button>
 
-      <div class="nav-group-label">Engineering &amp; verification</div>
-      <a class="nav-item" data-tab="analytics" href="#analytics">
-        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 20V10m-6 10V4M6 20v-6"/></svg>
-        <span>Solver analytics</span>
-      </a>
-      <a class="nav-item" data-tab="trust" href="#trust">
-        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>Trust &amp; verification</span>
-      </a>
-      <a class="nav-item" data-tab="benchmarks" href="#benchmarks">
-        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        <span>Benchmarks (RTX 5050)</span>
-      </a>
+      <!-- Desktop Nav Items -->
+      <div class="mrpl-nav-links">
+        <a class="nav-item active" data-tab="home" href="#home">Home</a>
+        <a class="nav-item" data-tab="about" href="#about">About Us</a>
 
-      <div class="nav-group-label">Governance &amp; evidence</div>
-      <a class="nav-item" data-tab="evidence" href="#evidence">
-        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        <span>Evidence &amp; audits</span>
-      </a>
-      <a class="nav-item" data-tab="reports" href="#reports">
-        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        <span>Reports &amp; export</span>
-      </a>
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-btn" aria-haspopup="true">Solver Portal <span class="nav-arrow">▾</span></button>
+          <div class="nav-dropdown-content">
+            <a class="nav-item" data-tab="overview" href="#overview">Overview &amp; Process Flow</a>
+            <a class="nav-item" data-tab="optimization" href="#optimization">Optimization Run</a>
+            <a class="nav-item" data-tab="analytics" href="#analytics">Solver Analytics</a>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-btn" aria-haspopup="true">Refinery Planning <span class="nav-arrow">▾</span></button>
+          <div class="nav-dropdown-content">
+            <a class="nav-item" data-tab="scenarios" href="#scenarios">Scenarios</a>
+            <a class="nav-item" data-tab="overview" href="#overview">Refinery Twin &amp; PFD</a>
+          </div>
+        </div>
+
+        <a class="nav-item" data-tab="trust" href="#trust">Trust &amp; Verification</a>
+        <a class="nav-item" data-tab="benchmarks" href="#benchmarks">Benchmarks</a>
+
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-btn" aria-haspopup="true">Evidence <span class="nav-arrow">▾</span></button>
+          <div class="nav-dropdown-content">
+            <a class="nav-item" data-tab="evidence" href="#evidence">Evidence &amp; Audits</a>
+            <a class="nav-item" data-tab="reports" href="#reports">Reports &amp; Export</a>
+          </div>
+        </div>
+
+        <a class="nav-item" data-tab="contact" href="#contact">Contact Us</a>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="mrpl-nav-actions">
+        <button id="btn-header-solve" class="btn btn-nav-action" title="Execute active optimization run">
+          <span>Run Optimization</span>
+        </button>
+        <button id="btn-header-audit" class="btn btn-nav-action-outline" title="Export audit artifacts">
+          <span>Export Audit</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Drawer Backdrop & Aside -->
+  <div id="mobile-backdrop"></div>
+  <aside id="nav-rail" class="mobile-drawer" aria-label="Mobile Navigation Menu">
+    <div class="mobile-drawer-header">
+      <div class="mobile-drawer-brand">
+        <div class="mobile-drawer-title">SOV-OPT</div>
+        <div class="mobile-drawer-sub">MRPL PS 26119</div>
+      </div>
+      <button id="mobile-close-btn" class="mobile-drawer-close" aria-label="Close Navigation Menu">&times;</button>
+    </div>
+    <nav class="mobile-drawer-nav">
+      <a class="nav-item active" data-tab="home" href="#home">Home</a>
+      <a class="nav-item" data-tab="about" href="#about">About Us</a>
+      <div class="mobile-drawer-group">Solver Portal</div>
+      <a class="nav-item" data-tab="overview" href="#overview">Overview &amp; Process Flow</a>
+      <a class="nav-item" data-tab="optimization" href="#optimization">Optimization Run</a>
+      <a class="nav-item" data-tab="analytics" href="#analytics">Solver Analytics</a>
+      <div class="mobile-drawer-group">Refinery Planning</div>
+      <a class="nav-item" data-tab="scenarios" href="#scenarios">Scenarios</a>
+      <div class="mobile-drawer-group">Trust &amp; Hardware Evidence</div>
+      <a class="nav-item" data-tab="trust" href="#trust">Trust &amp; Verification</a>
+      <a class="nav-item" data-tab="benchmarks" href="#benchmarks">Benchmarks (RTX 5050)</a>
+      <a class="nav-item" data-tab="evidence" href="#evidence">Evidence &amp; Audits</a>
+      <a class="nav-item" data-tab="reports" href="#reports">Reports &amp; Export</a>
+      <div class="mobile-drawer-group">Contact</div>
+      <a class="nav-item" data-tab="contact" href="#contact">Contact Us</a>
     </nav>
-
-    <div class="rail-footer">
-      <div><strong>Sovereign core</strong> · Pure NumPy</div>
-      <div>Residual tolerance: 1e-07 strict</div>
-    </div>
   </aside>
 
-  <!-- MAIN WORKSPACE -->
-  <div id="main-viewport">
+  <!-- =======================================================================
+       MAIN CONTENT VIEWPORT
+       ======================================================================= -->
+  <main id="content-viewport" class="page-container" tabindex="-1">
 
-    <!-- DESKTOP TOP HEADER -->
-    <header id="top-header">
-      <div class="header-left">
-        <span class="header-trail-title">Refinery planning</span>
-        <span style="color: var(--text-muted); margin: 0 2px;">/</span>
-        <span class="header-trail-sub" id="top-breadcrumb-sub">Base operational equilibrium</span>
-      </div>
+      <!-- ===================================================================
+           VIEW 0: HOME LANDING (Technical Portal)
+           =================================================================== -->
+      <section id="view-home" class="view-section active">
 
-      <div class="header-right">
-        <div class="header-meta">
-          <div class="header-meta-item">
-            <span>Scenario:</span>
-            <select id="scenario-quick-select" class="form-control" style="width: auto; padding: 2px 8px; font-size: 12px; background: var(--bg-surface); border-color: var(--border-default);">
-              <option value="SC-01">SC-01: Base equilibrium</option>
-              <option value="SC-02">SC-02: High-Basrah heavy discount</option>
-              <option value="SC-03">SC-03: Summer high-octane peak</option>
-              <option value="SC-04">SC-04: FCC maintenance turndown</option>
-              <option value="SC-05">SC-05: Strict BS-VI fuel quality</option>
-              <option value="SC-06">SC-06: Infeasible demand shock</option>
-            </select>
+        <!-- ===================================================================
+             SIH / TEAM IDENTITY PILL (OceanEmbed Inspired)
+             =================================================================== -->
+        <div class="sih-team-strip" role="region" aria-label="Smart India Hackathon Team Details">
+          <span class="sih-title">Smart India Hackathon 2026</span>
+          <span class="sih-separator"></span>
+          <span class="sih-meta-label">TEAM NAME</span>
+          <strong class="sih-meta-value">VarunNetra</strong>
+          <span class="sih-separator"></span>
+          <span class="sih-meta-label">TEAM ID</span>
+          <strong class="sih-meta-value">177365</strong>
+        </div>
+
+        <!-- ===================================================================
+             LATEST UPDATES ANIMATED TICKER (OceanEmbed Inspired)
+             =================================================================== -->
+        <div class="latest-updates-bar" role="region" aria-label="Latest Updates">
+          <div class="updates-badge">
+            <span class="updates-dot"></span>
+            <span class="updates-title">Latest Updates</span>
           </div>
-          <div class="header-meta-item">
-            <span>Execution:</span>
-            <strong id="header-platform-display">CPU · Sovereign</strong>
-          </div>
-          <div class="header-meta-item">
-            <span>Evidence node:</span>
-            <strong>RTX 5050</strong>
-          </div>
-          <div class="header-meta-item">
-            <span>Tolerance:</span>
-            <span class="mono">1e-07</span>
+          <div class="updates-ticker-wrapper" tabindex="0">
+            <div class="updates-ticker-track">
+              <div class="ticker-item"><span class="ticker-icon">⚡</span> SOV-OPT supports sovereign LP, MILP and convex QP optimization workflows.</div>
+              <div class="ticker-sep">•</div>
+              <div class="ticker-item"><span class="ticker-icon">🛡️</span> Numerical Trust Layer independently verifies accepted optimization results.</div>
+              <div class="ticker-sep">•</div>
+              <div class="ticker-item"><span class="ticker-icon">📜</span> Trust Passport is generated from the accepted solve snapshot with SHA-256 model provenance.</div>
+              <div class="ticker-sep">•</div>
+              <div class="ticker-item"><span class="ticker-icon">🔍</span> Certified Farkas diagnostics are available for supported infeasible cases.</div>
+              <div class="ticker-sep">•</div>
+              <div class="ticker-item"><span class="ticker-icon">💻</span> Historical physical CUDA validation evidence from the Acer RTX 5050 is preserved separately.</div>
+              <div class="ticker-sep">•</div>
+              <div class="ticker-item"><span class="ticker-icon">🏭</span> Refinery planning dashboard provides solver-driven process flow and scenario analysis.</div>
+              <!-- Duplicate set for seamless continuous loop -->
+              <div class="ticker-sep">•</div>
+              <div class="ticker-item"><span class="ticker-icon">⚡</span> SOV-OPT supports sovereign LP, MILP and convex QP optimization workflows.</div>
+              <div class="ticker-sep">•</div>
+              <div class="ticker-item"><span class="ticker-icon">🛡️</span> Numerical Trust Layer independently verifies accepted optimization results.</div>
+              <div class="ticker-sep">•</div>
+              <div class="ticker-item"><span class="ticker-icon">📜</span> Trust Passport is generated from the accepted solve snapshot with SHA-256 model provenance.</div>
+              <div class="ticker-sep">•</div>
+              <div class="ticker-item"><span class="ticker-icon">🔍</span> Certified Farkas diagnostics are available for supported infeasible cases.</div>
+              <div class="ticker-sep">•</div>
+              <div class="ticker-item"><span class="ticker-icon">💻</span> Historical physical CUDA validation evidence from the Acer RTX 5050 is preserved separately.</div>
+              <div class="ticker-sep">•</div>
+              <div class="ticker-item"><span class="ticker-icon">🏭</span> Refinery planning dashboard provides solver-driven process flow and scenario analysis.</div>
+            </div>
           </div>
         </div>
 
-        <div class="header-actions">
-          <button id="btn-header-solve" class="btn btn-primary btn-sm">
-            <span>Run optimization</span>
-          </button>
-          <button id="btn-header-audit" class="btn btn-secondary btn-sm">
-            <span>Export audit</span>
-          </button>
+        <!-- ===================================================================
+             MRPL-STYLE FULL-WIDTH ROTATING HERO CAROUSEL
+             =================================================================== -->
+        <div id="hero-carousel" class="mrpl-carousel" role="region" aria-roledescription="carousel" aria-label="SOV-OPT Highlights Carousel" tabindex="0">
+          <!-- Slide Track -->
+          <div class="carousel-track">
+            <!-- SLIDE 1: Project Identity & Refinery Overview -->
+            <div class="carousel-slide active" role="group" aria-roledescription="slide" aria-label="Slide 1 of 6: Project Identity" data-slide="0">
+              <div class="slide-content-grid">
+                <div class="slide-text">
+                  <div class="slide-eyebrow">Smart India Hackathon 2026 · Problem Statement 26119</div>
+                  <h1 class="slide-title">SOV-OPT</h1>
+                  <div class="slide-subtitle">Sovereign Numerical Optimization Core</div>
+                  <div class="slide-badge-row">
+                    <span class="badge badge-team">Team VarunNetra · Team ID 177365</span>
+                    <span class="badge badge-inst">RGIPT</span>
+                  </div>
+                  <div class="hero-philosophy-card" style="margin-top: 14px; margin-bottom: 18px;">
+                    <div class="hero-statement">GPU accelerates. CPU verifies.</div>
+                    <div class="hero-substatement">Mathematical LP, MILP, and convex QP optimization for refinery planning workflows.</div>
+                  </div>
+                  <div class="hero-ctas">
+                    <button class="btn btn-primary btn-lg" onclick="window.sovApp.switchTab('overview')">
+                      <span>Enter Solver Workspace</span>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                    <button class="btn btn-secondary btn-lg" onclick="window.sovApp.switchTab('trust')">
+                      <span>View Trust &amp; Verification</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="slide-visual">
+                  <div class="hero-schematic-card">
+                    <div class="hero-schematic-header">
+                      <span class="hero-schematic-title">Refinery Optimization Network Topology</span>
+                      <span class="badge badge-olive">Process Schematic</span>
+                    </div>
+                    <div class="hero-schematic-body">
+                      <svg viewBox="0 0 540 280" class="hero-svg" aria-label="Refinery Optimization Network Topology Schematic">
+                        <defs>
+                          <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#507624" />
+                          </marker>
+                          <marker id="arrow-charcoal" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#6A7064" />
+                          </marker>
+                        </defs>
+
+                        <!-- Network Connectors -->
+                        <path d="M 85 85 L 140 140" stroke="#507624" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+                        <path d="M 85 195 L 140 140" stroke="#507624" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+                        <path d="M 220 120 L 270 90" stroke="#507624" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+                        <path d="M 220 160 L 270 190" stroke="#507624" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+                        <path d="M 350 90 L 400 125" stroke="#507624" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+                        <path d="M 350 190 L 400 155" stroke="#507624" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+                        <path d="M 220 140 L 400 140" stroke="#6A7064" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow-charcoal)" fill="none"/>
+                        <path d="M 460 115 L 485 75" stroke="#507624" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+                        <path d="M 460 130 L 485 115" stroke="#507624" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+                        <path d="M 460 150 L 485 165" stroke="#507624" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+                        <path d="M 460 165 L 485 205" stroke="#507624" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+
+                        <!-- CRUDE FEED NODES -->
+                        <g transform="translate(20, 60)">
+                          <rect width="65" height="50" rx="4" fill="#FFFFFF" stroke="#D7DACF" stroke-width="1.5"/>
+                          <text x="32" y="22" font-family="'Montserrat', sans-serif" font-size="9" font-weight="700" fill="#507624" text-anchor="middle">CRUDE A</text>
+                          <text x="32" y="38" font-family="monospace" font-size="8" fill="#3D4038" text-anchor="middle">Arab Light</text>
+                        </g>
+                        <g transform="translate(20, 170)">
+                          <rect width="65" height="50" rx="4" fill="#FFFFFF" stroke="#D7DACF" stroke-width="1.5"/>
+                          <text x="32" y="22" font-family="'Montserrat', sans-serif" font-size="9" font-weight="700" fill="#507624" text-anchor="middle">CRUDE B</text>
+                          <text x="32" y="38" font-family="monospace" font-size="8" fill="#3D4038" text-anchor="middle">Basrah Hvy</text>
+                        </g>
+
+                        <!-- ATMOSPHERIC DISTILLATION (CDU) -->
+                        <g transform="translate(140, 105)">
+                          <rect width="80" height="70" rx="4" fill="#FFFFFF" stroke="#507624" stroke-width="2"/>
+                          <text x="40" y="26" font-family="'Montserrat', sans-serif" font-size="11" font-weight="700" fill="#3F641C" text-anchor="middle">CDU</text>
+                          <text x="40" y="42" font-family="'Montserrat', sans-serif" font-size="8" fill="#6A7064" text-anchor="middle">Distillation</text>
+                          <text x="40" y="58" font-family="monospace" font-size="7.5" fill="#507624" text-anchor="middle">100 kbpd max</text>
+                        </g>
+
+                        <!-- CONVERSION UNITS -->
+                        <g transform="translate(270, 65)">
+                          <rect width="80" height="50" rx="4" fill="#FFFFFF" stroke="#D7DACF" stroke-width="1.5"/>
+                          <text x="40" y="22" font-family="'Montserrat', sans-serif" font-size="10" font-weight="700" fill="#3D4038" text-anchor="middle">REFORMER</text>
+                          <text x="40" y="38" font-family="monospace" font-size="8" fill="#507624" text-anchor="middle">RON 98 Pool</text>
+                        </g>
+                        <g transform="translate(270, 165)">
+                          <rect width="80" height="50" rx="4" fill="#FFFFFF" stroke="#D7DACF" stroke-width="1.5"/>
+                          <text x="40" y="22" font-family="'Montserrat', sans-serif" font-size="10" font-weight="700" fill="#3D4038" text-anchor="middle">FCC UNIT</text>
+                          <text x="40" y="38" font-family="monospace" font-size="8" fill="#507624" text-anchor="middle">Cat Cracking</text>
+                        </g>
+
+                        <!-- BLENDING & POOLING -->
+                        <g transform="translate(400, 110)">
+                          <rect width="60" height="60" rx="4" fill="#FFFFFF" stroke="#507624" stroke-width="1.5"/>
+                          <text x="30" y="26" font-family="'Montserrat', sans-serif" font-size="9" font-weight="700" fill="#507624" text-anchor="middle">BLENDING</text>
+                          <text x="30" y="42" font-family="'Montserrat', sans-serif" font-size="8" fill="#6A7064" text-anchor="middle">BS-VI Specs</text>
+                        </g>
+
+                        <!-- PRODUCTS -->
+                        <g transform="translate(485, 60)">
+                          <rect width="45" height="24" rx="2" fill="#F3F6EE" stroke="#D7DACF"/>
+                          <text x="22" y="16" font-family="'Montserrat', sans-serif" font-size="7.5" font-weight="600" fill="#3D4038" text-anchor="middle">LPG</text>
+                        </g>
+                        <g transform="translate(485, 100)">
+                          <rect width="45" height="24" rx="2" fill="#F3F6EE" stroke="#507624" stroke-width="1.2"/>
+                          <text x="22" y="16" font-family="'Montserrat', sans-serif" font-size="7.5" font-weight="700" fill="#507624" text-anchor="middle">Mogas</text>
+                        </g>
+                        <g transform="translate(485, 150)">
+                          <rect width="45" height="24" rx="2" fill="#F3F6EE" stroke="#507624" stroke-width="1.2"/>
+                          <text x="22" y="16" font-family="'Montserrat', sans-serif" font-size="7.5" font-weight="700" fill="#507624" text-anchor="middle">HSD</text>
+                        </g>
+                        <g transform="translate(485, 195)">
+                          <rect width="45" height="24" rx="2" fill="#F3F6EE" stroke="#D7DACF"/>
+                          <text x="22" y="16" font-family="'Montserrat', sans-serif" font-size="7.5" font-weight="600" fill="#3D4038" text-anchor="middle">Fuel Oil</text>
+                        </g>
+
+                        <!-- Math annotation badge -->
+                        <g transform="translate(18, 18)">
+                          <rect width="180" height="22" rx="3" fill="#F5F6F2" stroke="#D7DACF"/>
+                          <text x="90" y="15" font-family="monospace" font-size="8" fill="#507624" text-anchor="middle">min c^T x  s.t.  Ax = b,  l ≤ x ≤ u</text>
+                        </g>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SLIDE 2: Problem Statement & Industrial Formulation -->
+            <div class="carousel-slide" role="group" aria-roledescription="slide" aria-label="Slide 2 of 6: Problem Statement" data-slide="1">
+              <div class="slide-content-grid">
+                <div class="slide-text">
+                  <div class="slide-eyebrow">Smart India Hackathon 2026 · Ministry of Petroleum &amp; Natural Gas</div>
+                  <h2 class="slide-title">MRPL PS 26119</h2>
+                  <div class="slide-subtitle">Indigenous GPU-Accelerated Optimization Solver</div>
+                  <p class="slide-desc">
+                    Development of a sovereign mathematical optimization core for industrial refinery planning. Eliminates dependency on proprietary commercial solvers (Gurobi, CPLEX, FICO Xpress) using pure NumPy and Python standard library algorithms.
+                  </p>
+                  <div class="slide-features-row">
+                    <div class="slide-feat-chip"><strong>LP:</strong> Two-Phase Revised Primal Simplex</div>
+                    <div class="slide-feat-chip"><strong>MILP:</strong> Branch-and-Bound + Exact ℚ-Bounds</div>
+                    <div class="slide-feat-chip"><strong>QP:</strong> Mehrotra Interior Point Predictor-Corrector</div>
+                  </div>
+                  <div class="hero-ctas" style="margin-top: 20px;">
+                    <button class="btn btn-primary btn-lg" onclick="window.sovApp.switchTab('optimization')">
+                      <span>Explore Optimization Run</span>
+                    </button>
+                    <button class="btn btn-secondary btn-lg" onclick="window.sovApp.switchTab('overview')">
+                      <span>Formulation Details</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="slide-visual">
+                  <div class="hero-math-card">
+                    <div class="hero-schematic-header">
+                      <span class="hero-schematic-title">Refinery Dispatch Formulation</span>
+                      <span class="badge badge-olive">Standard Primal Form</span>
+                    </div>
+                    <div class="math-card-body">
+                      <div class="math-block">
+                        <div class="math-eq-row"><span class="math-op">minimize</span> <span class="math-expr">cᵀ x</span></div>
+                        <div class="math-eq-row"><span class="math-op">subject to</span> <span class="math-expr">A x = b</span> <span class="math-note">(Material balances)</span></div>
+                        <div class="math-eq-row"><span class="math-op"></span> <span class="math-expr">l ≤ x ≤ u</span> <span class="math-note">(Unit capacity bounds)</span></div>
+                        <div class="math-eq-row"><span class="math-op"></span> <span class="math-expr">x_j ∈ ℤ, ∀ j ∈ I</span> <span class="math-note">(Discrete scheduling)</span></div>
+                      </div>
+                      <div class="math-meta-grid">
+                        <div class="math-meta-item"><span>CDU Distillation:</span> <strong>≤ 100 kbpd</strong></div>
+                        <div class="math-meta-item"><span>Octane Blending:</span> <strong>≥ 91 RON</strong></div>
+                        <div class="math-meta-item"><span>Diesel Cetane:</span> <strong>≥ 51 Index</strong></div>
+                        <div class="math-meta-item"><span>Sulfur Limit:</span> <strong>≤ 10 ppm BS-VI</strong></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SLIDE 3: Our Solution & Pipeline Architecture -->
+            <div class="carousel-slide" role="group" aria-roledescription="slide" aria-label="Slide 3 of 6: Pipeline Architecture" data-slide="2">
+              <div class="slide-content-grid">
+                <div class="slide-text">
+                  <div class="slide-eyebrow">Architectural Excellence</div>
+                  <h2 class="slide-title">One Sovereign Optimization Core</h2>
+                  <div class="slide-subtitle">Deterministic Dispatch · Pure NumPy · Zero Black Boxes</div>
+                  <p class="slide-desc">
+                    Every optimization instance flows through a structured, transparent pipeline with automatic problem classification, condition-number-aware presolve, sovereign solver execution, and independent unscaled KKT verification.
+                  </p>
+                  <div class="hero-philosophy-card" style="margin-top: 14px; margin-bottom: 18px;">
+                    <div class="hero-statement">Rigorous Dual-Plane Dispatch</div>
+                    <div class="hero-substatement">GPU restarted PDHG delivers accelerated operational exploration; CPU revised simplex independently audits KKT stationarity.</div>
+                  </div>
+                  <div class="hero-ctas">
+                    <button class="btn btn-primary btn-lg" onclick="window.sovApp.switchTab('overview')">
+                      <span>View Process Twin</span>
+                    </button>
+                    <button class="btn btn-secondary btn-lg" onclick="window.sovApp.switchTab('analytics')">
+                      <span>Solver Analytics</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="slide-visual">
+                  <div class="hero-schematic-card">
+                    <div class="hero-schematic-header">
+                      <span class="hero-schematic-title">Sovereign Architecture Pipeline</span>
+                      <span class="badge badge-olive">End-to-End Workflow</span>
+                    </div>
+                    <div class="pipeline-flow-body">
+                      <div class="pipe-node"><div class="pipe-num">1</div><div class="pipe-info"><div class="pipe-title">Model Input</div><div class="pipe-sub">MPS / JSON Schema</div></div></div>
+                      <div class="pipe-arrow">↓</div>
+                      <div class="pipe-node"><div class="pipe-num">2</div><div class="pipe-info"><div class="pipe-title">Presolve &amp; Scaling</div><div class="pipe-sub">Ruiz / Geometric Scaling</div></div></div>
+                      <div class="pipe-arrow">↓</div>
+                      <div class="pipe-node pipe-node-highlight"><div class="pipe-num">3</div><div class="pipe-info"><div class="pipe-title">Auto Solver Dispatch</div><div class="pipe-sub">LP · MILP · QP · PDHG</div></div></div>
+                      <div class="pipe-arrow">↓</div>
+                      <div class="pipe-node"><div class="pipe-num">4</div><div class="pipe-info"><div class="pipe-title">Numerical Trust Layer</div><div class="pipe-sub">KKT Audit &amp; Exact Farkas Ray</div></div></div>
+                      <div class="pipe-arrow">↓</div>
+                      <div class="pipe-node pipe-node-accent"><div class="pipe-num">5</div><div class="pipe-info"><div class="pipe-title">Trust Passport</div><div class="pipe-sub">SHA-256 Model Provenance</div></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SLIDE 4: Numerical Trust Layer -->
+            <div class="carousel-slide" role="group" aria-roledescription="slide" aria-label="Slide 4 of 6: Numerical Trust" data-slide="3">
+              <div class="slide-content-grid">
+                <div class="slide-text">
+                  <div class="slide-eyebrow">Trust Philosophy &amp; Verification</div>
+                  <h2 class="slide-title">Optimization That Proves What It Can</h2>
+                  <div class="slide-subtitle">"No result is trusted merely because an optimization algorithm stopped."</div>
+                  <p class="slide-desc">
+                    In industrial refinery scheduling, an erroneous solution produces unexecutable distillation schedules and millions in off-spec penalty. SOV-OPT subjects every outcome to independent unscaled verification before conferring terminal status.
+                  </p>
+                  <div class="trust-guarantees-grid">
+                    <div class="trust-guarantee-pill"><span class="pill-dot"></span> KKT stationarity verified to tol ≤ 10⁻⁷ on unscaled model</div>
+                    <div class="trust-guarantee-pill"><span class="pill-dot"></span> Infeasibility certified with exact rational Farkas ray in ℚ</div>
+                    <div class="trust-guarantee-pill"><span class="pill-dot"></span> Conservative MILP lower bounds via safe rational arithmetic</div>
+                    <div class="trust-guarantee-pill"><span class="pill-dot"></span> SHA-256 Model Fingerprint on unscaled model data</div>
+                  </div>
+                  <div class="hero-ctas" style="margin-top: 18px;">
+                    <button class="btn btn-primary btn-lg" onclick="window.sovApp.switchTab('trust')">
+                      <span>View Trust &amp; Verification</span>
+                    </button>
+                    <button class="btn btn-secondary btn-lg" onclick="window.sovApp.switchTab('evidence')">
+                      <span>Evidence &amp; Audits</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="slide-visual">
+                  <div class="hero-trust-visual-card">
+                    <div class="hero-schematic-header">
+                      <span class="hero-schematic-title">Independent Trust Passport Certification</span>
+                      <span class="badge badge-olive">Zero Unverified Claims</span>
+                    </div>
+                    <div class="trust-visual-body">
+                      <div class="trust-stamp-box">
+                        <div class="trust-stamp-icon">✓</div>
+                        <div class="trust-stamp-title">ORIGINAL-MODEL KKT VERIFICATION</div>
+                        <div class="trust-stamp-desc">Primal ||Ax - b||_∞ ≤ tol · Dual ||Aᵀy + s - c||_∞ ≤ tol</div>
+                      </div>
+                      <div class="trust-metrics-summary">
+                        <div class="tms-row"><span>Supported Status:</span> <strong style="color: var(--mrpl-deep-green);">OPTIMAL_VERIFIED</strong></div>
+                        <div class="tms-row"><span>Infeasible Ray:</span> <strong>Fraction Exact Arithmetic (ℚ)</strong></div>
+                        <div class="tms-row"><span>Floating Precision:</span> <strong>IEEE 754 Double Precision</strong></div>
+                        <div class="tms-row"><span>Audit Export:</span> <strong>Canonical JSON Passport</strong></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SLIDE 5: Team VarunNetra -->
+            <div class="carousel-slide" role="group" aria-roledescription="slide" aria-label="Slide 5 of 6: Team VarunNetra" data-slide="4">
+              <div class="slide-content-grid">
+                <div class="slide-text">
+                  <div class="slide-eyebrow">Smart India Hackathon 2026 · MRPL PS 26119</div>
+                  <h2 class="slide-title">Team VarunNetra</h2>
+                  <div class="slide-subtitle">Rajiv Gandhi Institute of Petroleum Technology</div>
+                  <div class="team-meta-pills" style="margin: 12px 0 16px;">
+                    <span class="team-pill-highlight">Team ID: 177365</span>
+                    <span class="team-pill">Institute of National Importance</span>
+                    <span class="team-pill">Amethi, Uttar Pradesh</span>
+                  </div>
+                  <p class="slide-desc" style="margin-bottom: 20px;">
+                    Dedicated student researchers from RGIPT building an indigenous, mathematically verified numerical solver for the Mangalore Refinery and Petrochemicals Limited problem statement.
+                  </p>
+                  <div class="hero-ctas">
+                    <button class="btn btn-primary btn-lg" onclick="window.sovApp.switchTab('about')">
+                      <span>Meet the Team</span>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                    <button class="btn btn-secondary btn-lg" onclick="window.sovApp.switchTab('contact')">
+                      <span>Contact Details</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="slide-visual">
+                  <div class="hero-schematic-card">
+                    <div class="hero-schematic-header">
+                      <span class="hero-schematic-title">Team Members (VarunNetra · ID 177365)</span>
+                      <span class="badge badge-olive">RGIPT</span>
+                    </div>
+                    <div class="carousel-team-grid">
+                      <!-- 1. Khagesh -->
+                      <div class="carousel-member-item">
+                        <img src="/assets/team/khagesh.png?v=3" alt="Khagesh Ranjan" class="carousel-member-img" width="56" height="56" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+                        <div class="carousel-photo-fallback" style="display:none;">KR</div>
+                        <div class="carousel-member-name">Khagesh Ranjan</div>
+                        <div class="carousel-member-role">LEADER</div>
+                      </div>
+                      <!-- 2. Satyam (STRICTLY SECOND) -->
+                      <div class="carousel-member-item">
+                        <img src="/assets/team/satyam.png?v=3" alt="Satyam Gupta" class="carousel-member-img" width="56" height="56" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+                        <div class="carousel-photo-fallback" style="display:none;">SG</div>
+                        <div class="carousel-member-name">Satyam Gupta</div>
+                        <div class="carousel-member-role">MEMBER</div>
+                      </div>
+                      <!-- 3. Sudipto -->
+                      <div class="carousel-member-item">
+                        <img src="/assets/team/sudipto.png?v=3" alt="Sudipto Ghosh" class="carousel-member-img" width="56" height="56" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+                        <div class="carousel-photo-fallback" style="display:none;">SG</div>
+                        <div class="carousel-member-name">Sudipto Ghosh</div>
+                        <div class="carousel-member-role">MEMBER</div>
+                      </div>
+                      <!-- 4. Ayush -->
+                      <div class="carousel-member-item">
+                        <img src="/assets/team/ayush.png?v=3" alt="Ayush Rao" class="carousel-member-img" width="56" height="56" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+                        <div class="carousel-photo-fallback" style="display:none;">AR</div>
+                        <div class="carousel-member-name">Ayush Rao</div>
+                        <div class="carousel-member-role">MEMBER</div>
+                      </div>
+                      <!-- 5. Shivanshu -->
+                      <div class="carousel-member-item">
+                        <img src="/assets/team/shivanshu.png?v=3" alt="Shivanshu Tripathi" class="carousel-member-img" width="56" height="56" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+                        <div class="carousel-photo-fallback" style="display:none;">ST</div>
+                        <div class="carousel-member-name">Shivanshu Tripathi</div>
+                        <div class="carousel-member-role">MEMBER</div>
+                      </div>
+                      <!-- 6. Muskan -->
+                      <div class="carousel-member-item">
+                        <img src="/assets/team/muskan.png?v=3" alt="Muskan Sahu" class="carousel-member-img" width="56" height="56" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+                        <div class="carousel-photo-fallback" style="display:none;">MS</div>
+                        <div class="carousel-member-name">Muskan Sahu</div>
+                        <div class="carousel-member-role">MEMBER</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SLIDE 6: Verified Evidence & RTX 5050 Benchmarks -->
+            <div class="carousel-slide" role="group" aria-roledescription="slide" aria-label="Slide 6 of 6: Hardware Evidence" data-slide="5">
+              <div class="slide-content-grid">
+                <div class="slide-text">
+                  <div class="slide-eyebrow">Physical Hardware Benchmarking</div>
+                  <h2 class="slide-title">Measured. Audited. Reproducible.</h2>
+                  <div class="slide-subtitle">Physical Acer RTX 5050 Laptop GPU (12.0 CC · 8GB VRAM)</div>
+                  <p class="slide-desc">
+                    All performance claims are backed by commit-hashed execution logs on physical NVIDIA hardware. Measured results strictly preserve differential comparisons without synthetic inflation.
+                  </p>
+                  <div class="slide-evidence-stats">
+                    <div class="slide-stat-item">
+                      <div class="stat-num">1.81×</div>
+                      <div class="stat-lbl">CUDA Improvement (Gate 9 vs Gate 8)</div>
+                    </div>
+                    <div class="slide-stat-item">
+                      <div class="stat-num">1.07×</div>
+                      <div class="stat-lbl">Aggregate Speedup (CPU / CUDA)</div>
+                    </div>
+                    <div class="slide-stat-item">
+                      <div class="stat-num">1.13×</div>
+                      <div class="stat-lbl">Speedup on LARGE Netlib Stratum</div>
+                    </div>
+                  </div>
+                  <div class="hero-ctas" style="margin-top: 18px;">
+                    <button class="btn btn-primary btn-lg" onclick="window.sovApp.switchTab('benchmarks')">
+                      <span>View Hardware Benchmarks</span>
+                    </button>
+                    <button class="btn btn-secondary btn-lg" onclick="window.sovApp.switchTab('reports')">
+                      <span>Audit Reports</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="slide-visual">
+                  <div class="hero-schematic-card">
+                    <div class="hero-schematic-header">
+                      <span class="hero-schematic-title">Physical Hardware Telemetry</span>
+                      <span class="badge badge-olive">RTX 5050 (Driver 576.83)</span>
+                    </div>
+                    <div class="hardware-telemetry-body">
+                      <div class="hw-item"><span>Platform:</span> <strong>Acer Nitro 5 (NVIDIA RTX 5050)</strong></div>
+                      <div class="hw-item"><span>Compute Capability:</span> <strong>SM 12.0 (Blackwell Architecture)</strong></div>
+                      <div class="hw-item"><span>VRAM Allocation:</span> <strong>7.96 GB GDDR6</strong></div>
+                      <div class="hw-item"><span>Frozen Suite:</span> <strong>18 Netlib Benchmark Problems</strong></div>
+                      <div class="hw-item"><span>Validation SHA:</span> <strong class="mono" style="font-size: 11px;">51b71bb8468b</strong></div>
+                      <div class="hw-item"><span>Verification Status:</span> <strong style="color: var(--mrpl-deep-green);">Independent CPU Audit (Passed)</strong></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Carousel Controls (MRPL Low-Key Style) -->
+          <div class="carousel-controls-bar">
+            <!-- Thin progress indicator track -->
+            <div class="carousel-progress-track" aria-hidden="true">
+              <div class="carousel-progress-fill" id="carousel-progress-fill"></div>
+            </div>
+
+            <!-- Dot indicators -->
+            <div class="carousel-dots" role="tablist" aria-label="Carousel slide selection">
+              <button class="carousel-dot active" role="tab" aria-selected="true" aria-label="Go to slide 1" data-index="0"></button>
+              <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Go to slide 2" data-index="1"></button>
+              <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Go to slide 3" data-index="2"></button>
+              <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Go to slide 4" data-index="3"></button>
+              <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Go to slide 5" data-index="4"></button>
+              <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Go to slide 6" data-index="5"></button>
+            </div>
+
+            <!-- Arrow buttons and Pause/Play toggle -->
+            <div class="carousel-action-buttons">
+              <button id="carousel-prev" class="carousel-ctrl-btn" aria-label="Previous slide" title="Previous slide">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button id="carousel-playpause" class="carousel-ctrl-btn" aria-label="Pause carousel" title="Pause carousel" aria-pressed="false">
+                <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+                <svg class="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none;"><path d="M5 3l14 9-14 9V3z"/></svg>
+              </button>
+              <button id="carousel-next" class="carousel-ctrl-btn" aria-label="Next slide" title="Next slide">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </header>
 
-    <!-- SCROLLABLE WORKSPACE CONTENT -->
-    <main id="content-viewport">
+        <!-- Factual Announcements Strip (MRPL style alert strip) -->
+        <div class="home-announcements-strip">
+          <div class="announcement-badge">Verification Records</div>
+          <div class="announcement-content">
+            <span class="announcement-item">✓ Sovereign solver core: validated by the repository\'s automated numerical and integration test suite.</span>
+            <span class="announcement-item">✓ Model-fingerprinted Trust Passport generated for every accepted solve.</span>
+            <span class="announcement-item">✓ Infinite-precision rational Farkas rays certify structural infeasibility.</span>
+            <span class="announcement-item">✓ Historical Acer RTX 5050 CUDA evidence preserved for differential comparison.</span>
+          </div>
+        </div>
 
+        <!-- 3 Core Architecture Pillars -->
+        <div class="home-pillars-grid">
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <h3 class="pillar-title">Sovereign Mathematical Core</h3>
+            <div class="pillar-tag">Pure NumPy &amp; Python stdlib</div>
+            <p class="pillar-desc">
+              Complete independence from commercial solvers. Built with an original revised two-phase primal simplex (LP), exact rational branch-and-bound (MILP), and Mehrotra predictor-corrector interior point method (QP).
+            </p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <h3 class="pillar-title">Dual-Plane Architecture</h3>
+            <div class="pillar-tag">Acceleration + Rigorous Audit</div>
+            <p class="pillar-desc">
+              Clear separation of concerns: GPU first-order restarted PDHG accelerates massive operational exploration, while CPU exact revised simplex independently certifies Karush-Kuhn-Tucker (KKT) stationarity.
+            </p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h3 class="pillar-title">Numerical Trust Layer</h3>
+            <div class="pillar-tag">Zero Unverified Claims</div>
+            <p class="pillar-desc">
+              Primal residuals, dual residuals, and bound violations are computed directly against the unscaled model (Ax = b, x ≥ 0). Infeasible models are accompanied by exact rational Farkas certificates.
+            </p>
+          </div>
+        </div>
+
+        <!-- Workflow Quick-Links -->
+        <div class="home-workflows-grid">
+          <div class="workflow-card" onclick="window.sovApp.switchTab('overview')">
+            <div class="workflow-card-inner">
+              <h4>Refinery Planning Twin</h4>
+              <p>Interactive process flow diagram across CDU, FCC, Reformer, and Blending units with live stream allocations.</p>
+              <span class="workflow-link">Open Process Twin →</span>
+            </div>
+          </div>
+          <div class="workflow-card" onclick="window.sovApp.switchTab('scenarios')">
+            <div class="workflow-card-inner">
+              <h4>Scenario Analysis</h4>
+              <p>Pre-configured operational baselines, high-Basrah crude discount sweeps, summer high-octane peaks, and infeasible demand shocks.</p>
+              <span class="workflow-link">Explore Scenarios →</span>
+            </div>
+          </div>
+          <div class="workflow-card" onclick="window.sovApp.switchTab('benchmarks')">
+            <div class="workflow-card-inner">
+              <h4>RTX 5050 Benchmark Evidence</h4>
+              <p>18-instance differential benchmark suite executed on physical NVIDIA hardware with full driver and runtime telemetry.</p>
+              <span class="workflow-link">Inspect Benchmarks →</span>
+            </div>
+          </div>
+        </div>
+      </section>
       <!-- ===================================================================
            VIEW 1: OVERVIEW (Refinery Planning & Process Flow)
            =================================================================== -->
-      <section id="view-overview" class="view-section active">
+      <section id="view-overview" class="view-section">
         <div class="page-header">
           <div class="page-eyebrow">MRPL PS 26119 · Refinery planning prototype</div>
           <h1 class="page-title">Refinery planning &amp; operational optimisation</h1>
@@ -146,7 +728,7 @@
           <div class="summary-dominant">
             <div class="summary-metric-label">Plan net margin</div>
             <div class="summary-dominant-val">
-              <span id="kpi-margin-val">$9,043.75</span><span class="unit">per planning period</span>
+              <span id="kpi-margin-val">—</span><span class="unit">Run solve to compute</span>
             </div>
             <div class="summary-dominant-sub">Finished product revenues minus crude procurement and unit operating expenditure</div>
           </div>
@@ -174,7 +756,7 @@
                 </span>
               </div>
               <div class="summary-cell-val">
-                <span class="status-pill"><span class="status-dot"></span> <span id="kpi-status-badge">Pass</span></span>
+                <span class="status-pill"><span class="status-dot" style="background: var(--text-muted);"></span> <span id="kpi-status-badge">Not executed</span></span>
               </div>
               <div class="summary-cell-sub mono" id="kpi-kkt-val">Residual 1.42 × 10⁻¹⁵</div>
             </div>
@@ -430,31 +1012,31 @@
               </div>
               <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border-subtle);">
                 <span style="color: var(--text-secondary);">Result status:</span>
-                <span class="status-pill"><span class="status-dot"></span> <span id="solve-status-pill">Verified</span></span>
+                <span class="status-pill"><span class="status-dot" style="background: var(--text-muted);"></span> <span id="solve-status-pill">Not executed</span></span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border-subtle);">
                 <span style="color: var(--text-secondary);">Iterations:</span>
-                <span class="tabular" id="solve-iter-val">109</span>
+                <span class="tabular" id="solve-iter-val">—</span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border-subtle);">
                 <span style="color: var(--text-secondary);">Duration:</span>
-                <span class="tabular" id="solve-time-val">48.2 ms</span>
+                <span class="tabular" id="solve-time-val">—</span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border-subtle);">
                 <span style="color: var(--text-secondary);">Net margin:</span>
-                <span class="tabular" id="solve-obj-val" style="font-weight: 600; color: var(--rust);">$9,043.75</span>
+                <span class="tabular" id="solve-obj-val" style="font-weight: 600; color: var(--text-primary);">—</span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border-subtle);">
                 <span style="color: var(--text-secondary);">Primal residual:</span>
-                <span class="mono" id="solve-prim-res" style="font-size: 11px;">1.42e-15</span>
+                <span class="mono" id="solve-prim-res" style="font-size: 11px;">—</span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border-subtle);">
                 <span style="color: var(--text-secondary);">Dual residual:</span>
-                <span class="mono" id="solve-dual-res" style="font-size: 11px;">2.84e-14</span>
+                <span class="mono" id="solve-dual-res" style="font-size: 11px;">—</span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 3px 0; align-items: center;">
                 <span style="color: var(--text-secondary);">Provenance:</span>
-                <span id="solve-provenance-pill" class="badge" style="font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); color: var(--text-secondary);">Scenario baseline</span>
+                <span id="solve-provenance-pill" class="badge" style="font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); color: var(--text-secondary);">Not executed</span>
               </div>
             </div>
           </div>
@@ -822,6 +1404,115 @@
             </table>
           </div>
         </div>
+
+        <!-- Canonical Trust Passport Card -->
+        <div class="table-section" id="trust-passport-section" style="margin-top: 24px;">
+          <div class="table-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h3 class="table-title">Canonical Trust Passport &amp; Execution Telemetry</h3>
+              <div class="table-subtitle">Model-fingerprinted verification audit for the active solution snapshot</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="window.sovApp.exportTrustPassportJSON()">
+              <span>Export Trust Passport (JSON)</span>
+            </button>
+          </div>
+
+          <div class="trust-passport-grid">
+            <div class="trust-passport-cell">
+              <span class="cell-label">Verification status</span>
+              <span class="cell-value" id="trust-card-status"><span class="status-pill"><span class="status-dot" style="background: var(--text-muted);"></span> Not executed</span></span>
+            </div>
+            <div class="trust-passport-cell">
+              <span class="cell-label">Target instance</span>
+              <span class="cell-value mono" id="trust-card-model">MRPL Refinery Twin (Unsolved)</span>
+            </div>
+            <div class="trust-passport-cell">
+              <span class="cell-label">Plan net margin</span>
+              <span class="cell-value tabular" id="trust-card-obj">—</span>
+            </div>
+            <div class="trust-passport-cell">
+              <span class="cell-label">Primal residual ||Ax - b||_∞</span>
+              <span class="cell-value mono" id="trust-card-prim-res">—</span>
+            </div>
+            <div class="trust-passport-cell">
+              <span class="cell-label">Dual residual ||A^T y + s - c||_∞</span>
+              <span class="cell-value mono" id="trust-card-dual-res">—</span>
+            </div>
+            <div class="trust-passport-cell">
+              <span class="cell-label">Max KKT residual</span>
+              <span class="cell-value mono" id="trust-card-kkt-res">—</span>
+            </div>
+            <div class="trust-passport-cell">
+              <span class="cell-label">Bound violation</span>
+              <span class="cell-value mono" id="trust-card-bound-viol">—</span>
+            </div>
+            <div class="trust-passport-cell">
+              <span class="cell-label">Integrality residual</span>
+              <span class="cell-value mono" id="trust-card-integrality-res">—</span>
+            </div>
+            <div class="trust-passport-cell">
+              <span class="cell-label">Certificate guarantee</span>
+              <span class="cell-value" id="trust-card-cert"><span class="status-pill"><span class="status-dot" style="background: var(--text-muted);"></span> Run solver to verify</span></span>
+            </div>
+            <div class="trust-passport-cell">
+              <span class="cell-label">Solver version &amp; commit</span>
+              <span class="cell-value mono" id="trust-card-commit">v0.3.2 (899ff0a8)</span>
+            </div>
+            <div class="trust-passport-cell">
+              <span class="cell-label">Execution backend</span>
+              <span class="cell-value" id="trust-card-backend">—</span>
+            </div>
+            <div class="trust-passport-cell">
+              <span class="cell-label">Algorithm</span>
+              <span class="cell-value" id="trust-card-algorithm">—</span>
+            </div>
+          </div>
+
+          <div class="trust-fingerprint-strip">
+            <span class="fingerprint-label">Model SHA-256 Fingerprint:</span>
+            <code class="mono" id="trust-card-fingerprint">d3b07384d113edec49eaa6238ad5ff00ebd70d10b77dc444be1b8a5fc4258eb7</code>
+          </div>
+
+          <div class="trust-notice-banner">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <div>
+              <strong>Audit Notice:</strong> The SHA-256 model fingerprint is an integrity identifier; this Passport is not a digital signature. Results are verified on the original unscaled constraint model.
+            </div>
+          </div>
+        </div>
+
+        <!-- Farkas Lens Section -->
+        <div class="table-section" id="farkas-lens-section" style="margin-top: 24px;">
+          <div class="table-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h3 class="table-title">Farkas Lens — Certificate Contribution Ranking</h3>
+              <div class="table-subtitle">Linear constraint contributions under exact rational infeasibility rays</div>
+            </div>
+            <span class="badge badge-warning" style="font-size: 11.5px; padding: 4px 10px;">Diagnostic ranking — not a minimal IIS</span>
+          </div>
+
+          <div id="farkas-lens-content" class="table-scroll-wrap" style="margin-top: 12px;">
+            <div id="farkas-lens-placeholder" style="padding: 24px; text-align: center; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); color: var(--text-secondary); font-size: 13px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="margin: 0 auto 8px; display: block; opacity: 0.6;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+              <span>Farkas Lens is active only when an infeasible instance is certified with an exact rational Farkas ray (e.g. <strong>Scenario SC-06: Infeasible Demand Shock</strong>). The active scenario is verified feasible.</span>
+            </div>
+            <table class="editorial-table" id="farkas-lens-table" style="display: none;">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Constraint identifier</th>
+                  <th>Description &amp; stream</th>
+                  <th class="num">Multiplier (y_i)</th>
+                  <th class="num">Contribution (b_i · y_i)</th>
+                  <th>Structural impact</th>
+                </tr>
+              </thead>
+              <tbody id="farkas-lens-tbody">
+                <!-- Dynamically populated when infeasible -->
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
 
       <!-- ===================================================================
@@ -1032,11 +1723,389 @@
           </div>
         </div>
       </section>
+      <!-- ===================================================================
+           VIEW 9: ABOUT US (SOV-OPT Team & RGIPT)
+           =================================================================== -->
+      <section id="view-about" class="view-section">
+        <div class="page-header text-center">
+          <div class="page-eyebrow">Smart India Hackathon 2026 · MRPL PS 26119</div>
+          <h1 class="page-title">About Us</h1>
+          <h2 class="page-subtitle" style="font-size: 20px; font-weight: 600; color: var(--mrpl-green); margin-top: 4px;">SOV-OPT Team</h2>
+          <p class="page-intro" style="max-width: 780px; margin: 12px auto 0;">
+            We are a student team from Rajiv Gandhi Institute of Petroleum Technology developing SOV-OPT, a sovereign LP/MILP/convex-QP optimization core for the MRPL Smart India Hackathon problem statement.
+          </p>
+        </div>
 
-    </main>
-  </div>
-</div>
+        <!-- Team Grid: Desktop 2 rows x 3 columns -->
+        <div class="team-grid">
+          <!-- Member 1: Khagesh Ranjan (Leader) -->
+          <div class="team-card reveal-on-scroll">
+            <div class="team-photo-wrap">
+              <img src="/assets/team/khagesh.png?v=3" alt="Khagesh Ranjan" class="team-photo" width="120" height="120" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+              <div class="team-photo-fallback" style="display:none;">KR</div>
+            </div>
+            <div class="team-role-badge">LEADER</div>
+            <h3 class="team-name">Khagesh Ranjan</h3>
+            <div class="team-program">B.Tech + M.Tech (Dual Degree) in CSE &amp; AI</div>
+            <div class="team-inst">Rajiv Gandhi Institute of Petroleum Technology</div>
+            <div class="team-contact-actions">
+              <a href="mailto:24cs2021@rgipt.ac.in" class="team-email-link" title="Email Khagesh Ranjan">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                <span>24cs2021@rgipt.ac.in</span>
+              </a>
+              <a href="https://www.linkedin.com/in/khagesh-ranjan-986721324/" target="_blank" rel="noopener noreferrer" class="team-linkedin-btn" title="Khagesh Ranjan on LinkedIn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                <span>LinkedIn</span>
+              </a>
+            </div>
+          </div>
 
-<script src="app.js"></script>
+          <!-- Member 2: Satyam Gupta (Member - STRICTLY SECOND) -->
+          <div class="team-card reveal-on-scroll">
+            <div class="team-photo-wrap">
+              <img src="/assets/team/satyam.png?v=3" alt="Satyam Gupta" class="team-photo" width="120" height="120" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+              <div class="team-photo-fallback" style="display:none;">SG</div>
+            </div>
+            <div class="team-role-badge">MEMBER</div>
+            <h3 class="team-name">Satyam Gupta</h3>
+            <div class="team-program">B.Tech + M.Tech (Dual Degree) in CSE &amp; AI</div>
+            <div class="team-inst">Rajiv Gandhi Institute of Petroleum Technology</div>
+            <div class="team-contact-actions">
+              <a href="mailto:24cs2032@rgipt.ac.in" class="team-email-link" title="Email Satyam Gupta">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                <span>24cs2032@rgipt.ac.in</span>
+              </a>
+              <a href="https://www.linkedin.com/in/satyam-gupta-2a1021324/" target="_blank" rel="noopener noreferrer" class="team-linkedin-btn" title="Satyam Gupta on LinkedIn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                <span>LinkedIn</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Member 3: Sudipto Ghosh (Member) -->
+          <div class="team-card reveal-on-scroll">
+            <div class="team-photo-wrap">
+              <img src="/assets/team/sudipto.png?v=3" alt="Sudipto Ghosh" class="team-photo" width="120" height="120" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+              <div class="team-photo-fallback" style="display:none;">SG</div>
+            </div>
+            <div class="team-role-badge">MEMBER</div>
+            <h3 class="team-name">Sudipto Ghosh</h3>
+            <div class="team-program">B.Tech + M.Tech (Dual Degree) in CSE &amp; AI</div>
+            <div class="team-inst">Rajiv Gandhi Institute of Petroleum Technology</div>
+            <div class="team-contact-actions">
+              <a href="mailto:24cs2037@rgipt.ac.in" class="team-email-link" title="Email Sudipto Ghosh">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                <span>24cs2037@rgipt.ac.in</span>
+              </a>
+              <a href="https://www.linkedin.com/in/sudipto-ghosh-486269346/" target="_blank" rel="noopener noreferrer" class="team-linkedin-btn" title="Sudipto Ghosh on LinkedIn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                <span>LinkedIn</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Member 4: Ayush Rao (Member) -->
+          <div class="team-card reveal-on-scroll">
+            <div class="team-photo-wrap">
+              <img src="/assets/team/ayush.png?v=3" alt="Ayush Rao" class="team-photo" width="120" height="120" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+              <div class="team-photo-fallback" style="display:none;">AR</div>
+            </div>
+            <div class="team-role-badge">MEMBER</div>
+            <h3 class="team-name">Ayush Rao</h3>
+            <div class="team-program">B.Tech in Information Technology</div>
+            <div class="team-inst">Rajiv Gandhi Institute of Petroleum Technology</div>
+            <div class="team-contact-actions">
+              <a href="mailto:24it3013@rgipt.ac.in" class="team-email-link" title="Email Ayush Rao">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                <span>24it3013@rgipt.ac.in</span>
+              </a>
+              <a href="https://www.linkedin.com/in/ayush-rao-5359bb335/" target="_blank" rel="noopener noreferrer" class="team-linkedin-btn" title="Ayush Rao on LinkedIn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                <span>LinkedIn</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Member 5: Shivanshu Tripathi (Member) -->
+          <div class="team-card reveal-on-scroll">
+            <div class="team-photo-wrap">
+              <img src="/assets/team/shivanshu.png?v=3" alt="Shivanshu Tripathi" class="team-photo" width="120" height="120" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+              <div class="team-photo-fallback" style="display:none;">ST</div>
+            </div>
+            <div class="team-role-badge">MEMBER</div>
+            <h3 class="team-name">Shivanshu Tripathi</h3>
+            <div class="team-program">B.Tech + M.Tech (Dual Degree) in CSE &amp; AI</div>
+            <div class="team-inst">Rajiv Gandhi Institute of Petroleum Technology</div>
+            <div class="team-contact-actions">
+              <a href="mailto:24cs2036@rgipt.ac.in" class="team-email-link" title="Email Shivanshu Tripathi">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                <span>24cs2036@rgipt.ac.in</span>
+              </a>
+              <a href="https://www.linkedin.com/in/shivanshu-tripathi-254876331/" target="_blank" rel="noopener noreferrer" class="team-linkedin-btn" title="Shivanshu Tripathi on LinkedIn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                <span>LinkedIn</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Member 6: Muskan Sahu (Member) -->
+          <div class="team-card reveal-on-scroll">
+            <div class="team-photo-wrap">
+              <img src="/assets/team/muskan.png?v=3" alt="Muskan Sahu" class="team-photo" width="120" height="120" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+              <div class="team-photo-fallback" style="display:none;">MS</div>
+            </div>
+            <div class="team-role-badge">MEMBER</div>
+            <h3 class="team-name">Muskan Sahu</h3>
+            <div class="team-program">B.Tech in Information Technology</div>
+            <div class="team-inst">Rajiv Gandhi Institute of Petroleum Technology</div>
+            <div class="team-contact-actions">
+              <a href="mailto:24it3036@rgipt.ac.in" class="team-email-link" title="Email Muskan Sahu">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                <span>24it3036@rgipt.ac.in</span>
+              </a>
+              <a href="https://www.linkedin.com/in/muskan-sahu-717162332/" target="_blank" rel="noopener noreferrer" class="team-linkedin-btn" title="Muskan Sahu on LinkedIn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                <span>LinkedIn</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 10: CONTACT US (Institutional Address & Communication)
+           =================================================================== -->
+      <section id="view-contact" class="view-section">
+        <div class="page-header text-center">
+          <div class="page-eyebrow">Institutional Connection</div>
+          <h1 class="page-title">Contact Us</h1>
+          <p class="page-intro" style="max-width: 720px; margin: 12px auto 0;">
+            Connect with the SOV-OPT student development team from Rajiv Gandhi Institute of Petroleum Technology.
+          </p>
+        </div>
+
+        <!-- Institution Card -->
+        <div class="institution-card">
+          <div class="institution-icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M9 10v11M15 10v11M19 10v11M12 2l10 8H2l10-8z"/></svg>
+          </div>
+          <div class="institution-details">
+            <h3 class="institution-name">Rajiv Gandhi Institute of Petroleum Technology</h3>
+            <div class="institution-tag">Institute of National Importance (INI) · Government of India</div>
+            <p class="institution-address">
+              Bahadurpur, Jais, Post Harbanshganj, Amethi - 229304, Uttar Pradesh, India
+            </p>
+            <div class="institution-meta">
+              <span>Smart India Hackathon 2026</span>
+              <span>·</span>
+              <span>MRPL Problem Statement 26119</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Cards in exact order -->
+        <div class="contact-grid">
+          <!-- 1. Khagesh -->
+          <div class="contact-card reveal-on-scroll">
+            <div class="contact-card-top">
+              <img src="/assets/team/khagesh.png?v=3" alt="Khagesh Ranjan" class="contact-photo" width="64" height="64" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+              <div class="contact-photo-fallback" style="display:none;">KR</div>
+              <div>
+                <div class="contact-role">LEADER</div>
+                <h4 class="contact-name">Khagesh Ranjan</h4>
+                <div class="contact-sub">B.Tech + M.Tech (CSE &amp; AI)</div>
+              </div>
+            </div>
+            <div class="contact-links">
+              <a href="mailto:24cs2021@rgipt.ac.in" class="btn btn-outline-sm">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                <span>24cs2021@rgipt.ac.in</span>
+              </a>
+              <a href="https://www.linkedin.com/in/khagesh-ranjan-986721324/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-sm btn-icon-only" title="LinkedIn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- 2. Satyam (STRICTLY SECOND) -->
+          <div class="contact-card reveal-on-scroll">
+            <div class="contact-card-top">
+              <img src="/assets/team/satyam.png?v=3" alt="Satyam Gupta" class="contact-photo" width="64" height="64" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+              <div class="contact-photo-fallback" style="display:none;">SG</div>
+              <div>
+                <div class="contact-role">MEMBER</div>
+                <h4 class="contact-name">Satyam Gupta</h4>
+                <div class="contact-sub">B.Tech + M.Tech (CSE &amp; AI)</div>
+              </div>
+            </div>
+            <div class="contact-links">
+              <a href="mailto:24cs2032@rgipt.ac.in" class="btn btn-outline-sm">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                <span>24cs2032@rgipt.ac.in</span>
+              </a>
+              <a href="https://www.linkedin.com/in/satyam-gupta-2a1021324/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-sm btn-icon-only" title="LinkedIn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- 3. Sudipto -->
+          <div class="contact-card reveal-on-scroll">
+            <div class="contact-card-top">
+              <img src="/assets/team/sudipto.png?v=3" alt="Sudipto Ghosh" class="contact-photo" width="64" height="64" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+              <div class="contact-photo-fallback" style="display:none;">SG</div>
+              <div>
+                <div class="contact-role">MEMBER</div>
+                <h4 class="contact-name">Sudipto Ghosh</h4>
+                <div class="contact-sub">B.Tech + M.Tech (CSE &amp; AI)</div>
+              </div>
+            </div>
+            <div class="contact-links">
+              <a href="mailto:24cs2037@rgipt.ac.in" class="btn btn-outline-sm">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                <span>24cs2037@rgipt.ac.in</span>
+              </a>
+              <a href="https://www.linkedin.com/in/sudipto-ghosh-486269346/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-sm btn-icon-only" title="LinkedIn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- 4. Ayush -->
+          <div class="contact-card reveal-on-scroll">
+            <div class="contact-card-top">
+              <img src="/assets/team/ayush.png?v=3" alt="Ayush Rao" class="contact-photo" width="64" height="64" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+              <div class="contact-photo-fallback" style="display:none;">AR</div>
+              <div>
+                <div class="contact-role">MEMBER</div>
+                <h4 class="contact-name">Ayush Rao</h4>
+                <div class="contact-sub">B.Tech (Information Technology)</div>
+              </div>
+            </div>
+            <div class="contact-links">
+              <a href="mailto:24it3013@rgipt.ac.in" class="btn btn-outline-sm">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                <span>24it3013@rgipt.ac.in</span>
+              </a>
+              <a href="https://www.linkedin.com/in/ayush-rao-5359bb335/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-sm btn-icon-only" title="LinkedIn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- 5. Shivanshu -->
+          <div class="contact-card reveal-on-scroll">
+            <div class="contact-card-top">
+              <img src="/assets/team/shivanshu.png?v=3" alt="Shivanshu Tripathi" class="contact-photo" width="64" height="64" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+              <div class="contact-photo-fallback" style="display:none;">ST</div>
+              <div>
+                <div class="contact-role">MEMBER</div>
+                <h4 class="contact-name">Shivanshu Tripathi</h4>
+                <div class="contact-sub">B.Tech + M.Tech (CSE &amp; AI)</div>
+              </div>
+            </div>
+            <div class="contact-links">
+              <a href="mailto:24cs2036@rgipt.ac.in" class="btn btn-outline-sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                <span>24cs2036@rgipt.ac.in</span>
+              </a>
+              <a href="https://www.linkedin.com/in/shivanshu-tripathi-254876331/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-sm btn-icon-only" title="LinkedIn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- 6. Muskan -->
+          <div class="contact-card reveal-on-scroll">
+            <div class="contact-card-top">
+              <img src="/assets/team/muskan.png?v=3" alt="Muskan Sahu" class="contact-photo" width="64" height="64" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';">
+              <div class="contact-photo-fallback" style="display:none;">MS</div>
+              <div>
+                <div class="contact-role">MEMBER</div>
+                <h4 class="contact-name">Muskan Sahu</h4>
+                <div class="contact-sub">B.Tech (Information Technology)</div>
+              </div>
+            </div>
+            <div class="contact-links">
+              <a href="mailto:24it3036@rgipt.ac.in" class="btn btn-outline-sm">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                <span>24it3036@rgipt.ac.in</span>
+              </a>
+              <a href="https://www.linkedin.com/in/muskan-sahu-717162332/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-sm btn-icon-only" title="LinkedIn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+  </main>
+
+  <!-- =======================================================================
+       MRPL TWO-STAGE INSTITUTIONAL FOOTER
+       ======================================================================= -->
+  <footer id="mrpl-footer" role="contentinfo">
+    <!-- Upper Stage: Deep Green (#3F641C) -->
+    <div class="footer-top">
+      <div class="footer-container">
+        <div class="footer-grid">
+          <!-- Col 1: About SOV-OPT -->
+          <div class="footer-col">
+            <h3 class="footer-title">SOV-OPT</h3>
+            <p class="footer-text">
+              An original sovereign numerical optimization research prototype developed for Smart India Hackathon 2026 Problem Statement 26119. Independent pure NumPy core with rigorous primal-dual certificate verification.
+            </p>
+          </div>
+
+          <!-- Col 2: Navigation Links -->
+          <div class="footer-col">
+            <h3 class="footer-title">Navigation</h3>
+            <ul class="footer-links">
+              <li><a href="#home" class="nav-item" data-tab="home">Home</a></li>
+              <li><a href="#about" class="nav-item" data-tab="about">About Us</a></li>
+              <li><a href="#overview" class="nav-item" data-tab="overview">Solver Portal</a></li>
+              <li><a href="#scenarios" class="nav-item" data-tab="scenarios">Refinery Planning</a></li>
+              <li><a href="#trust" class="nav-item" data-tab="trust">Trust &amp; Verification</a></li>
+              <li><a href="#benchmarks" class="nav-item" data-tab="benchmarks">RTX 5050 Benchmarks</a></li>
+              <li><a href="#contact" class="nav-item" data-tab="contact">Contact Us</a></li>
+            </ul>
+          </div>
+
+          <!-- Col 3: Problem Statement Info -->
+          <div class="footer-col">
+            <h3 class="footer-title">SIH 2026 PS 26119</h3>
+            <p class="footer-text">
+              <strong>Domain:</strong> Refining &amp; Petrochemical Supply Chain Optimization.<br>
+              <strong>Challenge:</strong> LP / MILP crude scheduling, operational conversion yields, BS-VI quality conformance, and independent numerical verification.
+            </p>
+          </div>
+
+          <!-- Col 4: Institutional Attribution -->
+          <div class="footer-col">
+            <h3 class="footer-title">Academic Institution</h3>
+            <p class="footer-text">
+              <strong>Rajiv Gandhi Institute of Petroleum Technology</strong><br>
+              Institute of National Importance (INI)<br>
+              Bahadurpur, Jais, Post Harbanshganj, Amethi - 229304, Uttar Pradesh, India
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lower Stage: Charcoal (#343434) -->
+    <div class="footer-bottom">
+      <div class="footer-container">
+        <div class="footer-disclaimer">
+          Developed for Smart India Hackathon 2026. Representative refinery inputs are engineering approximations and are not proprietary MRPL operating data.
+        </div>
+        <div class="footer-copyright">
+          &copy; 2026 SOV-OPT Project Team · Rajiv Gandhi Institute of Petroleum Technology. Developed for MRPL Problem Statement 26119.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/app.js?v=3"></script>
 </body>
 </html>

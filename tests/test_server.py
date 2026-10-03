@@ -47,12 +47,60 @@ class HandlerUnitTests(unittest.TestCase):
         self.assertEqual(status, 200)
         data = json.loads(body)
         self.assertEqual(data.get("status"), "ok")
-        self.assertEqual(data.get("version"), "0.3.1")
+        self.assertEqual(data.get("service"), "sov-opt")
+        self.assertTrue(data.get("solver_ready"))
+        self.assertEqual(data.get("version"), "0.3.2")
+
+    def test_get_api_health(self):
+        status, body = self._invoke("GET", "/api/health")
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertEqual(data.get("status"), "ok")
+        self.assertEqual(data.get("service"), "sov-opt")
+        self.assertTrue(data.get("solver_ready"))
+        self.assertEqual(data.get("version"), "0.3.2")
+
+    def test_host_port_env_handling(self):
+        import os
+        orig_host = os.environ.get("HOST")
+        orig_port = os.environ.get("PORT")
+        try:
+            os.environ["HOST"] = "0.0.0.0"
+            os.environ["PORT"] = "9999"
+            default_host = os.environ.get("HOST", "127.0.0.1")
+            default_port = int(os.environ.get("PORT", 8000))
+            self.assertEqual(default_host, "0.0.0.0")
+            self.assertEqual(default_port, 9999)
+        finally:
+            if orig_host is not None:
+                os.environ["HOST"] = orig_host
+            else:
+                os.environ.pop("HOST", None)
+            if orig_port is not None:
+                os.environ["PORT"] = orig_port
+            else:
+                os.environ.pop("PORT", None)
 
     def test_get_root_page(self):
         status, body = self._invoke("GET", "/")
         self.assertEqual(status, 200)
         self.assertIn(b"SOV-OPT", body)
+        self.assertIn(b"Mangalore Refinery and Petrochemicals Limited", body)
+
+    def test_get_static_asset_logo(self):
+        status, body = self._invoke("GET", "/assets/MRPL_logo.jpg")
+        self.assertEqual(status, 200)
+        self.assertTrue(len(body) > 100)
+
+    def test_get_static_asset_team_photo(self):
+        status, body = self._invoke("GET", "/assets/team/satyam.png")
+        self.assertEqual(status, 200)
+        self.assertTrue(len(body) > 100)
+
+    def test_get_static_asset_with_query_param(self):
+        status, body = self._invoke("GET", "/assets/MRPL_logo.jpg?v=123")
+        self.assertEqual(status, 200)
+        self.assertTrue(len(body) > 100)
 
     def test_get_manifest(self):
         status, body = self._invoke("GET", "/api/manifest")
@@ -152,6 +200,15 @@ class ServerIntegrationTests(unittest.TestCase):
             self.assertEqual(r.status, 200)
             data = json.loads(r.read())
             self.assertEqual(data["status"], "ok")
+
+    def test_http_api_health_integration(self):
+        req = urllib.request.Request(self.url + "/api/health")
+        with urllib.request.urlopen(req, timeout=2.0) as r:
+            self.assertEqual(r.status, 200)
+            data = json.loads(r.read())
+            self.assertEqual(data["status"], "ok")
+            self.assertEqual(data["service"], "sov-opt")
+            self.assertTrue(data["solver_ready"])
 
     def test_http_solve_integration(self):
         m = json.loads((ROOT / "examples/afiro.json").read_text())
