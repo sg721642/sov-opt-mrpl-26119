@@ -49,6 +49,9 @@
   --font-sans:           'Montserrat', Arial, Helvetica, sans-serif;
   --font-mono:           'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
+  /* Accessibility Scale */
+  --accessibility-font-scale: 1.0;
+
   /* Dimensions & Spacing */
   --nav-height:          48px;
   --radius-xs:           2px;
@@ -72,7 +75,7 @@ html, body {
   background-color: var(--bg-workspace);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: 13.5px;
+  font-size: calc(13.5px * var(--accessibility-font-scale, 1.0));
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -204,9 +207,11 @@ body.high-contrast a {
   outline: 2px solid var(--mrpl-hover-green);
 }
 
-.acc-btn[aria-pressed="true"] {
+.acc-btn[aria-pressed="true"],
+.acc-btn.active {
   background: var(--mrpl-green);
   border-color: var(--mrpl-hover-green);
+  color: #FFFFFF;
 }
 
 .acc-lang {
@@ -216,6 +221,20 @@ body.high-contrast a {
   font-weight: 500;
   margin-left: 6px;
   border-left: 1px solid #555555;
+  background: transparent;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color var(--trans-fast), background var(--trans-fast);
+}
+
+.acc-lang:hover,
+.acc-lang:focus-visible {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.15);
+  outline: none;
 }
 
 /* ==========================================================================

@@ -17,17 +17,17 @@
   <div id="accessibility-strip" role="region" aria-label="Accessibility and display controls">
     <div class="acc-container">
       <div class="acc-links">
-        <a href="#content-viewport" class="acc-link" title="Screen reader access">Screen Reader Access</a>
+        <a href="#content-viewport" class="acc-link" title="Screen reader access" data-i18n="screen_reader">Screen Reader Access</a>
         <span class="acc-sep" aria-hidden="true">|</span>
-        <a href="#content-viewport" class="acc-link" title="Skip to main content">Skip to main content</a>
+        <a href="#content-viewport" class="acc-link" title="Skip to main content" data-i18n="skip_to_content">Skip to main content</a>
       </div>
       <div class="acc-controls">
         <button id="btn-acc-space" class="acc-btn" title="Toggle text spacing" aria-label="Toggle text spacing" aria-pressed="false">T↔</button>
         <button id="btn-acc-contrast" class="acc-btn" title="Toggle high contrast" aria-label="Toggle high contrast" aria-pressed="false">A</button>
         <button id="btn-acc-font-minus" class="acc-btn" title="Decrease font size" aria-label="Decrease font size">A-</button>
-        <button id="btn-acc-font-reset" class="acc-btn" title="Default font size" aria-label="Default font size">A</button>
+        <button id="btn-acc-font-reset" class="acc-btn active" title="Default font size" aria-label="Default font size">A</button>
         <button id="btn-acc-font-plus" class="acc-btn" title="Increase font size" aria-label="Increase font size">A+</button>
-        <span class="acc-lang" title="Hindi Language Indicator" tabindex="0">हिन्दी</span>
+        <button id="btn-acc-lang" class="acc-btn acc-lang" title="भाषा हिन्दी में बदलें" aria-label="Switch language to Hindi">हिन्दी</button>
       </div>
     </div>
   </div>
@@ -63,47 +63,47 @@
 
       <!-- Desktop Nav Items -->
       <div class="mrpl-nav-links">
-        <a class="nav-item active" data-tab="home" href="#home">Home</a>
-        <a class="nav-item" data-tab="about" href="#about">About Us</a>
+        <a class="nav-item active" data-tab="home" href="#home" data-i18n="nav_home">Home</a>
+        <a class="nav-item" data-tab="about" href="#about" data-i18n="nav_about">About Us</a>
 
         <div class="nav-dropdown">
-          <button class="nav-dropdown-btn" aria-haspopup="true">Solver Portal <span class="nav-arrow">▾</span></button>
+          <button class="nav-dropdown-btn" aria-haspopup="true"><span data-i18n="nav_solver">Solver Portal</span> <span class="nav-arrow">▾</span></button>
           <div class="nav-dropdown-content">
-            <a class="nav-item" data-tab="overview" href="#overview">Overview &amp; Process Flow</a>
-            <a class="nav-item" data-tab="optimization" href="#optimization">Optimization Run</a>
-            <a class="nav-item" data-tab="analytics" href="#analytics">Solver Analytics</a>
+            <a class="nav-item" data-tab="overview" href="#overview" data-i18n="nav_overview">Overview &amp; Process Flow</a>
+            <a class="nav-item" data-tab="optimization" href="#optimization" data-i18n="nav_optimization">Optimization Run</a>
+            <a class="nav-item" data-tab="analytics" href="#analytics" data-i18n="nav_analytics">Solver Analytics</a>
           </div>
         </div>
 
         <div class="nav-dropdown">
-          <button class="nav-dropdown-btn" aria-haspopup="true">Refinery Planning <span class="nav-arrow">▾</span></button>
+          <button class="nav-dropdown-btn" aria-haspopup="true"><span data-i18n="nav_planning">Refinery Planning</span> <span class="nav-arrow">▾</span></button>
           <div class="nav-dropdown-content">
-            <a class="nav-item" data-tab="scenarios" href="#scenarios">Scenarios</a>
-            <a class="nav-item" data-tab="overview" href="#overview">Refinery Twin &amp; PFD</a>
+            <a class="nav-item" data-tab="scenarios" href="#scenarios" data-i18n="nav_scenarios">Scenarios</a>
+            <a class="nav-item" data-tab="overview" href="#overview" data-i18n="nav_twin_pfd">Refinery Twin &amp; PFD</a>
           </div>
         </div>
 
-        <a class="nav-item" data-tab="trust" href="#trust">Trust &amp; Verification</a>
-        <a class="nav-item" data-tab="benchmarks" href="#benchmarks">Benchmarks</a>
+        <a class="nav-item" data-tab="trust" href="#trust" data-i18n="nav_trust">Trust &amp; Verification</a>
+        <a class="nav-item" data-tab="benchmarks" href="#benchmarks" data-i18n="nav_benchmarks">Benchmarks</a>
 
         <div class="nav-dropdown">
-          <button class="nav-dropdown-btn" aria-haspopup="true">Evidence <span class="nav-arrow">▾</span></button>
+          <button class="nav-dropdown-btn" aria-haspopup="true"><span data-i18n="nav_evidence">Evidence</span> <span class="nav-arrow">▾</span></button>
           <div class="nav-dropdown-content">
-            <a class="nav-item" data-tab="evidence" href="#evidence">Evidence &amp; Audits</a>
-            <a class="nav-item" data-tab="reports" href="#reports">Reports &amp; Export</a>
+            <a class="nav-item" data-tab="evidence" href="#evidence" data-i18n="nav_evidence_audits">Evidence &amp; Audits</a>
+            <a class="nav-item" data-tab="reports" href="#reports" data-i18n="nav_reports">Reports &amp; Export</a>
           </div>
         </div>
 
-        <a class="nav-item" data-tab="contact" href="#contact">Contact Us</a>
+        <a class="nav-item" data-tab="contact" href="#contact" data-i18n="nav_contact">Contact Us</a>
       </div>
 
       <!-- Quick Actions -->
       <div class="mrpl-nav-actions">
         <button id="btn-header-solve" class="btn btn-nav-action" title="Execute active optimization run">
-          <span>Run Optimization</span>
+          <span data-i18n="nav_run_optimization">Run Optimization</span>
         </button>
         <button id="btn-header-audit" class="btn btn-nav-action-outline" title="Export audit artifacts">
-          <span>Export Audit</span>
+          <span data-i18n="nav_export_audit">Export Audit</span>
         </button>
       </div>
     </div>
@@ -120,21 +120,21 @@
       <button id="mobile-close-btn" class="mobile-drawer-close" aria-label="Close Navigation Menu">&times;</button>
     </div>
     <nav class="mobile-drawer-nav">
-      <a class="nav-item active" data-tab="home" href="#home">Home</a>
-      <a class="nav-item" data-tab="about" href="#about">About Us</a>
-      <div class="mobile-drawer-group">Solver Portal</div>
-      <a class="nav-item" data-tab="overview" href="#overview">Overview &amp; Process Flow</a>
-      <a class="nav-item" data-tab="optimization" href="#optimization">Optimization Run</a>
-      <a class="nav-item" data-tab="analytics" href="#analytics">Solver Analytics</a>
-      <div class="mobile-drawer-group">Refinery Planning</div>
-      <a class="nav-item" data-tab="scenarios" href="#scenarios">Scenarios</a>
-      <div class="mobile-drawer-group">Trust &amp; Hardware Evidence</div>
-      <a class="nav-item" data-tab="trust" href="#trust">Trust &amp; Verification</a>
-      <a class="nav-item" data-tab="benchmarks" href="#benchmarks">Benchmarks (RTX 5050)</a>
-      <a class="nav-item" data-tab="evidence" href="#evidence">Evidence &amp; Audits</a>
-      <a class="nav-item" data-tab="reports" href="#reports">Reports &amp; Export</a>
-      <div class="mobile-drawer-group">Contact</div>
-      <a class="nav-item" data-tab="contact" href="#contact">Contact Us</a>
+      <a class="nav-item active" data-tab="home" href="#home" data-i18n="nav_home">Home</a>
+      <a class="nav-item" data-tab="about" href="#about" data-i18n="nav_about">About Us</a>
+      <div class="mobile-drawer-group" data-i18n="nav_solver">Solver Portal</div>
+      <a class="nav-item" data-tab="overview" href="#overview" data-i18n="nav_overview">Overview &amp; Process Flow</a>
+      <a class="nav-item" data-tab="optimization" href="#optimization" data-i18n="nav_optimization">Optimization Run</a>
+      <a class="nav-item" data-tab="analytics" href="#analytics" data-i18n="nav_analytics">Solver Analytics</a>
+      <div class="mobile-drawer-group" data-i18n="nav_planning">Refinery Planning</div>
+      <a class="nav-item" data-tab="scenarios" href="#scenarios" data-i18n="nav_scenarios">Scenarios</a>
+      <div class="mobile-drawer-group" data-i18n="nav_trust">Trust &amp; Verification</div>
+      <a class="nav-item" data-tab="trust" href="#trust" data-i18n="nav_trust">Trust &amp; Verification</a>
+      <a class="nav-item" data-tab="benchmarks" href="#benchmarks" data-i18n="nav_benchmarks">Benchmarks (RTX 5050)</a>
+      <a class="nav-item" data-tab="evidence" href="#evidence" data-i18n="nav_evidence_audits">Evidence &amp; Audits</a>
+      <a class="nav-item" data-tab="reports" href="#reports" data-i18n="nav_reports">Reports &amp; Export</a>
+      <div class="mobile-drawer-group" data-i18n="nav_contact">Contact</div>
+      <a class="nav-item" data-tab="contact" href="#contact" data-i18n="nav_contact">Contact Us</a>
     </nav>
   </aside>
 
@@ -167,7 +167,7 @@
         <div class="latest-updates-bar" role="region" aria-label="Latest Updates">
           <div class="updates-badge">
             <span class="updates-dot"></span>
-            <span class="updates-title">Latest Updates</span>
+            <span class="updates-title" data-i18n="latest_updates">Latest Updates</span>
           </div>
           <div class="updates-ticker-wrapper" tabindex="0">
             <div class="updates-ticker-track">
@@ -222,11 +222,11 @@
                   </div>
                   <div class="hero-ctas">
                     <button class="btn btn-primary btn-lg" onclick="window.sovApp.switchTab('overview')">
-                      <span>Enter Solver Workspace</span>
+                      <span data-i18n="enter_workspace">Enter Solver Workspace</span>
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </button>
                     <button class="btn btn-secondary btn-lg" onclick="window.sovApp.switchTab('trust')">
-                      <span>View Trust &amp; Verification</span>
+                      <span data-i18n="view_trust">View Trust &amp; Verification</span>
                     </button>
                   </div>
                 </div>
@@ -929,8 +929,8 @@
       <section id="view-optimization" class="view-section">
         <div class="page-header">
           <div class="page-eyebrow">Operations console</div>
-          <h1 class="page-title">Optimization engine dispatch &amp; live solve</h1>
-          <p class="page-intro">
+          <h1 class="page-title" data-i18n="opt_run_title">Optimization engine dispatch &amp; live solve</h1>
+          <p class="page-intro" data-i18n="opt_run_intro">
             Adjust operational crude and demand parameters, execute the sovereign solver core, and inspect convergence trajectories and certified solution vectors.
           </p>
         </div>
@@ -938,12 +938,12 @@
         <div style="display: grid; grid-template-columns: 320px 1fr; gap: 20px;">
           <!-- Left Control Panel -->
           <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-sm); padding: 18px;">
-            <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle);">
+            <div data-i18n="opt_controls_title" style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle);">
               Model &amp; operational inputs
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="solver-model-select">Target model instance</label>
+              <label class="form-label" for="solver-model-select" data-i18n="target_model">Target model instance</label>
               <select id="solver-model-select" class="form-control">
                 <option value="refinery-lp">MRPL Refinery Planning: Multi-period LP</option>
                 <option value="refinery-milp">MRPL Refinery Planning: Unit commitment (MILP)</option>
@@ -957,7 +957,7 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="solver-backend-select">Execution backend</label>
+              <label class="form-label" for="solver-backend-select" data-i18n="exec_backend">Execution backend</label>
               <select id="solver-backend-select" class="form-control">
                 <option value="cpu">Sovereign reference CPU (Simplex / IPM / B&amp;B)</option>
                 <option value="pdhg-cpu">Sovereign restarted PDHG · CPU</option>
@@ -1001,7 +1001,7 @@
             </div>
 
             <button id="btn-run-solve" class="btn btn-primary" style="width: 100%; margin-top: 12px; padding: 8px;">
-              <span>Run optimization</span>
+              <span data-i18n="btn_run_solver">Run optimization</span>
             </button>
 
             <!-- Dispatch telemetry strip -->
@@ -1729,9 +1729,9 @@
       <section id="view-about" class="view-section">
         <div class="page-header text-center">
           <div class="page-eyebrow">Smart India Hackathon 2026 · MRPL PS 26119</div>
-          <h1 class="page-title">About Us</h1>
-          <h2 class="page-subtitle" style="font-size: 20px; font-weight: 600; color: var(--mrpl-green); margin-top: 4px;">SOV-OPT Team</h2>
-          <p class="page-intro" style="max-width: 780px; margin: 12px auto 0;">
+          <h1 class="page-title" data-i18n="about_us">About Us</h1>
+          <h2 class="page-subtitle" style="font-size: 20px; font-weight: 600; color: var(--mrpl-green); margin-top: 4px;" data-i18n="about_subtitle">SOV-OPT Team</h2>
+          <p class="page-intro" style="max-width: 780px; margin: 12px auto 0;" data-i18n="about_intro">
             We are a student team from Rajiv Gandhi Institute of Petroleum Technology developing SOV-OPT, a sovereign LP/MILP/convex-QP optimization core for the MRPL Smart India Hackathon problem statement.
           </p>
         </div>
@@ -1878,8 +1878,8 @@
       <section id="view-contact" class="view-section">
         <div class="page-header text-center">
           <div class="page-eyebrow">Institutional Connection</div>
-          <h1 class="page-title">Contact Us</h1>
-          <p class="page-intro" style="max-width: 720px; margin: 12px auto 0;">
+          <h1 class="page-title" data-i18n="contact_us">Contact Us</h1>
+          <p class="page-intro" style="max-width: 720px; margin: 12px auto 0;" data-i18n="contact_intro">
             Connect with the SOV-OPT student development team from Rajiv Gandhi Institute of Petroleum Technology.
           </p>
         </div>
