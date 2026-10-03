@@ -2925,3 +2925,31 @@ body.high-contrast a {
     letter-spacing: 0;
   }
 }
+
+/* ==========================================================================
+   ACCESSIBILITY FONT SCALING (A- / A / A+)
+   Proportionally scales computed font-size of typography elements across UI.
+   ========================================================================== */
+.mrpl-masthead-title { font-size: calc(18px * var(--accessibility-font-scale, 1.0)) !important; }
+.mrpl-masthead-subtitle { font-size: calc(12.5px * var(--accessibility-font-scale, 1.0)) !important; }
+.nav-item, .nav-dropdown-btn { font-size: calc(13px * var(--accessibility-font-scale, 1.0)) !important; }
+.hero-heading, .slide-title { font-size: calc(38px * var(--accessibility-font-scale, 1.0)) !important; }
+.hero-statement, .slide-subtitle { font-size: calc(20px * var(--accessibility-font-scale, 1.0)) !important; }
+.hero-substatement, .slide-eyebrow { font-size: calc(14.5px * var(--accessibility-font-scale, 1.0)) !important; }
+.page-title { font-size: calc(26px * var(--accessibility-font-scale, 1.0)) !important; }
+.page-subtitle { font-size: calc(20px * var(--accessibility-font-scale, 1.0)) !important; }
+.page-intro { font-size: calc(13.5px * var(--accessibility-font-scale, 1.0)) !important; }
+.btn, .btn-primary, .btn-secondary, .btn-nav-action, .btn-sm { font-size: calc(13.5px * var(--accessibility-font-scale, 1.0)) !important; }
+.team-name, .contact-name { font-size: calc(16px * var(--accessibility-font-scale, 1.0)) !important; }
+.team-program, .team-inst, .contact-detail { font-size: calc(12px * var(--accessibility-font-scale, 1.0)) !important; }
+.data-table th, .data-table td, table th, table td { font-size: calc(12px * var(--accessibility-font-scale, 1.0)) !important; }
+.footer-text, .footer-col, .footer-bottom { font-size: calc(12px * var(--accessibility-font-scale, 1.0)) !important; }
+.sc-card-title { font-size: calc(16px * var(--accessibility-font-scale, 1.0)) !important; }
+.sc-card-desc { font-size: calc(12.5px * var(--accessibility-font-scale, 1.0)) !important; }
+.kpi-title { font-size: calc(11px * var(--accessibility-font-scale, 1.0)) !important; }
+.kpi-value { font-size: calc(22px * var(--accessibility-font-scale, 1.0)) !important; }
+.form-label { font-size: calc(12.5px * var(--accessibility-font-scale, 1.0)) !important; }
+.form-input, .form-select { font-size: calc(13.5px * var(--accessibility-font-scale, 1.0)) !important; }
+.ticker-title { font-size: calc(11px * var(--accessibility-font-scale, 1.0)) !important; }
+.ticker-text { font-size: calc(12.5px * var(--accessibility-font-scale, 1.0)) !important; }
+.analytics-callout-text { font-size: calc(13px * var(--accessibility-font-scale, 1.0)) !important; }

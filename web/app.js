@@ -6,7 +6,7 @@
 
 (function () {
   'use strict';
-  const ASSET_VERSION = 'v=3';
+  const ASSET_VERSION = 'v=4';
 
   // Centralized Team Member Data (Mandatory Order: Khagesh #1, Satyam #2, Sudipto #3, Ayush #4, Shivanshu #5, Muskan #6)
   const TEAM_MEMBERS = [
@@ -135,11 +135,11 @@
       nav_solver: 'सॉल्वर पोर्टल',
       nav_overview: 'अवलोकन एवं प्रक्रिया प्रवाह',
       nav_optimization: 'ऑप्टिमाइज़ेशन रन',
-      nav_analytics: 'सॉल्वर एनालिटिक्स',
+      nav_analytics: 'सॉल्वर विश्लेषण',
       nav_planning: 'रिफाइनरी योजना',
       nav_scenarios: 'परिदृश्य',
       nav_twin_pfd: 'रिफाइनरी मॉडल एवं पीएफडी',
-      nav_trust: 'सत्यापन एवं विश्वसनीयता',
+      nav_trust: 'विश्वसनीयता एवं सत्यापन',
       nav_benchmarks: 'बेंचमार्क',
       nav_evidence: 'प्रमाण',
       nav_evidence_audits: 'प्रमाण एवं ऑडिट',
@@ -149,8 +149,8 @@
       nav_export_audit: 'ऑडिट निर्यात करें',
       latest_updates: 'नवीनतम अपडेट',
       enter_workspace: 'सॉल्वर वर्कस्पेस में प्रवेश करें',
-      view_trust: 'सत्यापन एवं विश्वसनीयता देखें',
-      opt_run_title: 'ऑप्टिमाइज़ेशन इंजन प्रेषण एवं लाइव सॉल्व',
+      view_trust: 'विश्वसनीयता एवं सत्यापन देखें',
+      opt_run_title: 'ऑप्टिमाइज़ेशन इंजन प्रेषण एवं लाइव समाधान',
       opt_run_intro: 'परिचालन क्रूड एवं माँग मापदंड समायोजित करें, सॉवरेन सॉल्वर निष्पादित करें, और अभिसरण पथ एवं प्रमाणित समाधान देखें।',
       opt_controls_title: 'मॉडल एवं परिचालन इनपुट',
       target_model: 'लक्षित मॉडल',
@@ -167,6 +167,947 @@
       lang_aria_label: 'Switch language to English'
     }
   };
+
+  // Complete English to Hindi Translation Dictionary
+  const TRANSLATION_MAP = {
+  "Screen Reader Access": "स्क्रीन रीडर एक्सेस",
+  "Skip to main content": "मुख्य सामग्री पर जाएँ",
+  "Toggle text spacing": "टेक्स्ट स्पेसिंग बदलें",
+  "Toggle high contrast": "उच्च कंट्रास्ट बदलें",
+  "Decrease font size": "फ़ॉन्ट का आकार घटाएँ",
+  "Default font size": "सामान्य फ़ॉन्ट आकार",
+  "Increase font size": "फ़ॉन्ट का आकार बढ़ाएँ",
+  "भाषा हिन्दी में बदलें": "Switch language to English",
+  "Switch language to Hindi": "भाषा हिन्दी में बदलें",
+  "Switch language to English": "अंग्रेज़ी में बदलें",
+  "हिन्दी": "English",
+  "English": "हिन्दी",
+  "Smart India Hackathon 2026": "स्मार्ट इंडिया हैकाथॉन 2026",
+  "TEAM NAME": "टीम का नाम",
+  "TEAM ID": "टीम आईडी",
+  "Home": "होम",
+  "About Us": "हमारे बारे में",
+  "Solver Portal": "सॉल्वर पोर्टल",
+  "Overview & Process Flow": "अवलोकन एवं प्रक्रिया प्रवाह",
+  "Optimization Run": "ऑप्टिमाइज़ेशन रन",
+  "Solver Analytics": "सॉल्वर विश्लेषण",
+  "Refinery Planning": "रिफाइनरी योजना",
+  "Scenarios": "परिदृश्य",
+  "Refinery Twin & PFD": "रिफाइनरी मॉडल एवं पीएफडी",
+  "Trust & Verification": "विश्वसनीयता एवं सत्यापन",
+  "Benchmarks": "बेंचमार्क",
+  "Evidence": "प्रमाण",
+  "Evidence & Audits": "प्रमाण एवं ऑडिट",
+  "Reports & Export": "रिपोर्ट एवं निर्यात",
+  "Contact Us": "संपर्क करें",
+  "Run Optimization": "ऑप्टिमाइज़ेशन चलाएँ",
+  "Export Audit": "ऑडिट निर्यात करें",
+  "Menu": "मेनू",
+  "Latest Updates": "नवीनतम अपडेट",
+  "SOV-OPT supports sovereign LP, MILP and convex QP optimization workflows.": "SOV-OPT सॉवरेन LP, MILP और उत्तल QP ऑप्टिमाइज़ेशन वर्कफ़्लो का समर्थन करता है।",
+  "Numerical Trust Layer independently verifies accepted optimization results.": "न्यूमेरिकल ट्रस्ट लेयर स्वीकृत ऑप्टिमाइज़ेशन परिणामों को स्वतंत्र रूप से सत्यापित करती है।",
+  "Trust Passport is generated from the accepted solve snapshot with SHA-256 model provenance.": "स्वीकृत समाधान स्नैपशॉट से SHA-256 मॉडल मूल के साथ ट्रस्ट पासपोर्ट तैयार किया जाता है।",
+  "Certified Farkas diagnostics are available for supported infeasible cases.": "समर्थित असाध्य मामलों के लिए प्रमाणित फरकस डायग्नोस्टिक्स उपलब्ध हैं।",
+  "Mixed-integer branch-and-bound enforces conservative rational dual bounds.": "मिश्रित-पूर्णांक शाखा-और-बाउंड रूढ़िवादी परिमेय दोहरे बाउंड लागू करता है।",
+  "Pure NumPy & Python standard library implementation with zero external solver dependencies.": "शून्य बाहरी सॉल्वर निर्भरता के साथ शुद्ध NumPy एवं Python मानक लाइब्रेरी कार्यान्वयन।",
+  "Original Mathematical Optimization Engine": "मूल गणितीय ऑप्टिमाइज़ेशन इंजन",
+  "SOV-OPT Refinery Workstation": "SOV-OPT रिफाइनरी वर्कस्टेशन",
+  "GPU accelerates. CPU verifies.": "GPU गति देता है। CPU सत्यापन करता है।",
+  "Mathematical LP, MILP, and convex QP optimization for refinery planning workflows.": "रिफाइनरी योजना वर्कफ़्लो के लिए गणितीय LP, MILP और उत्तल QP ऑप्टिमाइज़ेशन।",
+  "Enter Solver Workspace": "सॉल्वर वर्कस्पेस में प्रवेश करें",
+  "View Trust & Verification": "विश्वसनीयता एवं सत्यापन देखें",
+  "Refinery Optimization Network Topology": "रिफाइनरी ऑप्टिमाइज़ेशन नेटवर्क टोपोलॉजी",
+  "Process Schematic": "प्रक्रिया योजना",
+  "MRPL Problem Statement 26119": "MRPL समस्या विवरण 26119",
+  "Refinery Production & Planning Formulation": "रिफाइनरी उत्पादन एवं योजना निरूपण",
+  "Real-World Industrial Scope": "वास्तविक औद्योगिक क्षेत्र",
+  "Multi-period linear programming with crude selection, unit capacities, blending constraints, and product demands.": "क्रूड चयन, इकाई क्षमता, सम्मिश्रण सीमाओं और उत्पाद मांगों के साथ बहु-अवधि रैखिक प्रोग्रामिंग।",
+  "Explore Refinery Twin": "रिफाइनरी मॉडल देखें",
+  "Review Mathematical Model": "गणितीय मॉडल की समीक्षा करें",
+  "Multi-Unit Material Balance Matrix": "मल्टी-यूनिट सामग्री संतुलन मैट्रिक्स",
+  "Optimization Matrix": "ऑप्टिमाइज़ेशन मैट्रिक्स",
+  "Sovereign Numerical Foundation": "सॉवरेन न्यूमेरिकल आधार",
+  "Dual-Layer Architecture": "द्वि-स्तरीय वास्तुकला",
+  "First-Order Acceleration + Exact Active-Set Basis Recovery": "प्रथम-क्रम त्वरण + सटीक सक्रिय-सेट आधार पुनर्प्राप्ति",
+  "PDHG executes rapid first-order iterations. The CPU simplex and IPM cores construct certified basis factorizations and KKT proofs.": "PDHG तेज़ प्रथम-क्रम पुनरावृत्ति निष्पादित करता है। CPU सिम्प्लेक्स और IPM कोर प्रमाणित आधार गुणनखंडन और KKT प्रमाण बनाते हैं।",
+  "Inspect Architecture": "वास्तुकला का निरीक्षण करें",
+  "Run Live Benchmark": "लाइव बेंचमार्क चलाएँ",
+  "Dual-Engine Execution Pipeline": "दोहरे इंजन निष्पादन पाइपलाइन",
+  "System Blueprint": "सिस्टम ब्लूप्रिंट",
+  "Trust & Numerical Integrity": "विश्वास एवं संख्यात्मक अखंडता",
+  "KKT Verification & Certified Diagnostics": "KKT सत्यापन एवं प्रमाणित डायग्नोस्टिक्स",
+  "Truthful Failure Reporting": "सटीक विफलता रिपोर्टिंग",
+  "Every solution is independently verified. Infeasible instances emit certified Farkas rays. Degeneracy and limits are reported honestly.": "प्रत्येक समाधान का स्वतंत्र रूप से सत्यापन किया जाता है। असाध्य मामलों में प्रमाणित फरकस किरणें निकलती हैं। सीमाओं की सटीक रिपोर्ट की जाती है।",
+  "View Trust Passport": "ट्रस्ट पासपोर्ट देखें",
+  "Inspect Farkas Lens": "फरकस लेंस का निरीक्षण करें",
+  "Certified KKT Residual Monitor": "प्रमाणित KKT अवशिष्ट मॉनिटर",
+  "Residual Ledger": "अवशिष्ट बहीखाता",
+  "Smart India Hackathon 2026 Finalists": "स्मार्ट इंडिया हैकाथॉन 2026 फाइनलिस्ट",
+  "Team VarunNetra": "टीम वरुणनेत्र",
+  "Rajiv Gandhi Institute of Petroleum Technology": "राजीव गाँधी पेट्रोलियम प्रौद्योगिकी संस्थान",
+  "Six students developing original optimization software for India's energy and process engineering sovereignty.": "भारत की ऊर्जा और प्रक्रिया इंजीनियरिंग संप्रभुता के लिए मूल ऑप्टिमाइज़ेशन सॉफ़्टवेयर विकसित करने वाले छह छात्र।",
+  "Meet The Team": "हमारी टीम से मिलें",
+  "Contact Team VarunNetra": "टीम वरुणनेत्र से संपर्क करें",
+  "Team Roster & Research Focus": "टीम सूची एवं अनुसंधान केंद्र",
+  "Student R&D": "छात्र अनुसंधान एवं विकास",
+  "Hardware Acceleration Evidence": "हार्डवेयर त्वरण प्रमाण",
+  "Physical GPU Verification": "भौतिक GPU सत्यापन",
+  "Dedicated RawKernels · Measured on Acer RTX 5050": "समर्पित RawKernels · Acer RTX 5050 पर मापा गया",
+  "Differential benchmarks executed against Netlib and MIPLIB suites with full runtime telemetry and driver provenance.": "पूर्ण रनटाइम टेलीमेट्री और ड्राइवर मूल के साथ Netlib और MIPLIB सूट के खिलाफ निष्पादित अंतर बेंचमार्क।",
+  "Inspect Hardware Benchmarks": "हार्डवेयर बेंचमार्क देखें",
+  "Download Audit Bundle": "ऑडिट बंडल डाउनलोड करें",
+  "GPU Execution Telemetry": "GPU निष्पादन टेलीमेट्री",
+  "Measured Evidence": "मापा गया प्रमाण",
+  "LEADER": "टीम लीडर",
+  "MEMBER": "सदस्य",
+  "B.Tech + M.Tech (Dual Degree) in CSE & AI": "बी.टेक + एम.टेक (दोहरी डिग्री) सीएसई और एआई",
+  "B.Tech in Information Technology": "बी.टेक सूचना प्रौद्योगिकी",
+  "Program": "पाठ्यक्रम",
+  "Email": "ईमेल",
+  "LinkedIn": "लिंक्डइन",
+  "Operations console": "संचालन कंसोल",
+  "Optimization engine dispatch & live solve": "ऑप्टिमाइज़ेशन इंजन प्रेषण एवं लाइव समाधान",
+  "Adjust operational crude and demand parameters, execute the sovereign solver core, and inspect convergence trajectories and certified solution vectors.": "परिचालन क्रूड एवं माँग मापदंड समायोजित करें, सॉवरेन सॉल्वर निष्पादित करें, और अभिसरण पथ एवं प्रमाणित समाधान देखें।",
+  "Model & operational inputs": "मॉडल एवं परिचालन इनपुट",
+  "Target model instance": "लक्षित मॉडल",
+  "Execution backend": "निष्पादन बैकएंड",
+  "Arab Light crude cost ($/bbl)": "अरब लाइट क्रूड लागत ($/बैरल)",
+  "Basrah Heavy crude cost ($/bbl)": "बसरा हेवी क्रूड लागत ($/बैरल)",
+  "Minimum gasoline demand (kbpd)": "न्यूनतम गैसोलीन माँग (kbpd)",
+  "Minimum diesel demand (kbpd)": "न्यूनतम डीजल माँग (kbpd)",
+  "Run optimization": "ऑप्टिमाइज़ेशन चलाएँ",
+  "Running optimization…": "ऑप्टिमाइज़ेशन चल रहा है…",
+  "Optimization Complete ✓": "ऑप्टिमाइज़ेशन पूर्ण ✓",
+  "Solver stage:": "सॉल्वर चरण:",
+  "Result status:": "परिणाम स्थिति:",
+  "Iterations:": "पुनरावृत्तियाँ:",
+  "Duration:": "समय:",
+  "Net margin:": "शुद्ध मार्जिन:",
+  "Primal residual:": "प्राइमल अवशिष्ट:",
+  "Dual residual:": "ड्यूअल अवशिष्ट:",
+  "Idle": "निष्क्रिय",
+  "Not executed": "अभी चलाया नहीं गया",
+  "Building model…": "मॉडल तैयार हो रहा है…",
+  "Executing sparse LU solver…": "सॉल्वर निष्पादित हो रहा है…",
+  "Optimal verified": "इष्टतम सत्यापित",
+  "Farkas certificate ray": "फरकस प्रमाणपत्र किरण",
+  "Inputs modified — click 'Run optimization'": "इनपुट बदले गए — 'ऑप्टिमाइज़ेशन चलाएँ' पर क्लिक करें",
+  "Solve failed": "समाधान विफल",
+  "Execution error": "निष्पादन त्रुटि",
+  "CUDA unavailable on this machine — select CPU backend": "इस मशीन पर CUDA अनुपलब्ध है — CPU बैकएंड चुनें",
+  "CUDA unavailable": "CUDA अनुपलब्ध",
+  "SOV-OPT Team": "SOV-OPT टीम",
+  "We are a student team from Rajiv Gandhi Institute of Petroleum Technology developing SOV-OPT, a sovereign LP/MILP/convex-QP optimization core for the MRPL Smart India Hackathon problem statement.": "हम राजीव गाँधी पेट्रोलियम प्रौद्योगिकी संस्थान के छात्र हैं जो MRPL स्मार्ट इंडिया हैकाथॉन समस्या विवरण हेतु SOV-OPT सॉवरेन LP/MILP/QP सॉल्वर विकसित कर रहे हैं।",
+  "Institutional Connection": "संस्थागत संपर्क",
+  "Connect with the SOV-OPT student development team from Rajiv Gandhi Institute of Petroleum Technology.": "राजीव गाँधी पेट्रोलियम प्रौद्योगिकी संस्थान के SOV-OPT छात्र विकास दल से संपर्क करें।",
+  "Institute of National Importance (INI) · Government of India": "राष्ट्रीय महत्व का संस्थान (INI) · भारत सरकार",
+  "Bahadurpur, Jais, Post Harbanshganj, Amethi - 229304, Uttar Pradesh, India": "बहादुरपुर, जायस, पोस्ट हरबंशगंज, अमेठी - 229304, उत्तर प्रदेश, भारत",
+  "Refinery Planning Scenarios": "रिफाइनरी योजना परिदृश्य",
+  "Curated industrial operating regimes representing baseline equilibrium, demand spikes, sulfur upsets, FCC outages, and certified infeasible bounds.": "आधारभूत संतुलन, माँग वृद्धि, सल्फर समस्या, FCC आउटेज और प्रमाणित असाध्य सीमाओं का प्रतिनिधित्व करने वाले औद्योगिक परिदृश्य।",
+  "Base refinery equilibrium": "आधारभूत रिफाइनरी संतुलन",
+  "High gasoline demand spike": "उच्च गैसोलीन माँग वृद्धि",
+  "Heavy crude discount arbitrage": "भारी क्रूड छूट आर्बिट्राज",
+  "FCC unit partial outage": "FCC इकाई आंशिक आउटेज",
+  "High sulfur crude intake penalty": "उच्च सल्फर क्रूड इनटेक पेनल्टी",
+  "Infeasible production constraint": "असाध्य उत्पादन सीमा",
+  "Canonical Trust Passport & Execution Telemetry": "कैनोनिकल ट्रस्ट पासपोर्ट एवं निष्पादन टेलीमेट्री",
+  "Model-fingerprinted verification audit for the active solution snapshot": "सक्रिय समाधान स्नैपशॉट हेतु मॉडल-फिंगरप्रिंटेड सत्यापन ऑडिट",
+  "Verification Status": "सत्यापन स्थिति",
+  "Model Instance": "मॉडल का नाम",
+  "Objective Value": "उद्देश्य मान",
+  "Primal Residual": "प्राइमल अवशिष्ट",
+  "Dual Residual": "ड्यूअल अवशिष्ट",
+  "KKT Residual": "KKT अवशिष्ट",
+  "Bound Violation": "बाउंड उल्लंघन",
+  "Integrality Gap": "पूर्णांक अंतर",
+  "Certificate Type": "प्रमाणपत्र प्रकार",
+  "Solver Commit": "सॉल्वर कमिट",
+  "Backend Selected": "चयनित बैकएंड",
+  "Algorithm Dispatched": "प्रयुक्त एल्गोरिथ्म",
+  "Model Fingerprint (SHA-256)": "मॉडल फिंगरप्रिंट (SHA-256)",
+  "Export Trust Passport (JSON)": "ट्रस्ट पासपोर्ट निर्यात करें (JSON)",
+  "Copy JSON": "JSON कॉपी करें",
+  "Copied": "कॉपी हो गया",
+  "Download Artifact": "आर्टिफ़ैक्ट डाउनलोड करें",
+  "Run solver to verify": "सत्यापन हेतु सॉल्वर चलाएँ",
+  "Infeasibility Certificate & Constraint Attribution (Farkas Lens)": "असाध्यता प्रमाणपत्र एवं प्रतिबंध विश्लेषण (फरकस लेंस)",
+  "Exact rational Farkas certificate identifies governing infeasible constraint subsystems": "सटीक परिमेय फरकस प्रमाणपत्र प्रमुख असाध्य प्रतिबंध उप-प्रणालियों की पहचान करता है",
+  "Farkas ray certifies that no feasible production schedule exists satisfying all constraints simultaneously.": "फरकस किरण प्रमाणित करती है कि सभी प्रतिबंधों को एक साथ पूरा करने वाला कोई व्यावहारिक उत्पादन कार्यक्रम मौजूद नहीं है।",
+  "Diagnostic ranking — not a minimal IIS.": "डायग्नोस्टिक रैंकिंग — न्यूनतम IIS नहीं।",
+  "Refinery Overview & Process Flow Diagram": "रिफाइनरी अवलोकन एवं प्रक्रिया प्रवाह आरेख",
+  "Interactive flowsheet representing CDU, FCC, Reformer, and Blending pools with live stream balances": "CDU, FCC, रिफॉर्मर और सम्मिश्रण पूल का सजीव स्ट्रीम संतुलन दर्शाने वाला इंटरैक्टिव फ्लोशीट",
+  "Unit Inspector": "इकाई विश्लेषक",
+  "Select any processing unit in the flowsheet above to inspect its design specification, operating parameters, and active shadow prices.": "डिज़ाइन विनिर्देश, परिचालन मापदंड और शैडो कीमतों का निरीक्षण करने के लिए ऊपर फ्लोशीट में किसी भी इकाई का चयन करें।",
+  "Crude Distillation Unit (Atmospheric)": "क्रूड आसवन इकाई (वायुमंडलीय)",
+  "Primary fractionator": "प्राथमिक प्रभाजक",
+  "Fluid Catalytic Cracker": "द्रव उत्प्रेरक क्रैकर",
+  "Secondary upgrading & cracking": "द्वितीयक उन्नयन एवं क्रैकिंग",
+  "Catalytic Reforming Unit (Semi-Regen)": "उत्प्रेरक सुधार इकाई",
+  "High-octane aromatics & H2": "उच्च-ऑक्टेन एरोमैटिक्स एवं H2",
+  "Motor Gasoline Blending Pool": "मोटर गैसोलीन सम्मिश्रण पूल",
+  "High-Speed Diesel Blending Pool": "हाई-स्पीड डीजल सम्मिश्रण पूल",
+  "Fuel Oil & Asphalt Header": "ईंधन तेल एवं डामर हेडर",
+  "Governing crack spread": "प्रमुख क्रैक स्प्रेड",
+  "Slack available": "अतिरिक्त क्षमता उपलब्ध",
+  "Marginal cost binding": "सीमांत लागत बाध्यकारी",
+  "Hardware Benchmark Suite": "हार्डवेयर बेंचमार्क सूट",
+  "Acer Nitro V 15 · NVIDIA GeForce RTX 5050 Laptop GPU (8GB GDDR7, Blackwell, SM 12.0) vs Intel Core i5-13420H (12 threads)": "Acer Nitro V 15 · NVIDIA GeForce RTX 5050 लैपटॉप GPU बनाम Intel Core i5-13420H (12 थ्रेड)",
+  "Execution Summary": "निष्पादन सारांश",
+  "Instances Evaluated": "मूल्यांकित मॉडल",
+  "Mean CPU/CUDA Ratio": "औसत CPU/CUDA अनुपात",
+  "Large-Instance Max Ratio": "बड़े मॉडल अधिकतम अनुपात",
+  "Gate 9 vs Gate 8 Speedup": "गेट 9 बनाम गेट 8 गति सुधार",
+  "RawKernels Deployed": "तैनात RawKernels",
+  "Instance": "मॉडल",
+  "Class": "वर्ग",
+  "Rows": "पंक्तियाँ",
+  "Cols": "कॉलम",
+  "Nonzeros": "अशून्य मान",
+  "CPU Time": "CPU समय",
+  "CUDA Time": "CUDA समय",
+  "Ratio": "अनुपात",
+  "Discrepancy": "अंतर",
+  "Experimental Evidence & Validation Manifests": "प्रायोगिक प्रमाण एवं सत्यापन घोषणापत्र",
+  "Verifiable execution logs, solver comparison tables, and raw cryptographic checksum manifests for all test instances": "सत्यापन योग्य निष्पादन लॉग, सॉल्वर तुलना तालिकाएँ और सभी परीक्षण मॉडलों के लिए क्रिप्टोग्राफ़िक चेकसम घोषणापत्र",
+  "Artifact": "आर्टिफ़ैक्ट",
+  "Source": "स्रोत",
+  "SHA-256 Hash": "SHA-256 हैश",
+  "Format": "प्रारूप",
+  "Action": "कार्रवाई",
+  "View": "देखें",
+  "Download": "डाउनलोड",
+  "Operations Reports & Data Export": "संचालन रिपोर्ट एवं डेटा निर्यात",
+  "Download certified execution passports, schedule spreadsheets, and audit summaries for industrial verification": "औद्योगिक सत्यापन के लिए प्रमाणित निष्पादन पासपोर्ट, शेड्यूल स्प्रेडशीट और ऑडिट सारांश डाउनलोड करें",
+  "Export CSV Schedule": "CSV शेड्यूल निर्यात करें",
+  "Export JSON Passport": "JSON पासपोर्ट निर्यात करें",
+  "Download Full Bundle": "पूर्ण बंडल डाउनलोड करें",
+  "Official Portal": "आधिकारिक पोर्टल",
+  "Autonomous Numerical Optimization Research Prototype developed for MRPL Smart India Hackathon Problem Statement 26119.": "MRPL स्मार्ट इंडिया हैकाथॉन समस्या विवरण 26119 हेतु विकसित मूल संख्यात्मक ऑप्टिमाइज़ेशन प्रोटोटाइप।",
+  "Quick Links": "त्वरित लिंक",
+  "Institutional Authority": "संस्थागत प्राधिकरण",
+  "Ministry of Petroleum and Natural Gas, Government of India": "पेट्रोलियम एवं प्राकृतिक गैस मंत्रालय, भारत सरकार",
+  "Smart India Hackathon · Ministry of Education, Government of India": "स्मार्ट इंडिया हैकाथॉन · शिक्षा मंत्रालय, भारत सरकार",
+  "All rights reserved.": "सर्वाधिकार सुरक्षित।",
+  "\"No result is trusted merely because an optimization algorithm stopped.\"": "\"केवल इसलिए किसी परिणाम पर भरोसा नहीं किया जाता क्योंकि ऑप्टिमाइज़ेशन एल्गोरिथ्म रुक गया।\"",
+  "$0.00 / bbl": "$0.00 / बैरल",
+  "$0.50 / bbl-period": "$0.50 / बैरल-अवधि",
+  "$29.89 / bbl": "$29.89 / बैरल",
+  "$8.40 / bbl": "$8.40 / बैरल",
+  "& unroll 4": "& अनरोल 4",
+  "(Discrete scheduling)": "(असतत शेड्यूलिंग)",
+  "(Material balances)": "(सामग्री संतुलन)",
+  "(Unit capacity bounds)": "(इकाई क्षमता सीमा)",
+  "(resident buffers)": "(निवासी बफ़र)",
+  "). The active scenario is verified feasible.": ")। सक्रिय परिदृश्य व्यवहार्य सत्यापित है।",
+  ". An accelerated factor of ≥2x was": "। ≥2x का त्वरित कारक ",
+  ". Physical Acer RTX 5050 validation evidence is catalogued under the": "। भौतिक Acer RTX 5050 सत्यापन प्रमाण सूचीबद्ध है ",
+  "0 allocations across 50,000 iterations": "50,000 पुनरावृत्तियों में 0 आवंटन",
+  "0 runtime allocations": "0 रनटाइम आवंटन",
+  "100 kbpd max": "अधिकतम 100 kbpd",
+  "100.0 kbpd (100% load)": "100.0 kbpd (100% भार)",
+  "15.0 kbbl working stock": "15.0 kbbl कार्यशील स्टॉक",
+  "17.0 kbpd (56.7% load)": "17.0 kbpd (56.7% भार)",
+  "18 Netlib Benchmark Problems": "18 Netlib बेंचमार्क समस्याएँ",
+  "18-instance CPU vs CUDA timing and discrepancy summary": "18-मॉडल CPU बनाम CUDA समय एवं विसंगति सारांश",
+  "18-instance differential benchmark suite executed on physical NVIDIA hardware with full driver and runtime telemetry.": "पूर्ण ड्राइवर और रनटाइम टेलीमेट्री के साथ भौतिक NVIDIA हार्डवेयर पर निष्पादित 18-मॉडल अंतर बेंचमार्क सूट।",
+  "25.0 kbbl per intermediate product": "25.0 kbbl प्रति मध्यवर्ती उत्पाद",
+  "3 warmups + 7 measured repeats at committed source SHA 51b71bb": "प्रतिबद्ध स्रोत SHA 51b71bb पर 3 वार्मअप + 7 मापे गए दोहराव",
+  "30.0 kbpd heavy naphtha": "30.0 kbpd भारी नैफ्था",
+  "360°C Flash Zone": "360°C फ्लैश ज़ोन",
+  "4 dedicated RawKernels": "4 समर्पित RawKernels",
+  "4.5x reduction in driver launch latency": "ड्राइवर लॉन्च लेटेंसी में 4.5 गुना कमी",
+  "44.0 kbpd finished product": "44.0 kbpd तैयार उत्पाद",
+  "45.0 kbpd (90% load)": "45.0 kbpd (90% भार)",
+  "50.0 kbpd gasoil/residue": "50.0 kbpd गैसऑयल/अवशेष",
+  "500°C Furnace Inlet": "500°C भट्टी इनलेट",
+  "530°C Riser Reactor": "530°C राइजर रिएक्टर",
+  "56.2 kbpd finished product": "56.2 kbpd तैयार उत्पाद",
+  "60L / 40H kbpd": "60L / 40H kbpd",
+  "90% (45.0 kbpd)": "90% (45.0 kbpd)",
+  "Academic Institution": "शैक्षणिक संस्थान",
+  "Acceleration + Rigorous Audit": "त्वरण + कठोर ऑडिट",
+  "Accessibility and display controls": "पहुंच एवं प्रदर्शन नियंत्रण",
+  "Acer Nitro 5 (NVIDIA RTX 5050)": "Acer Nitro 5 (NVIDIA RTX 5050)",
+  "Acer RTX 5050 physical GPU benchmark center": "Acer RTX 5050 भौतिक GPU बेंचमार्क केंद्र",
+  "Active refinery constraints": "सक्रिय रिफाइनरी प्रतिबंध",
+  "Aggregate Speedup (CPU / CUDA)": "कुल गति सुधार (CPU / CUDA)",
+  "Algorithm": "एल्गोरिथ्म",
+  "Algorithm routine": "एल्गोरिथ्म रूटीन",
+  "All performance claims are backed by commit-hashed execution logs on physical NVIDIA hardware. Measured results strictly preserve differential comparisons without synthetic inflation.": "सभी प्रदर्शन दावे भौतिक NVIDIA हार्डवेयर पर कमिट-हैश किए गए निष्पादन लॉग द्वारा समर्थित हैं। मापे गए परिणाम कृत्रिम वृद्धि के बिना अंतर तुलना को सख्ती से संरक्षित करते हैं।",
+  "Ambient": "परिवेशी",
+  "Ambient (25°C)": "परिवेशी (25°C)",
+  "Amethi, Uttar Pradesh": "अमेठी, उत्तर प्रदेश",
+  "An original sovereign numerical optimization research prototype developed for Smart India Hackathon 2026 Problem Statement 26119. Independent pure NumPy core with rigorous primal-dual certificate verification.": "स्मार्ट इंडिया हैकाथॉन 2026 समस्या विवरण 26119 हेतु विकसित एक मूल सॉवरेन संख्यात्मक अनुकूलन अनुसंधान प्रोटोटाइप। कठोर प्राइमल-ड्यूअल प्रमाणपत्र सत्यापन के साथ स्वतंत्र शुद्ध NumPy कोर।",
+  "Arab Light": "अरब लाइट",
+  "Arab Light (60 kbpd) + Basrah Heavy (40 kbpd)": "अरब लाइट (60 kbpd) + बसरा हेवी (40 kbpd)",
+  "Arab Light 60.0 · Basrah 40.0": "अरब लाइट 60.0 · बसरा 40.0",
+  "Arbitrage": "आर्बिट्राज",
+  "Architectural Excellence": "वास्तुकला उत्कृष्टता",
+  "Architectural optimizations implemented to eliminate Python/CUDA dispatch bottlenecks": "Python/CUDA प्रेषण अड़चनों को दूर करने के लिए कार्यान्वित वास्तुकला अनुकूलन",
+  "Artifact path": "आर्टिफ़ैक्ट पथ",
+  "At Upper": "ऊपरी सीमा पर",
+  "Atmospheric": "वायुमंडलीय",
+  "Atmospheric Crude Distillation (CDU)": "वायुमंडलीय कच्चा तेल आसवन (CDU)",
+  "Atmospheric Crude Distillation Unit (CDU)": "वायुमंडलीय कच्चा तेल आसवन इकाई (CDU)",
+  "Atmospheric residue & gasoil header": "वायुमंडलीय अवशेष एवं गैसऑयल हेडर",
+  "Audit Export:": "ऑडिट निर्यात:",
+  "Audit Notice:": "ऑडिट सूचना:",
+  "Audit Reports": "ऑडिट रिपोर्ट",
+  "Audit artifacts": "ऑडिट आर्टिफ़ैक्ट",
+  "Authentic data files catalogued in repository": "रिपॉजिटरी में सूचीबद्ध प्रामाणिक डेटा फ़ाइलें",
+  "Auto Solver Dispatch": "ऑटो सॉल्वर प्रेषण",
+  "Ayush Rao on LinkedIn": "Ayush Rao लिंक्डइन पर",
+  "B.Tech (Information Technology)": "बी.टेक (सूचना प्रौद्योगिकी)",
+  "B.Tech + M.Tech (CSE & AI)": "बी.टेक + एम.टेक (सीएसई और एआई)",
+  "BLENDING": "सम्मिश्रण",
+  "BS-VI High-Speed Diesel Pool": "BS-VI हाई-स्पीड डीजल पूल",
+  "BS-VI Specs": "BS-VI विनिर्देश",
+  "Balanced 60/40 Arab Light / Basrah Heavy crude slate. Standard product netbacks ($115/bbl Gasoline, $105/bbl Diesel). Nominal CDU throughput at 100 kbpd ceiling.": "संतुलित 60/40 अरब लाइट / बसरा हेवी क्रूड स्लेट। मानक उत्पाद नेटबैक ($115/बैरल गैसोलीन, $105/बैरल डीजल)। 100 kbpd सीमा पर नाममात्र CDU थ्रूपुट।",
+  "Balanced 60/40 sweet/sour crude slate. Standard product netbacks ($115/bbl Gasoline, $105/bbl Diesel). Nominal CDU throughput at 100 kbpd ceiling.": "संतुलित 60/40 स्वीट/सॉर क्रूड स्लेट। मानक उत्पाद नेटबैक ($115/बैरल गैसोलीन, $105/बैरल डीजल)। 100 kbpd सीमा पर नाममात्र CDU थ्रूपुट।",
+  "Basic": "मूलभूत",
+  "Basis status": "आधार स्थिति",
+  "Basrah Heavy crude price spread widens to -$10/bbl ($52/bbl vs $70/bbl Arab Light). Optimal intake pivots heavily to Basrah to capture crude margin arbitrage.": "बसरा हेवी क्रूड मूल्य अंतर -$10/बैरल तक बढ़ता है ($52/बैरल बनाम $70/बैरल अरब लाइट)। क्रूड मार्जिन आर्बिट्राज का लाभ उठाने के लिए इष्टतम इनटेक मुख्य रूप से बसरा की ओर झुकता है।",
+  "Basrah Hvy": "बसरा हेवी",
+  "Benchmarks (RTX 5050)": "बेंचमार्क (RTX 5050)",
+  "Best-bound B&B + rational bounds": "बेस्ट-बाउंड B&B + परिमेय सीमाएँ",
+  "Bottleneck": "अड़चन",
+  "Bound violation": "बाउंड उल्लंघन",
+  "Branch-and-Bound + Exact ℚ-Bounds": "शाखा-और-बाउंड + सटीक ℚ-बाउंड",
+  "Branch-and-bound lower bounds are computed in exact rational Fraction arithmetic, guaranteeing that the mathematical gap cannot close falsely due to floating-point leakage.": "शाखा-और-बाउंड निचली सीमाएँ सटीक परिमेय भिन्न अंकगणित में गणना की जाती हैं, जिससे यह गारंटी मिलती है कि फ्लोटिंग-पॉइंट रिसाव के कारण गणितीय अंतर गलत तरीके से बंद नहीं हो सकता।",
+  "CDU Distillate (45 kbpd) + FCC LCO (11.2 kbpd)": "CDU डिस्टिलेट (45 kbpd) + FCC LCO (11.2 kbpd)",
+  "CDU Distillation:": "CDU आसवन:",
+  "CDU intake": "CDU इनटेक",
+  "CDU intake capacity": "CDU इनटेक क्षमता",
+  "CDU intake capacity (100 kbpd)": "CDU इनटेक क्षमता (100 kbpd)",
+  "CDU total throughput": "CDU कुल थ्रूपुट",
+  "CPU faster due to sub-ms launch & transfer latency": "सब-मिलीसेकंड लॉन्च एवं ट्रांसफर लेटेंसी के कारण CPU तेज़",
+  "CPU median (ms)": "CPU माध्यिका (ms)",
+  "CRUDE A": "क्रूड A",
+  "CRUDE B": "क्रूड B",
+  "CSR with": "CSR साथ",
+  "CUDA Improvement (Gate 9 vs Gate 8)": "CUDA सुधार (गेट 9 बनाम गेट 8)",
+  "CUDA SpMV memory bandwidth acceleration demonstrated": "CUDA SpMV मेमोरी बैंडविड्थ त्वरण प्रदर्शित",
+  "CUDA backend unavailable on this machine (Apple Silicon / ARM64). Execution is disabled for this option. To run optimizations live, select": "इस मशीन (Apple Silicon / ARM64) पर CUDA बैकएंड अनुपलब्ध है। इस विकल्प के लिए निष्पादन अक्षम है। लाइव ऑप्टिमाइज़ेशन चलाने के लिए, चुनें",
+  "CUDA build / runtime": "CUDA बिल्ड / रनटाइम",
+  "CUDA — unavailable on this machine (Apple Silicon)": "CUDA — इस मशीन (Apple Silicon) पर अनुपलब्ध",
+  "Candidate solution x* is directly substituted into the original untransformed constraint matrix A. Any violation exceeding 10⁻⁷ is rejected as NUMERICAL_FAILURE.": "प्रस्तावित समाधान x* को सीधे मूल अपरिवर्तित बाधा मैट्रिक्स A में प्रतिस्थापित किया जाता है। 10⁻⁷ से अधिक किसी भी उल्लंघन को NUMERICAL_FAILURE के रूप में अस्वीकार कर दिया जाता है।",
+  "Canonical JSON Passport": "कैनोनिकल JSON पासपोर्ट",
+  "Carousel slide selection": "हिंडोला स्लाइड चयन",
+  "Cat Cracking": "कैट क्रैकिंग",
+  "CatGas (27 kbpd) + Reformate (17 kbpd)": "कैटगैस (27 kbpd) + रिफॉर्मेट (17 kbpd)",
+  "CatGas 60% · LCO 30% · Heavy bottoms 10%": "कैटगैस 60% · LCO 30% · भारी बॉटम्स 10%",
+  "CatGas to gasoline pool": "कैटगैस से गैसोलीन पूल",
+  "Catalog of 81 authentic public benchmark instances": "81 प्रामाणिक सार्वजनिक बेंचमार्क मॉडलों की सूची",
+  "Catalytic": "उत्प्रेरक",
+  "Ceiling 50.0 kbpd gasoil / residue": "अधिकतम 50.0 kbpd गैसऑयल / अवशेष",
+  "Certificate guarantee": "प्रमाणपत्र गारंटी",
+  "Certification guarantee": "प्रमाणीकरण गारंटी",
+  "Certified basic & non-basic variables satisfying physical bounds": "भौतिक सीमाओं को संतुष्ट करने वाले प्रमाणित मूल एवं गैर-मूल चर",
+  "Challenge:": "चुनौती:",
+  "Clear separation of concerns: GPU first-order restarted PDHG accelerates massive operational exploration, while CPU exact revised simplex independently certifies Karush-Kuhn-Tucker (KKT) stationarity.": "स्पष्ट दायित्व विभाजन: GPU प्रथम-क्रम पुनरारंभित PDHG व्यापक परिचालन अन्वेषण को गति देता है, जबकि CPU सटीक संशोधित सिम्प्लेक्स स्वतंत्र रूप से KKT स्थिरता प्रमाणित करता है।",
+  "Close Navigation Menu": "नेविगेशन मेनू बंद करें",
+  "Collapsed DRAM passes into fast registers": "DRAM पास को तेज़ रजिस्टरों में समेटा गया",
+  "Commands to verify all results from the terminal": "टर्मिनल से सभी परिणामों को सत्यापित करने के आदेश",
+  "Committed git milestone hashes, file digests, and reproducible audit artifacts.": "प्रतिबद्ध गिट माइलस्टोन हैश, फ़ाइल डाइजेस्ट और पुनरुत्पादनीय ऑडिट आर्टिफ़ैक्ट।",
+  "Committed git milestone ledger": "प्रतिबद्ध गिट माइलस्टोन बहीखाता",
+  "Compare:": "तुलना करें:",
+  "Complete independence from commercial solvers. Built with an original revised two-phase primal simplex (LP), exact rational branch-and-bound (MILP), and Mehrotra predictor-corrector interior point method (QP).": "वाणिज्यिक सॉल्वरों से पूर्ण स्वतंत्रता। एक मूल संशोधित दो-चरणीय प्राइमल सिम्प्लेक्स (LP), सटीक परिमेय शाखा-और-बाउंड (MILP), और मेहरोत्रा प्रिडिक्टर-कॉरेक्टर इंटीरियर पॉइंट विधि (QP) के साथ निर्मित।",
+  "Compute Capability:": "कंप्यूट क्षमता:",
+  "Compute capability": "कंप्यूट क्षमता",
+  "Conservative MILP lower bounds via safe rational arithmetic": "सुरक्षित परिमेय अंकगणित के माध्यम से रूढ़िवादी MILP निचली सीमाएँ",
+  "Constraint": "प्रतिबंध",
+  "Constraint identifier": "प्रतिबंध पहचानकर्ता",
+  "Constraint state": "प्रतिबंध स्थिति",
+  "Contact": "संपर्क",
+  "Contact Details": "संपर्क विवरण",
+  "Continuous LP": "सतत LP",
+  "Contraction of infinity-norm KKT residuals over iterations": "पुनरावृत्तियों के साथ अनंत-मानक KKT अवशिष्टों का संकुचन",
+  "Contractual volume fulfilled": "अनुबंधित मात्रा पूर्ण",
+  "Contribution (b_i · y_i)": "योगदान (b_i · y_i)",
+  "Convex QP": "उत्तल QP",
+  "Copy": "कॉपी करें",
+  "Core solver routines in sovopt/": "sovopt/ में कोर सॉल्वर रूटीन",
+  "Cracking conversion is limited by reactor bed maintenance. Atmospheric residue is bypassed directly to low-value bunker fuel oil, reducing overall economic margin.": "क्रैकिंग रूपांतरण रिएक्टर बेड रखरखाव द्वारा सीमित है। वायुमंडलीय अवशेष को सीधे कम मूल्य वाले बंकर ईंधन तेल में बाईपास किया जाता है, जिससे समग्र आर्थिक मार्जिन कम होता है।",
+  "Crude intake ratio": "कच्चा तेल इनटेक अनुपात",
+  "Crude procurement expands Basrah Heavy to metallurgical maximum 80 kbpd. Fluid catalytic cracker reaches thermal ceiling (50 kbpd), becoming the binding operational constraint.": "क्रूड खरीद बसरा हेवी को धातुकर्म अधिकतम 80 kbpd तक बढ़ाती है। द्रव उत्प्रेरक क्रैकर थर्मल सीमा (50 kbpd) तक पहुँचता है, जो बाध्यकारी परिचालन बाधा बन जाता है।",
+  "Crude: Arab Light intake": "क्रूड: अरब लाइट इनटेक",
+  "Crude: Basrah Heavy intake": "क्रूड: बसरा हेवी इनटेक",
+  "Cryptographic evidence & commit registry": "क्रिप्टोग्राफ़िक साक्ष्य एवं कमिट रजिस्ट्री",
+  "Current load": "वर्तमान भार",
+  "Dedicated student researchers from RGIPT building an indigenous, mathematically verified numerical solver for the Mangalore Refinery and Petrochemicals Limited problem statement.": "RGIPT के समर्पित छात्र शोधकर्ता मैंगलोर रिफाइनरी एंड पेट्रोकेमिकल्स लिमिटेड समस्या विवरण के लिए एक स्वदेशी, गणितीय रूप से सत्यापित संख्यात्मक सॉल्वर का निर्माण कर रहे हैं।",
+  "Description": "विवरण",
+  "Description & stream": "विवरण एवं स्ट्रीम",
+  "Design capacity": "डिज़ाइन क्षमता",
+  "Desulfurized heavy naphtha": "विसल्फरीकृत भारी नैफ्था",
+  "Deterministic Dispatch · Pure NumPy · Zero Black Boxes": "नियत प्रेषण · शुद्ध NumPy · शून्य ब्लैक बॉक्स",
+  "Developed for Smart India Hackathon 2026. Representative refinery inputs are engineering approximations and are not proprietary MRPL operating data.": "स्मार्ट इंडिया हैकाथॉन 2026 के लिए विकसित। प्रतिनिधि रिफाइनरी इनपुट इंजीनियरिंग सन्निकटन हैं और स्वामित्व MRPL परिचालन डेटा नहीं हैं।",
+  "Development of a sovereign mathematical optimization core for industrial refinery planning. Eliminates dependency on proprietary commercial solvers (Gurobi, CPLEX, FICO Xpress) using pure NumPy and Python standard library algorithms.": "औद्योगिक रिफाइनरी योजना के लिए एक सॉवरेन गणितीय अनुकूलन कोर का विकास। शुद्ध NumPy और Python मानक लाइब्रेरी एल्गोरिदम का उपयोग करके वाणिज्यिक सॉल्वरों (Gurobi, CPLEX, FICO Xpress) पर निर्भरता समाप्त करता है।",
+  "Diagnostic ranking — not a minimal IIS": "डायग्नोस्टिक रैंकिंग — न्यूनतम IIS नहीं",
+  "Diesel Cetane:": "डीजल सीटेन:",
+  "Diesel demand quota": "डीजल माँग कोटा",
+  "Diesel hydrotreating specification": "डीजल हाइड्रो-ट्रीटिंग विनिर्देश",
+  "Discrete MILP": "असतत MILP",
+  "Distillate (52 Cetane) + LCO (35 Cetane) -> 51 Cetane Pool": "डिस्टिलेट (52 सीटेन) + LCO (35 सीटेन) -> 51 सीटेन पूल",
+  "Distillation": "आसवन",
+  "Domain:": "डोमेन:",
+  "Download audit package (JSON)": "ऑडिट पैकेज डाउनलोड करें (JSON)",
+  "Download production schedule (CSV)": "उत्पादन शेड्यूल डाउनलोड करें (CSV)",
+  "Dual multipliers y and reduced costs s must satisfy Karush-Kuhn-Tucker stationarity, with complementary slackness x_j · s_j = 0 across all variables.": "ड्यूअल गुणक y और घटी हुई लागत s को KKT स्थिरता को संतुष्ट करना चाहिए, सभी चरों में पूरक शिथिलता x_j · s_j = 0 के साथ।",
+  "Dual residual ||A^T y + s - c||_∞": "ड्यूअल अवशिष्ट ||A^T y + s - c||_∞",
+  "Dual stationarity": "ड्यूअल स्थिरता",
+  "Dual-Plane Architecture": "द्वि-स्तरीय वास्तुकला",
+  "Dynamic array copies": "गतिशील सरणी प्रतियाँ",
+  "Economic implication": "आर्थिक प्रभाव",
+  "Elementwise CSR loop": "तत्ववार CSR लूप",
+  "Elevated furnace firing on semi-regenerative reformer. Reformate yield pushed to maximum 25.5 kbpd. Octane blending margin widens to -$18.25/bbl.": "सेमी-रीजेनेरेटिव रिफॉर्मर पर बढ़ी हुई भट्टी फायरिंग। रिफॉर्मेट उपज अधिकतम 25.5 kbpd तक पहुंचाई गई। ऑक्टेन सम्मिश्रण मार्जिन -$18.25/बैरल तक चौड़ा होता है।",
+  "Eliminated CuPy memory pool lock churn": "CuPy मेमोरी पूल लॉक चर्न समाप्त किया गया",
+  "Email Ayush Rao": "Ayush Rao को ईमेल करें",
+  "Email Khagesh Ranjan": "Khagesh Ranjan को ईमेल करें",
+  "Email Muskan Sahu": "Muskan Sahu को ईमेल करें",
+  "Email Satyam Gupta": "Satyam Gupta को ईमेल करें",
+  "Email Shivanshu Tripathi": "Shivanshu Tripathi को ईमेल करें",
+  "Email Sudipto Ghosh": "Sudipto Ghosh को ईमेल करें",
+  "End-to-End Workflow": "शुरुआत से अंत तक वर्कफ़्लो",
+  "Environmental": "पर्यावरण संबंधी",
+  "Equilibrium": "संतुलन",
+  "Evaluate refinery response under crude slate shifts, unit turnarounds, and environmental fuel quality tightening. Select any scenario to inspect operational assumptions, business impacts, and bottleneck migrations.": "क्रूड स्लेट परिवर्तन, इकाई टर्नअराउंड और ईंधन गुणवत्ता कड़े होने के तहत रिफाइनरी प्रतिक्रिया का मूल्यांकन करें। परिचालन मान्यताओं, व्यावसायिक प्रभावों और अड़चन प्रवासन का निरीक्षण करने के लिए किसी भी परिदृश्य का चयन करें।",
+  "Every optimization instance flows through a structured, transparent pipeline with automatic problem classification, condition-number-aware presolve, sovereign solver execution, and independent unscaled KKT verification.": "प्रत्येक अनुकूलन उदाहरण स्वचालित समस्या वर्गीकरण, स्थिति-संख्या-सचेत प्रीसॉल्व, सॉवरेन सॉल्वर निष्पादन और स्वतंत्र असंरचित KKT सत्यापन के साथ एक संरचित, पारदर्शी पाइपलाइन से गुजरता है।",
+  "Evidence measured on physical NVIDIA hardware under AC mains power. Same-machine comparisons against host CPU.": "AC मुख्य शक्ति के तहत भौतिक NVIDIA हार्डवेयर पर मापा गया साक्ष्य। होस्ट CPU के विरुद्ध समान-मशीन तुलना।",
+  "Exact rational": "सटीक परिमेय",
+  "Exact rational Farkas ray y verified in Fraction arithmetic": "भिन्न अंकगणित में सत्यापित सटीक परिमेय फरकस किरण y",
+  "Execute active optimization run": "सक्रिय अनुकूलन चलाएँ",
+  "Expected plan margin": "अपेक्षित योजना मार्जिन",
+  "Explore Optimization Run": "ऑप्टिमाइज़ेशन रन देखें",
+  "Explore Scenarios →": "परिदृश्य देखें →",
+  "Export audit artifacts": "ऑडिट आर्टिफ़ैक्ट निर्यात करें",
+  "Export machine-readable audit packages, operational schedules, and terminal reproduction commands.": "मशीन-पठनीय ऑडिट पैकेज, परिचालन कार्यक्रम और टर्मिनल पुनरुत्पादन आदेश निर्यात करें।",
+  "Exports a tabular operational dispatch sheet for refinery operations engineers, including crude intake, conversion loadings, and product shipments.": "रिफाइनरी संचालन इंजीनियरों के लिए कच्चे तेल के सेवन, रूपांतरण लोडिंग और उत्पाद शिपमेंट सहित एक सारणीबद्ध परिचालन प्रेषण पत्रक निर्यात करता है।",
+  "FCC UNIT": "FCC इकाई",
+  "FCC feed capacity": "FCC फीड क्षमता",
+  "FCC feed capacity (50 kbpd ceiling)": "FCC फीड क्षमता (50 kbpd अधिकतम सीमा)",
+  "FCC feed intake": "FCC फीड इनटेक",
+  "FCC maintenance turndown": "FCC रखरखाव टर्नडाउन",
+  "FCC turndown limit (20 kbpd)": "FCC टर्नडाउन सीमा (20 kbpd)",
+  "FCC utilisation": "FCC उपयोग",
+  "Farkas Lens is active only when an infeasible instance is certified with an exact rational Farkas ray (e.g.": "फरकस लेंस केवल तभी सक्रिय होता है जब एक असाध्य उदाहरण सटीक परिमेय फरकस किरण के साथ प्रमाणित होता है (उदा.",
+  "Farkas Lens — Certificate Contribution Ranking": "फरकस लेंस — प्रमाणपत्र योगदान रैंकिंग",
+  "Farkas ray": "फरकस किरण",
+  "Finished diesel shipment": "तैयार डीजल शिपमेंट",
+  "Finished gasoil header": "तैयार गैसऑयल हेडर",
+  "Finished gasoline shipment": "तैयार गैसोलीन शिपमेंट",
+  "Finished gasoline shipment quota set to 500 kbpd against a physical CDU ceiling of 100 kbpd. Engine detects impossibility and certifies an exact Farkas ray.": "100 kbpd की भौतिक CDU सीमा के विरुद्ध तैयार गैसोलीन शिपमेंट कोटा 500 kbpd पर सेट किया गया। इंजन असंभवता का पता लगाता है और एक सटीक फरकस किरण प्रमाणित करता है।",
+  "Finished product revenues minus crude procurement and unit operating expenditure": "तैयार उत्पाद राजस्व घटा कच्चा तेल खरीद और इकाई परिचालन व्यय",
+  "Floating Precision:": "फ्लोटिंग प्रिसिजन:",
+  "Floating roof storage": "फ्लोटिंग रूफ स्टोरेज",
+  "Fluidized Catalytic Cracking Unit (FCC)": "द्रव उत्प्रेरक क्रैकिंग इकाई (FCC)",
+  "Formulation Details": "निरूपण विवरण",
+  "Fraction Exact Arithmetic (ℚ)": "भिन्न सटीक अंकगणित (ℚ)",
+  "Fraction arithmetic lower bounds": "भिन्न अंकगणित निचली सीमाएँ",
+  "Frozen Suite:": "संरक्षित सूट:",
+  "Fuel Oil": "ईंधन तेल",
+  "Fused primal & dual step RawKernels": "संयुक्त प्राइमल और ड्यूअल स्टेप RawKernels",
+  "GPU hardware": "GPU हार्डवेयर",
+  "GPU memory allocations": "GPU मेमोरी आवंटन",
+  "GPU restarted PDHG delivers accelerated operational exploration; CPU revised simplex independently audits KKT stationarity.": "GPU पुनरारंभित PDHG त्वरित परिचालन अन्वेषण प्रदान करता है; CPU संशोधित सिम्प्लेक्स स्वतंत्र रूप से KKT स्थिरता का ऑडिट करता है।",
+  "Gasoline octane rating": "गैसोलीन ऑक्टेन रेटिंग",
+  "Gasoline quota vs CDU intake (500 > 100 kbpd)": "गैसोलीन कोटा बनाम CDU इनटेक (500 > 100 kbpd)",
+  "Gate 8 CUDA (ms)": "गेट 8 CUDA (ms)",
+  "Gate 8 baseline": "गेट 8 बेसलाइन",
+  "Gate 8 baseline evidence commit:": "गेट 8 बेसलाइन साक्ष्य कमिट:",
+  "Gate 8 baseline vs Gate 9 performance engineering": "गेट 8 बेसलाइन बनाम गेट 9 प्रदर्शन इंजीनियरिंग",
+  "Gate 9 CUDA (ms)": "गेट 9 CUDA (ms)",
+  "Gate 9 implemented architecture": "गेट 9 कार्यान्वित वास्तुकला",
+  "Gate 9 physical CUDA validation commit:": "गेट 9 भौतिक CUDA सत्यापन कमिट:",
+  "Gate 9.1 cross-platform checksum portability commit:": "गेट 9.1 क्रॉस-प्लेटफ़ॉर्म चेकसम पोर्टेबिलिटी कमिट:",
+  "Generates a JSON audit payload containing model parameter fingerprints, primal solution vectors x*, dual Lagrange multipliers y*, and KKT stationarity residuals.": "मॉडल पैरामीटर फ़िंगरप्रिंट, प्राइमल समाधान वेक्टर x*, ड्यूअल लैग्रेंज गुणक y*, और KKT स्थिरता अवशिष्ट युक्त एक JSON ऑडिट पेलोड उत्पन्न करता है।",
+  "Go to slide 1": "स्लाइड 1 पर जाएँ",
+  "Go to slide 2": "स्लाइड 2 पर जाएँ",
+  "Go to slide 3": "स्लाइड 3 पर जाएँ",
+  "Go to slide 4": "स्लाइड 4 पर जाएँ",
+  "Go to slide 5": "स्लाइड 5 पर जाएँ",
+  "Go to slide 6": "स्लाइड 6 पर जाएँ",
+  "Governing constraint": "प्रमुख प्रतिबंध",
+  "Granular execution telemetry, CPU vs CUDA speedup ratios, stratum distributions, and physical hardware profiling from the Acer RTX 5050 validation run.": "Acer RTX 5050 सत्यापन रन से विस्तृत निष्पादन टेलीमेट्री, CPU बनाम CUDA गति अनुपात, स्ट्रैटम वितरण, और भौतिक हार्डवेयर प्रोफाइलिंग।",
+  "Hardware notice:": "हार्डवेयर सूचना:",
+  "Hardware read-only cache loads (LDG.E)": "हार्डवेयर रीड-ओनली कैश लोड (LDG.E)",
+  "Hardware, driver version 576.83, and runtime records": "हार्डवेयर, ड्राइवर संस्करण 576.83, और रनटाइम रिकॉर्ड",
+  "Heavy fuel oil decant": "भारी ईंधन तेल डिकेंट",
+  "High-Basrah heavy discount": "उच्च-बसरा भारी छूट",
+  "Historical physical CUDA validation evidence from the Acer RTX 5050 is preserved separately.": "Acer RTX 5050 से ऐतिहासिक भौतिक CUDA सत्यापन साक्ष्य अलग से संरक्षित हैं।",
+  "IEEE 754 Double Precision": "IEEE 754 डबल प्रिसिजन",
+  "INFEASIBLE_CERTIFIED": "प्रमाणित असाध्य",
+  "Ill-conditioned basis or residual check failed": "अस्वस्थ आधार या अवशिष्ट जांच विफल",
+  "In compliance with the project charter, unfavorable benchmark results are strictly preserved. Across the entire 18-instance Netlib benchmark suite on the physical Acer RTX 5050, the overall same-machine CPU/CUDA speedup ratio is": "परियोजना चार्टर के अनुपालन में, प्रतिकूल बेंचमार्क परिणाम सख्ती से संरक्षित हैं। भौतिक Acer RTX 5050 पर संपूर्ण 18-उदाहरण Netlib बेंचमार्क सूट में समग्र समान-मशीन CPU/CUDA गति अनुपात है",
+  "In industrial refinery scheduling, an erroneous solution produces unexecutable distillation schedules and millions in off-spec penalty. SOV-OPT subjects every outcome to independent unscaled verification before conferring terminal status.": "औद्योगिक रिफाइनरी शेड्यूलिंग में, एक गलत समाधान गैर-निष्पादन योग्य आसवन कार्यक्रम और लाखों का ऑफ-स्पेक जुर्माना पैदा करता है। SOV-OPT अंतिम स्थिति प्रदान करने से पहले प्रत्येक परिणाम को स्वतंत्र असंरचित सत्यापन के अधीन करता है।",
+  "In-line finished fuel header": "इन-लाइन तैयार ईंधन हेडर",
+  "Incumbent provided if available; optimality not guaranteed": "यदि उपलब्ध हो तो अवलंबी प्रदान किया गया; इष्टतमता की गारंटी नहीं है",
+  "Independent CPU Audit (Passed)": "स्वतंत्र CPU ऑडिट (उत्तीर्ण)",
+  "Independent Trust Passport Certification": "स्वतंत्र ट्रस्ट पासपोर्ट प्रमाणीकरण",
+  "Independent numerical verification on the original untransformed model. Every result is audited against KKT stationarity, dual feasibility, or exact rational certificates before acceptance.": "मूल अपरिवर्तित मॉडल पर स्वतंत्र संख्यात्मक सत्यापन। स्वीकृति से पहले प्रत्येक परिणाम का KKT स्थिरता, ड्यूअल व्यवहार्यता, या सटीक परिमेय प्रमाणपत्रों के विरुद्ध ऑडिट किया जाता है।",
+  "Independent verification of primal feasibility and KKT dual stationarity at tol ≤ 1e-07.": "tol ≤ 1e-07 पर प्राइमल व्यवहार्यता और KKT ड्यूअल स्थिरता का स्वतंत्र सत्यापन।",
+  "Indigenous GPU-Accelerated Optimization Solver": "स्वदेशी GPU-त्वरित अनुकूलन सॉल्वर",
+  "Infeasibility certificates": "असाध्यता प्रमाणपत्र",
+  "Infeasibility certified with exact rational Farkas ray in ℚ": "ℚ में सटीक परिमेय फरकस किरण के साथ प्रमाणित असाध्यता",
+  "Infeasible (Certified)": "असाध्य (प्रमाणित)",
+  "Infeasible Ray:": "असाध्य किरण:",
+  "Inspect Benchmarks →": "बेंचमार्क देखें →",
+  "Institute of National Importance": "राष्ट्रीय महत्व का संस्थान",
+  "Institute of National Importance (INI)": "राष्ट्रीय महत्व का संस्थान (INI)",
+  "Integrality residual": "पूर्णांक अवशिष्ट",
+  "Interactive process flow diagram across CDU, FCC, Reformer, and Blending units with live stream allocations.": "लाइव स्ट्रीम आवंटन के साथ CDU, FCC, रिफॉर्मर और सम्मिश्रण इकाइयों में इंटरैक्टिव प्रक्रिया प्रवाह आरेख।",
+  "Interactive process flowsheet: click any unit to inspect operating rates, yield equations, and dual shadow prices.": "इंटरैक्टिव प्रक्रिया फ्लोशीट: परिचालन दरों, उपज समीकरणों और ड्यूअल शैडो कीमतों का निरीक्षण करने के लिए किसी भी इकाई पर क्लिक करें।",
+  "Intermediate & Finished Tank Farm": "मध्यवर्ती एवं तैयार टैंक फार्म",
+  "Intermediate rundown lines": "मध्यवर्ती रनडाउन लाइनें",
+  "Inventory balanced": "इन्वेंटरी संतुलित",
+  "JSON audit package": "JSON ऑडिट पैकेज",
+  "KKT Audit & Exact Farkas Ray": "KKT ऑडिट एवं सटीक फरकस किरण",
+  "KKT stationarity + exact Farkas ray": "KKT स्थिरता + सटीक फरकस किरण",
+  "KKT stationarity verified to tol ≤ 10⁻⁷ on original model (floating-point numerical verification within stated tolerance; not a formal rational proof)": "मूल मॉडल पर tol ≤ 10⁻⁷ के लिए KKT स्थिरता सत्यापित (निर्दिष्ट सहनशीलता के भीतर फ्लोटिंग-पॉइंट संख्यात्मक सत्यापन; औपचारिक परिमेय प्रमाण नहीं)",
+  "KKT stationarity verified to tol ≤ 10⁻⁷ on unscaled model": "असंरचित मॉडल पर tol ≤ 10⁻⁷ के लिए KKT स्थिरता सत्यापित",
+  "Kernel dispatches per iteration": "प्रति पुनरावृत्ति कर्नेल प्रेषण",
+  "Khagesh Ranjan on LinkedIn": "Khagesh Ranjan लिंक्डइन पर",
+  "LARGE stratum (n > 1000)": "बड़ा स्ट्रैटम (n > 1000)",
+  "LIMIT_REACHED": "सीमा समाप्त",
+  "LP / MILP crude scheduling, operational conversion yields, BS-VI quality conformance, and independent numerical verification.": "LP / MILP क्रूड शेड्यूलिंग, परिचालन रूपांतरण उपज, BS-VI गुणवत्ता अनुरूपता, और स्वतंत्र संख्यात्मक सत्यापन।",
+  "LP · MILP · QP · PDHG": "LP · MILP · QP · PDHG",
+  "LP:": "LP:",
+  "Lagrange multiplier λ indicating marginal refinery margin per incremental barrel of capacity.": "क्षमता के प्रति वृद्धिशील बैरल पर सीमांत रिफाइनरी मार्जिन दर्शाने वाला लैग्रेंज गुणक λ।",
+  "Lagrange multipliers indicating marginal economic value": "सीमांत आर्थिक मूल्य दर्शाने वाले लैग्रेंज गुणक",
+  "Large-scale LP": "बड़े पैमाने का LP",
+  "Limit": "सीमा",
+  "Linear constraint contributions under exact rational infeasibility rays": "सटीक परिमेय असाध्यता किरणों के तहत रैखिक बाधा योगदान",
+  "Load into solver console": "सॉल्वर कंसोल में लोड करें",
+  "Lower": "निचली सीमा",
+  "MEDIUM stratum (100 < n ≤ 1000)": "मध्यम स्ट्रैटम (100 < n ≤ 1000)",
+  "MILP bound verification": "MILP बाउंड सत्यापन",
+  "MILP:": "MILP:",
+  "MPS / JSON Schema": "MPS / JSON स्कीमा",
+  "MRPL Diagnostic: Infeasible demand (Farkas proof)": "MRPL डायग्नोस्टिक: असाध्य माँग (फरकस प्रमाण)",
+  "MRPL Home": "MRPL होम",
+  "MRPL PS 26119": "MRPL PS 26119",
+  "MRPL PS 26119 · Refinery planning prototype": "MRPL PS 26119 · रिफाइनरी योजना प्रोटोटाइप",
+  "MRPL Refinery Planning: Multi-period LP": "MRPL रिफाइनरी योजना: बहु-अवधि LP",
+  "MRPL Refinery Planning: Smooth dispatch (QP)": "MRPL रिफाइनरी योजना: सुचारू प्रेषण (QP)",
+  "MRPL Refinery Planning: Unit commitment (MILP)": "MRPL रिफाइनरी योजना: इकाई प्रतिबद्धता (MILP)",
+  "MRPL Refinery Twin (Unsolved)": "MRPL रिफाइनरी ट्विन (असमाधानित)",
+  "MRPL_Refinery_Twin_LP": "MRPL_Refinery_Twin_LP",
+  "Main menu": "मुख्य मेनू",
+  "Mangalore Refinery and Petrochemicals Limited · SOV-OPT Portal": "मैंगलोर रिफाइनरी एंड पेट्रोकेमिकल्स लिमिटेड · SOV-OPT पोर्टल",
+  "Marginal value of additional crude intake": "अतिरिक्त क्रूड इनटेक का सीमांत मूल्य",
+  "Market": "बाजार",
+  "Mathematical contracts": "गणितीय अनुबंध",
+  "Mathematical guarantee": "गणितीय गारंटी",
+  "Mathematical proof of impossibility. The sovereign simplex Phase-I engine produces an exact rational Farkas ray y proving that no feasible operating schedule exists.": "असंभवता का गणितीय प्रमाण। सॉवरेन सिम्प्लेक्स चरण-I इंजन एक सटीक परिमेय फरकस किरण y उत्पन्न करता है जो साबित करता है कि कोई व्यवहार्य परिचालन कार्यक्रम मौजूद नहीं है।",
+  "Max KKT residual": "अधिकतम KKT अवशिष्ट",
+  "Measured impact": "मापा गया प्रभाव",
+  "Measured. Audited. Reproducible.": "मापा गया। ऑडिट किया गया। पुनरुत्पादनीय।",
+  "Meet the Team": "हमारी टीम से मिलें",
+  "Mehrotra Interior Point Predictor-Corrector": "मेहरोत्रा इंटीरियर पॉइंट प्रिडिक्टर-कॉरेक्टर",
+  "Mehrotra predictor-corrector IPM": "मेहरोत्रा प्रिडिक्टर-कॉरेक्टर IPM",
+  "Min 50 kbpd": "न्यूनतम 50 kbpd",
+  "Min 95 RON": "न्यूनतम 95 RON",
+  "Mobile Navigation Menu": "मोबाइल नेविगेशन मेनू",
+  "Mode": "मोड",
+  "Model Input": "मॉडल इनपुट",
+  "Model SHA-256 Fingerprint:": "मॉडल SHA-256 फिंगरप्रिंट:",
+  "Model class": "मॉडल वर्ग",
+  "Mogas": "मोगैस (पेट्रोल)",
+  "Multiple temporary VRAM writes": "एकाधिक अस्थायी VRAM लेखन",
+  "Multiplier (y_i)": "गुणक (y_i)",
+  "Muskan Sahu on LinkedIn": "Muskan Sahu लिंक्डइन पर",
+  "NOT_EXECUTED": "चलाया नहीं गया",
+  "NUMERICAL_FAILURE": "संख्यात्मक विफलता",
+  "NVIDIA GeForce RTX 5050 Laptop GPU": "NVIDIA GeForce RTX 5050 लैपटॉप GPU",
+  "NVIDIA driver": "NVIDIA ड्राइवर",
+  "Naphtha 20% · Distillate 45% · Residue 35%": "नैफ्था 20% · डिस्टिलेट 45% · अवशेष 35%",
+  "Naphtha, Reformate, Distillate, CatGas, LCO, Fuel Oil": "नैफ्था, रिफॉर्मेट, डिस्टिलेट, कैटगैस, LCO, ईंधन तेल",
+  "Navigation": "नेविगेशन",
+  "Netlib LP: AFIRO (Saunders Bell Labs)": "Netlib LP: AFIRO (Saunders Bell Labs)",
+  "Netlib LP: BLEND": "Netlib LP: BLEND",
+  "Netlib LP: SC50A": "Netlib LP: SC50A",
+  "Netlib LP: SC50B": "Netlib LP: SC50B",
+  "Next slide": "अगली स्लाइड",
+  "Node, iteration, or wall-clock budget exhausted": "नोड, पुनरावृत्ति, या समय सीमा समाप्त",
+  "Numerical Trust Layer": "न्यूमेरिकल ट्रस्ट लेयर",
+  "Numerical performance": "संख्यात्मक प्रदर्शन",
+  "Numerical trust & verification layer": "संख्यात्मक विश्वास एवं सत्यापन परत",
+  "Numerical verification": "संख्यात्मक सत्यापन",
+  "OPTIMAL_VERIFIED": "इष्टतम सत्यापित",
+  "ORIGINAL-MODEL KKT VERIFICATION": "मूल-मॉडल KKT सत्यापन",
+  "Objective & residual convergence trajectory": "उद्देश्य एवं अवशिष्ट अभिसरण प्रक्षेपवक्र",
+  "Octane Blending:": "ऑक्टेन सम्मिश्रण:",
+  "Octane verified (95.1 RON)": "ऑक्टेन सत्यापित (95.1 RON)",
+  "One Sovereign Optimization Core": "एक सॉवरेन अनुकूलन कोर",
+  "Open Navigation Menu": "नेविगेशन मेनू खोलें",
+  "Open Process Twin →": "प्रोसेस मॉडल खोलें →",
+  "Operating under standard design parameters. Fluid catalytic cracker operating at 90% capacity, leaving 5.0 kbpd headroom for unplanned swings. Reformer severity set at normal reformate RON 100 target.": "मानक डिज़ाइन मापदंडों के तहत संचालन। द्रव उत्प्रेरक क्रैकर 90% क्षमता पर काम कर रहा है, जिससे अनियोजित परिवर्तनों के लिए 5.0 kbpd की गुंजाइश बचती है। रिफॉर्मर तीव्रता सामान्य रिफॉर्मेट RON 100 लक्ष्य पर सेट है।",
+  "Operational meaning": "परिचालन अर्थ",
+  "Operational parameter": "परिचालन पैरामीटर",
+  "Operational scenarios & stress testing": "परिचालन परिदृश्य एवं तनाव परीक्षण",
+  "Optimal allocation vector (x*)": "इष्टतम आवंटन वेक्टर (x*)",
+  "Optimal at ceiling": "अधिकतम सीमा पर इष्टतम",
+  "Optimal rate (x*)": "इष्टतम दर (x*)",
+  "Optimise crude intake, conversion, blending and production schedules with independently certified numerical results. Representative open-literature refinery planning formulation. All units, yields and economics are representative engineering approximations.": "स्वतंत्र रूप से प्रमाणित संख्यात्मक परिणामों के साथ क्रूड इनटेक, रूपांतरण, सम्मिश्रण और उत्पादन कार्यक्रम का अनुकूलन करें। प्रतिनिधि ओपन-साहित्य रिफाइनरी योजना निरूपण। सभी इकाइयाँ, उपज और अर्थशास्त्र प्रतिनिधि इंजीनियरिंग सन्निकटन हैं।",
+  "Optimization That Proves What It Can": "अनुकूलन जो प्रमाणित करता है कि वह क्या कर सकता है",
+  "Optimization vector": "अनुकूलन वेक्टर",
+  "Parity boundary; GPU compute balances driver overhead": "समानता सीमा; GPU गणना ड्राइवर ओवरहेड को संतुलित करती है",
+  "Pass": "उत्तीर्ण",
+  "Pause carousel": "हिंडोला रोकें",
+  "Peak demand": "चरम माँग",
+  "Periodic restarts": "आवधिक पुनरारंभ",
+  "Physical": "भौतिक",
+  "Physical Acer RTX 5050 Laptop GPU (12.0 CC · 8GB VRAM)": "भौतिक Acer RTX 5050 लैपटॉप GPU (12.0 CC · 8GB VRAM)",
+  "Physical CUDA SpMV + CPU KKT": "भौतिक CUDA SpMV + CPU KKT",
+  "Physical Hardware Benchmarking": "भौतिक हार्डवेयर बेंचमार्किंग",
+  "Physical Hardware Telemetry": "भौतिक हार्डवेयर टेलीमेट्री",
+  "Physical benchmark suite (18 continuous Netlib LP instances)": "भौतिक बेंचमार्क सूट (18 सतत Netlib LP मॉडल)",
+  "Physical bottleneck shock": "भौतिक अड़चन झटका",
+  "Physical impossibility proven; capacity expansion required": "भौतिक असंभवता सिद्ध; क्षमता विस्तार आवश्यक",
+  "Physical validation": "भौतिक सत्यापन",
+  "Plan net margin": "योजना शुद्ध मार्जिन",
+  "Platform:": "प्लेटफ़ॉर्म:",
+  "Pool octane specification binding": "पूल ऑक्टेन विनिर्देश बाध्यकारी",
+  "Pre-configured operational baselines, high-Basrah crude discount sweeps, summer high-octane peaks, and infeasible demand shocks.": "पूर्व-कॉन्फ़िगर किए गए परिचालन आधार रेखाएं, उच्च-बसरा क्रूड छूट स्वीप, ग्रीष्मकालीन उच्च-ऑक्टेन चोटियां, और असाध्य मांग झटके।",
+  "Precise mathematical conditions for solver outcomes": "सॉल्वर परिणामों के लिए सटीक गणितीय स्थितियाँ",
+  "Presolve & Scaling": "प्रीसॉल्व एवं स्केलिंग",
+  "Previous slide": "पिछली स्लाइड",
+  "Primal feasibility": "प्राइमल व्यवहार्यता",
+  "Primal residual ||Ax - b||_∞": "प्राइमल अवशिष्ट ||Ax - b||_∞",
+  "Primal residuals, dual residuals, and bound violations are computed directly against the unscaled model (Ax = b, x ≥ 0). Infeasible models are accompanied by exact rational Farkas certificates.": "प्राइमल अवशिष्ट, ड्यूअल अवशिष्ट, और बाउंड उल्लंघन सीधे असंरचित मॉडल (Ax = b, x ≥ 0) के विरुद्ध गणना किए जाते हैं। असाध्य मॉडल सटीक परिमेय फरकस प्रमाणपत्रों के साथ होते हैं।",
+  "Primal ||Ax - b||_∞ ≤ tol · Dual ||Aᵀy + s - c||_∞ ≤ tol": "प्राइमल ||Ax - b||_∞ ≤ tol · ड्यूअल ||Aᵀy + s - c||_∞ ≤ tol",
+  "Primary atmospheric separation": "प्राथमिक वायुमंडलीय पृथक्करण",
+  "Primary benchmark and evidence artifacts": "प्राथमिक बेंचमार्क एवं साक्ष्य आर्टिफ़ैक्ट",
+  "Process flow / Base operational equilibrium": "प्रक्रिया प्रवाह / आधार परिचालन संतुलन",
+  "Provenance records": "उत्पत्ति रिकॉर्ड",
+  "Provenance:": "उत्पत्ति:",
+  "Pure NumPy & Python stdlib": "शुद्ध NumPy एवं Python stdlib",
+  "Pushed and verified commits on remote repository": "रिमोट रिपॉजिटरी पर पुश और सत्यापित कमिट",
+  "QP:": "QP:",
+  "Quadratic throughput flutter penalties are active to protect hydrotreating catalysts from thermal cycling. Solved via Mehrotra predictor-corrector interior point method.": "हाइड्रोट्रीटिंग उत्प्रेरकों को थर्मल चक्रण से बचाने के लिए द्विघात थ्रूपुट स्पंदन दंड सक्रिय हैं। मेहरोत्रा प्रिडिक्टर-कॉरेक्टर इंटीरियर पॉइंट विधि के माध्यम से हल किया गया।",
+  "Quality": "गुणवत्ता",
+  "REFORMER": "रिफॉर्मर",
+  "RON 98 Pool": "RON 98 पूल",
+  "RTX 5050 (Driver 576.83)": "RTX 5050 (ड्राइवर 576.83)",
+  "RTX 5050 Benchmark Evidence": "RTX 5050 बेंचमार्क साक्ष्य",
+  "RTX 5050 Benchmarks": "RTX 5050 बेंचमार्क",
+  "Rank": "रैंक",
+  "Raw byte": "रॉ बाइट",
+  "Refinery Dispatch Formulation": "रिफाइनरी प्रेषण निरूपण",
+  "Refinery Optimization Network Topology Schematic": "रिफाइनरी ऑप्टिमाइज़ेशन नेटवर्क टोपोलॉजी योजना",
+  "Refinery Planning Twin": "रिफाइनरी योजना मॉडल",
+  "Refinery planning & operational optimisation": "रिफाइनरी योजना एवं परिचालन अनुकूलन",
+  "Refinery planning dashboard provides solver-driven process flow and scenario analysis.": "रिफाइनरी योजना डैशबोर्ड सॉल्वर-संचालित प्रक्रिया प्रवाह और परिदृश्य विश्लेषण प्रदान करता है।",
+  "Refinery production schedule": "रिफाइनरी उत्पादन कार्यक्रम",
+  "Refinery stream role": "रिफाइनरी स्ट्रीम भूमिका",
+  "Refining & Petrochemical Supply Chain Optimization.": "रिफाइनिंग एवं पेट्रोकेमिकल आपूर्ति श्रृंखला अनुकूलन।",
+  "Reformate (100 RON) + CatGas (92 RON) -> 95 RON Pool": "रिफॉर्मेट (100 RON) + कैटगैस (92 RON) -> 95 RON पूल",
+  "Reformate (100 RON) 85% + hydrogen": "रिफॉर्मेट (100 RON) 85% + हाइड्रोजन",
+  "Reformate to gasoline pool": "रिफॉर्मेट से गैसोलीन पूल",
+  "Reformer feed intake": "रिफॉर्मर फीड इनटेक",
+  "Reformer severity ceiling (30 kbpd)": "रिफॉर्मर तीव्रता अधिकतम सीमा (30 kbpd)",
+  "Reformer throughput": "रिफॉर्मर थ्रूपुट",
+  "Relative discrepancy": "सापेक्ष विसंगति",
+  "Reports, audit packs & production schedules": "रिपोर्ट, ऑडिट पैक एवं उत्पादन कार्यक्रम",
+  "Representative open-literature refinery planning formulation. All units, yields and economics are representative engineering approximations.": "प्रतिनिधि ओपन-साहित्य रिफाइनरी योजना निरूपण। सभी इकाइयाँ, उपज और अर्थशास्त्र प्रतिनिधि इंजीनियरिंग सन्निकटन हैं।",
+  "Resident vector-copy in-place updates": "रेसिडेंट वेक्टर-कॉपी इन-प्लेस अपडेट",
+  "Residual 1.42 × 10⁻¹⁵": "अवशिष्ट 1.42 × 10⁻¹⁵",
+  "Restarted PDHG (first-order)": "पुनरारंभित PDHG (प्रथम-क्रम)",
+  "Revised dual simplex (sparse LU PFI)": "संशोधित ड्यूअल सिम्प्लेक्स (स्पार्स LU PFI)",
+  "Rigorous Dual-Plane Dispatch": "कठोर द्वि-स्तरीय प्रेषण",
+  "Ruiz / Geometric Scaling": "रूइज़ / ज्यामितीय स्केलिंग",
+  "Run solve to compute": "गणना के लिए सॉल्व चलाएँ",
+  "Run test suite (298 tests):": "परीक्षण सूट चलाएँ (298 परीक्षण):",
+  "SC-01: Base equilibrium": "SC-01: आधार संतुलन",
+  "SC-02: High-Basrah heavy": "SC-02: उच्च-बसरा हेवी",
+  "SC-03": "SC-03",
+  "SC-03: Summer octane peak": "SC-03: ग्रीष्मकालीन ऑक्टेन चरम",
+  "SC-04": "SC-04",
+  "SC-04: FCC turndown": "SC-04: FCC टर्नडाउन",
+  "SC-05": "SC-05",
+  "SC-05: Strict BS-VI spec": "SC-05: सख्त BS-VI विनिर्देश",
+  "SC-06": "SC-06",
+  "SC-06: Infeasible shock": "SC-06: असाध्य झटका",
+  "SHA-256 Model Fingerprint on unscaled model data": "असंरचित मॉडल डेटा पर SHA-256 मॉडल फ़िंगरप्रिंट",
+  "SHA-256 Model Provenance": "SHA-256 मॉडल उत्पत्ति",
+  "SIH 2026 PS 26119": "SIH 2026 PS 26119",
+  "SM 12.0 (Blackwell Architecture)": "SM 12.0 (ब्लैकवेल आर्किटेक्चर)",
+  "SMALL stratum (n ≤ 100)": "छोटा स्ट्रैटम (n ≤ 100)",
+  "SOV-OPT Highlights Carousel": "SOV-OPT मुख्य अंश हिंडोला",
+  "Safe for production refinery dispatch": "उत्पादन रिफाइनरी प्रेषण के लिए सुरक्षित",
+  "Satyam Gupta on LinkedIn": "Satyam Gupta लिंक्डइन पर",
+  "Scenario A": "परिदृश्य A",
+  "Scenario Analysis": "परिदृश्य विश्लेषण",
+  "Scenario B": "परिदृश्य B",
+  "Scenario SC-06: Infeasible Demand Shock": "परिदृश्य SC-06: असाध्य माँग झटका",
+  "Scenario delta comparison matrix": "परिदृश्य अंतर तुलना मैट्रिक्स",
+  "Scientific reporting disclosure:": "वैज्ञानिक रिपोर्टिंग प्रकटीकरण:",
+  "Scope": "कार्यक्षेत्र",
+  "Screen reader access": "स्क्रीन रीडर एक्सेस",
+  "Seasonal motor gasoline demand surges to 52 kbpd (+25%). Catalytic Reformer runs at 100% capacity limit to satisfy pool RON 95 octane requirements.": "मौसमी मोटर गैसोलीन की मांग बढ़कर 52 kbpd (+25%) हो गई। कैटेलिटिक रिफॉर्मर पूल RON 95 ऑक्टेन आवश्यकताओं को पूरा करने के लिए 100% क्षमता सीमा पर चलता है।",
+  "Selected unit": "चयनित इकाई",
+  "Shadow price": "शैडो मूल्य",
+  "Shadow price (λ)": "शैडो मूल्य (λ)",
+  "Shivanshu Tripathi on LinkedIn": "Shivanshu Tripathi लिंक्डइन पर",
+  "Slack available (13 kbpd)": "उपलब्ध अतिरिक्त क्षमता (13 kbpd)",
+  "Slack available: 13.0 kbpd headroom": "उपलब्ध अतिरिक्त क्षमता: 13.0 kbpd गुंजाइश",
+  "Slide 1 of 6: Project Identity": "स्लाइड 1 / 6: परियोजना पहचान",
+  "Slide 2 of 6: Problem Statement": "स्लाइड 2 / 6: समस्या विवरण",
+  "Slide 3 of 6: Pipeline Architecture": "स्लाइड 3 / 6: पाइपलाइन वास्तुकला",
+  "Slide 4 of 6: Numerical Trust": "स्लाइड 4 / 6: संख्यात्मक विश्वास",
+  "Slide 5 of 6: Team VarunNetra": "स्लाइड 5 / 6: टीम वरुणनेत्र",
+  "Slide 6 of 6: Hardware Evidence": "स्लाइड 6 / 6: हार्डवेयर साक्ष्य",
+  "Smart India Hackathon 2026 · MRPL PS 26119": "स्मार्ट इंडिया हैकाथॉन 2026 · MRPL PS 26119",
+  "Smart India Hackathon 2026 · Ministry of Petroleum & Natural Gas": "स्मार्ट इंडिया हैकाथॉन 2026 · पेट्रोलियम एवं प्राकृतिक गैस मंत्रालय",
+  "Smart India Hackathon 2026 · Problem Statement 26119": "स्मार्ट इंडिया हैकाथॉन 2026 · समस्या विवरण 26119",
+  "Smart India Hackathon Team Details": "स्मार्ट इंडिया हैकाथॉन टीम विवरण",
+  "Solution rejected; equilibration scaling advised": "समाधान अस्वीकृत; संतुलन स्केलिंग की सलाह दी गई",
+  "Solve refinery LP twin:": "रिफाइनरी LP मॉडल हल करें:",
+  "Solver numerical analytics & profiling": "सॉल्वर संख्यात्मक विश्लेषण एवं प्रोफाइलिंग",
+  "Solver version & commit": "सॉल्वर संस्करण एवं कमिट",
+  "Sovereign Architecture Pipeline": "सॉवरेन वास्तुकला पाइपलाइन",
+  "Sovereign Mathematical Core": "सॉवरेन गणितीय कोर",
+  "Sovereign Numerical Optimization Core": "सॉवरेन संख्यात्मक अनुकूलन कोर",
+  "Sovereign reference CPU": "सॉवरेन संदर्भ CPU",
+  "Sovereign reference CPU (Simplex / IPM / B&B)": "सॉवरेन संदर्भ CPU (सिम्प्लेक्स / IPM / B&B)",
+  "Sovereign restarted PDHG · CPU": "सॉवरेन पुनरारंभित PDHG · CPU",
+  "SpMV memory layout": "SpMV मेमोरी लेआउट",
+  "Sparse CSR": "स्पार्स CSR",
+  "Specification compliant": "विनिर्देश अनुरूप",
+  "Speedup (CPU/CUDA)": "गति सुधार (CPU/CUDA)",
+  "Speedup on LARGE Netlib Stratum": "बड़े Netlib स्ट्रैटम पर गति सुधार",
+  "Standard Primal Form": "मानक प्राइमल रूप",
+  "Stationarity & positive semidefiniteness": "स्थिरता एवं धनात्मक अर्ध-निश्चितता",
+  "Status": "स्थिति",
+  "Strategic decision analysis": "रणनीतिक निर्णय विश्लेषण",
+  "Stratum": "स्ट्रैटम",
+  "Strict BS-VI fuel quality": "सख्त BS-VI ईंधन गुणवत्ता",
+  "Structural impact": "संरचनात्मक प्रभाव",
+  "Sudipto Ghosh on LinkedIn": "Sudipto Ghosh लिंक्डइन पर",
+  "Sulfur Limit:": "सल्फर सीमा:",
+  "Summer high-octane surge": "ग्रीष्मकालीन उच्च-ऑक्टेन उछाल",
+  "Supported Status:": "समर्थन स्थिति:",
+  "Supported mathematical models": "समर्थित गणितीय मॉडल",
+  "Target instance": "लक्षित मॉडल",
+  "Team ID: 177365": "टीम आईडी: 177365",
+  "Team Members (VarunNetra · ID 177365)": "टीम के सदस्य (वरुणनेत्र · आईडी 177365)",
+  "Team VarunNetra · Team ID 177365": "टीम वरुणनेत्र · टीम आईडी 177365",
+  "Terminal reproduction commands": "टर्मिनल पुनरुत्पादन आदेश",
+  "Terminal status semantics contract": "अंतिम स्थिति सिमेंटिक्स अनुबंध",
+  "Text-LF": "टेक्स्ट-LF",
+  "The SHA-256 model fingerprint is an integrity identifier; this Passport is not a digital signature. Results are verified on the original unscaled constraint model.": "SHA-256 मॉडल फ़िंगरप्रिंट एक अखंडता पहचानकर्ता है; यह पासपोर्ट डिजिटल हस्ताक्षर नहीं है। परिणाम मूल असंरचित बाधा मॉडल पर सत्यापित किए जाते हैं।",
+  "Thermal": "थर्मल",
+  "Trust Passport": "ट्रस्ट पासपोर्ट",
+  "Trust Philosophy & Verification": "विश्वास दर्शन एवं सत्यापन",
+  "Turnaround": "टर्नअराउंड",
+  "Two-Phase Revised Primal Simplex": "दो-चरणीय संशोधित प्राइमल सिम्प्लेक्स",
+  "Type": "प्रकार",
+  "Ultra-low sulfur (<10 ppm) & high-cetane specifications restrict cracked LCO blending into high-speed diesel pool. Hydroprocessing units operate at elevated severity.": "अल्ट्रा-लो सल्फर (<10 ppm) और उच्च-सीटेन विनिर्देश हाई-स्पीड डीजल पूल में क्रैक किए गए LCO सम्मिश्रण को प्रतिबंधित करते हैं। हाइड्रोप्रोसेसिंग इकाइयाँ उच्च गंभीरता पर काम करती हैं।",
+  "Unscheduled turnaround clamps FCC unit feed to 20 kbpd (-60%). Gasoil balances re-routed to heavy fuel oil; diesel relies exclusively on straight-run distillate.": "अनियोजित टर्नअराउंड FCC यूनिट फीड को 20 kbpd (-60%) तक सीमित करता है। गैसऑयल संतुलन को भारी ईंधन तेल में फिर से भेजा जाता है; डीजल विशेष रूप से स्ट्रेट-रन डिस्टिलेट पर निर्भर करता है।",
+  "Upgrading capacity constraint": "उन्नयन क्षमता बाधा",
+  "Upper": "ऊपरी सीमा",
+  "VRAM Allocation:": "VRAM आवंटन:",
+  "Validation SHA:": "सत्यापन SHA:",
+  "Variable": "चर",
+  "Variance (Δ = B - A)": "भिन्नता (Δ = B - A)",
+  "Vector arithmetic pipeline": "वेक्टर अंकगणित पाइपलाइन",
+  "Verification Records": "सत्यापन रिकॉर्ड",
+  "Verification Status:": "सत्यापन स्थिति:",
+  "Verification status": "सत्यापन स्थिति",
+  "Verified": "सत्यापित",
+  "Verify repository checksums:": "रिपॉजिटरी चेकसम सत्यापित करें:",
+  "View Hardware Benchmarks": "हार्डवेयर बेंचमार्क देखें",
+  "View Process Twin": "प्रक्रिया मॉडल देखें",
+  "When a refinery scenario is declared infeasible (e.g. demand exceeds intake capacity), the solver certifies an exact Farkas vector y in infinite-precision rational arithmetic.": "जब एक रिफाइनरी परिदृश्य को असाध्य घोषित किया जाता है (उदा. मांग इनटेक क्षमता से अधिक हो), तो सॉल्वर अनंत-परिशुद्धता परिमेय अंकगणित में एक सटीक फरकस वेक्टर y प्रमाणित करता है।",
+  "Yield basis": "उपज आधार",
+  "Zero Unverified Claims": "शून्य असत्यापित दावे",
+  "and": "और",
+  "compared to Gate 8.": "गेट 8 की तुलना में।",
+  "minimize": "न्यूनतम करें",
+  "not demonstrated": "प्रदर्शित नहीं हुआ",
+  "on small instances due to PCIe and kernel launch latency. Gate 9 CUDA performance engineering improved raw GPU execution time by": "PCIe और कर्नेल लॉन्च लेटेंसी के कारण छोटे उदाहरणों पर। गेट 9 CUDA प्रदर्शन इंजीनियरिंग ने GPU निष्पादन समय में सुधार किया",
+  "or": "या",
+  "subject to": "बशर्ते कि",
+  "tabs.": "टैब।",
+  "vs": "बनाम",
+  "z_LB ≤ z* (exact rational)": "z_LB ≤ z* (सटीक परिमेय)",
+  "~15 dynamic arrays / iter": "~15 गतिशील सरणियाँ / पुनरावृत्ति",
+  "~18 CuPy Python dispatches": "~18 CuPy Python प्रेषण",
+  "© 2026 SOV-OPT Project Team · Rajiv Gandhi Institute of Petroleum Technology. Developed for MRPL Problem Statement 26119.": "© 2026 SOV-OPT प्रोजेक्ट टीम · राजीव गाँधी पेट्रोलियम प्रौद्योगिकी संस्थान। MRPL समस्या विवरण 26119 हेतु विकसित।",
+  "ऑप्टिमाइज़ेशन इंजन प्रेषण एवं लाइव सॉल्व": "ऑप्टिमाइज़ेशन इंजन प्रेषण एवं लाइव सॉल्व",
+  "मॉडल एवं परिचालन इनपुट": "मॉडल एवं परिचालन इनपुट",
+  "⇄ Pan flowsheet horizontally": "⇄ फ्लोशीट को क्षैतिज रूप से पैन करें",
+  "≤ 10 ppm BS-VI": "≤ 10 ppm BS-VI",
+  "≤ 100 kbpd": "≤ 100 kbpd",
+  "≥ 51 Index": "≥ 51 इंडेक्स",
+  "≥ 91 RON": "≥ 91 RON",
+  "✓ Historical Acer RTX 5050 CUDA evidence preserved for differential comparison.": "✓ अंतर तुलना हेतु ऐतिहासिक Acer RTX 5050 CUDA साक्ष्य संरक्षित।",
+  "✓ Infinite-precision rational Farkas rays certify structural infeasibility.": "✓ अनंत-परिशुद्धता परिमेय फरकस किरणें संरचनात्मक असाध्यता प्रमाणित करती हैं।",
+  "✓ Model-fingerprinted Trust Passport generated for every accepted solve.": "✓ प्रत्येक स्वीकृत समाधान के लिए मॉडल-फिंगरप्रिंटेड ट्रस्ट पासपोर्ट तैयार किया गया।",
+  "✓ Sovereign solver core: validated by the repository's automated numerical and integration test suite.": "✓ सॉवरेन सॉल्वर कोर: रिपॉजिटरी के स्वचालित संख्यात्मक एवं एकीकरण परीक्षण सूट द्वारा मान्य।",
+  "-$105.00 / bbl": "-$105.00 / बैरल",
+  "-$105.00/bbl": "-$105.00/बैरल",
+  "-$115.00 / bbl": "-$115.00 / बैरल",
+  "-$115.00/bbl": "-$115.00/बैरल",
+  "-$29.89/bbl": "-$29.89/बैरल",
+  "-$8.40/bbl": "-$8.40/बैरल",
+  "1.07×": "1.07×",
+  "1.13×": "1.13×",
+  "1.81×": "1.81×",
+  "1.2 barg": "1.2 barg",
+  "15.0 barg": "15.0 barg",
+  "2.1 barg": "2.1 barg",
+  "4.5 barg": "4.5 barg",
+  "5.0 barg": "5.0 barg",
+  "250v / 1000r": "250 चर / 1000 पंक्तियाँ",
+  "40k": "40k",
+  "50k": "50k",
+  "50 nodes": "50 नोड्स",
+  "5000 vars": "5000 चर",
+  "7.96 GB GDDR6": "7.96 GB GDDR6",
+  "8 GB GDDR6": "8 GB GDDR6",
+  "VRAM": "VRAM",
+  "AR": "AR",
+  "KR": "KR",
+  "SG": "SG",
+  "ST": "ST",
+  "SC-01": "SC-01",
+  "SC-02": "SC-02",
+  "✓ Sovereign solver core: validated by the repository\'s automated numerical and integration test suite.": "✓ सॉवरेन सॉल्वर कोर: रिपॉजिटरी के स्वचालित संख्यात्मक एवं एकीकरण परीक्षण सूट द्वारा मान्य।",
+  "✓ Sovereign solver core: validated by the repository's automated numerical and integration test suite.": "✓ सॉवरेन सॉल्वर कोर: रिपॉजिटरी के स्वचालित संख्यात्मक एवं एकीकरण परीक्षण सूट द्वारा मान्य।",
+  "Basrah Heavy": "बसरा हेवी",
+  "Arab Light": "अरब लाइट",
+  "01 · PRIMARY": "01 · प्राथमिक",
+  "Atmospheric": "वातावरणीय",
+  "Distillation": "आसवन",
+  "CDU Feed": "CDU फीड",
+  "Naphtha": "नेफ्था",
+  "Distillate Header": "डिस्टिलेट हेडर",
+  "Residue": "अवशेष",
+  "02 · OCTANE": "02 · ऑक्टेन",
+  "Semi-Regen": "सेमी-रीजन",
+  "Reformer": "रिफॉर्मर",
+  "03 · CRACKING": "03 · क्रैकिंग",
+  "Fluid Catalytic": "फ्लुइड कैटेलिटिक",
+  "Cracker (FCC)": "क्रैकर (FCC)",
+  "Reformate (100 RON)": "रिफॉर्मेट (100 RON)",
+  "CatGas (92 RON)": "कैटगैस (92 RON)",
+  "FCC LCO": "FCC LCO",
+  "Slurry/Bottoms": "स्लरी/तली",
+  "04 · POOL": "04 · पूल",
+  "Gasoline Pool": "गैसोलीन पूल",
+  "05 · POOL": "05 · पूल",
+  "BS-VI Diesel Pool": "BS-VI डीजल पूल",
+  "06 · RESIDUE": "06 · अवशेष",
+  "Fuel Oil Decant": "फ्यूल ऑयल डिकैन्ट",
+  "Market: $115/bbl": "बाजार: $115/bbl",
+  "Market: $105/bbl": "बाजार: $105/bbl",
+  "Bunker: $55/bbl": "बंकर: $55/bbl",
+  "Baseline scenario loaded — click \"Run optimisation\" to generate certified convergence trajectory": "आधारभूत परिदृश्य लोड किया गया — प्रमाणित अभिसरण प्रक्षेपवक्र उत्पन्न करने के लिए \"ऑप्टिमाइज़ेशन चलाएँ\" पर क्लिक करें",
+  "Baseline scenario loaded — click &quot;Run optimisation&quot; to generate certified convergence trajectory": "आधारभूत परिदृश्य लोड किया गया — प्रमाणित अभिसरण प्रक्षेपवक्र उत्पन्न करने के लिए \"ऑप्टिमाइज़ेशन चलाएँ\" पर क्लिक करें",
+  "Sparse LU revised simplex verifies feasibility & KKT optimality at final basis": "स्पार्स LU संशोधित सिम्प्लेक्स अंतिम आधार पर साध्यता एवं KKT इष्टतमता की पुष्टि करता है",
+  "Sparse LU revised simplex verifies feasibility &amp; KKT optimality at final basis": "स्पार्स LU संशोधित सिम्प्लेक्स अंतिम आधार पर साध्यता एवं KKT इष्टतमता की पुष्टि करता है",
+  "Contraction of infinity-norm KKT residuals over iterations": "पुनरावृत्तियों के दौरान अनंत-मानक KKT अवशेषों का संकुचन",
+  "Certificate vector y satisfies: y ≥ 0, Aᵀy ≤ 0, bᵀy > 0": "प्रमाणपत्र वेक्टर y संतुष्ट करता है: y ≥ 0, Aᵀy ≤ 0, bᵀy > 0",
+  "Certificate vector y satisfies: y ≥ 0, Aᵀy ≤ 0, bᵀy &gt; 0": "प्रमाणपत्र वेक्टर y संतुष्ट करता है: y ≥ 0, Aᵀy ≤ 0, bᵀy > 0",
+  "Net operational plan margin": "शुद्ध परिचालन योजना मार्जिन",
+  "Arab Light crude intake": "अरब लाइट क्रूड अंतर्ग्रहण",
+  "Basrah Heavy crude intake": "बसरा हेवी क्रूड अंतर्ग्रहण",
+  "FCC unit feed rate": "FCC यूनिट फीड दर",
+  "Reformer feed rate": "रिफॉर्मर फीड दर",
+  "Governing bottleneck constraint": "शासी बाधा अड़चन",
+  "Finished gasoline shipment": "तैयार गैसोलीन प्रेषण",
+  "Finished diesel shipment": "तैयार डीजल प्रेषण",
+  "Pivoted": "धुरीकृत (पिवोटेड)",
+  "Identical": "समान (अपरिवर्तित)",
+  "Infeasible": "असाध्य (इनफीजिबल)",
+  "Infeasible (Certified)": "असाध्य (प्रमाणित Farkas)",
+  "REFINERY-LP (Unsolved)": "REFINERY-LP (अनसुलझा)",
+  "Primal residual": "प्राइमल अवशेष",
+  "Dual residual": "ड्यूअल अवशेष",
+  "SMALL": "छोटा",
+  "MEDIUM": "मध्यम",
+  "LARGE": "बड़ा"
+};
+
+  function t(str) {
+    if (!str) return str;
+    if (STATE.currentLanguage !== 'hi') return str;
+    const s = String(str);
+    const trimmed = s.trim();
+    if (TRANSLATION_MAP[trimmed]) {
+      return s.replace(trimmed, TRANSLATION_MAP[trimmed]);
+    }
+    return s;
+  }
+
+  function applyDOMTranslations(root, lang) {
+    if (!root) root = document.body;
+    const isHi = (lang === 'hi');
+
+    // Walk all visible text nodes
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function(node) {
+        if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        const parent = node.parentElement;
+        if (!parent) return NodeFilter.FILTER_REJECT;
+        const tag = parent.tagName.toLowerCase();
+        if (tag === 'script' || tag === 'style' || tag === 'code' || tag === 'pre') return NodeFilter.FILTER_REJECT;
+        if (parent.closest('#mrpl-masthead .mrpl-title-block')) return NodeFilter.FILTER_REJECT;
+        if (parent.closest('.notranslate')) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+
+    const nodes = [];
+    while (walker.nextNode()) {
+      nodes.push(walker.currentNode);
+    }
+
+    for (const node of nodes) {
+      if (isHi) {
+        if (node.__origText === undefined) {
+          node.__origText = node.nodeValue;
+        }
+        const raw = node.__origText;
+        const trimmed = raw.trim();
+        const normalized = trimmed.replace(/\s+/g, ' ');
+        if (TRANSLATION_MAP[trimmed]) {
+          node.nodeValue = raw.replace(trimmed, TRANSLATION_MAP[trimmed]);
+        } else if (TRANSLATION_MAP[normalized]) {
+          node.nodeValue = raw.replace(trimmed, TRANSLATION_MAP[normalized]);
+        }
+      } else {
+        if (node.__origText !== undefined) {
+          node.nodeValue = node.__origText;
+        }
+      }
+    }
+
+    // Translate common attributes
+    const attrElements = root.querySelectorAll ? root.querySelectorAll('[placeholder], [title], [aria-label]') : [];
+    attrElements.forEach(el => {
+      if (el.closest('#mrpl-masthead .mrpl-title-block') || el.closest('.notranslate')) return;
+      ['placeholder', 'title', 'aria-label'].forEach(attr => {
+        const val = el.getAttribute(attr);
+        if (!val || !val.trim()) return;
+        const prop = '__orig_' + attr;
+        if (isHi) {
+          if (el[prop] === undefined) el[prop] = val;
+          const trimmed = el[prop].trim();
+          const normalized = trimmed.replace(/\s+/g, ' ');
+          if (TRANSLATION_MAP[trimmed]) {
+            el.setAttribute(attr, el[prop].replace(trimmed, TRANSLATION_MAP[trimmed]));
+          } else if (TRANSLATION_MAP[normalized]) {
+            el.setAttribute(attr, el[prop].replace(trimmed, TRANSLATION_MAP[normalized]));
+          }
+        } else {
+          if (el[prop] !== undefined) {
+            el.setAttribute(attr, el[prop]);
+          }
+        }
+      });
+    });
+  }
 
   function setLanguage(lang) {
     if (!I18N[lang]) lang = 'en';
@@ -195,6 +1136,27 @@
       const headerSolveBtn = document.getElementById('btn-header-solve');
       if (headerSolveBtn) headerSolveBtn.innerHTML = '<span>' + dict.nav_run_optimization + '</span>';
     }
+
+    applyDOMTranslations(document.body, lang);
+
+    // Refresh dynamic views if they have been initialized
+    try {
+      if (typeof updateUnitInspector === 'function' && STATE.selectedUnit) {
+        updateUnitInspector(STATE.selectedUnit);
+      }
+      if (typeof updateScenarioDetail === 'function' && STATE.activeScenario) {
+        updateScenarioDetail(STATE.activeScenario);
+      }
+      if (typeof updateSolverUI === 'function') {
+        updateSolverUI(STATE.solveResult);
+      }
+      if (typeof updateTrustPassportUI === 'function') {
+        updateTrustPassportUI(STATE.solveResult);
+      }
+      if (typeof updateOverviewKPIs === 'function') {
+        updateOverviewKPIs();
+      }
+    } catch (e) {}
   }
 
   function setFontScale(scaleStr) {
@@ -899,6 +1861,8 @@
 
   function switchTab(tabId) {
     STATE.activeTab = tabId;
+    window.STATE = STATE;
+  window.switchTab = switchTab;
 
     document.querySelectorAll('.nav-item').forEach(item => {
       item.classList.toggle('active', item.getAttribute('data-tab') === tabId);
@@ -919,8 +1883,12 @@
       updateTrustPassportUI(STATE.solveResult);
     }
 
-    // Reveal any cards inside newly activated view section
     const targetView = document.getElementById('view-' + tabId);
+    if (STATE.currentLanguage === 'hi' && targetView) {
+      applyDOMTranslations(targetView, 'hi');
+    }
+
+    // Reveal any cards inside newly activated view section
     if (targetView) {
       const cards = targetView.querySelectorAll('.reveal-on-scroll');
       cards.forEach((card, idx) => {
@@ -955,13 +1923,14 @@
         const shadowEl = document.getElementById('inspector-shadow');
         const statusEl = document.getElementById('inspector-status');
 
-        if (titleEl) titleEl.textContent = u.name;
-        if (capEl) capEl.textContent = u.designCapacity;
-        if (rateEl) rateEl.textContent = u.nominalOperatingRate;
-        if (yieldEl) yieldEl.textContent = u.yieldFormula;
-        if (shadowEl) shadowEl.textContent = u.shadowPrice;
-        if (statusEl) statusEl.innerHTML = `<span class="status-pill"><span class="status-dot"></span> ${u.status}</span>`;
+        if (titleEl) titleEl.textContent = t(u.name);
+        if (capEl) capEl.textContent = t(u.designCapacity);
+        if (rateEl) rateEl.textContent = t(u.nominalOperatingRate);
+        if (yieldEl) yieldEl.textContent = t(u.yieldFormula);
+        if (shadowEl) shadowEl.textContent = t(u.shadowPrice);
+        if (statusEl) statusEl.innerHTML = `<span class="status-pill"><span class="status-dot"></span> ${t(u.status)}</span>`;
         strip.classList.remove('fading');
+        if (STATE.currentLanguage === 'hi') applyDOMTranslations(strip, 'hi');
       }, 100);
     }
 
@@ -1128,6 +2097,10 @@
 
     // Apply active pipe animations if a live optimal solve exists
     updateFlowsheetActivePipes(STATE.resultSource === 'live' ? STATE.solveResult : null);
+
+    if (STATE.currentLanguage === 'hi') {
+      applyDOMTranslations(svg, 'hi');
+    }
   }
 
   // Solver-Driven Process Flow Animation (Runs ONLY on accepted optimal solve)
@@ -1304,18 +2277,21 @@
           </g>
         `;
       } else {
-        if (subEl) subEl.textContent = 'Contraction of infinity-norm KKT residuals over iterations';
+        if (subEl) subEl.textContent = t('Contraction of infinity-norm KKT residuals over iterations');
         svg.innerHTML = `
           <rect width="${width}" height="${height}" fill="transparent"/>
           <g transform="translate(${width / 2}, ${height / 2 - 8})">
             <text x="0" y="0" fill="var(--text-secondary)" font-family="var(--font-sans)" font-size="12" font-weight="500" text-anchor="middle">
-              Baseline scenario loaded — click &quot;Run optimisation&quot; to generate certified convergence trajectory
+              ${t('Baseline scenario loaded — click "Run optimisation" to generate certified convergence trajectory')}
             </text>
             <text x="0" y="20" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="10.5" text-anchor="middle">
-              Sparse LU revised simplex verifies feasibility &amp; KKT optimality at final basis
+              ${t('Sparse LU revised simplex verifies feasibility & KKT optimality at final basis')}
             </text>
           </g>
         `;
+      }
+      if (STATE.currentLanguage === 'hi') {
+        applyDOMTranslations(svg, 'hi');
       }
       return;
     }
@@ -1483,6 +2459,10 @@
         </g>
       `;
     }
+
+    if (STATE.currentLanguage === 'hi') {
+      applyDOMTranslations(svg, 'hi');
+    }
   }
 
   // Setup Scenario Master-Detail & Quick Switcher
@@ -1555,14 +2535,17 @@
       const notesEl = document.getElementById('sc-detail-notes');
 
       if (codeEl) codeEl.textContent = sc.code;
-      if (titleEl) titleEl.textContent = sc.title;
-      if (descEl) descEl.textContent = sc.desc;
-      if (marginEl) marginEl.textContent = sc.netMargin !== null ? ('$' + sc.netMargin.toFixed(2)) : 'Infeasible';
+      if (titleEl) titleEl.textContent = t(sc.title);
+      if (descEl) descEl.textContent = t(sc.desc);
+      if (marginEl) marginEl.textContent = sc.netMargin !== null ? ('$' + sc.netMargin.toFixed(2)) : t('Infeasible');
       if (ratioEl) ratioEl.textContent = `${sc.cduArab.toFixed(0)}L / ${sc.cduBasrah.toFixed(0)}H kbpd`;
-      if (bottleEl) bottleEl.textContent = sc.bottleneck;
-      if (notesEl) notesEl.textContent = sc.notes;
+      if (bottleEl) bottleEl.textContent = t(sc.bottleneck);
+      if (notesEl) notesEl.textContent = t(sc.notes);
 
-      if (panel) panel.classList.remove('fading');
+      if (panel) {
+        panel.classList.remove('fading');
+        if (STATE.currentLanguage === 'hi') applyDOMTranslations(panel, 'hi');
+      }
     }, 100);
   }
 
@@ -1921,7 +2904,7 @@
     const fpEl = document.getElementById('trust-card-fingerprint');
 
     if (!res || !res.status || res.status === 'NOT_EXECUTED') {
-      if (statusEl) statusEl.innerHTML = '<span class="status-pill"><span class="status-dot" style="background: var(--text-muted);"></span> Not executed</span>';
+      if (statusEl) statusEl.innerHTML = '<span class="status-pill"><span class="status-dot" style="background: var(--text-muted);"></span> ' + t('Not executed') + '</span>';
       if (modelEl) modelEl.textContent = STATE.activeModel ? STATE.activeModel.toUpperCase() + ' (Unsolved)' : 'Refinery Twin (Unsolved)';
       if (objEl) { objEl.textContent = '—'; objEl.style.color = 'var(--text-primary)'; }
       if (primEl) primEl.textContent = '—';
@@ -1929,7 +2912,7 @@
       if (kktEl) kktEl.textContent = '—';
       if (boundEl) boundEl.textContent = '—';
       if (intEl) intEl.textContent = '—';
-      if (certEl) certEl.innerHTML = '<span class="status-pill"><span class="status-dot" style="background: var(--text-muted);"></span> Run solver to verify</span>';
+      if (certEl) certEl.innerHTML = '<span class="status-pill"><span class="status-dot" style="background: var(--text-muted);"></span> ' + t('Run solver to verify') + '</span>';
       if (commitEl) commitEl.textContent = 'v0.3.2 (main)';
       if (backendEl) backendEl.textContent = '—';
       if (algoEl) algoEl.textContent = '—';
@@ -1956,7 +2939,7 @@
 
     if (objEl) {
       if (res.status === 'INFEASIBLE_CERTIFIED') {
-        objEl.textContent = 'Certified Infeasible';
+        objEl.textContent = t('Certified Infeasible');
         objEl.style.color = 'var(--status-error)';
       } else if (res.objective !== undefined && res.objective !== null) {
         objEl.textContent = '$' + Math.abs(res.objective).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -1970,7 +2953,7 @@
       if (v.primal_residual !== undefined && v.primal_residual !== null) {
         primEl.textContent = Number(v.primal_residual).toExponential(2);
       } else if (res.status === 'INFEASIBLE_CERTIFIED') {
-        primEl.textContent = 'Certified Ray (Infeasible)';
+        primEl.textContent = t('Certified Ray (Infeasible)');
       } else {
         primEl.textContent = '-';
       }
@@ -1980,7 +2963,7 @@
       if (v.dual_residual !== undefined && v.dual_residual !== null) {
         dualEl.textContent = Number(v.dual_residual).toExponential(2);
       } else if (res.status === 'INFEASIBLE_CERTIFIED') {
-        dualEl.textContent = 'Exact Farkas Ray';
+        dualEl.textContent = t('Exact Farkas Ray');
       } else {
         dualEl.textContent = '-';
       }
@@ -2006,7 +2989,7 @@
       if (STATE.activeModel === 'milp' && v.integrality_residual !== undefined && v.integrality_residual !== null) {
         intEl.textContent = Number(v.integrality_residual).toExponential(2);
       } else {
-        intEl.textContent = 'N/A (Continuous LP/QP)';
+        intEl.textContent = t('N/A (Continuous LP/QP)');
       }
     }
 
@@ -2231,6 +3214,9 @@
     }
 
     tbody.innerHTML = rowsHtml;
+    if (STATE.currentLanguage === 'hi') {
+      applyDOMTranslations(tbody, 'hi');
+    }
   }
 
   function updateLiveRefineryMetrics(res) {
@@ -2307,6 +3293,9 @@
     });
 
     tbody.innerHTML = rowsHtml;
+    if (STATE.currentLanguage === 'hi') {
+      applyDOMTranslations(tbody, 'hi');
+    }
   }
 
   function setupComparisonMatrix() {
@@ -2406,6 +3395,9 @@
         </td>
       </tr>
     `;
+    if (STATE.currentLanguage === 'hi') {
+      applyDOMTranslations(container, 'hi');
+    }
   }
 
   function setupEvidenceCopy() {
@@ -2592,6 +3584,12 @@
       }
     });
   }
+
+  window.STATE = STATE;
+  window.switchTab = switchTab;
+  window.selectScenario = selectScenario;
+  window.setLanguage = setLanguage;
+  window.setFontScale = setFontScale;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

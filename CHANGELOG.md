@@ -1,5 +1,17 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.10] - 2026-10-03
+
+### Gate 14: Final Accessibility Hotfix + Full Hindi Localization
+
+- **fix(web): Complete font scaling and exhaustive Hindi localization:**
+  - Enforced CSS typography scaling with `calc(... * var(--accessibility-font-scale, 1.0)) !important` across masthead, hero carousel, slide titles, slide subtitles, navigation items, buttons, cards, forms, inputs, labels, and table cells, strictly satisfying `size(0.9) < size(1.0) < size(1.1)` in headless CDP verification.
+  - Implemented exhaustive DOM-wide Hindi localization engine in `web/app.js` with comprehensive `TRANSLATION_MAP` (900+ entries), whitespace-normalized lookup, and automatic translation across text nodes and attributes (`placeholder`, `title`, `aria-label`).
+  - Integrated dynamic re-translation on tab switching, PFD flowsheet rendering, scenario comparison metrics, solver variable tables, convergence chart placeholders, and unit inspectors.
+  - Preserved allowlisted technical terms, personal names, official institutional mastheads, and benchmark dataset identifiers in English.
+  - Validated 100% full coverage across all 11 portal views with automated CDP visible-text audit, achieving exactly 0 untranslated non-allowlisted English phrases.
+  - Checksum manifest updated in `SHA256SUMS.json`; 0 diff in `sovopt/`, `data/`, and `reports/`.
+
 ## [0.3.9] - 2026-10-03
 
 ### Gate 13: Accessibility Controls and Solve Loading State Hotfix
