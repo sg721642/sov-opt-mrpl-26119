@@ -82,8 +82,7 @@
     compareA: 'SC-01',
     compareB: 'SC-02',
     isMobileMenuOpen: false,
-    currentLanguage: 'en',
-    currentFontScale: '1.0'
+    currentLanguage: 'en'
   };
 
   // Centralized Internationalization (English / हिन्दी)
@@ -1158,24 +1157,8 @@
       }
     } catch (e) {}
   }
-
-  function setFontScale(scaleStr) {
-    const valid = ['0.9', '1.0', '1.1'];
-    const scale = valid.includes(String(scaleStr)) ? String(scaleStr) : '1.0';
-    STATE.currentFontScale = scale;
-    try { localStorage.setItem('sovopt-font-scale', scale); } catch (e) {}
-
-    document.documentElement.style.setProperty('--accessibility-font-scale', scale);
-    document.body.style.setProperty('--accessibility-font-scale', scale);
-
-    const btnMinus = document.getElementById('btn-acc-font-minus');
-    const btnReset = document.getElementById('btn-acc-font-reset');
-    const btnPlus = document.getElementById('btn-acc-font-plus');
-
-    if (btnMinus) btnMinus.classList.toggle('active', scale === '0.9');
-    if (btnReset) btnReset.classList.toggle('active', scale === '1.0');
-    if (btnPlus) btnPlus.classList.toggle('active', scale === '1.1');
-  }
+  // Clear any stale font-scale preference stored by previous gate
+  try { localStorage.removeItem('sovopt-font-scale'); } catch (e) {}
 
   // 1. Curated Industrial Scenarios
   const SCENARIOS = {
@@ -1732,45 +1715,8 @@
     }
   }
 
-  // Accessibility Controls Setup
+  // Accessibility Controls Setup — language toggle only
   function setupAccessibility() {
-    const btnSpace = document.getElementById('btn-acc-space');
-    if (btnSpace) {
-      btnSpace.addEventListener('click', () => {
-        const isWide = document.body.classList.toggle('wide-spacing');
-        btnSpace.setAttribute('aria-pressed', String(isWide));
-      });
-    }
-
-    const btnContrast = document.getElementById('btn-acc-contrast');
-    if (btnContrast) {
-      btnContrast.addEventListener('click', () => {
-        const isHigh = document.body.classList.toggle('high-contrast');
-        btnContrast.setAttribute('aria-pressed', String(isHigh));
-      });
-    }
-
-    const btnFontMinus = document.getElementById('btn-acc-font-minus');
-    if (btnFontMinus) {
-      btnFontMinus.addEventListener('click', () => {
-        setFontScale('0.9');
-      });
-    }
-
-    const btnFontReset = document.getElementById('btn-acc-font-reset');
-    if (btnFontReset) {
-      btnFontReset.addEventListener('click', () => {
-        setFontScale('1.0');
-      });
-    }
-
-    const btnFontPlus = document.getElementById('btn-acc-font-plus');
-    if (btnFontPlus) {
-      btnFontPlus.addEventListener('click', () => {
-        setFontScale('1.1');
-      });
-    }
-
     const btnLang = document.getElementById('btn-acc-lang');
     if (btnLang) {
       btnLang.addEventListener('click', () => {
@@ -1779,11 +1725,7 @@
       });
     }
 
-    // Initialize persisted font scale and language preference
-    let initialScale = '1.0';
-    try { initialScale = localStorage.getItem('sovopt-font-scale') || '1.0'; } catch (e) {}
-    setFontScale(initialScale);
-
+    // Initialize persisted language preference
     let initialLang = 'en';
     try { initialLang = localStorage.getItem('sovopt-language') || 'en'; } catch (e) {}
     setLanguage(initialLang);
@@ -3423,7 +3365,6 @@
       switchTab: switchTab,
       triggerSolve: triggerSolve,
       setLanguage: setLanguage,
-      setFontScale: setFontScale,
       I18N: I18N,
       getState: () => STATE,
       TEAM_MEMBERS: TEAM_MEMBERS,
@@ -3589,7 +3530,6 @@
   window.switchTab = switchTab;
   window.selectScenario = selectScenario;
   window.setLanguage = setLanguage;
-  window.setFontScale = setFontScale;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

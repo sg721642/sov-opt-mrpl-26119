@@ -1172,7 +1172,7 @@
     "mode": "text-lf"
   },
   "web/app.js": {
-    "sha256": "9fefa2b1f2b7faf573a5814262bdef1677c3aaea741d8c70e6e29fded320dcbf",
+    "sha256": "cb2cb7e60f20a1f512e355b4f54e186e6ad63562ad4362781dc414d36d552d29",
     "mode": "text-lf"
   },
   "web/assets/MRPL_logo.jpg": {
@@ -1204,11 +1204,11 @@
     "mode": "raw"
   },
   "web/index.html": {
-    "sha256": "7d00ccf652afe311172f17ca0bd6ff191e1aa8b963a38b6068aa18fc117accbe",
+    "sha256": "30b1bb674f6b16fbb538b2ccbbbc47d75373a84a00596c511a44c6e148c4e6f2",
     "mode": "text-lf"
   },
   "web/style.css": {
-    "sha256": "2b387ede5c8c425b825f133bf1ac7e9bf0548e9d22d5d5b84b310f152d6eaa4e",
+    "sha256": "218e7cfb051c663b5ab19baa5c70fbe23d838461139d9cdf0a62240aa56a11ec",
     "mode": "text-lf"
   }
 }
