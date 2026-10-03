@@ -1,5 +1,24 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.11] - 2026-10-03
+
+### Gate 15: Simplify Accessibility Controls to Language Toggle Only
+
+- **fix(web): Remove entire font-size / text-scaling accessibility system:**
+  - Deleted T↔ (wide-spacing), A (contrast), A−, A (reset), A+ buttons from `web/index.html` accessibility strip. Only हिन्दी / English language toggle remains.
+  - Updated `aria-label` on `#accessibility-strip` to "Language controls".
+  - Replaced dynamic `calc(... * var(--accessibility-font-scale, 1.0)) !important` typography block in `web/style.css` (27 selectors) with direct static pixel sizes at 0.9× of original values (compact baseline matching former A− visual state). No `calc()`, `zoom`, `transform: scale()`, or CSS variable scaling.
+  - Removed `--accessibility-font-scale: 1.0` CSS variable from `:root`.
+  - Changed `body` `font-size` from `calc(13.5px * var(...))` to static `12.15px`.
+  - Deleted `body.wide-spacing`, `body.small-text`, `body.large-text`, `body.high-contrast` CSS classes (no longer toggled by any control).
+  - Updated `.acc-lang` button to standalone fixed-width design (`min-width: 66px`, `height: 30px`, `display: inline-flex`, `align-items: center`, `justify-content: center`).
+  - Deleted `setFontScale()` function from `web/app.js`; removed `STATE.currentFontScale`; removed all font/spacing/contrast event handlers from `setupAccessibility()`; removed `localStorage` font-scale init.
+  - Added `localStorage.removeItem('sovopt-font-scale')` on page load to clear stale Gate 13 preference.
+  - Removed `setFontScale` from `sovApp` export object and `window.setFontScale` global.
+  - Bumped `?v=4` → `?v=5` cache-busters on `style.css` and `app.js` includes.
+  - Hindi / English toggle system from Gate 13/14 fully preserved and intact.
+  - 340 tests pass (0 failures, 0 errors, 14 skipped); freeze check clean (`sovopt/`, `data/`, `reports/` unchanged); SHA256SUMS.json updated (303 entries).
+
 ## [0.3.10] - 2026-10-03
 
 ### Gate 14: Final Accessibility Hotfix + Full Hindi Localization

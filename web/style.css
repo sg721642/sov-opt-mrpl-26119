@@ -49,8 +49,6 @@
   --font-sans:           'Montserrat', Arial, Helvetica, sans-serif;
   --font-mono:           'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  /* Accessibility Scale */
-  --accessibility-font-scale: 1.0;
 
   /* Dimensions & Spacing */
   --nav-height:          48px;
@@ -75,58 +73,10 @@ html, body {
   background-color: var(--bg-workspace);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: calc(13.5px * var(--accessibility-font-scale, 1.0));
+  font-size: 12.15px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Accessibility Modifiers */
-body.wide-spacing {
-  word-spacing: 0.16em !important;
-  letter-spacing: 0.05em !important;
-  line-height: 1.8 !important;
-}
-
-body.small-text {
-  font-size: 12px !important;
-}
-
-body.large-text {
-  font-size: 15.5px !important;
-}
-
-body.high-contrast {
-  background-color: #000000 !important;
-  color: #FFFFFF !important;
-}
-
-body.high-contrast #mrpl-masthead,
-body.high-contrast .page-container,
-body.high-contrast .team-card,
-body.high-contrast .contact-card,
-body.high-contrast .institution-card,
-body.high-contrast .pillar-card,
-body.high-contrast .workflow-card,
-body.high-contrast .table-section,
-body.high-contrast .summary-band,
-body.high-contrast .summary-dominant,
-body.high-contrast .summary-item {
-  background-color: #000000 !important;
-  color: #FFFFFF !important;
-  border-color: #00FF00 !important;
-}
-
-body.high-contrast #accessibility-strip,
-body.high-contrast #mrpl-nav,
-body.high-contrast .footer-top,
-body.high-contrast .footer-bottom {
-  background-color: #111111 !important;
-  border-color: #00FF00 !important;
-}
-
-body.high-contrast a {
-  color: #FFFF00 !important;
 }
 
 /* Monospace Class */
@@ -215,16 +165,19 @@ body.high-contrast a {
 }
 
 .acc-lang {
+  min-width: 66px;
+  height: 30px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
   color: #E5E7EB;
-  padding: 2px 8px;
   font-size: 11.5px;
   font-weight: 500;
-  margin-left: 6px;
-  border-left: 1px solid #555555;
-  background: transparent;
-  border-top: none;
-  border-right: none;
-  border-bottom: none;
+  background: #444444;
+  border: 1px solid #555555;
+  border-radius: var(--radius-xs);
   cursor: pointer;
   font-family: inherit;
   transition: color var(--trans-fast), background var(--trans-fast);
@@ -233,8 +186,8 @@ body.high-contrast a {
 .acc-lang:hover,
 .acc-lang:focus-visible {
   color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.15);
-  outline: none;
+  background: #555555;
+  outline: 2px solid var(--mrpl-hover-green);
 }
 
 /* ==========================================================================
@@ -2927,29 +2880,30 @@ body.high-contrast a {
 }
 
 /* ==========================================================================
-   ACCESSIBILITY FONT SCALING (A- / A / A+)
-   Proportionally scales computed font-size of typography elements across UI.
+   STATIC TYPOGRAPHY SIZES (compact baseline — formerly A− visual state)
+   Direct pixel values. No CSS variable scaling, no calc(), no zoom.
    ========================================================================== */
-.mrpl-masthead-title { font-size: calc(18px * var(--accessibility-font-scale, 1.0)) !important; }
-.mrpl-masthead-subtitle { font-size: calc(12.5px * var(--accessibility-font-scale, 1.0)) !important; }
-.nav-item, .nav-dropdown-btn { font-size: calc(13px * var(--accessibility-font-scale, 1.0)) !important; }
-.hero-heading, .slide-title { font-size: calc(38px * var(--accessibility-font-scale, 1.0)) !important; }
-.hero-statement, .slide-subtitle { font-size: calc(20px * var(--accessibility-font-scale, 1.0)) !important; }
-.hero-substatement, .slide-eyebrow { font-size: calc(14.5px * var(--accessibility-font-scale, 1.0)) !important; }
-.page-title { font-size: calc(26px * var(--accessibility-font-scale, 1.0)) !important; }
-.page-subtitle { font-size: calc(20px * var(--accessibility-font-scale, 1.0)) !important; }
-.page-intro { font-size: calc(13.5px * var(--accessibility-font-scale, 1.0)) !important; }
-.btn, .btn-primary, .btn-secondary, .btn-nav-action, .btn-sm { font-size: calc(13.5px * var(--accessibility-font-scale, 1.0)) !important; }
-.team-name, .contact-name { font-size: calc(16px * var(--accessibility-font-scale, 1.0)) !important; }
-.team-program, .team-inst, .contact-detail { font-size: calc(12px * var(--accessibility-font-scale, 1.0)) !important; }
-.data-table th, .data-table td, table th, table td { font-size: calc(12px * var(--accessibility-font-scale, 1.0)) !important; }
-.footer-text, .footer-col, .footer-bottom { font-size: calc(12px * var(--accessibility-font-scale, 1.0)) !important; }
-.sc-card-title { font-size: calc(16px * var(--accessibility-font-scale, 1.0)) !important; }
-.sc-card-desc { font-size: calc(12.5px * var(--accessibility-font-scale, 1.0)) !important; }
-.kpi-title { font-size: calc(11px * var(--accessibility-font-scale, 1.0)) !important; }
-.kpi-value { font-size: calc(22px * var(--accessibility-font-scale, 1.0)) !important; }
-.form-label { font-size: calc(12.5px * var(--accessibility-font-scale, 1.0)) !important; }
-.form-input, .form-select { font-size: calc(13.5px * var(--accessibility-font-scale, 1.0)) !important; }
-.ticker-title { font-size: calc(11px * var(--accessibility-font-scale, 1.0)) !important; }
-.ticker-text { font-size: calc(12.5px * var(--accessibility-font-scale, 1.0)) !important; }
-.analytics-callout-text { font-size: calc(13px * var(--accessibility-font-scale, 1.0)) !important; }
+.mrpl-masthead-title { font-size: 16.2px !important; }
+.mrpl-masthead-subtitle { font-size: 11.25px !important; }
+.nav-item, .nav-dropdown-btn { font-size: 11.7px !important; }
+.hero-heading, .slide-title { font-size: 34.2px !important; }
+.hero-statement, .slide-subtitle { font-size: 18px !important; }
+.hero-substatement, .slide-eyebrow { font-size: 13.05px !important; }
+.page-title { font-size: 23.4px !important; }
+.page-subtitle { font-size: 18px !important; }
+.page-intro { font-size: 12.15px !important; }
+.btn, .btn-primary, .btn-secondary, .btn-nav-action, .btn-sm { font-size: 12.15px !important; }
+.team-name, .contact-name { font-size: 14.4px !important; }
+.team-program, .team-inst, .contact-detail { font-size: 10.8px !important; }
+.data-table th, .data-table td, table th, table td { font-size: 10.8px !important; }
+.footer-text, .footer-col, .footer-bottom { font-size: 10.8px !important; }
+.sc-card-title { font-size: 14.4px !important; }
+.sc-card-desc { font-size: 11.25px !important; }
+.kpi-title { font-size: 9.9px !important; }
+.kpi-value { font-size: 19.8px !important; }
+.form-label { font-size: 11.25px !important; }
+.form-input, .form-select { font-size: 12.15px !important; }
+.ticker-title { font-size: 9.9px !important; }
+.ticker-text { font-size: 11.25px !important; }
+.analytics-callout-text { font-size: 11.7px !important; }
+
