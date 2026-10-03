@@ -16,7 +16,7 @@
     "mode": "text-lf"
   },
   "CHANGELOG.md": {
-    "sha256": "505cf9d9f97fafa0744be40b5e9a38f67db1bb9e184032092b1f9a60f2341b8b",
+    "sha256": "14522161b879263be57ce564f809c5db95d8e249a809c600ed38a22db5f55d69",
     "mode": "text-lf"
   },
   "Dockerfile": {
@@ -1172,7 +1172,7 @@
     "mode": "text-lf"
   },
   "web/app.js": {
-    "sha256": "cb2cb7e60f20a1f512e355b4f54e186e6ad63562ad4362781dc414d36d552d29",
+    "sha256": "e7552a18baa6eb71f5b1a4be37b31443e0b2be5e40d3468a4407cf9c915082d4",
     "mode": "text-lf"
   },
   "web/assets/MRPL_logo.jpg": {
@@ -1204,7 +1204,7 @@
     "mode": "raw"
   },
   "web/index.html": {
-    "sha256": "30b1bb674f6b16fbb538b2ccbbbc47d75373a84a00596c511a44c6e148c4e6f2",
+    "sha256": "5d5d796721080bea72bef2dda0e8cac842c9cc067d31b13f7b6d500a431e8da1",
     "mode": "text-lf"
   },
   "web/style.css": {
