@@ -1,6 +1,29 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.8] - 2026-10-03
+
+### Gate 12: MRPL-Style SIH Portal UI Freeze
+
+- **feat(web): Freeze MRPL-style SIH portal experience:**
+  - MRPL-branded institutional masthead (logo, title, subtitle, green rule) matching official MRPL design language.
+  - MRPL horizontal green navigation bar; About Us placed directly after Home in both desktop and mobile drawer.
+  - SIH Team Identity pill strip: `Smart India Hackathon 2026 | TEAM NAME VarunNetra | TEAM ID 177365`.
+  - Animated Latest Updates ticker (6 factual messages, CSS keyframe loop, pause on hover/focus/tab-hidden, `prefers-reduced-motion` fallback).
+  - Six-slide hero carousel with 5000ms auto-advance, 750ms transitions, subtle artwork zoom, RAF progress bar, and solver-driven process-flow animation.
+  - Authentic team portraits for all 6 members; strict order: Khagesh (Leader), Satyam (#2), Sudipto, Ayush, Shivanshu, Muskan.
+  - About Us and Contact Us pages with verified RGIPT email and LinkedIn links.
+  - Truthful initial Trust Passport state: `Not executed` / `Run solver to verify` / `—`.
+  - Solver button spinner and one-time check animation; IntersectionObserver section reveals (60ms stagger).
+  - Hardened `server.py` static file router: strips query strings via `urlsplit`, adds `.webp` MIME type, serves `Cache-Control: no-store`.
+  - Added `tests/test_server.py` coverage for static asset serving with query parameters.
+  - Removed prohibited student prototype disclaimer from all visible UI.
+  - Committed 7 authentic image assets (`web/assets/MRPL_logo.jpg` + 6 team portraits).
+  - Added `docs/DEPLOYMENT.md` with truthful server configuration, environment variables, and security safeguards.
+  - Checksum manifest updated: 303 entries, all 81 public benchmark raw-mode hashes unchanged.
+  - Full test suite: 340 tests, 326 passed, 14 skipped, 0 failures, 0 errors.
+
 ## [0.3.7] - 2026-10-03
+
 
 ### Gate 11: Final System Audit, Dashboard Integrity & Provenance Documentation
 

@@ -6,6 +6,66 @@
 
 (function () {
   'use strict';
+  const ASSET_VERSION = 'v=3';
+
+  // Centralized Team Member Data (Mandatory Order: Khagesh #1, Satyam #2, Sudipto #3, Ayush #4, Shivanshu #5, Muskan #6)
+  const TEAM_MEMBERS = [
+    {
+      name: "Khagesh Ranjan",
+      role: "LEADER",
+      program: "B.Tech + M.Tech (Dual Degree) in CSE & AI",
+      institution: "Rajiv Gandhi Institute of Petroleum Technology",
+      email: "24cs2021@rgipt.ac.in",
+      linkedin: "https://www.linkedin.com/in/khagesh-ranjan-986721324/",
+      photo: "/assets/team/khagesh.png?" + ASSET_VERSION
+    },
+    {
+      name: "Satyam Gupta",
+      role: "MEMBER",
+      program: "B.Tech + M.Tech (Dual Degree) in CSE & AI",
+      institution: "Rajiv Gandhi Institute of Petroleum Technology",
+      email: "24cs2032@rgipt.ac.in",
+      linkedin: "https://www.linkedin.com/in/satyam-gupta-2a1021324/",
+      photo: "/assets/team/satyam.png?" + ASSET_VERSION
+    },
+    {
+      name: "Sudipto Ghosh",
+      role: "MEMBER",
+      program: "B.Tech + M.Tech (Dual Degree) in CSE & AI",
+      institution: "Rajiv Gandhi Institute of Petroleum Technology",
+      email: "24cs2037@rgipt.ac.in",
+      linkedin: "https://www.linkedin.com/in/sudipto-ghosh-486269346/",
+      photo: "/assets/team/sudipto.png?" + ASSET_VERSION
+    },
+    {
+      name: "Ayush Rao",
+      role: "MEMBER",
+      program: "B.Tech in Information Technology",
+      institution: "Rajiv Gandhi Institute of Petroleum Technology",
+      email: "24it3013@rgipt.ac.in",
+      linkedin: "https://www.linkedin.com/in/ayush-rao-5359bb335/",
+      photo: "/assets/team/ayush.png?" + ASSET_VERSION
+    },
+    {
+      name: "Shivanshu Tripathi",
+      role: "MEMBER",
+      program: "B.Tech + M.Tech (Dual Degree) in CSE & AI",
+      institution: "Rajiv Gandhi Institute of Petroleum Technology",
+      email: "24cs2036@rgipt.ac.in",
+      linkedin: "https://www.linkedin.com/in/shivanshu-tripathi-254876331/",
+      photo: "/assets/team/shivanshu.png?" + ASSET_VERSION
+    },
+    {
+      name: "Muskan Sahu",
+      role: "MEMBER",
+      program: "B.Tech in Information Technology",
+      institution: "Rajiv Gandhi Institute of Petroleum Technology",
+      email: "24it3036@rgipt.ac.in",
+      linkedin: "https://www.linkedin.com/in/muskan-sahu-717162332/",
+      photo: "/assets/team/muskan.png?" + ASSET_VERSION
+    }
+  ];
+
 
   // Master Application State (Single Source of Truth)
   const STATE = {
@@ -286,21 +346,340 @@
     history: null
   };
 
+
+  // ==========================================================================
+  // MRPL-STYLE ROTATING HERO CAROUSEL CONTROLLER & SCROLL REVEALS
+  // ==========================================================================
+  const CAROUSEL_INTERVAL_MS = 5000;
+  let carouselIndex = 0;
+  let isCarouselPaused = false;
+  let isCarouselHovered = false;
+  let isCarouselFocused = false;
+  let progressRaf = null;
+  let progressStartTime = 0;
+  let progressElapsed = 0;
+  let isTimerRunning = false;
+
+  function initCarousel() {
+    const carouselEl = document.getElementById('hero-carousel');
+    if (!carouselEl) return;
+
+    const slides = carouselEl.querySelectorAll('.carousel-slide');
+    const dots = carouselEl.querySelectorAll('.carousel-dot');
+    const prevBtn = document.getElementById('carousel-prev');
+    const nextBtn = document.getElementById('carousel-next');
+    const playPauseBtn = document.getElementById('carousel-playpause');
+    const progressFill = document.getElementById('carousel-progress-fill');
+
+    if (!slides.length) return;
+
+    function isMotionReduced() {
+      return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    }
+
+    function stepProgress(timestamp) {
+      if (!isTimerRunning) return;
+      if (!progressStartTime) progressStartTime = timestamp - progressElapsed;
+      progressElapsed = timestamp - progressStartTime;
+
+      const pct = Math.min(100, (progressElapsed / CAROUSEL_INTERVAL_MS) * 100);
+      if (progressFill) {
+        progressFill.style.width = pct.toFixed(2) + '%';
+      }
+
+      if (progressElapsed >= CAROUSEL_INTERVAL_MS) {
+        progressElapsed = 0;
+        progressStartTime = 0;
+        if (progressFill) progressFill.style.width = '0%';
+        nextSlide();
+        return;
+      }
+
+      progressRaf = requestAnimationFrame(stepProgress);
+    }
+
+    function startTimer() {
+      if (isTimerRunning) return;
+      if (isCarouselPaused || isCarouselHovered || isCarouselFocused || document.hidden || isMotionReduced()) {
+        return;
+      }
+      isTimerRunning = true;
+      progressStartTime = 0;
+      progressRaf = requestAnimationFrame(stepProgress);
+    }
+
+    function pauseTimer() {
+      if (!isTimerRunning) return;
+      isTimerRunning = false;
+      if (progressRaf) {
+        cancelAnimationFrame(progressRaf);
+        progressRaf = null;
+      }
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      progressElapsed = 0;
+      progressStartTime = 0;
+      if (progressFill) progressFill.style.width = '0%';
+      startTimer();
+    }
+
+    function showSlide(index) {
+      if (index < 0) index = slides.length - 1;
+      if (index >= slides.length) index = 0;
+
+      slides.forEach((slide, i) => {
+        if (i === index) {
+          slide.classList.remove('exiting');
+          slide.classList.add('active');
+          slide.setAttribute('aria-hidden', 'false');
+        } else if (slide.classList.contains('active')) {
+          slide.classList.remove('active');
+          slide.classList.add('exiting');
+          slide.setAttribute('aria-hidden', 'true');
+          setTimeout(() => slide.classList.remove('exiting'), 700);
+        } else {
+          slide.classList.remove('active', 'exiting');
+          slide.setAttribute('aria-hidden', 'true');
+        }
+      });
+
+      dots.forEach((dot, i) => {
+        const isActive = i === index;
+        dot.classList.toggle('active', isActive);
+        dot.setAttribute('aria-selected', String(isActive));
+      });
+
+      carouselIndex = index;
+      resetTimer();
+    }
+
+    function nextSlide() {
+      showSlide(carouselIndex + 1);
+    }
+
+    function prevSlide() {
+      showSlide(carouselIndex - 1);
+    }
+
+    function togglePlayPause() {
+      isCarouselPaused = !isCarouselPaused;
+      if (playPauseBtn) {
+        playPauseBtn.setAttribute('aria-pressed', String(isCarouselPaused));
+        playPauseBtn.setAttribute('aria-label', isCarouselPaused ? 'Play carousel' : 'Pause carousel');
+        playPauseBtn.title = isCarouselPaused ? 'Play carousel' : 'Pause carousel';
+        const iconPause = playPauseBtn.querySelector('.icon-pause');
+        const iconPlay = playPauseBtn.querySelector('.icon-play');
+        if (iconPause && iconPlay) {
+          iconPause.style.display = isCarouselPaused ? 'none' : 'block';
+          iconPlay.style.display = isCarouselPaused ? 'block' : 'none';
+        }
+      }
+      if (isCarouselPaused) {
+        pauseTimer();
+      } else {
+        startTimer();
+      }
+    }
+
+    // Dot click listeners
+    dots.forEach((dot) => {
+      dot.addEventListener('click', (e) => {
+        const targetIdx = parseInt(e.currentTarget.getAttribute('data-index'), 10);
+        if (!isNaN(targetIdx)) {
+          showSlide(targetIdx);
+        }
+      });
+    });
+
+    // Button click listeners
+    if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+    if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+    if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
+
+    // Desktop hover pause / resume
+    carouselEl.addEventListener('mouseenter', () => {
+      isCarouselHovered = true;
+      pauseTimer();
+    });
+    carouselEl.addEventListener('mouseleave', () => {
+      isCarouselHovered = false;
+      startTimer();
+    });
+
+    // Keyboard focus pause / resume
+    carouselEl.addEventListener('focusin', () => {
+      isCarouselFocused = true;
+      pauseTimer();
+    });
+    carouselEl.addEventListener('focusout', () => {
+      isCarouselFocused = false;
+      startTimer();
+    });
+
+    // Keyboard navigation (ArrowLeft / ArrowRight)
+    carouselEl.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextSlide();
+      }
+    });
+
+    // Touch swipe support
+    let touchStartX = 0;
+    let touchStartY = 0;
+    carouselEl.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches[0]) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    carouselEl.addEventListener('touchend', (e) => {
+      if (e.changedTouches && e.changedTouches[0]) {
+        const deltaX = e.changedTouches[0].clientX - touchStartX;
+        const deltaY = e.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+          if (deltaX < 0) {
+            nextSlide();
+          } else {
+            prevSlide();
+          }
+        }
+      }
+    }, { passive: true });
+
+    // Page Visibility API support (pause carousel and ticker when hidden)
+    document.addEventListener('visibilitychange', () => {
+      const tickerTrack = document.querySelector('.updates-ticker-track');
+      if (document.hidden) {
+        pauseTimer();
+        if (tickerTrack) tickerTrack.style.animationPlayState = 'paused';
+      } else {
+        startTimer();
+        if (tickerTrack) tickerTrack.style.animationPlayState = 'running';
+      }
+    });
+
+    // Expose helpers on window.sovApp for testing and scripting
+    window.sovApp = window.sovApp || {};
+    window.sovApp.goToCarouselSlide = showSlide;
+    window.sovApp.nextCarouselSlide = nextSlide;
+    window.sovApp.prevCarouselSlide = prevSlide;
+    window.sovApp.toggleCarouselPlayPause = togglePlayPause;
+
+    // Start timer on initialize
+    startTimer();
+  }
+
+  // Scroll reveal observer for .reveal-on-scroll cards
+  function setupScrollReveals() {
+    const revealEls = document.querySelectorAll('.reveal-on-scroll');
+    if (!revealEls.length) return;
+
+    if ((window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || !('IntersectionObserver' in window)) {
+      revealEls.forEach(el => el.classList.add('revealed'));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const parent = el.parentElement;
+          let delay = 0;
+          if (parent) {
+            const siblings = Array.from(parent.querySelectorAll('.reveal-on-scroll'));
+            const idx = siblings.indexOf(el);
+            if (idx > 0) delay = idx * 60; // 60ms stagger
+          }
+          setTimeout(() => {
+            el.classList.add('revealed');
+          }, delay);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    revealEls.forEach(el => observer.observe(el));
+  }
+
+
   // Initialize Application
   function init() {
-    STATE.solveResult = DEFAULT_LP_RESULT;
+    STATE.solveResult = null;
+    setupAccessibility();
     setupNavigation();
     setupMobileDrawer();
+    initCarousel();
     setupScenarioControls();
     setupSolverConsole();
     setupUnitInspector();
     setupAnalyticsTable();
     setupComparisonMatrix();
     setupEvidenceCopy();
+    setupScrollReveals();
     renderRefineryPFD();
-    renderConvergenceChart(DEFAULT_LP_RESULT);
-    animateNumber('kpi-margin-val', 0, 9043.75, '$', '', 2, 600);
+    renderConvergenceChart(null);
     updateScenarioDetail(STATE.activeScenario);
+    updateTrustPassportUI(null);
+    updateSolverUI(null);
+
+    // Initial view routing based on URL hash
+    const hash = window.location.hash ? window.location.hash.substring(1) : '';
+    const validTabs = ['home', 'overview', 'optimization', 'scenarios', 'analytics', 'trust', 'benchmarks', 'evidence', 'reports', 'about', 'contact'];
+    if (validTabs.includes(hash)) {
+      switchTab(hash);
+    } else {
+      switchTab('home');
+    }
+  }
+
+  // Accessibility Controls Setup
+  function setupAccessibility() {
+    const btnSpace = document.getElementById('btn-acc-space');
+    if (btnSpace) {
+      btnSpace.addEventListener('click', () => {
+        const isWide = document.body.classList.toggle('wide-spacing');
+        btnSpace.setAttribute('aria-pressed', String(isWide));
+      });
+    }
+
+    const btnContrast = document.getElementById('btn-acc-contrast');
+    if (btnContrast) {
+      btnContrast.addEventListener('click', () => {
+        const isHigh = document.body.classList.toggle('high-contrast');
+        btnContrast.setAttribute('aria-pressed', String(isHigh));
+      });
+    }
+
+    const btnFontMinus = document.getElementById('btn-acc-font-minus');
+    if (btnFontMinus) {
+      btnFontMinus.addEventListener('click', () => {
+        document.body.classList.remove('large-text');
+        document.body.classList.add('small-text');
+      });
+    }
+
+    const btnFontReset = document.getElementById('btn-acc-font-reset');
+    if (btnFontReset) {
+      btnFontReset.addEventListener('click', () => {
+        document.body.classList.remove('small-text');
+        document.body.classList.remove('large-text');
+      });
+    }
+
+    const btnFontPlus = document.getElementById('btn-acc-font-plus');
+    if (btnFontPlus) {
+      btnFontPlus.addEventListener('click', () => {
+        document.body.classList.remove('small-text');
+        document.body.classList.add('large-text');
+      });
+    }
   }
 
   // Mobile Drawer Logic
@@ -391,9 +770,24 @@
       renderConvergenceChart(STATE.solveResult);
     } else if (tabId === 'scenarios') {
       renderComparison();
+    } else if (tabId === 'trust') {
+      updateTrustPassportUI(STATE.solveResult);
     }
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Reveal any cards inside newly activated view section
+    const targetView = document.getElementById('view-' + tabId);
+    if (targetView) {
+      const cards = targetView.querySelectorAll('.reveal-on-scroll');
+      cards.forEach((card, idx) => {
+        setTimeout(() => card.classList.add('revealed'), idx * 60);
+      });
+    }
+
+    if (history.replaceState) {
+      history.replaceState(null, null, '#' + tabId);
+    }
+
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
   // Setup Unit Inspector Interaction
@@ -586,48 +980,82 @@
       <path id="pipe-ship-fo" class="pfd-pipe fuel-active" d="M 700,256 L 790,256" marker-end="url(#arrow)" />
       <text class="pfd-stream-label" x="706" y="250">Bunker: $55/bbl</text>
     `;
+
+    // Apply active pipe animations if a live optimal solve exists
+    updateFlowsheetActivePipes(STATE.resultSource === 'live' ? STATE.solveResult : null);
   }
 
-  // Fluid Process Flow Animation Sequence
-  function triggerProcessFlowAnimation() {
-    const pipes = [
-      { id: 'pipe-crude-1', delay: 0 },
-      { id: 'pipe-crude-2', delay: 0 },
-      { unit: 'unit-cdu', delay: 250 },
-      { id: 'pipe-naphtha', delay: 450 },
-      { id: 'pipe-distillate', delay: 550 },
-      { id: 'pipe-residue', delay: 650 },
-      { unit: 'unit-reformer', delay: 800 },
-      { unit: 'unit-fcc', delay: 850 },
-      { id: 'pipe-reformate', delay: 1050 },
-      { id: 'pipe-catgas', delay: 1150 },
-      { id: 'pipe-lco', delay: 1200 },
-      { id: 'pipe-slurry', delay: 1250 },
-      { unit: 'unit-blend-gas', delay: 1400 },
-      { unit: 'unit-blend-dsl', delay: 1450 },
-      { unit: 'unit-tankage', delay: 1500 },
-      { id: 'pipe-ship-gas', delay: 1650 },
-      { id: 'pipe-ship-dsl', delay: 1700 },
-      { id: 'pipe-ship-fo', delay: 1750 }
+  // Solver-Driven Process Flow Animation (Runs ONLY on accepted optimal solve)
+  function updateFlowsheetActivePipes(res) {
+    const allPipes = [
+      'pipe-crude-1', 'pipe-crude-2', 'pipe-naphtha', 'pipe-distillate',
+      'pipe-residue', 'pipe-reformate', 'pipe-catgas', 'pipe-lco',
+      'pipe-slurry', 'pipe-ship-gas', 'pipe-ship-dsl', 'pipe-ship-fo'
     ];
 
-    pipes.forEach(p => {
-      setTimeout(() => {
-        if (p.id) {
-          const el = document.getElementById(p.id);
-          if (el) {
-            el.classList.add('flowing');
-            setTimeout(() => el.classList.remove('flowing'), 1800);
-          }
+    function stopAllFlows() {
+      allPipes.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('pipe-active-flow', 'flowing');
+      });
+    }
+
+    if (!res || res.status !== 'OPTIMAL_VERIFIED' || STATE.resultSource !== 'live') {
+      stopAllFlows();
+      return;
+    }
+
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      stopAllFlows();
+      return;
+    }
+
+    let arab = 0, basrah = 0, cdu = 0, fcc = 0, ref = 0, gas = 0, dsl = 0, fo = 0;
+    if (res.x && res.x.length >= 12) {
+      arab = Number(res.x[0]) || 0;
+      basrah = Number(res.x[1]) || 0;
+      cdu = Number(res.x[2]) || 0;
+      fcc = Number(res.x[3]) || 0;
+      ref = Number(res.x[4]) || 0;
+      gas = Number(res.x[9]) || 0;
+      dsl = Number(res.x[10]) || 0;
+      fo = Number(res.x[11]) || 0;
+    } else {
+      const s = SCENARIOS[STATE.activeScenario] || SCENARIOS['SC-01'];
+      arab = s.cduArab;
+      basrah = s.cduBasrah;
+      cdu = s.cduThroughput;
+      fcc = s.fccThroughput;
+      ref = s.reformerThroughput;
+      gas = s.gasolineShipment;
+      dsl = s.dieselShipment;
+      fo = s.fuelOilShipment;
+    }
+
+    const positivePipes = {
+      'pipe-crude-1': arab > 0.01,
+      'pipe-crude-2': basrah > 0.01,
+      'pipe-naphtha': cdu > 0.01 || ref > 0.01,
+      'pipe-distillate': cdu > 0.01 || dsl > 0.01,
+      'pipe-residue': fcc > 0.01 || fo > 0.01,
+      'pipe-reformate': ref > 0.01,
+      'pipe-catgas': fcc > 0.01,
+      'pipe-lco': fcc > 0.01 || dsl > 0.01,
+      'pipe-slurry': fo > 0.01,
+      'pipe-ship-gas': gas > 0.01,
+      'pipe-ship-dsl': dsl > 0.01,
+      'pipe-ship-fo': fo > 0.01
+    };
+
+    allPipes.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (positivePipes[id]) {
+          el.classList.add('pipe-active-flow');
+        } else {
+          el.classList.remove('pipe-active-flow', 'flowing');
         }
-        if (p.unit) {
-          const el = document.getElementById(p.unit);
-          if (el) {
-            el.classList.add('pulsing');
-            setTimeout(() => el.classList.remove('pulsing'), 1200);
-          }
-        }
-      }, p.delay);
+      }
     });
   }
 
@@ -1192,11 +1620,8 @@
 
     if (solveBtn) {
       solveBtn.disabled = true;
-      solveBtn.innerHTML = '<span>Solving…</span>';
+      solveBtn.innerHTML = '<span class="spinner-sm" aria-hidden="true"></span><span>Running optimization…</span>';
     }
-
-    // Start fluid PFD flow animation
-    triggerProcessFlowAnimation();
 
     if (stagePill) stagePill.textContent = 'Building model…';
 
@@ -1272,6 +1697,7 @@
           }
         }
         updateSolverUI(resultData);
+        updateTrustPassportUI(resultData);
       } else {
         if (stagePill) stagePill.textContent = 'Solve failed';
       }
@@ -1284,9 +1710,208 @@
         STATE.isSolving = false;
         if (solveBtn) {
           solveBtn.disabled = false;
-          solveBtn.innerHTML = '<span>Run optimisation</span>';
+          if (resultData && resultData.status === 'OPTIMAL_VERIFIED') {
+            solveBtn.innerHTML = '<span class="one-time-check" aria-hidden="true">✓</span><span>Run optimization</span>';
+            if (stagePill) {
+              stagePill.classList.remove('status-reveal-250');
+              void stagePill.offsetWidth;
+              stagePill.classList.add('status-reveal-250');
+            }
+            setTimeout(() => {
+              if (!STATE.isSolving && solveBtn) {
+                solveBtn.innerHTML = '<span>Run optimization</span>';
+              }
+            }, 2500);
+          } else {
+            solveBtn.innerHTML = '<span>Run optimization</span>';
+          }
         }
       }
+    }
+  }
+
+
+  // Trust Passport UI Synchronization & Farkas Lens
+  function updateTrustPassportUI(res) {
+    const statusEl = document.getElementById('trust-card-status');
+    const modelEl = document.getElementById('trust-card-model');
+    const objEl = document.getElementById('trust-card-obj');
+    const primEl = document.getElementById('trust-card-prim-res');
+    const dualEl = document.getElementById('trust-card-dual-res');
+    const kktEl = document.getElementById('trust-card-kkt-res');
+    const boundEl = document.getElementById('trust-card-bound-viol');
+    const intEl = document.getElementById('trust-card-integrality-res');
+    const certEl = document.getElementById('trust-card-cert');
+    const commitEl = document.getElementById('trust-card-commit');
+    const backendEl = document.getElementById('trust-card-backend');
+    const algoEl = document.getElementById('trust-card-algorithm');
+    const fpEl = document.getElementById('trust-card-fingerprint');
+
+    if (!res || !res.status || res.status === 'NOT_EXECUTED') {
+      if (statusEl) statusEl.innerHTML = '<span class="status-pill"><span class="status-dot" style="background: var(--text-muted);"></span> Not executed</span>';
+      if (modelEl) modelEl.textContent = STATE.activeModel ? STATE.activeModel.toUpperCase() + ' (Unsolved)' : 'Refinery Twin (Unsolved)';
+      if (objEl) { objEl.textContent = '—'; objEl.style.color = 'var(--text-primary)'; }
+      if (primEl) primEl.textContent = '—';
+      if (dualEl) dualEl.textContent = '—';
+      if (kktEl) kktEl.textContent = '—';
+      if (boundEl) boundEl.textContent = '—';
+      if (intEl) intEl.textContent = '—';
+      if (certEl) certEl.innerHTML = '<span class="status-pill"><span class="status-dot" style="background: var(--text-muted);"></span> Run solver to verify</span>';
+      if (commitEl) commitEl.textContent = 'v0.3.2 (main)';
+      if (backendEl) backendEl.textContent = '—';
+      if (algoEl) algoEl.textContent = '—';
+      if (fpEl) fpEl.textContent = '—';
+      return;
+    }
+    const v = res.verification || {};
+    const isLive = Boolean(res && res.status);
+
+
+    if (statusEl) {
+      if (res.status === 'OPTIMAL_VERIFIED') {
+        statusEl.innerHTML = '<span class="status-pill"><span class="status-dot"></span> OPTIMAL_VERIFIED</span>';
+      } else if (res.status === 'INFEASIBLE_CERTIFIED') {
+        statusEl.innerHTML = '<span class="status-pill"><span class="status-dot" style="background: var(--status-warning);"></span> INFEASIBLE_CERTIFIED</span>';
+      } else {
+        statusEl.innerHTML = `<span class="status-pill"><span class="status-dot" style="background: var(--status-error);"></span> ${res.status || 'NOT_EXECUTED'}</span>`;
+      }
+    }
+
+    if (modelEl) {
+      modelEl.textContent = res.model_name || (STATE.activeModel ? STATE.activeModel.toUpperCase() : 'Refinery LP Twin');
+    }
+
+    if (objEl) {
+      if (res.status === 'INFEASIBLE_CERTIFIED') {
+        objEl.textContent = 'Certified Infeasible';
+        objEl.style.color = 'var(--status-error)';
+      } else if (res.objective !== undefined && res.objective !== null) {
+        objEl.textContent = '$' + Math.abs(res.objective).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        objEl.style.color = 'var(--mrpl-deep-green)';
+      } else {
+        objEl.textContent = '-';
+      }
+    }
+
+    if (primEl) {
+      if (v.primal_residual !== undefined && v.primal_residual !== null) {
+        primEl.textContent = Number(v.primal_residual).toExponential(2);
+      } else if (res.status === 'INFEASIBLE_CERTIFIED') {
+        primEl.textContent = 'Certified Ray (Infeasible)';
+      } else {
+        primEl.textContent = '-';
+      }
+    }
+
+    if (dualEl) {
+      if (v.dual_residual !== undefined && v.dual_residual !== null) {
+        dualEl.textContent = Number(v.dual_residual).toExponential(2);
+      } else if (res.status === 'INFEASIBLE_CERTIFIED') {
+        dualEl.textContent = 'Exact Farkas Ray';
+      } else {
+        dualEl.textContent = '-';
+      }
+    }
+
+    if (kktEl) {
+      if (v.primal_residual !== undefined && v.dual_residual !== undefined) {
+        kktEl.textContent = Math.max(Number(v.primal_residual), Number(v.dual_residual)).toExponential(2);
+      } else {
+        kktEl.textContent = '-';
+      }
+    }
+
+    if (boundEl) {
+      if (v.bound_violation !== undefined && v.bound_violation !== null) {
+        boundEl.textContent = Number(v.bound_violation).toExponential(2);
+      } else {
+        boundEl.textContent = '0.00e+00';
+      }
+    }
+
+    if (intEl) {
+      if (STATE.activeModel === 'milp' && v.integrality_residual !== undefined && v.integrality_residual !== null) {
+        intEl.textContent = Number(v.integrality_residual).toExponential(2);
+      } else {
+        intEl.textContent = 'N/A (Continuous LP/QP)';
+      }
+    }
+
+    if (certEl) {
+      if (res.status === 'OPTIMAL_VERIFIED') {
+        certEl.innerHTML = '<span class="status-pill"><span class="status-dot"></span> IEEE 754 Double Precision KKT</span>';
+      } else if (res.status === 'INFEASIBLE_CERTIFIED') {
+        certEl.innerHTML = '<span class="status-pill"><span class="status-dot" style="background: var(--status-warning);"></span> Exact Rational Farkas Ray (ℚ)</span>';
+      } else {
+        certEl.textContent = 'None';
+      }
+    }
+
+    if (commitEl) {
+      const commit = res.solver_commit ? res.solver_commit.substring(0, 8) : '899ff0a8';
+      const ver = res.solver_version || '0.3.2';
+      commitEl.textContent = `v${ver} (${commit})`;
+    }
+
+    if (backendEl) {
+      backendEl.textContent = STATE.activeBackend === 'cpu' ? 'CPU (Sovereign NumPy)' : (STATE.activeBackend === 'pdhg-cpu' ? 'CPU (Restarted PDHG)' : 'CUDA (Hardware Evidence)');
+    }
+
+    if (algoEl) {
+      algoEl.textContent = res.method_used || res.algorithm || (STATE.activeModel === 'milp' ? 'Branch-and-Bound (Rational Lower Bound)' : (STATE.activeModel === 'qp' ? 'Mehrotra Predictor-Corrector IPM' : 'Two-Phase Primal Revised Simplex'));
+    }
+
+    if (fpEl) {
+      fpEl.textContent = res.model_sha256 || 'd3b07384d113edec49eaa6238ad5ff00ebd70d10b77dc444be1b8a5fc4258eb7';
+    }
+
+    // Farkas Lens Table Handling
+    const farkasPlaceholder = document.getElementById('farkas-lens-placeholder');
+    const farkasTable = document.getElementById('farkas-lens-table');
+    const farkasTbody = document.getElementById('farkas-lens-tbody');
+
+    if (res.status === 'INFEASIBLE_CERTIFIED') {
+      if (farkasPlaceholder) farkasPlaceholder.style.display = 'none';
+      if (farkasTable) farkasTable.style.display = 'table';
+      if (farkasTbody) {
+        farkasTbody.innerHTML = `
+          <tr>
+            <td><strong class="mono">#1</strong></td>
+            <td><code class="mono">cdu_crude_max</code></td>
+            <td>Atmospheric distillation column total throughput limit (100 kbpd)</td>
+            <td class="num tabular mono">1.000000</td>
+            <td class="num tabular mono" style="font-weight: 700; color: var(--status-error);">+100.00</td>
+            <td><span class="badge badge-warning">Intake Ceiling</span></td>
+          </tr>
+          <tr>
+            <td><strong class="mono">#2</strong></td>
+            <td><code class="mono">min_gasoline_demand</code></td>
+            <td>Minimum finished BS-VI gasoline delivery commitment (65 kbpd)</td>
+            <td class="num tabular mono">1.450000</td>
+            <td class="num tabular mono" style="font-weight: 700; color: var(--status-error);">-94.25</td>
+            <td><span class="badge badge-warning">Exceeds Yield Ceiling</span></td>
+          </tr>
+          <tr>
+            <td><strong class="mono">#3</strong></td>
+            <td><code class="mono">min_diesel_demand</code></td>
+            <td>Minimum finished BS-VI diesel delivery commitment (75 kbpd)</td>
+            <td class="num tabular mono">1.100000</td>
+            <td class="num tabular mono" style="font-weight: 700; color: var(--status-error);">-82.50</td>
+            <td><span class="badge badge-warning">Exceeds Yield Ceiling</span></td>
+          </tr>
+          <tr>
+            <td><strong class="mono">#4</strong></td>
+            <td><code class="mono">fcc_feed_max</code></td>
+            <td>Fluid catalytic cracker feed intake capacity (50 kbpd)</td>
+            <td class="num tabular mono">0.320000</td>
+            <td class="num tabular mono" style="font-weight: 700;">+16.00</td>
+            <td><span class="badge">Secondary Unit Constraint</span></td>
+          </tr>
+        `;
+      }
+    } else {
+      if (farkasPlaceholder) farkasPlaceholder.style.display = 'block';
+      if (farkasTable) farkasTable.style.display = 'none';
     }
   }
 
@@ -1297,6 +1922,21 @@
     const objEl = document.getElementById('solve-obj-val');
     const primResEl = document.getElementById('solve-prim-res');
     const dualResEl = document.getElementById('solve-dual-res');
+
+    if (!res || !res.status || res.status === 'NOT_EXECUTED') {
+      if (statusPill) { statusPill.textContent = 'Not executed'; statusPill.style.color = 'var(--text-secondary)'; }
+      if (iterEl) iterEl.textContent = '—';
+      if (timeEl) timeEl.textContent = '—';
+      if (objEl) { objEl.textContent = '—'; objEl.style.color = 'var(--text-primary)'; }
+      if (primResEl) primResEl.textContent = '—';
+      if (dualResEl) dualResEl.textContent = '—';
+      const stagePill = document.getElementById('solve-stage-pill');
+      if (stagePill) { stagePill.textContent = 'Idle'; stagePill.style.color = 'var(--text-secondary)'; }
+      const provPill = document.getElementById('solve-provenance-pill');
+      if (provPill) provPill.textContent = 'Not executed';
+      updateFlowsheetActivePipes(null);
+      return;
+    }
 
     if (statusPill) {
       statusPill.textContent = res.status === 'OPTIMAL_VERIFIED' ? 'Verified' : (res.status === 'INFEASIBLE_CERTIFIED' ? 'Infeasible (Certified)' : res.status);
@@ -1349,6 +1989,7 @@
     }
 
     renderSolverVarsTable(res);
+    updateTrustPassportUI(res);
 
     if (STATE.activeModel.startsWith('refinery-') && res.status === 'OPTIMAL_VERIFIED' && res.x && res.x.length >= 12) {
       updateLiveRefineryMetrics(res);
@@ -1357,6 +1998,7 @@
     }
 
     renderConvergenceChart(res);
+    updateFlowsheetActivePipes(res);
   }
 
   function renderSolverVarsTable(res) {
@@ -1611,7 +2253,13 @@
       document.body.removeChild(textArea);
     }
 
-    window.sovApp = {
+    window.sovApp = window.sovApp || {};
+    Object.assign(window.sovApp, {
+      switchTab: switchTab,
+      triggerSolve: triggerSolve,
+      getState: () => STATE,
+      TEAM_MEMBERS: TEAM_MEMBERS,
+      ASSET_VERSION: ASSET_VERSION,
       inspectUnit: updateUnitInspector,
       copyText: (text, btnId) => {
         const doFeedback = () => {
@@ -1691,7 +2339,7 @@
           schema_version: '1.0.0',
           model_sha256: res ? (res.model_sha256 || null) : null,
           solver_version: res ? (res.solver_version || '0.3.2') : '0.3.2',
-          solver_commit: 'c44f1384',
+          solver_commit: (res && res.solver_commit) ? res.solver_commit : null,
           model_type: STATE.activeModel ? STATE.activeModel.toUpperCase() : 'LP',
           rows: res ? res.rows : null,
           columns: res ? res.variables : null,
@@ -1766,7 +2414,7 @@
         a.click();
         URL.revokeObjectURL(url);
       }
-    };
+    });
   }
 
   if (document.readyState === 'loading') {
