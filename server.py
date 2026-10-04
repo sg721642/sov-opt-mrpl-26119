@@ -1,10 +1,27 @@
 """Local demo server: bounded requests, subprocess isolation, hard solve timeout.
 For public use put this behind an authenticated reverse proxy with TLS/rate limits.
 """
-import argparse,json,os,subprocess,sys,tempfile,threading
+import argparse,json,os,subprocess,sys,tempfile,threading,time
 from http.server import ThreadingHTTPServer,BaseHTTPRequestHandler
 from pathlib import Path
+from urllib.request import urlopen
+from urllib.error import URLError
 ROOT=Path(__file__).resolve().parent
+
+# ---------------------------------------------------------------------------
+# Keep-alive: prevent Render free-tier spin-down (sleeps after ~15 min idle)
+# ---------------------------------------------------------------------------
+_KEEP_ALIVE_INTERVAL = int(os.environ.get('KEEP_ALIVE_SECONDS', 600))  # 10 min
+
+def _keep_alive(port: int):
+    """Background daemon thread: pings /health every 10 min to stay warm."""
+    url = f'http://127.0.0.1:{port}/health'
+    while True:
+        time.sleep(_KEEP_ALIVE_INTERVAL)
+        try:
+            urlopen(url, timeout=10).read()
+        except (URLError, OSError):
+            pass  # server might be restarting; retry next cycle
 SLOTS=threading.BoundedSemaphore(2)
 EXAMPLES={p.stem:p for p in (ROOT/'examples').glob('*.json')}
 class Handler(BaseHTTPRequestHandler):
@@ -122,5 +139,8 @@ if __name__=='__main__':
     p.add_argument('--host',default=default_host)
     p.add_argument('--port',type=int,default=default_port)
     a=p.parse_args()
-    print(f'SOV-OPT demo at http://{a.host}:{a.port}',flush=True)
+    # Start keep-alive pinger (daemon=True so it dies with the server)
+    t=threading.Thread(target=_keep_alive,args=(a.port,),daemon=True)
+    t.start()
+    print(f'SOV-OPT demo at http://{a.host}:{a.port}  (keep-alive every {_KEEP_ALIVE_INTERVAL}s)',flush=True)
     ThreadingHTTPServer((a.host,a.port),Handler).serve_forever()

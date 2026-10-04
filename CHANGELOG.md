@@ -1,5 +1,19 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.14] - 2026-10-04
+
+### Keep-alive for Render free-tier deployment
+
+- **feat(server): Add self-ping keep-alive thread to prevent Render spin-down:**
+  - Background daemon thread pings `/health` every 10 minutes (configurable via
+    `KEEP_ALIVE_SECONDS` environment variable) to keep the free-tier service warm.
+  - Uses only Python stdlib (`urllib`, `threading`) — no new dependencies.
+  - Thread is daemonized so it exits cleanly when the server stops.
+- **chore(ci): Add GitHub Actions cron workflow (`.github/workflows/keep-alive.yml`):**
+  - External backup pinger runs every 10 minutes via GitHub Actions free tier.
+  - Retries 3 times with 15-second gaps to handle cold-start latency.
+  - Free for public repos; uses ~6 min/day of Actions quota for private repos.
+
 ## [0.3.13] - 2026-10-04
 
 ### Gate 18: Competitive Evidence Pass — SOV-OPT vs HiGHS, MIPLIB, Scalability, Coverage Matrix
@@ -157,6 +171,7 @@
   - Guaranteed 100% preservation of all 81 public benchmark provenance SHA-256 digests across Netlib, MIPLIB, and QPLIB manifests without alteration.
   - Added unit test suite `tests/test_checksum_portability.py` with 8 comprehensive cross-platform regression tests.
   - Authored `docs/INTEGRITY.md` detailing the dual-mode checksum architecture, EOL normalization rationale, and provenance invariants.
+
 
 ## [0.3.4] - 2026-10-02
 
