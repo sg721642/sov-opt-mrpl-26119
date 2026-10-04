@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=6">
+  <link rel="stylesheet" href="/style.css?v=7">
 </head>
 <body>
 
@@ -928,7 +928,15 @@
           </p>
         </div>
 
+        <!-- Refinery Data Disclosure -->
+        <div style="background: #fff3e0; border: 1px solid #ffb300; border-radius: 4px; padding: 10px 16px; margin-bottom: 18px; font-size: 12.5px; color: #5d4037; line-height: 1.5;">
+          <strong>Demonstration model:</strong> Representative open-literature refinery planning data;
+          not actual MRPL operational data. All process unit capacities, stream yields, and pricing coefficients are representative engineering approximations (Gary &amp; Handwerk; Meyers).
+          Results are numerically verified for this prototype model; they are not cleared for production refinery dispatch.
+        </div>
+
         <div style="display: grid; grid-template-columns: 320px 1fr; gap: 20px;">
+
           <!-- Left Control Panel -->
           <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-sm); padding: 18px;">
             <div data-i18n="opt_controls_title" style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle);">
@@ -1376,7 +1384,7 @@
                 <tr>
                   <td><span class="status-pill"><span class="status-dot"></span> <strong>OPTIMAL_VERIFIED</strong></span></td>
                   <td>KKT stationarity verified to tol ≤ 10⁻⁷ on original model (floating-point numerical verification within stated tolerance; not a formal rational proof)</td>
-                  <td>Safe for production refinery dispatch</td>
+                  <td>Numerically verified for this prototype model (KKT within tolerance; not cleared for production refinery dispatch)</td>
                 </tr>
                 <tr>
                   <td><span class="status-pill"><span class="status-dot" style="background: var(--status-warning);"></span> <strong>INFEASIBLE_CERTIFIED</strong></span></td>
@@ -1580,7 +1588,62 @@
             </table>
           </div>
         </div>
+
+        <!-- GPU Semantics Disclosure -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-sm); padding: 14px 18px; margin-top: 20px; font-size: 12.5px; color: var(--text-secondary); line-height: 1.55;">
+          <strong style="color: var(--text-primary);">GPU performance clarification:</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0;">
+            <li><strong>1.81×</strong> = Gate 9 CUDA vs Gate 8 CUDA aggregate implementation improvement (189.69 s vs 342.64 s) — <em>not</em> CPU vs GPU.</li>
+            <li><strong>1.07×</strong> = Same-machine aggregate CPU/CUDA ratio across 18 Netlib instances (203.56 s CPU vs 189.69 s CUDA).</li>
+            <li><strong>1.13×</strong> = Repository-relative LARGE stratum CPU/CUDA ratio (172.04 s vs 152.60 s).</li>
+            <li>A <strong>≥ 2× same-machine GPU acceleration over CPU was not demonstrated.</strong> First-order methods on small-to-moderate Netlib instances are bottlenecked by kernel launch latency, not floating-point throughput.</li>
+            <li>The <strong>public Render deployment is CPU-only.</strong> GPU results shown here come from separate physical RTX 5050 validation on an Acer laptop (Linux x86_64, Driver 572.16, CUDA 12.8).</li>
+          </ul>
+        </div>
+
+        <!-- SOV-OPT vs HiGHS Comparison -->
+        <div class="table-section" style="margin-top: 28px;">
+          <div class="table-header">
+            <h3 class="table-title">SOV-OPT vs HiGHS — Differential Comparison</h3>
+            <div class="table-subtitle">External HiGHS called exclusively from a subprocess worker. It is never imported into sovopt/ or server.py.</div>
+          </div>
+          <div style="background: #fff8e1; border: 1px solid #f9a825; border-radius: 4px; padding: 10px 14px; font-size: 12px; margin-bottom: 12px; color: #5d4037;">
+            ⚠ <strong>Reporting policy:</strong> We report every evaluated benchmark, including failures and cases where the baseline is faster.
+          </div>
+          <div id="highs-comparison-lp-wrap" class="table-scroll-wrap">
+            <div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px;" id="highs-loading-msg">Loading differential benchmark results…</div>
+          </div>
+          <div id="highs-comparison-milp-wrap" class="table-scroll-wrap" style="margin-top: 16px;"></div>
+        </div>
+
+        <!-- MIPLIB Results -->
+        <div class="table-section" style="margin-top: 28px;">
+          <div class="table-header">
+            <h3 class="table-title">MIPLIB 2017 — Branch-and-Bound Results</h3>
+            <div class="table-subtitle">30-second bounded evaluation across 38 MIPLIB instances. LIMIT_REACHED is reported without an optimality claim.</div>
+          </div>
+          <div id="miplib-results-wrap" class="table-scroll-wrap">
+            <div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px;" id="miplib-loading-msg">Loading MIPLIB results…</div>
+          </div>
+        </div>
+
+        <!-- Sparse Scalability Stress Test -->
+        <div class="table-section" style="margin-top: 28px;">
+          <div class="table-header">
+            <h3 class="table-title">Synthetic Sparse Scalability Stress Test</h3>
+            <div class="table-subtitle">Deterministic synthetic instances — NOT public benchmark accuracy evidence</div>
+          </div>
+          <div style="background: #e3f2fd; border: 1px solid #90caf9; border-radius: 4px; padding: 10px 14px; font-size: 12px; margin-bottom: 12px; color: #1565c0;">
+            ℹ This stress test measures construction time, memory footprint, and sparse matvec/preprocessing throughput on deterministic random instances.
+            It demonstrates scalability mechanics, not accuracy on public benchmarks.
+          </div>
+          <div id="sparse-stress-wrap" class="table-scroll-wrap">
+            <div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px;" id="sparse-loading-msg">Loading sparse stress results…</div>
+          </div>
+        </div>
+
       </section>
+
 
       <!-- ===================================================================
            VIEW 7: EVIDENCE (Provenance Registry)
@@ -1656,7 +1719,135 @@
             </table>
           </div>
         </div>
+
+        <!-- Problem Statement Coverage Matrix -->
+        <div class="table-section" style="margin-top: 28px;">
+          <div class="table-header">
+            <h3 class="table-title">Problem Statement Coverage Matrix</h3>
+            <div class="table-subtitle">MRPL PS 26119 requirements vs SOV-OPT implementation status</div>
+          </div>
+          <div class="table-scroll-wrap">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Requirement</th>
+                  <th>SOV-OPT Status</th>
+                  <th>Evidence</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>LP solving (primal &amp; dual simplex)</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>17 Netlib LP instances, 340-test suite</td></tr>
+                <tr><td>MILP (Branch-and-Bound)</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>38 MIPLIB instances; LIMIT_REACHED reported honestly</td></tr>
+                <tr><td>Convex QP (IPM)</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>4 QPlib instances; KKT verified</td></tr>
+                <tr><td>Presolve &amp; scaling</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Ruiz equilibration; redundant-row detection; test_presolve.py</td></tr>
+                <tr><td>Sparse linear algebra</td><td><span style="color:#f57c00;font-weight:600">PARTIAL</span></td><td>Sparse LU; dense fallback for large instances; test_sparse.py</td></tr>
+                <tr><td>GPU acceleration (PDHG CUDA)</td><td><span style="color:#f57c00;font-weight:600">PARTIAL</span></td><td>RTX 5050 physical validation; CPU-only on Render; 1.07× aggregate</td></tr>
+                <tr><td>Multi-core CPU</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>ThreadingHTTPServer; OPENBLAS_NUM_THREADS isolated per solve</td></tr>
+                <tr><td>Branch-and-Bound with warm starts</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Dual warm-start at each B&amp;B node; pseudocost branching</td></tr>
+                <tr><td>Heuristics</td><td><span style="color:#9e9e9e;font-weight:600">ROADMAP</span></td><td>Planned: feasibility pump, rounding; not in current release</td></tr>
+                <tr><td>Cutting planes</td><td><span style="color:#9e9e9e;font-weight:600">ROADMAP</span></td><td>Planned: Gomory cuts; not in current release</td></tr>
+                <tr><td>Large-scale sparse capability</td><td><span style="color:#f57c00;font-weight:600">PARTIAL</span></td><td>Sparse stress test (preprocessing/matvec); dense LP cap applies to full solve</td></tr>
+                <tr><td>Industrial refinery model</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>4-period MRPL digital twin; representative open-literature data (Gary &amp; Handwerk)</td></tr>
+                <tr><td>Netlib public benchmarks</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>17 instances; SHA-256 frozen; SOV-OPT vs HiGHS comparison</td></tr>
+                <tr><td>MIPLIB public benchmarks</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>38 instances; SHA-256 frozen; status reported honestly</td></tr>
+                <tr><td>QPlib public benchmarks</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>4 instances; SHA-256 frozen</td></tr>
+                <tr><td>Mittelmann benchmark</td><td><span style="color:#616161;font-weight:600">NOT YET DEMONSTRATED</span></td><td>Instance acquisition not completed; recorded as gap in documentation</td></tr>
+                <tr><td>External solver comparison</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>SOV-OPT vs HiGHS 1.15.1 via subprocess isolation; all results reported</td></tr>
+                <tr><td>Numerical robustness / verification</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>KKT residuals; exact rational Farkas; 10 numerical stress test categories</td></tr>
+                <tr><td>Infeasibility certificates</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Exact Farkas rays (exact rational arithmetic); verified in test_audit_gate11.py</td></tr>
+                <tr><td>Trust Passport / provenance</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>SHA-256 model fingerprint; algorithm, version, timestamp, KKT residuals</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 8px; line-height: 1.5;">
+            Status labels: <strong>IMPLEMENTED</strong> = active, tested; <strong>PARTIAL</strong> = working but with known limitations; <strong>EXPERIMENTAL</strong> = proof-of-concept only; <strong>ROADMAP</strong> = planned, not present; <strong>NOT YET DEMONSTRATED</strong> = not completed.
+          </div>
+        </div>
+
+        <!-- Numerical Stress Cases -->
+        <div class="table-section" style="margin-top: 28px;">
+          <div class="table-header">
+            <h3 class="table-title">Numerical Stress Cases</h3>
+            <div class="table-subtitle">Internal mathematical unit fixtures — not public benchmark data. Results from test_numerical_stress.py (340-test suite).</div>
+          </div>
+          <div class="table-scroll-wrap">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Problem Type</th>
+                  <th>Expected Challenge</th>
+                  <th>SOV-OPT Behavior</th>
+                  <th>Verification Outcome</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Row scales 8 orders of magnitude (1e-4 to 1e4)</td>
+                  <td>Basis ill-conditioning; pivot failure</td>
+                  <td>Applies Ruiz equilibration scaling; solves with dual simplex</td>
+                  <td>OPTIMAL_VERIFIED — KKT passed</td>
+                </tr>
+                <tr>
+                  <td>Column scales 8 orders of magnitude (1e-4 to 1e4)</td>
+                  <td>Large dynamic range in constraint matrix</td>
+                  <td>Column scaling reduces condition number before factorization</td>
+                  <td>OPTIMAL_VERIFIED — KKT passed</td>
+                </tr>
+                <tr>
+                  <td>Near-dependent rows (1e-6 perturbation)</td>
+                  <td>Near-singular basis; cycling risk</td>
+                  <td>Accepts OPTIMAL_VERIFIED or NUMERICAL_FAILURE (honest)</td>
+                  <td>OPTIMAL_VERIFIED or NUMERICAL_FAILURE — never false optimum</td>
+                </tr>
+                <tr>
+                  <td>Duplicate rows</td>
+                  <td>Redundant constraints; singular presolve</td>
+                  <td>Presolve detects and removes duplicate; solves reduced problem</td>
+                  <td>OPTIMAL_VERIFIED — KKT passed</td>
+                </tr>
+                <tr>
+                  <td>Extreme finite bounds (10<sup>14</sup>)</td>
+                  <td>Numerical overflow in bound-shift</td>
+                  <td>Handles without overflow; scaling applied</td>
+                  <td>OPTIMAL_VERIFIED — KKT passed</td>
+                </tr>
+                <tr>
+                  <td>Tiny coefficients (10<sup>-10</sup>)</td>
+                  <td>Effective zeros causing division errors</td>
+                  <td>Scaling amplifies small coefficients before factorization</td>
+                  <td>OPTIMAL_VERIFIED — KKT passed</td>
+                </tr>
+                <tr>
+                  <td>Multi-decade objective (10<sup>-4</sup> to 10<sup>4</sup>)</td>
+                  <td>Steepest-descent direction distortion</td>
+                  <td>Objective scaling normalizes reduced costs</td>
+                  <td>OPTIMAL_VERIFIED — KKT passed</td>
+                </tr>
+                <tr>
+                  <td>Degenerate vertex (3 active constraints at optimum)</td>
+                  <td>Cycling; stalling; incorrect pivot selection</td>
+                  <td>Bland-rule anti-cycling; terminates at correct vertex</td>
+                  <td>OPTIMAL_VERIFIED — x* = (1,1) exact</td>
+                </tr>
+                <tr>
+                  <td>Infeasibility (WOODINFE Netlib instance)</td>
+                  <td>Primal infeasibility; incorrect status</td>
+                  <td>Emits exact rational Farkas ray (y<sup>T</sup>A = 0, y<sup>T</sup>b &gt; 0)</td>
+                  <td>INFEASIBLE_CERTIFIED — Farkas certificate verified</td>
+                </tr>
+                <tr>
+                  <td>Unboundedness detection</td>
+                  <td>False optimal when objective is unbounded</td>
+                  <td>Emits UNBOUNDED_CERTIFIED with unbounded ray</td>
+                  <td>UNBOUNDED_CERTIFIED — ray satisfies certification conditions</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </section>
+
 
       <!-- ===================================================================
            VIEW 8: REPORTS & EXPORT
@@ -2099,6 +2290,6 @@
     </div>
   </footer>
 
-  <script src="/app.js?v=6"></script>
+  <script src="/app.js?v=7"></script>
 </body>
 </html>

@@ -1,6 +1,37 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.13] - 2026-10-04
+
+### Gate 18: Competitive Evidence Pass — SOV-OPT vs HiGHS, MIPLIB, Scalability, Coverage Matrix
+
+- **feat(reports): Add differential benchmark — SOV-OPT vs HiGHS 1.15.1:**
+  - New script `scripts/run_differential_benchmark.py` runs HiGHS exclusively via `scripts/baseline_worker.py` subprocess. HiGHS is never imported into `sovopt/` or `server.py`.
+  - 17 Netlib LP instances evaluated: 14/17 OPTIMAL for SOV-OPT (objective matches), 2 NUMERICAL_FAILURE (BRANDY, SHARE2B), 1 INFEASIBLE (WOODINFE, both solvers agree).
+  - 38 MIPLIB 2017 instances evaluated: 0/38 OPTIMAL for SOV-OPT within 30 s (Branch-and-Bound iteration limits), 37 LIMIT_REACHED. All reported honestly.
+  - Reporting policy: every case including failures and HiGHS wins is shown.
+  - Results saved to `reports/differential_benchmark/results.json`.
+- **feat(reports): Add synthetic sparse scalability stress test:**
+  - New script `scripts/run_sparse_stress.py` measures construction, matvec throughput, preprocessing at increasing scale.
+  - WARMUP(500v×300c), SMALL(2000v×1000c), MEDIUM(5000v×2500c) → FULL SOLVE OPTIMAL_VERIFIED.
+  - LARGE(10000v×5000c), XLARGE(25000v×10000c) → PARTIAL ITERATION STRESS (preprocessing completed).
+  - XXLARGE(50000v×15000c) → MEMORY_STRESS (5722 MB estimated, skipped safely).
+  - NOT public benchmark accuracy evidence; clearly labeled as scalability measurement.
+  - Results saved to `reports/sparse_stress/results.json`.
+- **feat(server): Add `/api/differential_benchmark` and `/api/sparse_stress` endpoints.**
+- **feat(web): Add competitive evidence sections to Benchmarks tab:**
+  - SOV-OPT vs HiGHS comparison tables (LP + MILP) loaded dynamically from `/api/differential_benchmark`.
+  - GPU positioning disclosure: 1.81×/1.07×/1.13× semantics, ≥2× NOT demonstrated disclaimer, Render CPU-only note.
+  - Sparse scalability stress test table with FULL SOLVE / PARTIAL ITERATION STRESS / MEMORY STRESS labels.
+- **feat(web): Add PS Coverage Matrix and Numerical Stress Cases to Evidence & Audits tab:**
+  - 20-row coverage matrix (IMPLEMENTED/PARTIAL/ROADMAP/NOT YET DEMONSTRATED) for all MRPL PS 26119 requirements.
+  - 10 numerical stress cases with problem type, challenge, behavior, and verification outcome.
+  - Mittelmann: NOT YET DEMONSTRATED (recorded honestly).
+- **fix(web): Replace "Safe for production refinery dispatch" with "Numerically verified for this prototype model".**
+- **fix(web): Add prominent refinery demonstration disclosure banner in Optimization Console.**
+- **chore(web): Bump cache-busters to `?v=7`.**
+
 ## [0.3.12] - 2026-10-03
+
 
 ### Gate 16: Correct Language Toggle and Accessibility Links
 
