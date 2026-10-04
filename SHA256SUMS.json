@@ -28,7 +28,7 @@
     "mode": "text-lf"
   },
   "README.md": {
-    "sha256": "56057ee8b8e64d62db3d4d30f8aefc4c240306776fb8c746ef82fca7cd1351ee",
+    "sha256": "57aa4be262e70b45374a2f095bd46cf8fec68a18cc66cbbf507d74636e068c4b",
     "mode": "text-lf"
   },
   "START_HERE.html": {
@@ -476,7 +476,7 @@
     "mode": "text-lf"
   },
   "docs/REPRODUCE.md": {
-    "sha256": "a19d8b2b4d80c151da28309fb398dfcfd3ece213eb3b64b8d96d0db9fb1b21f2",
+    "sha256": "ca5feeb5385e17322ef9c37c4bbf39cfb4c836b28fd91de488cd27404dbfc4fb",
     "mode": "text-lf"
   },
   "docs/SPARSE_ALGEBRA_AUDIT.md": {
@@ -1212,7 +1212,7 @@
     "mode": "text-lf"
   },
   "web/app.js": {
-    "sha256": "59dbff7a952d5109b022f6588bd6d9b77e30eb1795bec1b3091513bc4a0b3dd3",
+    "sha256": "5e0c93ba483903174bde3cc01d060592e1ca761e27053dfd1b7375b3bb2fb1c9",
     "mode": "text-lf"
   },
   "web/assets/MRPL_logo.jpg": {
@@ -1244,7 +1244,7 @@
     "mode": "raw"
   },
   "web/index.html": {
-    "sha256": "a62f501d233074338867e43faf4fa62cd1ba5ae2d9854cb8c40e0a45520e0018",
+    "sha256": "479d5c39fabf45c5fc0221ec88f2ab837297bb882d22762e3ae30836a1c85dde",
     "mode": "text-lf"
   },
   "web/style.css": {

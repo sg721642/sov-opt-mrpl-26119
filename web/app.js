@@ -811,6 +811,7 @@
   "Ruiz / Geometric Scaling": "रूइज़ / ज्यामितीय स्केलिंग",
   "Run solve to compute": "गणना के लिए सॉल्व चलाएँ",
   "Run test suite (298 tests):": "परीक्षण सूट चलाएँ (298 परीक्षण):",
+  "Run test suite (344 tests):": "परीक्षण सूट चलाएँ (344 परीक्षण):",
   "SC-01: Base equilibrium": "SC-01: आधार संतुलन",
   "SC-02: High-Basrah heavy": "SC-02: उच्च-बसरा हेवी",
   "SC-03": "SC-03",

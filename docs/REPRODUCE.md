@@ -69,13 +69,13 @@ python scripts/reproduce_evidence.py --mode highs-sample
 
 ## 4. Full Regression Test Suite
 
-Run the full automated test suite (342 tests):
+Run the full automated test suite (344 tests):
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-Expected result: `Ran 342 tests in ~60s ... OK (skipped=14)`.
+Expected result: `Ran 344 tests in ~60s ... OK (skipped=14)`.
 
 ---
 

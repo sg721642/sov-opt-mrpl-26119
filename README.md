@@ -218,9 +218,9 @@ The test suite covers linear algebra invariants, simplex correctness, QP KKT sta
 ```
 
 **Current Test Results (Local clean environment):**
-- **Ran 340 tests in 67.4s**
-- **340 passed, 0 failures, 0 errors, 11 skipped** (skipped tests correspond to optional loopback network sockets and GPU-only hardware requirements).
-- `verify_checksums.py`: **SUCCESS** (All 303 tracked files match expected SHA-256 digests).
+- **Ran 344 tests in 62.5s**
+- **330 passed, 14 skipped, 0 failures, 0 errors** (skipped tests correspond to optional loopback network sockets and GPU-only hardware requirements).
+- `verify_checksums.py`: **SUCCESS** (All 313 tracked files match expected SHA-256 digests).
 
 ---
 
@@ -298,7 +298,7 @@ SOV-OPT enforces strict, unambiguous solver status semantics:
 sov-opt-mrpl-26119/
 ├── sovopt/              # Sovereign optimization core (simplex, dual simplex, milp, qp, pdhg, verify)
 ├── web/                 # Web portal frontend (index.html, app.js, style.css, static assets)
-├── tests/               # Comprehensive automated test suite (340 unit and integration tests)
+├── tests/               # Comprehensive automated test suite (344 unit and integration tests)
 ├── scripts/             # Offline verification, benchmarking, checksum, and reporting tooling
 ├── data/                # Frozen public benchmark datasets, catalogue, and integrity manifests
 ├── reports/             # Verified benchmark reports, physical GPU telemetry, and audit summaries
