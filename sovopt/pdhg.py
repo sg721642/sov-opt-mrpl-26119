@@ -181,8 +181,10 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
     setup_seconds = time.perf_counter() - setup_start
     compute_start = time.perf_counter()
 
+    AT_cpu = AT if isinstance(AT, CSRMatrix) else CSRMatrix(G.T)
+
     def checked_cpu(xc, yc):
-        grad = model.c + G.T @ yc
+        grad = model.c + AT_cpu.dot(yc)
         z = list(yc)
         for j_idx in range(n):
             if np.isfinite(model.upper[j_idx]):
