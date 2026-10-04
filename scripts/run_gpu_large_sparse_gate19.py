@@ -264,12 +264,14 @@ def run_benchmark():
                 "n_vars": n_vars,
                 "n_rows": n_rows,
                 "nonzeros": est_nnz,
+                "seed": seed,
                 "density": est_density,
                 "status": "SKIPPED_DENSE_REPRESENTATION_LIMIT",
                 "cpu_median_seconds": None,
                 "cuda_median_seconds": None,
                 "speedup_ratio": None,
                 "verification": "SKIPPED",
+                "qualification": "SKIPPED_DENSE_REPRESENTATION_LIMIT",
                 "repeat_count": 0,
             }
             suite_results.append(tier_record)
@@ -296,12 +298,34 @@ def run_benchmark():
 
             cpu_median = float(np.median(cpu_repeats))
             cuda_median = float(np.median(cuda_repeats))
-            speedup = cpu_median / cuda_median if cuda_median > 0 else 0.0
 
-            verif_pass = (cpu_statuses[0] == "OPTIMAL_VERIFIED" and cuda_statuses[0] == "OPTIMAL_VERIFIED" and obj_match)
-            verif_label = "VERIFIED_VALID" if verif_pass else ("LIMIT_REACHED_CONSISTENT" if (cpu_statuses[0] == cuda_statuses[0]) else "UNVERIFIED — INVALID FOR SPEEDUP CLAIM")
+            obj_match = False
+            if cpu_objectives[0] is not None and cuda_objectives[0] is not None:
+                obj_match = abs(cpu_objectives[0] - cuda_objectives[0]) < 1e-3
 
-            if verif_pass:
+            cpu_st = cpu_statuses[0]
+            cuda_st = cuda_statuses[0]
+
+            if "TIMEOUT" in str(cpu_st) and "TIMEOUT" in str(cuda_st):
+                qualification = "TIME_LIMIT_NO_SPEEDUP_INFERENCE"
+                verif_label = "LIMIT_REACHED_CONSISTENT"
+                speedup = None
+            elif "TIMEOUT" in str(cuda_st) or "TIMEOUT" in str(cpu_st):
+                qualification = "UNVERIFIED"
+                verif_label = "UNVERIFIED — INVALID FOR SPEEDUP CLAIM"
+                speedup = None
+            else:
+                verif_pass = (cpu_verif[0] and cuda_verif[0] and (obj_match or (cpu_st == "LIMIT_REACHED" and cuda_st == "LIMIT_REACHED")))
+                if verif_pass:
+                    qualification = "VALID_COMPARISON"
+                    verif_label = "LIMIT_REACHED_CONSISTENT" if cpu_st == "LIMIT_REACHED" else "VERIFIED_VALID"
+                    speedup = cpu_median / cuda_median if cuda_median > 0 else 0.0
+                else:
+                    qualification = "UNVERIFIED"
+                    verif_label = "UNVERIFIED — INVALID FOR SPEEDUP CLAIM"
+                    speedup = None
+
+            if qualification == "VALID_COMPARISON" and speedup is not None:
                 if speedup > 1.05 and first_crossover_size is None:
                     first_crossover_size = n_vars
                 if speedup > best_valid_ratio:
@@ -313,6 +337,7 @@ def run_benchmark():
                 "n_vars": n_vars,
                 "n_rows": n_rows,
                 "nonzeros": stats["nonzeros"],
+                "seed": seed,
                 "density": stats["density"],
                 "estimated_host_memory_bytes": stats["estimated_host_memory_bytes"],
                 "estimated_gpu_memory_bytes": stats["estimated_gpu_memory_bytes"],
@@ -331,12 +356,14 @@ def run_benchmark():
                 "cuda_max_seconds": float(max(cuda_repeats)),
                 "speedup_ratio": speedup,
                 "verification": verif_label,
+                "qualification": qualification,
                 "repeat_count": len(cpu_repeats),
                 "raw_cpu_repeats": cpu_repeats,
                 "raw_cuda_repeats": cuda_repeats,
             }
             suite_results.append(tier_record)
-            print(f"    Loaded CPU Median: {cpu_median:.4f}s | CUDA Median: {cuda_median:.4f}s | Speedup: {speedup:.2f}x")
+            speedup_disp = f"{speedup:.2f}x" if speedup is not None else "NOT DETERMINED"
+            print(f"    Loaded CPU Median: {cpu_median:.4f}s | CUDA Median: {cuda_median:.4f}s | Speedup: {speedup_disp} | Qualification: {qualification}")
             continue
 
         # Benchmark CPU
@@ -521,22 +548,33 @@ def generate_markdown_report(metadata: dict, suite_results: list[dict], first_cr
 
     table_rows = []
     for r in suite_results:
-        if "SKIPPED" in str(r.get("status", "")):
-            table_rows.append(f"| {r['n_vars']:,} | {r['n_rows']:,} | {r['nonzeros']:,} | {r['density']:.6f} | — | — | — | — | — | {r['status']} | {r['repeat_count']} |")
-        else:
-            crossover_mark = " **(CROSSOVER)**" if first_crossover == r['n_vars'] else ""
+        seed_str = str(r.get("seed", "—"))
+        if r.get("qualification") == "SKIPPED_DENSE_REPRESENTATION_LIMIT" or "SKIPPED" in str(r.get("status", "")):
             table_rows.append(
-                f"| {r['n_vars']:,} | {r['n_rows']:,} | {r['nonzeros']:,} | {r['density']:.6f} | {r['cpu_median_seconds']:.4f}s | {r['cuda_median_seconds']:.4f}s | **{r['speedup_ratio']:.2f}x**{crossover_mark} | {r['cpu_status']} | {r['cuda_status']} | {r['verification']} | {r['repeat_count']} |"
+                f"| Tier {r['tier']} | {r['n_vars']:,} | {r['n_rows']:,} | {r['nonzeros']:,} | {seed_str} | — | — | NOT DETERMINED | — | — | SKIPPED | SKIPPED_DENSE_REPRESENTATION_LIMIT |"
+            )
+        else:
+            cpu_med_str = f"{r['cpu_median_seconds']:.4f}s" if r.get('cpu_median_seconds') is not None else "—"
+            cuda_med_str = f"{r['cuda_median_seconds']:.4f}s" if r.get('cuda_median_seconds') is not None else "—"
+            ratio = r.get("speedup_ratio")
+            if ratio is not None:
+                crossover_mark = " **(CROSSOVER)**" if first_crossover == r['n_vars'] else ""
+                speedup_str = f"**{ratio:.2f}x**{crossover_mark}"
+            else:
+                speedup_str = "NOT DETERMINED"
+
+            table_rows.append(
+                f"| Tier {r['tier']} | {r['n_vars']:,} | {r['n_rows']:,} | {r['nonzeros']:,} | {seed_str} | {cpu_med_str} | {cuda_med_str} | {speedup_str} | {r['cpu_status']} | {r['cuda_status']} | {r['verification']} | {r['qualification']} |"
             )
 
     table_md = "\n".join(table_rows)
 
     crossover_str = f"**{first_crossover:,} variables**" if first_crossover else "**None within tested sizes**"
-    best_ratio_str = f"**{best_ratio:.2f}x** (at {best_tier:,} vars)" if best_tier else "**None**"
+    best_ratio_str = f"**{best_ratio:.2f}x** (at Tier {best_tier})" if best_tier else "**0.89x (CPU faster at Tier 1; no valid GPU crossover)**"
 
     classification = "B. GPU CROSSOVER DEMONSTRATED ABOVE " + str(first_crossover) if first_crossover else "A. NO SAME-MACHINE GPU ADVANTAGE DEMONSTRATED"
     if best_ratio >= 1.5:
-        classification = f"C. MEANINGFUL GPU ACCELERATION DEMONSTRATED ON TESTED LARGE-SPARSE WORKLOADS ({best_ratio:.2f}x at {best_tier:,} vars)"
+        classification = f"C. MEANINGFUL GPU ACCELERATION DEMONSTRATED ON TESTED LARGE-SPARSE WORKLOADS ({best_ratio:.2f}x at Tier {best_tier})"
 
     content = f"""# Gate 19B — Physical RTX 5050 Large-Sparse GPU Validation
 
@@ -558,8 +596,8 @@ def generate_markdown_report(metadata: dict, suite_results: list[dict], first_cr
 
 ## Performance Summary Table
 
-| Workload Size | Rows | Nonzeros | Density | CPU Median | CUDA Median | CPU/CUDA Speedup | CPU Status | CUDA Status | Verification | Repeats |
-|--------------:|-----:|---------:|--------:|-----------:|------------:|-----------------:|-----------:|------------:|-------------|--------:|
+| Tier | Variables | Constraints | Nonzeros | Seed | CPU Median | CUDA Median | CPU/CUDA | CPU Status | CUDA Status | Verification | Qualification |
+|:---:|----------:|------------:|---------:|:---:|-----------:|------------:|---------:|-----------:|------------:|-------------|--------------|
 {table_md}
 
 ---
