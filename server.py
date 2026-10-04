@@ -48,6 +48,14 @@ class Handler(BaseHTTPRequestHandler):
             p=ROOT/'reports/gpu_gate9_final_51b71bb/summary.json'
             if p.exists():return self.send(200,json.loads(p.read_text()))
             return self.send(404,{'error':'GPU summary not found'})
+        if self.path=='/api/differential_benchmark':
+            p=ROOT/'reports/differential_benchmark/results.json'
+            if p.exists():return self.send(200,json.loads(p.read_text()))
+            return self.send(404,{'error':'Differential benchmark results not yet generated. Run: .venv/bin/python scripts/run_differential_benchmark.py'})
+        if self.path=='/api/sparse_stress':
+            p=ROOT/'reports/sparse_stress/results.json'
+            if p.exists():return self.send(200,json.loads(p.read_text()))
+            return self.send(404,{'error':'Sparse stress results not yet generated. Run: .venv/bin/python scripts/run_sparse_stress.py'})
         import urllib.parse
         clean_path = urllib.parse.urlsplit(self.path).path
         if clean_path.startswith('/static/') or clean_path.startswith('/assets/'):

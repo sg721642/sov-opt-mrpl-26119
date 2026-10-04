@@ -16,7 +16,7 @@
     "mode": "text-lf"
   },
   "CHANGELOG.md": {
-    "sha256": "14522161b879263be57ce564f809c5db95d8e249a809c600ed38a22db5f55d69",
+    "sha256": "17c78a24ec0e306045f371861169faa99a8f1403e9abd8965d245e98deda2887",
     "mode": "text-lf"
   },
   "Dockerfile": {
@@ -531,6 +531,10 @@
     "sha256": "a8e6fec0db9be56da7cd22a5d4d39dc3e33c458943322757c5bb70a565aad67d",
     "mode": "text-lf"
   },
+  "reports/differential_benchmark/results.json": {
+    "sha256": "7abda3059e796c29ce737380c107fea235e7e3dce6304b08608315fc0160b314",
+    "mode": "text-lf"
+  },
   "reports/external_validation.json": {
     "sha256": "9b0955cb157d614cfc38d4f1bb89768bf53b49a07c4b5de02b4f002c44f4275b",
     "mode": "text-lf"
@@ -923,6 +927,10 @@
     "sha256": "b12b2727c03fe26bde5320376a830bd9847b4e7c4730bae19dec64147607f84f",
     "mode": "text-lf"
   },
+  "reports/sparse_stress/results.json": {
+    "sha256": "372c9824541261ac97787ae507eeef83eac2ec23063cdeffa9ff4f9db8de02ed",
+    "mode": "text-lf"
+  },
   "reports/tests.txt": {
     "sha256": "6d37410681196e64a4b6970907ba78a89054eebb47a725ff9b967997e54ff567",
     "mode": "text-lf"
@@ -991,6 +999,10 @@
     "sha256": "9332262960f1daf8daa05e919a85fcb4855e356eddcafa1be735315de1d7fea0",
     "mode": "text-lf"
   },
+  "scripts/run_differential_benchmark.py": {
+    "sha256": "d0e11c43f546c6c91795f63b9cb4674a40e678b89b551fc3b3dde35798f05682",
+    "mode": "text-lf"
+  },
   "scripts/run_gpu_ablation.py": {
     "sha256": "bb2c8dcdeef675205ac299bfa1f1996ceb9a7c17ee0ab3d010dc456652062bf4",
     "mode": "text-lf"
@@ -1003,6 +1015,10 @@
     "sha256": "d2fd6c8a5b9c2067d25182f54d2d7cde235bdfe5abd97e7fde42e08a142940a2",
     "mode": "text-lf"
   },
+  "scripts/run_sparse_stress.py": {
+    "sha256": "788fb0cb3a546c8d91f42131fb396d4b50810197e9d2c63863b438921283e800",
+    "mode": "text-lf"
+  },
   "scripts/validate_audit.py": {
     "sha256": "b491f93c91db9196dec262b9fb62e127648d5f47f7d0b40d0c877830a23c440c",
     "mode": "text-lf"
@@ -1012,7 +1028,7 @@
     "mode": "text-lf"
   },
   "server.py": {
-    "sha256": "46bddf83ed608c99e3ff9d13eccb5dfa0fe56634f0957bb2be209e7d8b835347",
+    "sha256": "b26a9c151c0f0e0eb4ead38ae8d169283add5d6c137680938219c431d1ac2a4d",
     "mode": "text-lf"
   },
   "sovopt/__init__.py": {
@@ -1160,7 +1176,7 @@
     "mode": "text-lf"
   },
   "tests/test_server.py": {
-    "sha256": "3a8cd02a01bb2006720e5bb561ed68d99387daa053b25ddf482cd4c0d4e7f8e8",
+    "sha256": "56f88add3e1777afc6c33742cee91aeecc9611d80c264a21139233c57218107b",
     "mode": "text-lf"
   },
   "tests/test_solver.py": {
@@ -1172,7 +1188,7 @@
     "mode": "text-lf"
   },
   "web/app.js": {
-    "sha256": "e7552a18baa6eb71f5b1a4be37b31443e0b2be5e40d3468a4407cf9c915082d4",
+    "sha256": "63f91571c5cbf3fdda0f3a26074d39571b1dcd32ea3fac0d62cc12dbc163b08a",
     "mode": "text-lf"
   },
   "web/assets/MRPL_logo.jpg": {
@@ -1204,7 +1220,7 @@
     "mode": "raw"
   },
   "web/index.html": {
-    "sha256": "5d5d796721080bea72bef2dda0e8cac842c9cc067d31b13f7b6d500a431e8da1",
+    "sha256": "e03d28871f46d4d1ddd0208c03c53c114d73a564b919deda355217af1cb81563",
     "mode": "text-lf"
   },
   "web/style.css": {

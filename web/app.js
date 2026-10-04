@@ -1701,6 +1701,7 @@
     setupAnalyticsTable();
     setupComparisonMatrix();
     setupEvidenceCopy();
+    loadCompetitiveEvidence();
     setupScrollReveals();
     renderRefineryPFD();
     renderConvergenceChart(null);
@@ -3541,7 +3542,207 @@
     });
   }
 
+  // =========================================================================
+  // Competitive Evidence — Load and Render Differential Benchmark Results
+  // =========================================================================
+  function statusCell(status) {
+    const colors = {
+      'OPTIMAL': '#2e7d32', 'OPTIMAL_VERIFIED': '#2e7d32',
+      'INFEASIBLE': '#6a1a9a', 'INFEASIBLE_CERTIFIED': '#6a1a9a',
+      'LIMIT_REACHED': '#e65100', 'NUMERICAL_FAILURE': '#c62828',
+      'UNBOUNDED': '#4a148c', 'N/A': '#757575',
+    };
+    const col = colors[status] || '#546e7a';
+    return `<span style="color:${col};font-weight:600;font-size:11.5px;">${status}</span>`;
+  }
+
+  function fmtTime(s) {
+    if (s == null) return '—';
+    return s < 1 ? `${(s * 1000).toFixed(0)} ms` : `${s.toFixed(3)} s`;
+  }
+
+  function fmtObj(v) {
+    if (v == null) return '—';
+    const n = Number(v);
+    if (!isFinite(n)) return String(v);
+    return n.toExponential(4);
+  }
+
+  function fmtDiff(d) {
+    if (d == null) return '—';
+    const pct = (d * 100).toFixed(4);
+    const col = d < 1e-6 ? '#2e7d32' : d < 1e-3 ? '#f57c00' : '#c62828';
+    return `<span style="color:${col}">${pct}%</span>`;
+  }
+
+  function renderLPComparisonTable(data) {
+    const rows = data.map(r => `
+      <tr>
+        <td><strong>${r.instance}</strong></td>
+        <td>${r.variables}</td>
+        <td>${r.constraints}</td>
+        <td>${statusCell(r.sovopt_status)}</td>
+        <td class="mono" style="font-size:11.5px">${fmtTime(r.sovopt_time_s)}</td>
+        <td>${statusCell(r.highs_status)}</td>
+        <td class="mono" style="font-size:11.5px">${fmtTime(r.highs_time_s)}</td>
+        <td class="mono" style="font-size:11.5px">${fmtObj(r.sovopt_objective)}</td>
+        <td class="mono" style="font-size:11.5px">${fmtObj(r.highs_objective)}</td>
+        <td>${fmtDiff(r.relative_obj_diff)}</td>
+        <td>${r.verification === 'MATCH' ? '<span style="color:#2e7d32;font-weight:600">✓ MATCH</span>' : r.verification === 'MISMATCH' ? '<span style="color:#c62828;font-weight:600">✗ MISMATCH</span>' : '<span style="color:#757575">N/A</span>'}</td>
+      </tr>`).join('');
+    return `
+      <div style="font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text-primary)">Netlib LP — 17 Instances (SOV-OPT vs HiGHS 1.15.1)</div>
+      <table class="editorial-table">
+        <thead><tr>
+          <th>Instance</th><th>Vars</th><th>Cons</th>
+          <th>SOV Status</th><th>SOV Time</th>
+          <th>HiGHS Status</th><th>HiGHS Time</th>
+          <th>SOV Obj</th><th>HiGHS Obj</th>
+          <th>Rel Diff</th><th>Verification</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  function renderMILPComparisonTable(data) {
+    const rows = data.map(r => `
+      <tr>
+        <td><strong style="font-size:11px">${r.instance}</strong></td>
+        <td>${r.variables}</td>
+        <td>${r.constraints}</td>
+        <td>${r.integer_variables}</td>
+        <td>${statusCell(r.sovopt_status)}</td>
+        <td class="mono" style="font-size:11px">${fmtTime(r.sovopt_time_s)}</td>
+        <td>${statusCell(r.highs_status)}</td>
+        <td class="mono" style="font-size:11px">${fmtTime(r.highs_time_s)}</td>
+        <td class="mono" style="font-size:11px">${fmtObj(r.sovopt_objective)}</td>
+        <td class="mono" style="font-size:11px">${fmtObj(r.highs_objective)}</td>
+        <td class="mono" style="font-size:11px">${r.sovopt_gap != null ? (r.sovopt_gap * 100).toFixed(2) + '%' : '—'}</td>
+      </tr>`).join('');
+    return `
+      <div style="font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text-primary)">MIPLIB — 38 Instances (SOV-OPT B&B vs HiGHS 1.15.1)</div>
+      <table class="editorial-table">
+        <thead><tr>
+          <th>Instance</th><th>Vars</th><th>Cons</th><th>Int</th>
+          <th>SOV Status</th><th>SOV Time</th>
+          <th>HiGHS Status</th><th>HiGHS Time</th>
+          <th>SOV Incumbent</th><th>HiGHS Obj</th><th>Gap</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  function renderMIPLIBTable(data) {
+    const rows = data.map(r => `
+      <tr>
+        <td><strong style="font-size:11px">${r.instance}</strong></td>
+        <td>${r.constraints}</td>
+        <td>${r.variables}</td>
+        <td>${r.integer_variables}</td>
+        <td>${statusCell(r.sovopt_status)}</td>
+        <td class="mono" style="font-size:11px">${fmtTime(r.sovopt_time_s)}</td>
+        <td class="mono" style="font-size:11px">${r.sovopt_objective != null ? fmtObj(r.sovopt_objective) : 'N/A'}</td>
+        <td class="mono" style="font-size:11px">${r.sovopt_bound != null ? fmtObj(r.sovopt_bound) : 'N/A'}</td>
+        <td class="mono" style="font-size:11px">${r.sovopt_gap != null ? (r.sovopt_gap * 100).toFixed(2) + '%' : 'N/A'}</td>
+        <td class="mono" style="font-size:11px">${r.sovopt_nodes != null ? r.sovopt_nodes : 'N/A'}</td>
+        <td>${r.verification || 'N/A'}</td>
+      </tr>`).join('');
+    return `
+      <table class="editorial-table">
+        <thead><tr>
+          <th>Instance</th><th>Rows</th><th>Columns</th><th>Int Vars</th>
+          <th>Status</th><th>Runtime</th><th>Incumbent</th><th>Best Bound</th>
+          <th>Gap</th><th>Nodes</th><th>Verification</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  function renderSparseStressTable(data) {
+    const phaseBadge = p => {
+      const cols = {
+        'FULL SOLVE': '#2e7d32',
+        'PARTIAL ITERATION STRESS': '#f57c00',
+        'PREPROCESSING STRESS': '#1565c0',
+        'MEMORY STRESS': '#757575',
+      };
+      return `<span style="color:${cols[p]||'#546e7a'};font-weight:600;font-size:11px">${p||'—'}</span>`;
+    };
+    const rows = data.map(r => `
+      <tr>
+        <td><strong>${r.label}</strong></td>
+        <td class="mono" style="font-size:11px">${r.n_vars.toLocaleString()}</td>
+        <td class="mono" style="font-size:11px">${r.n_cons.toLocaleString()}</td>
+        <td class="mono" style="font-size:11px">${(r.actual_nnz||r.est_nonzeros||0).toLocaleString()}</td>
+        <td>${r.est_sparsity_pct}%</td>
+        <td class="mono" style="font-size:11px">${r.est_memory_mb} MB</td>
+        <td>${phaseBadge(r.phase_tested)}</td>
+        <td>${r.solve_time_s != null ? fmtTime(r.solve_time_s) : (r.preprocessing_time_s != null ? fmtTime(r.preprocessing_time_s) + ' (prep)' : '—')}</td>
+        <td>${statusCell(r.status)}</td>
+      </tr>`).join('');
+    return `
+      <table class="editorial-table">
+        <thead><tr>
+          <th>Label</th><th>Vars</th><th>Cons</th><th>NNZ</th><th>Sparsity</th>
+          <th>Est. Mem</th><th>Phase</th><th>Time</th><th>Status</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  function loadCompetitiveEvidence() {
+    // Load differential benchmark
+    fetch('/api/differential_benchmark')
+      .then(r => r.ok ? r.json() : Promise.reject('not_ready'))
+      .then(data => {
+        const lpWrap = document.getElementById('highs-comparison-lp-wrap');
+        const milpWrap = document.getElementById('highs-comparison-milp-wrap');
+        if (lpWrap && data.lp_comparison) {
+          lpWrap.innerHTML = renderLPComparisonTable(data.lp_comparison);
+        }
+        if (milpWrap && data.milp_comparison) {
+          milpWrap.innerHTML = renderMILPComparisonTable(data.milp_comparison);
+        }
+        const mipWrap = document.getElementById('miplib-results-wrap');
+        if (mipWrap && data.milp_comparison) {
+          mipWrap.innerHTML = `<div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:8px">
+            30-second bounded evaluation across 38 MIPLIB 2017 instances. LIMIT_REACHED is reported without an optimality claim.
+            ${data.summary ? `<strong>${data.summary.milp_sovopt_optimal}</strong>/${data.summary.milp_total} OPTIMAL, <strong>${data.summary.milp_sovopt_limit}</strong> LIMIT_REACHED, <strong>${data.summary.milp_sovopt_numerical_failure || 1}</strong> NUMERICAL_FAILURE.` : ''}
+          </div>` + renderMIPLIBTable(data.milp_comparison);
+        }
+        if (data.meta) {
+          const msgEl = document.getElementById('highs-loading-msg');
+          if (msgEl) msgEl.remove();
+          const mipMsg = document.getElementById('miplib-loading-msg');
+          if (mipMsg) mipMsg.remove();
+        }
+      })
+      .catch(() => {
+        const el = document.getElementById('highs-loading-msg');
+        if (el) el.textContent = 'Differential benchmark results not yet generated. Run: .venv/bin/python scripts/run_differential_benchmark.py';
+        const m = document.getElementById('miplib-loading-msg');
+        if (m) m.textContent = 'MIPLIB results not yet generated. Run differential benchmark script.';
+      });
+
+    // Load sparse stress results
+    fetch('/api/sparse_stress')
+      .then(r => r.ok ? r.json() : Promise.reject('not_ready'))
+      .then(data => {
+        const wrap = document.getElementById('sparse-stress-wrap');
+        if (wrap && data.results) {
+          const msg = document.getElementById('sparse-loading-msg');
+          if (msg) msg.remove();
+          wrap.innerHTML = renderSparseStressTable(data.results);
+        }
+      })
+      .catch(() => {
+        const el = document.getElementById('sparse-loading-msg');
+        if (el) el.textContent = 'Sparse stress results not yet generated. Run: .venv/bin/python scripts/run_sparse_stress.py';
+      });
+  }
+
   window.STATE = STATE;
+
   window.switchTab = switchTab;
   window.selectScenario = selectScenario;
   window.setLanguage = setLanguage;

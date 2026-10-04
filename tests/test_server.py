@@ -160,6 +160,22 @@ class HandlerUnitTests(unittest.TestCase):
         self.assertIn("gpu_device", data)
         self.assertIn("suite_totals", data)
 
+    def test_get_differential_benchmark(self):
+        status, body = self._invoke("GET", "/api/differential_benchmark")
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertIn("lp_comparison", data)
+        self.assertIn("milp_comparison", data)
+        self.assertEqual(len(data["lp_comparison"]), 17)
+        self.assertEqual(len(data["milp_comparison"]), 38)
+
+    def test_get_sparse_stress(self):
+        status, body = self._invoke("GET", "/api/sparse_stress")
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertIn("results", data)
+        self.assertTrue(len(data["results"]) >= 5)
+
 
 class ServerIntegrationTests(unittest.TestCase):
     # Integration tests communicating with a live HTTP server over loopback socket.
