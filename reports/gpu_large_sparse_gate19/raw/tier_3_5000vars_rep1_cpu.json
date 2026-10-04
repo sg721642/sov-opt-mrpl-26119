@@ -1,0 +1,20 @@
+{
+  "problem_id": "sparse_5000",
+  "seed": 45,
+  "rows": 2500,
+  "columns": 5000,
+  "nonzeros": 15000,
+  "density": 0.0012,
+  "backend": "pdhg-cpu",
+  "status": "LIMIT_REACHED (TIMEOUT > 60s)",
+  "iterations": 2000,
+  "objective": null,
+  "primal_residual": null,
+  "dual_residual": null,
+  "verification_status": null,
+  "wall_clock_seconds": 60.06121299999995,
+  "warmup_count": 1,
+  "measured_repeat_number": 1,
+  "device": "CPU (Intel Core 5 210H)",
+  "commit_sha": "f7b49c260f54d8677a9652f5985484c61e685d6a"
+}
