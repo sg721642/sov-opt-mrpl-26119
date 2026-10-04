@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=7">
+  <link rel="stylesheet" href="/style.css?v=8">
 </head>
 <body>
 
@@ -330,7 +330,7 @@
                   <h2 class="slide-title">MRPL PS 26119</h2>
                   <div class="slide-subtitle">Indigenous GPU-Accelerated Optimization Solver</div>
                   <p class="slide-desc">
-                    Development of a sovereign mathematical optimization core for industrial refinery planning. Eliminates dependency on proprietary commercial solvers (Gurobi, CPLEX, FICO Xpress) using pure NumPy and Python standard library algorithms.
+                    Development of a sovereign mathematical optimization core for industrial refinery planning, designed to reduce dependency on proprietary commercial solvers using pure NumPy and Python standard library algorithms.
                   </p>
                   <div class="slide-features-row">
                     <div class="slide-feat-chip"><strong>LP:</strong> Two-Phase Revised Primal Simplex</div>
@@ -1625,6 +1625,16 @@
           <div id="miplib-results-wrap" class="table-scroll-wrap">
             <div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px;" id="miplib-loading-msg">Loading MIPLIB results…</div>
           </div>
+
+          <!-- Representative MILP Tree Telemetry Panel -->
+          <div style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border-default);">
+            <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
+              Representative MILP Branch-and-Bound Telemetry (Genuine Solver Outputs)
+            </div>
+            <div id="milp-telemetry-wrap">
+              <div style="padding: 12px; text-align: center; color: var(--text-secondary); font-size: 12px;" id="milp-telemetry-loading-msg">Loading MILP branch-and-bound telemetry…</div>
+            </div>
+          </div>
         </div>
 
         <!-- Sparse Scalability Stress Test -->
@@ -1639,6 +1649,21 @@
           </div>
           <div id="sparse-stress-wrap" class="table-scroll-wrap">
             <div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px;" id="sparse-loading-msg">Loading sparse stress results…</div>
+          </div>
+        </div>
+
+        <!-- Multicore Characterization: Parallel Batch Throughput -->
+        <div class="table-section" style="margin-top: 28px;">
+          <div class="table-header">
+            <h3 class="table-title">Multicore Characterization — Parallel Batch Throughput</h3>
+            <div class="table-subtitle">Process-level concurrent dispatch across independent instances — NOT parallel branch-and-bound</div>
+          </div>
+          <div style="background: #f1f8e9; border: 1px solid #c5e1a5; border-radius: 4px; padding: 10px 14px; font-size: 12px; margin-bottom: 12px; color: #33691e;">
+            ℹ <strong>Architecture note:</strong> SOV-OPT simplex and MILP branch-and-bound algorithms execute serially per solve.
+            Multicore scaling operates at the process batch level (concurrent independent solves via worker processes), matching production API server worker architecture.
+          </div>
+          <div id="batch-throughput-wrap" class="table-scroll-wrap">
+            <div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px;" id="batch-throughput-loading-msg">Loading parallel batch throughput results…</div>
           </div>
         </div>
 
@@ -1900,10 +1925,23 @@
               <button id="btn-copy-cli-chk" class="copy-btn" onclick="window.sovApp.copyText('python scripts/verify_checksums.py', 'btn-copy-cli-chk')">Copy</button>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
-              <span style="font-size: 12px;">Run test suite (298 tests):</span>
+              <span style="font-size: 12px;">Push-button evidence evaluator:</span>
+              <code class="mono" style="font-size: 11.5px;">python scripts/reproduce_evidence.py --all</code>
+              <button id="btn-copy-cli-rep" class="copy-btn" onclick="window.sovApp.copyText('python scripts/reproduce_evidence.py --all', 'btn-copy-cli-rep')">Copy</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12px;">Parallel batch throughput benchmark:</span>
+              <code class="mono" style="font-size: 11.5px;">python scripts/run_batch_throughput.py</code>
+              <button id="btn-copy-cli-mcore" class="copy-btn" onclick="window.sovApp.copyText('python scripts/run_batch_throughput.py', 'btn-copy-cli-mcore')">Copy</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12px;">Run test suite (342 tests):</span>
               <code class="mono" style="font-size: 11.5px;">python -m unittest discover -s tests -v</code>
               <button id="btn-copy-cli-tst" class="copy-btn" onclick="window.sovApp.copyText('python -m unittest discover -s tests -v', 'btn-copy-cli-tst')">Copy</button>
             </div>
+          </div>
+          <div style="margin-top: 14px; font-size: 12px; color: var(--text-secondary);">
+            Full documentation: See <a href="https://github.com/sg721642/sov-opt-mrpl-26119/blob/main/docs/REPRODUCE.md" target="_blank" rel="noopener noreferrer" style="color: var(--mrpl-green); font-weight: 600;">docs/REPRODUCE.md</a> for comprehensive evaluator commands and expected output tables.
           </div>
         </div>
       </section>
@@ -2290,6 +2328,6 @@
     </div>
   </footer>
 
-  <script src="/app.js?v=7"></script>
+  <script src="/app.js?v=8"></script>
 </body>
 </html>

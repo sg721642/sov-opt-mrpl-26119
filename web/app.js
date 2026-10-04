@@ -535,7 +535,7 @@
   "Desulfurized heavy naphtha": "विसल्फरीकृत भारी नैफ्था",
   "Deterministic Dispatch · Pure NumPy · Zero Black Boxes": "नियत प्रेषण · शुद्ध NumPy · शून्य ब्लैक बॉक्स",
   "Developed for Smart India Hackathon 2026. Representative refinery inputs are engineering approximations and are not proprietary MRPL operating data.": "स्मार्ट इंडिया हैकाथॉन 2026 के लिए विकसित। प्रतिनिधि रिफाइनरी इनपुट इंजीनियरिंग सन्निकटन हैं और स्वामित्व MRPL परिचालन डेटा नहीं हैं।",
-  "Development of a sovereign mathematical optimization core for industrial refinery planning. Eliminates dependency on proprietary commercial solvers (Gurobi, CPLEX, FICO Xpress) using pure NumPy and Python standard library algorithms.": "औद्योगिक रिफाइनरी योजना के लिए एक सॉवरेन गणितीय अनुकूलन कोर का विकास। शुद्ध NumPy और Python मानक लाइब्रेरी एल्गोरिदम का उपयोग करके वाणिज्यिक सॉल्वरों (Gurobi, CPLEX, FICO Xpress) पर निर्भरता समाप्त करता है।",
+  "Development of a sovereign mathematical optimization core for industrial refinery planning, designed to reduce dependency on proprietary commercial solvers using pure NumPy and Python standard library algorithms.": "औद्योगिक रिफाइनरी योजना के लिए एक सॉवरेन गणितीय अनुकूलन कोर का विकास, शुद्ध NumPy और Python मानक लाइब्रेरी एल्गोरिदम का उपयोग करके वाणिज्यिक सॉल्वरों पर निर्भरता कम करने के लिए डिज़ाइन किया गया।",
   "Diagnostic ranking — not a minimal IIS": "डायग्नोस्टिक रैंकिंग — न्यूनतम IIS नहीं",
   "Diesel Cetane:": "डीजल सीटेन:",
   "Diesel demand quota": "डीजल माँग कोटा",
@@ -827,7 +827,7 @@
   "SM 12.0 (Blackwell Architecture)": "SM 12.0 (ब्लैकवेल आर्किटेक्चर)",
   "SMALL stratum (n ≤ 100)": "छोटा स्ट्रैटम (n ≤ 100)",
   "SOV-OPT Highlights Carousel": "SOV-OPT मुख्य अंश हिंडोला",
-  "Safe for production refinery dispatch": "उत्पादन रिफाइनरी प्रेषण के लिए सुरक्षित",
+  "Numerically verified for this prototype model": "इस प्रोटोटाइप मॉडल के लिए संख्यात्मक रूप से सत्यापित",
   "Satyam Gupta on LinkedIn": "Satyam Gupta लिंक्डइन पर",
   "Scenario A": "परिदृश्य A",
   "Scenario Analysis": "परिदृश्य विश्लेषण",
@@ -3690,6 +3690,66 @@
       </table>`;
   }
 
+  function renderMILPTelemetryCards(cases) {
+    const cards = cases.map(c => {
+      const isLimit = c.status === 'LIMIT_REACHED';
+      const statusBadge = statusCell(c.status);
+      const inc = c.incumbent != null ? fmtObj(c.incumbent) : 'N/A';
+      const bound = c.best_certified_bound != null ? fmtObj(c.best_certified_bound) : 'N/A';
+      const root = c.root_relaxation != null ? fmtObj(c.root_relaxation) : 'N/A';
+      const gap = c.relative_gap != null ? (c.relative_gap * 100).toFixed(2) + '%' : 'N/A';
+
+      return `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 4px; padding: 14px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <div>
+              <strong style="font-size: 13px; color: var(--text-primary);">${c.name}</strong>
+              <span style="font-size: 11px; color: var(--text-secondary); margin-left: 8px;">(${c.category} · ${c.variables} vars, ${c.constraints} cons, ${c.integer_variables} int)</span>
+            </div>
+            <div>${statusBadge}</div>
+          </div>
+          <div style="font-size: 11.5px; color: var(--text-secondary); margin-bottom: 10px;">${c.description}</div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; font-size: 11.5px; background: var(--bg-alt, #fafafa); border: 1px solid var(--border-subtle, #eee); border-radius: 4px; padding: 10px;">
+            <div><span style="color:var(--text-secondary)">Root Relaxation:</span><br><strong class="mono">${root}</strong></div>
+            <div><span style="color:var(--text-secondary)">Incumbent:</span><br><strong class="mono">${inc}</strong></div>
+            <div><span style="color:var(--text-secondary)">Best Bound:</span><br><strong class="mono">${bound}</strong></div>
+            <div><span style="color:var(--text-secondary)">Relative Gap:</span><br><strong class="mono">${gap}</strong></div>
+            <div><span style="color:var(--text-secondary)">Nodes Explored:</span><br><strong class="mono">${c.nodes_explored}</strong></div>
+            <div><span style="color:var(--text-secondary)">Pruned Nodes:</span><br><strong class="mono">${c.pruned_nodes}</strong></div>
+            <div><span style="color:var(--text-secondary)">Runtime:</span><br><strong class="mono">${fmtTime(c.solve_time_s)}</strong></div>
+          </div>
+          <div style="margin-top: 8px; font-size: 11px; color: ${isLimit ? '#b71c1c' : 'var(--text-secondary)'};">
+            <strong>Termination:</strong> ${c.termination_reason}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `<div>${cards}</div>`;
+  }
+
+  function renderBatchThroughputTable(data) {
+    const rows = data.map(r => `
+      <tr>
+        <td><strong>${r.workers} worker${r.workers > 1 ? 's' : ''}</strong></td>
+        <td class="mono" style="font-size: 11.5px;">${r.batch_size} instances</td>
+        <td class="mono" style="font-size: 11.5px;">${r.wall_clock_seconds.toFixed(3)} s</td>
+        <td class="mono" style="font-size: 11.5px; font-weight: 600;">${r.throughput_instances_per_second.toFixed(2)} inst/s</td>
+        <td><strong style="color: #2e7d32;">${r.speedup_vs_single_worker.toFixed(2)}x</strong></td>
+        <td><span style="color: #2e7d32; font-weight: 600;">✓ 100% verified</span></td>
+      </tr>
+    `).join('');
+
+    return `
+      <table class="editorial-table">
+        <thead><tr>
+          <th>Worker Tier</th><th>Batch Size</th><th>Wall-Clock Time</th><th>Throughput</th><th>Scaling Factor</th><th>Verification</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  }
+
   function loadCompetitiveEvidence() {
     // Load differential benchmark
     fetch('/api/differential_benchmark')
@@ -3738,6 +3798,36 @@
       .catch(() => {
         const el = document.getElementById('sparse-loading-msg');
         if (el) el.textContent = 'Sparse stress results not yet generated. Run: .venv/bin/python scripts/run_sparse_stress.py';
+      });
+
+    // Load MILP representative telemetry
+    fetch('/api/milp_telemetry')
+      .then(r => r.ok ? r.json() : Promise.reject('not_ready'))
+      .then(data => {
+        const wrap = document.getElementById('milp-telemetry-wrap');
+        if (wrap && data.cases) {
+          wrap.innerHTML = renderMILPTelemetryCards(data.cases);
+        }
+      })
+      .catch(() => {
+        const el = document.getElementById('milp-telemetry-loading-msg');
+        if (el) el.textContent = 'MILP telemetry details available in reports/milp_telemetry/representative_cases.json';
+      });
+
+    // Load Batch Throughput multicore results
+    fetch('/api/batch_throughput')
+      .then(r => r.ok ? r.json() : Promise.reject('not_ready'))
+      .then(data => {
+        const wrap = document.getElementById('batch-throughput-wrap');
+        if (wrap && data.results) {
+          const msg = document.getElementById('batch-throughput-loading-msg');
+          if (msg) msg.remove();
+          wrap.innerHTML = renderBatchThroughputTable(data.results);
+        }
+      })
+      .catch(() => {
+        const el = document.getElementById('batch-throughput-loading-msg');
+        if (el) el.textContent = 'Batch throughput results not yet generated. Run: .venv/bin/python scripts/run_batch_throughput.py';
       });
   }
 

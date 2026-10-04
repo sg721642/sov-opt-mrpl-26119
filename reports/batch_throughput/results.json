@@ -1,0 +1,174 @@
+{
+  "meta": {
+    "experiment": "Parallel Batch Throughput \u2014 Independent Solves",
+    "generated_at": "2026-10-04T18:41:17.107603Z",
+    "sovopt_version": "0.3.2",
+    "sovopt_commit": "995df387e551d3e08a925e28bcd844dfd7ccf6a2",
+    "machine": "Darwin 25.6.0 arm64",
+    "python": "3.11.16",
+    "disclaimer": "Parallel batch throughput across independent solves. This does NOT represent parallel branch-and-bound or intra-solve multi-threaded simplex.",
+    "concurrency_mechanism": "Subprocess-level concurrency with OPENBLAS_NUM_THREADS=1 isolation per process",
+    "evaluation_set": [
+      "adlittle",
+      "afiro",
+      "blend",
+      "kb2",
+      "recipe",
+      "sc50a",
+      "sc50b",
+      "stocfor1"
+    ]
+  },
+  "results": [
+    {
+      "workers": 1,
+      "wall_clock_seconds": 3.4202,
+      "throughput_instances_per_second": 2.34,
+      "speedup_vs_single_worker": 1.0,
+      "batch_size": 8,
+      "all_verified": true,
+      "instance_details": [
+        {
+          "instance": "adlittle",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.3339
+        },
+        {
+          "instance": "afiro",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.1235
+        },
+        {
+          "instance": "blend",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.5226
+        },
+        {
+          "instance": "kb2",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.2056
+        },
+        {
+          "instance": "recipe",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 1.1495
+        },
+        {
+          "instance": "sc50a",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.2101
+        },
+        {
+          "instance": "sc50b",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.2224
+        },
+        {
+          "instance": "stocfor1",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.6494
+        }
+      ]
+    },
+    {
+      "workers": 2,
+      "wall_clock_seconds": 1.7035,
+      "throughput_instances_per_second": 4.7,
+      "speedup_vs_single_worker": 2.01,
+      "batch_size": 8,
+      "all_verified": true,
+      "instance_details": [
+        {
+          "instance": "adlittle",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.3249
+        },
+        {
+          "instance": "afiro",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.1212
+        },
+        {
+          "instance": "blend",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.5232
+        },
+        {
+          "instance": "kb2",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.1988
+        },
+        {
+          "instance": "recipe",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 1.1531
+        },
+        {
+          "instance": "sc50a",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.2003
+        },
+        {
+          "instance": "sc50b",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.2147
+        },
+        {
+          "instance": "stocfor1",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.6409
+        }
+      ]
+    },
+    {
+      "workers": 4,
+      "wall_clock_seconds": 1.2917,
+      "throughput_instances_per_second": 6.19,
+      "speedup_vs_single_worker": 2.65,
+      "batch_size": 8,
+      "all_verified": true,
+      "instance_details": [
+        {
+          "instance": "adlittle",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.3342
+        },
+        {
+          "instance": "afiro",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.1282
+        },
+        {
+          "instance": "blend",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.5312
+        },
+        {
+          "instance": "kb2",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.2083
+        },
+        {
+          "instance": "recipe",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 1.1625
+        },
+        {
+          "instance": "sc50a",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.2061
+        },
+        {
+          "instance": "sc50b",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.2186
+        },
+        {
+          "instance": "stocfor1",
+          "status": "OPTIMAL_VERIFIED",
+          "elapsed_seconds": 0.6407
+        }
+      ]
+    }
+  ]
+}
