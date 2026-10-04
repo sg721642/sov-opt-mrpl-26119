@@ -1767,7 +1767,7 @@
                 <tr><td>Presolve &amp; scaling</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Ruiz equilibration; redundant-row detection; test_presolve.py</td></tr>
                 <tr><td>Sparse linear algebra</td><td><span style="color:#f57c00;font-weight:600">PARTIAL</span></td><td>Sparse LU; dense fallback for large instances; test_sparse.py</td></tr>
                 <tr><td>GPU acceleration (PDHG CUDA)</td><td><span style="color:#f57c00;font-weight:600">PARTIAL</span></td><td>RTX 5050 physical validation; CPU-only on Render; 1.07× aggregate</td></tr>
-                <tr><td>Multi-core CPU</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>ThreadingHTTPServer; OPENBLAS_NUM_THREADS isolated per solve</td></tr>
+                <tr><td>Multi-core CPU</td><td><span style="color:#f57c00;font-weight:600">PARTIAL</span></td><td>Process batch throughput (2.65× on 4 workers); intra-solve simplex/B&amp;B remain serial</td></tr>
                 <tr><td>Branch-and-Bound with warm starts</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Dual warm-start at each B&amp;B node; pseudocost branching</td></tr>
                 <tr><td>Heuristics</td><td><span style="color:#9e9e9e;font-weight:600">ROADMAP</span></td><td>Planned: feasibility pump, rounding; not in current release</td></tr>
                 <tr><td>Cutting planes</td><td><span style="color:#9e9e9e;font-weight:600">ROADMAP</span></td><td>Planned: Gomory cuts; not in current release</td></tr>
