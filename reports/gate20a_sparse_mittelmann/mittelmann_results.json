@@ -1,0 +1,198 @@
+{
+  "suite": "Gate 20A True Sparse Mittelmann Evaluation",
+  "timestamp": "2026-10-04T23:14:55Z",
+  "solver_identity": "SOV-OPT Sovereign Core (NumPy only, zero solver dependencies)",
+  "external_baseline": "HiGHS (via isolated subprocess scripts/baseline_worker.py)",
+  "transparency_notice": "We report every evaluated benchmark, including failures, iteration limits, and cases where the baseline solver is faster. Industrial C++ simplex/interior-point solvers are expected to outperform first-order prototypes on large degenerate LPs.",
+  "time_limit_semantics": "SOV-OPT evaluated with a 20-second in-loop time budget checked at convergence checkpoints; wall-clock elapsed time may exceed the nominal budget by one checkpoint interval. External HiGHS evaluated with a 30-second evaluation window.",
+  "instances": [
+    {
+      "instance": "qap15",
+      "archive": "qap15.mps.bz2",
+      "domain": "LP benchmark instance (QAP relaxation)",
+      "dimensions": {
+        "rows": 6330,
+        "columns": 22275,
+        "nonzeros": 94950,
+        "density": 0.0006734006734006734
+      },
+      "memory": {
+        "csr_memory_mb": 1.5,
+        "dense_memory_gb": 1.05,
+        "compression_ratio": 718.5
+      },
+      "parse": {
+        "status": "PARSED_SPARSE_OK",
+        "parse_time_s": 0.1334,
+        "validation_time_s": 0.0011
+      },
+      "sovopt": {
+        "backend": "pdhg-cpu",
+        "status": "LIMIT_REACHED",
+        "verdict": "TIME_OR_ITERATION_LIMIT",
+        "time_s": 20.754,
+        "iterations": 500,
+        "objective": 97.10214012493552,
+        "primal_residual": 0.12158632360404106,
+        "dual_residual": 0.00024736131639579995,
+        "relative_gap": 0.6409635043245956,
+        "kkt_passed": false
+      },
+      "highs": {
+        "backend": "highspy 1.15.1 (native C++ HiGHS)",
+        "status": "HighsModelStatus.kTimeLimit",
+        "time_s": 30.063,
+        "iterations": 27720,
+        "objective": null,
+        "summary": "HiGHS did not report an optimal solution within the 30-second evaluation window."
+      },
+      "comparison": {
+        "relative_objective_diff": null,
+        "reference_objective": 1040.99,
+        "reference_source": "Hans Mittelmann LP Benchmark (plato.asu.edu/ftp/lpopt.html)",
+        "note": "SOV-OPT is a pure-Python first-order prototype; HiGHS is an industrial C++ revised simplex/IPM solver."
+      }
+    },
+    {
+      "instance": "brazil3",
+      "archive": "brazil3.mps.bz2",
+      "domain": "LP benchmark instance (MIPLIB 2017 LP relaxation)",
+      "dimensions": {
+        "rows": 14646,
+        "columns": 23968,
+        "nonzeros": 133184,
+        "density": 0.000379403408650653
+      },
+      "memory": {
+        "csr_memory_mb": 2.14,
+        "dense_memory_gb": 2.62,
+        "compression_ratio": 1249.2
+      },
+      "parse": {
+        "status": "PARSED_SPARSE_OK",
+        "parse_time_s": 0.2182,
+        "validation_time_s": 0.0014
+      },
+      "sovopt": {
+        "backend": "pdhg-cpu",
+        "status": "LIMIT_REACHED",
+        "verdict": "TIME_OR_ITERATION_LIMIT",
+        "time_s": 20.973,
+        "iterations": 350,
+        "objective": 0.0,
+        "primal_residual": 0.02063677794088588,
+        "dual_residual": 0.0021790685877482556,
+        "relative_gap": 0.5457377317868151,
+        "kkt_passed": false
+      },
+      "highs": {
+        "backend": "highspy 1.15.1 (native C++ HiGHS)",
+        "status": "HighsModelStatus.kOptimal",
+        "time_s": 9.065,
+        "iterations": 22146,
+        "objective": 1.9999999999998248,
+        "summary": "HiGHS reported kOptimal with objective 2.0 in approximately 9.065 s."
+      },
+      "comparison": {
+        "relative_objective_diff": 1.0,
+        "reference_objective": 2.0,
+        "reference_source": "MIPLIB 2017 LP Relaxation / HiGHS C++",
+        "note": "SOV-OPT is a pure-Python first-order prototype; HiGHS is an industrial C++ revised simplex/IPM solver."
+      }
+    },
+    {
+      "instance": "chromaticindex1024-7",
+      "archive": "chromaticindex1024-7.mps.bz2",
+      "domain": "LP benchmark instance (MIPLIB 2017 LP relaxation)",
+      "dimensions": {
+        "rows": 67583,
+        "columns": 73728,
+        "nonzeros": 270324,
+        "density": 5.425186668614889e-05
+      },
+      "memory": {
+        "csr_memory_mb": 4.64,
+        "dense_memory_gb": 37.12,
+        "compression_ratio": 8192.2
+      },
+      "parse": {
+        "status": "PARSED_SPARSE_OK",
+        "parse_time_s": 0.5218,
+        "validation_time_s": 0.0035
+      },
+      "sovopt": {
+        "backend": "pdhg-cpu",
+        "status": "LIMIT_REACHED",
+        "verdict": "TIME_OR_ITERATION_LIMIT",
+        "time_s": 29.236,
+        "iterations": 150,
+        "objective": 3.4406207130030726,
+        "primal_residual": 0.0,
+        "dual_residual": 0.44493882091212456,
+        "relative_gap": 0.0,
+        "kkt_passed": false
+      },
+      "highs": {
+        "backend": "highspy 1.15.1 (native C++ HiGHS)",
+        "status": "HighsModelStatus.kTimeLimit",
+        "time_s": 30.339,
+        "iterations": 40655,
+        "objective": null,
+        "summary": "HiGHS did not report an optimal solution within the 30-second evaluation window."
+      },
+      "comparison": {
+        "relative_objective_diff": null,
+        "reference_objective": null,
+        "reference_source": "MIPLIB 2017 LP Relaxation / HiGHS C++",
+        "note": "SOV-OPT is a pure-Python first-order prototype; HiGHS is an industrial C++ revised simplex/IPM solver."
+      }
+    },
+    {
+      "instance": "supportcase10",
+      "archive": "supportcase10.mps.bz2",
+      "domain": "LP benchmark instance (MIPLIB 2017 LP relaxation)",
+      "dimensions": {
+        "rows": 165684,
+        "columns": 14770,
+        "nonzeros": 555082,
+        "density": 0.00022682769429817513
+      },
+      "memory": {
+        "csr_memory_mb": 9.73,
+        "dense_memory_gb": 18.23,
+        "compression_ratio": 1918.1
+      },
+      "parse": {
+        "status": "PARSED_SPARSE_OK",
+        "parse_time_s": 0.9128,
+        "validation_time_s": 0.0014
+      },
+      "sovopt": {
+        "backend": "pdhg-cpu",
+        "status": "LIMIT_REACHED",
+        "verdict": "TIME_OR_ITERATION_LIMIT",
+        "time_s": 21.084,
+        "iterations": 100,
+        "objective": 33.17544124311944,
+        "primal_residual": 0.0003554183430458705,
+        "dual_residual": 0.08341747409648566,
+        "relative_gap": 2.4540279045532248e-05,
+        "kkt_passed": false
+      },
+      "highs": {
+        "backend": "highspy 1.15.1 (native C++ HiGHS)",
+        "status": "HighsModelStatus.kTimeLimit",
+        "time_s": 30.544,
+        "iterations": 23065,
+        "objective": null,
+        "summary": "HiGHS did not report an optimal solution within the 30-second evaluation window."
+      },
+      "comparison": {
+        "relative_objective_diff": null,
+        "reference_objective": null,
+        "reference_source": "MIPLIB 2017 LP Relaxation / HiGHS C++",
+        "note": "SOV-OPT is a pure-Python first-order prototype; HiGHS is an industrial C++ revised simplex/IPM solver."
+      }
+    }
+  ]
+}

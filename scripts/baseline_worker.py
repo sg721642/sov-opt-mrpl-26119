@@ -92,8 +92,38 @@ def run_highspy(target):
 
     h = highspy.Highs()
     h.setOptionValue("output_flag", False)
-    t0 = time.perf_counter()
-    status = h.readModel(str(target))
+    import os
+    if "HIGHS_TIME_LIMIT" in os.environ:
+        h.setOptionValue("time_limit", float(os.environ["HIGHS_TIME_LIMIT"]))
+    target_str = str(target)
+    temp_mps = None
+    if target_str.endswith('.bz2'):
+        import tempfile, bz2, shutil
+        temp_mps = tempfile.NamedTemporaryFile(suffix='.mps', delete=False)
+        with bz2.open(target_str, 'rb') as f_in:
+            shutil.copyfileobj(f_in, temp_mps)
+        temp_mps.close()
+        actual_target = temp_mps.name
+    elif target_str.endswith('.gz'):
+        import tempfile, gzip, shutil
+        temp_mps = tempfile.NamedTemporaryFile(suffix='.mps', delete=False)
+        with gzip.open(target_str, 'rb') as f_in:
+            shutil.copyfileobj(f_in, temp_mps)
+        temp_mps.close()
+        actual_target = temp_mps.name
+    else:
+        actual_target = target_str
+
+    try:
+        status = h.readModel(actual_target)
+    finally:
+        if temp_mps is not None:
+            import os
+            try:
+                os.unlink(temp_mps.name)
+            except OSError:
+                pass
+
     if status != highspy.HighsStatus.kOk:
         return {'backend': f'highspy {version} (native C++ HiGHS)', 'solver_version': version, 'status': 'READ_ERROR', 'objective': None}
     
@@ -103,6 +133,7 @@ def run_highspy(target):
     int_count = sum(1 for x in lp.integrality_ if x != highspy.HighsVarType.kContinuous) if hasattr(lp, "integrality_") else 0
     sense = "MAXIMIZE" if h.getObjectiveSense()[1] == highspy.ObjSense.kMaximize else "MINIMIZE"
 
+    t0 = time.perf_counter()
     h.run()
     elapsed = time.perf_counter() - t0
     info = h.getInfo()

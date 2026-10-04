@@ -58,7 +58,7 @@ def solve(model, backend='cpu', tol=1e-7, method='auto', presolve=True, scaling=
         timestamp_utc=datetime.now(timezone.utc).isoformat(),
         variables=len(model.c),
         rows=len(model.A),
-        nonzeros=int((model.A != 0).sum()),
+        nonzeros=int(model.A.nnz) if hasattr(model.A, 'nnz') else int((model.A != 0).sum()),
         dispatch=disp,
         machine=dict(system=platform.system(), architecture=platform.machine(), python=platform.python_version())
     )

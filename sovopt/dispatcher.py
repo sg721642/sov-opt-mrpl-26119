@@ -10,7 +10,10 @@ import numpy as np
 def inspect_model(model):
     """Analyze mathematical properties of an optimization model."""
     m, n = model.A.shape
-    nnz = int((model.A != 0).sum())
+    if hasattr(model.A, 'nnz'):
+        nnz = int(model.A.nnz)
+    else:
+        nnz = int((model.A != 0).sum())
     density = float(nnz / (m * n)) if (m * n) > 0 else 0.0
     int_count = len(model.integer)
     has_qp = bool(model.Q is not None and np.any(model.Q != 0))
@@ -21,7 +24,11 @@ def inspect_model(model):
         c_nz = np.abs(model.c[model.c != 0])
         if len(c_nz): nonzeros.extend(c_nz)
     if nnz > 0:
-        a_nz = np.abs(model.A[model.A != 0])
+        from .sparse import CSRMatrix, CSCMatrix
+        if isinstance(model.A, (CSRMatrix, CSCMatrix)):
+            a_nz = np.abs(model.A.data[model.A.data != 0])
+        else:
+            a_nz = np.abs(model.A[model.A != 0])
         nonzeros.extend(a_nz)
     
     if len(nonzeros) > 0:
