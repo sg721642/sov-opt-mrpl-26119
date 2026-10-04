@@ -73,6 +73,14 @@ class Handler(BaseHTTPRequestHandler):
             p=ROOT/'reports/sparse_stress/results.json'
             if p.exists():return self.send(200,json.loads(p.read_text()))
             return self.send(404,{'error':'Sparse stress results not yet generated. Run: .venv/bin/python scripts/run_sparse_stress.py'})
+        if self.path=='/api/milp_telemetry':
+            p=ROOT/'reports/milp_telemetry/representative_cases.json'
+            if p.exists():return self.send(200,json.loads(p.read_text()))
+            return self.send(404,{'error':'MILP telemetry results not found'})
+        if self.path=='/api/batch_throughput':
+            p=ROOT/'reports/batch_throughput/results.json'
+            if p.exists():return self.send(200,json.loads(p.read_text()))
+            return self.send(404,{'error':'Batch throughput results not found. Run: .venv/bin/python scripts/run_batch_throughput.py'})
         import urllib.parse
         clean_path = urllib.parse.urlsplit(self.path).path
         if clean_path.startswith('/static/') or clean_path.startswith('/assets/'):

@@ -7,6 +7,10 @@
     "sha256": "783f062e329efff306307b1cad79cc83f0090527f3def0845e4ad1bfbb77ff97",
     "mode": "text-lf"
   },
+  ".github/workflows/keep-alive.yml": {
+    "sha256": "822777d17817eeeb39298a0239893a1b64614803c9475c7437c8f7d5997da06d",
+    "mode": "text-lf"
+  },
   ".gitignore": {
     "sha256": "5bcbb1ad34675fd993f6e966524a9217724eb36d08c829a2410dbc19f36217aa",
     "mode": "text-lf"
@@ -16,7 +20,7 @@
     "mode": "text-lf"
   },
   "CHANGELOG.md": {
-    "sha256": "17c78a24ec0e306045f371861169faa99a8f1403e9abd8965d245e98deda2887",
+    "sha256": "1ac6c42538e54b9c43e4233278fc476de4970fb4a9e6d4e34d2bebee8dd9752b",
     "mode": "text-lf"
   },
   "Dockerfile": {
@@ -471,6 +475,10 @@
     "sha256": "3668aba302d811382100f00e9ec026bde7e4235119ed5be3fe2dcfa3500b4588",
     "mode": "text-lf"
   },
+  "docs/REPRODUCE.md": {
+    "sha256": "a19d8b2b4d80c151da28309fb398dfcfd3ece213eb3b64b8d96d0db9fb1b21f2",
+    "mode": "text-lf"
+  },
   "docs/SPARSE_ALGEBRA_AUDIT.md": {
     "sha256": "c512aea8e55b9d39e94576dae54b1365f8323ba9db5710c24306687163ff6091",
     "mode": "text-lf"
@@ -525,6 +533,10 @@
   },
   "reports/VERIFIED_BENCHMARKS.md": {
     "sha256": "4e8974f74eb6b0f1f0a69eaf6444ea7fead6fa7caf50bcd0ae543141211a5917",
+    "mode": "text-lf"
+  },
+  "reports/batch_throughput/results.json": {
+    "sha256": "d5b6962e22b2c1cebbb7dc146e91bbb0c9ae76eef5b1ada041524d9281b3dd0c",
     "mode": "text-lf"
   },
   "reports/benchmark.json": {
@@ -923,6 +935,10 @@
     "sha256": "598daca26b30707bb9e01478d36a51dce384c173a6e44fe6183bd7aab1161677",
     "mode": "text-lf"
   },
+  "reports/milp_telemetry/representative_cases.json": {
+    "sha256": "10f6bee3362f578b30567b9815c4730aac8aae698a0dde3d7ab5e1abd78589ba",
+    "mode": "text-lf"
+  },
   "reports/source_inputs.json": {
     "sha256": "b12b2727c03fe26bde5320376a830bd9847b4e7c4730bae19dec64147607f84f",
     "mode": "text-lf"
@@ -999,6 +1015,14 @@
     "sha256": "9332262960f1daf8daa05e919a85fcb4855e356eddcafa1be735315de1d7fea0",
     "mode": "text-lf"
   },
+  "scripts/reproduce_evidence.py": {
+    "sha256": "98a5e33ed86c1afea75b5919f27025ce7dbbeb33aa869e4ad030a473d245d26c",
+    "mode": "text-lf"
+  },
+  "scripts/run_batch_throughput.py": {
+    "sha256": "afadef2621b2a35fa4579354714b91557fa98d0f38401ada0f2ed621d7ca8b9d",
+    "mode": "text-lf"
+  },
   "scripts/run_differential_benchmark.py": {
     "sha256": "d0e11c43f546c6c91795f63b9cb4674a40e678b89b551fc3b3dde35798f05682",
     "mode": "text-lf"
@@ -1028,7 +1052,7 @@
     "mode": "text-lf"
   },
   "server.py": {
-    "sha256": "b26a9c151c0f0e0eb4ead38ae8d169283add5d6c137680938219c431d1ac2a4d",
+    "sha256": "c8068b8cc7c69a65a73859d4489bbce2315eb3e8703dd4673ec8b3bb741024fa",
     "mode": "text-lf"
   },
   "sovopt/__init__.py": {
@@ -1176,7 +1200,7 @@
     "mode": "text-lf"
   },
   "tests/test_server.py": {
-    "sha256": "56f88add3e1777afc6c33742cee91aeecc9611d80c264a21139233c57218107b",
+    "sha256": "0cee199e7daabe39584e527e049c56c2fd49a0c25930d869c03ff9f3ce040105",
     "mode": "text-lf"
   },
   "tests/test_solver.py": {
@@ -1188,7 +1212,7 @@
     "mode": "text-lf"
   },
   "web/app.js": {
-    "sha256": "63f91571c5cbf3fdda0f3a26074d39571b1dcd32ea3fac0d62cc12dbc163b08a",
+    "sha256": "59dbff7a952d5109b022f6588bd6d9b77e30eb1795bec1b3091513bc4a0b3dd3",
     "mode": "text-lf"
   },
   "web/assets/MRPL_logo.jpg": {
@@ -1220,7 +1244,7 @@
     "mode": "raw"
   },
   "web/index.html": {
-    "sha256": "e03d28871f46d4d1ddd0208c03c53c114d73a564b919deda355217af1cb81563",
+    "sha256": "d70b4e376dec514699e430376cc53acb369b66f1e41a9f92b6369ee00d837029",
     "mode": "text-lf"
   },
   "web/style.css": {

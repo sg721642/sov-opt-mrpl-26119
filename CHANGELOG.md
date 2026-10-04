@@ -1,5 +1,29 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.15] - 2026-10-05
+
+### Gate 19A: Final CPU / Benchmark / Evidence Hardening Pass
+
+- **feat(reproduce): Add push-button reproducibility suite and evaluator guide:**
+  - Created `scripts/reproduce_evidence.py` providing automated push-button reproduction for self-test, small-lp, small-qp, small-milp, infeasible Farkas certification, Netlib sample (AFIRO), and differential comparison vs HiGHS 1.15.1.
+  - Created comprehensive `docs/REPRODUCE.md` guide for hackathon judges and evaluators without local machine paths.
+  - Added copy-to-clipboard commands in Reports tab.
+- **feat(milp): Add representative MILP branch-and-bound telemetry panel:**
+  - Added structured telemetry artifact `reports/milp_telemetry/representative_cases.json` containing genuine solver outputs for: (1) MRPL Refinery Unit Commitment (OPTIMAL_VERIFIED, 9 nodes, 0.00% gap), (2) MIPLIB gen-ip054 (LIMIT_REACHED at 30 s timeout), and (3) MIPLIB flugpl (NUMERICAL_FAILURE basis limit).
+  - Added real-solver telemetry cards in Benchmarks tab displaying root relaxation, incumbent, best certified bound, relative gap, nodes explored, pruned nodes, and explicit termination reason.
+- **feat(multicore): Add multicore characterization and parallel batch throughput:**
+  - Created `scripts/run_batch_throughput.py` measuring wall-clock throughput across 1, 2, and 4 worker processes on independent Netlib benchmark instances.
+  - Demonstrated process-level parallel batch scaling (2.34 inst/s at 1 worker to 6.19 inst/s at 4 workers, 2.65x speedup) with 100% verification across all tiers.
+  - Clarified architectural distinction: process-level concurrent dispatch across independent solves, while intra-solve simplex and B&B remain serial. Retained PARTIAL status in Coverage Matrix.
+  - Added `/api/batch_throughput` and `/api/milp_telemetry` endpoints in `server.py` with unit tests in `tests/test_server.py`.
+- **audit(mittelmann): Verify Mittelmann benchmark status:**
+  - Inspected official Plato ASU benchmark suites (`lptestset`, `lpopt.html`, `milp.html`). Verified that public LP test instances exceed dense 5,000-variable resource limits, and MILP instances derive from MIPLIB 2017.
+  - Retained explicit, honest `NOT YET DEMONSTRATED` status in the Problem Statement Coverage Matrix to prevent fake coverage.
+- **audit(claims): Sovereign positioning and claim tightening:**
+  - Replaced "eliminates dependency on commercial solvers" with "designed to reduce dependency on proprietary commercial solvers" in web carousel.
+  - Removed deprecated production dispatch translation keys.
+- **chore(web): Bump cache-busters to `?v=8`.**
+
 ## [0.3.14] - 2026-10-04
 
 ### Keep-alive for Render free-tier deployment

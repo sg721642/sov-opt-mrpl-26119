@@ -176,6 +176,20 @@ class HandlerUnitTests(unittest.TestCase):
         self.assertIn("results", data)
         self.assertTrue(len(data["results"]) >= 5)
 
+    def test_get_milp_telemetry(self):
+        status, body = self._invoke("GET", "/api/milp_telemetry")
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertIn("cases", data)
+        self.assertEqual(len(data["cases"]), 3)
+
+    def test_get_batch_throughput(self):
+        status, body = self._invoke("GET", "/api/batch_throughput")
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertIn("results", data)
+        self.assertTrue(len(data["results"]) >= 3)
+
 
 class ServerIntegrationTests(unittest.TestCase):
     # Integration tests communicating with a live HTTP server over loopback socket.

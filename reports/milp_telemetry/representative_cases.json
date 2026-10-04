@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "title": "SOV-OPT Representative MILP Branch-and-Bound Telemetry",
+    "generated_at": "2026-10-04T18:41:20Z",
+    "sovopt_version": "0.3.2",
+    "sovopt_commit": "995df387e551d3e08a925e28bcd844dfd7ccf6a2",
+    "machine": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.11.16",
+    "reporting_policy": "Genuine solver outputs only. No simulated or fabricated tree paths.",
+    "timeout_policy": "30.0s cloud evaluation limit"
+  },
+  "cases": [
+    {
+      "id": "CASE-01",
+      "name": "MRPL Refinery Unit Commitment (MILP)",
+      "category": "Industrial Refinery Digital Twin",
+      "description": "Multi-period refinery planning with discrete conversion unit on/off commitment and minimum capacity thresholds.",
+      "variables": 42,
+      "constraints": 40,
+      "integer_variables": 6,
+      "status": "OPTIMAL_VERIFIED",
+      "root_relaxation": -8973.55,
+      "best_certified_bound": -8953.75,
+      "incumbent": -8953.75,
+      "relative_gap": 0.0,
+      "nodes_explored": 9,
+      "pruned_nodes": 5,
+      "solve_time_s": 3.7317,
+      "termination_reason": "Finite B&B tree with exact rational lower bounds; incumbent feasibility verified numerically; relative gap 0.00e+00 <= 1.00e-07"
+    },
+    {
+      "id": "CASE-02",
+      "name": "MIPLIB 2017: gen-ip054",
+      "category": "Public Academic Benchmark",
+      "description": "Combinatorial integer programming problem from MIPLIB 2017 library.",
+      "variables": 30,
+      "constraints": 27,
+      "integer_variables": 30,
+      "status": "LIMIT_REACHED",
+      "root_relaxation": 6765.21,
+      "best_certified_bound": 6767.38,
+      "incumbent": null,
+      "relative_gap": null,
+      "nodes_explored": 11,
+      "pruned_nodes": 0,
+      "solve_time_s": 30.0,
+      "termination_reason": "Time limit reached — no optimality claim made."
+    },
+    {
+      "id": "CASE-03",
+      "name": "MIPLIB 2017: flugpl",
+      "category": "Public Academic Benchmark",
+      "description": "Flight planning discrete allocation problem from MIPLIB 2017.",
+      "variables": 18,
+      "constraints": 18,
+      "integer_variables": 11,
+      "status": "NUMERICAL_FAILURE",
+      "root_relaxation": 1167185.73,
+      "best_certified_bound": 1178754.0,
+      "incumbent": null,
+      "relative_gap": null,
+      "nodes_explored": 319,
+      "pruned_nodes": 80,
+      "solve_time_s": 27.695,
+      "termination_reason": "Unresolved child LP relaxation: ill-conditioned basis during branch-and-bound search"
+    }
+  ]
+}
