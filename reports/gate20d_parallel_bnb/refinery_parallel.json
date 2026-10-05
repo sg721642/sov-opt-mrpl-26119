@@ -1,0 +1,298 @@
+{
+  "problem": "refinery_unit_commitment_milp",
+  "model_type": "representative_synthetic_fixture",
+  "provenance_disclaimer": "Representative model for unit commitment; strictly NOT MRPL proprietary refinery data.",
+  "variables": 42,
+  "constraints": 40,
+  "integer_variables": 6,
+  "legacy_serial": {
+    "median_runtime_seconds": 3.764433958014706,
+    "median_nodes": 9,
+    "status": "OPTIMAL_VERIFIED",
+    "objective": -8953.75,
+    "repeats": [
+      {
+        "repeat": 1,
+        "runtime_seconds": 3.7674096669943538,
+        "nodes": 9,
+        "status": "OPTIMAL_VERIFIED",
+        "objective": -8953.75
+      },
+      {
+        "repeat": 2,
+        "runtime_seconds": 3.7530375419883057,
+        "nodes": 9,
+        "status": "OPTIMAL_VERIFIED",
+        "objective": -8953.75
+      },
+      {
+        "repeat": 3,
+        "runtime_seconds": 3.764433958014706,
+        "nodes": 9,
+        "status": "OPTIMAL_VERIFIED",
+        "objective": -8953.75
+      },
+      {
+        "repeat": 4,
+        "runtime_seconds": 3.7836194160045125,
+        "nodes": 9,
+        "status": "OPTIMAL_VERIFIED",
+        "objective": -8953.75
+      },
+      {
+        "repeat": 5,
+        "runtime_seconds": 3.7595818750269245,
+        "nodes": 9,
+        "status": "OPTIMAL_VERIFIED",
+        "objective": -8953.75
+      }
+    ]
+  },
+  "matched_parallel_engine": {
+    "w_1": {
+      "median_runtime_seconds": 3.6717850000131875,
+      "median_nodes": 9,
+      "status": "OPTIMAL_VERIFIED",
+      "objective": -8953.75,
+      "worker_pids": [
+        40768,
+        40771,
+        40773,
+        40775,
+        40778
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "runtime_seconds": 3.624704665999161,
+          "nodes": 9,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40768
+          ]
+        },
+        {
+          "repeat": 2,
+          "runtime_seconds": 3.6693838750070427,
+          "nodes": 9,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40771
+          ]
+        },
+        {
+          "repeat": 3,
+          "runtime_seconds": 3.6976725409913342,
+          "nodes": 9,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40773
+          ]
+        },
+        {
+          "repeat": 4,
+          "runtime_seconds": 3.678444707999006,
+          "nodes": 9,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40775
+          ]
+        },
+        {
+          "repeat": 5,
+          "runtime_seconds": 3.6717850000131875,
+          "nodes": 9,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40778
+          ]
+        }
+      ]
+    },
+    "w_2": {
+      "median_runtime_seconds": 3.052360250003403,
+      "median_nodes": 11,
+      "status": "OPTIMAL_VERIFIED",
+      "objective": -8953.75,
+      "worker_pids": [
+        40785,
+        40786,
+        40798,
+        40799,
+        40801,
+        40802,
+        40809,
+        40810,
+        40824,
+        40825
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "runtime_seconds": 3.052360250003403,
+          "nodes": 11,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40785,
+            40786
+          ]
+        },
+        {
+          "repeat": 2,
+          "runtime_seconds": 3.267534374987008,
+          "nodes": 11,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40798,
+            40799
+          ]
+        },
+        {
+          "repeat": 3,
+          "runtime_seconds": 2.6291281250014435,
+          "nodes": 11,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40801,
+            40802
+          ]
+        },
+        {
+          "repeat": 4,
+          "runtime_seconds": 2.5300412089854944,
+          "nodes": 11,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40809,
+            40810
+          ]
+        },
+        {
+          "repeat": 5,
+          "runtime_seconds": 3.872950958000729,
+          "nodes": 13,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40824,
+            40825
+          ]
+        }
+      ]
+    },
+    "w_4": {
+      "median_runtime_seconds": 3.7091451669984963,
+      "median_nodes": 17,
+      "status": "OPTIMAL_VERIFIED",
+      "objective": -8953.75,
+      "worker_pids": [
+        40838,
+        40840,
+        40845,
+        40846,
+        40852,
+        40853,
+        40854,
+        40855,
+        40857,
+        40858,
+        40859,
+        40860,
+        40874,
+        40875,
+        40876,
+        40877,
+        40879,
+        40880,
+        40882,
+        40883
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "runtime_seconds": 4.052913541003363,
+          "nodes": 17,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40838,
+            40840,
+            40845,
+            40846
+          ]
+        },
+        {
+          "repeat": 2,
+          "runtime_seconds": 3.8061464999918826,
+          "nodes": 17,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40852,
+            40853,
+            40854,
+            40855
+          ]
+        },
+        {
+          "repeat": 3,
+          "runtime_seconds": 3.578685749991564,
+          "nodes": 17,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40857,
+            40858,
+            40859,
+            40860
+          ]
+        },
+        {
+          "repeat": 4,
+          "runtime_seconds": 3.5505531250091735,
+          "nodes": 17,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40874,
+            40875,
+            40876,
+            40877
+          ]
+        },
+        {
+          "repeat": 5,
+          "runtime_seconds": 3.7091451669984963,
+          "nodes": 17,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -8953.75,
+          "worker_pids": [
+            40879,
+            40880,
+            40882,
+            40883
+          ]
+        }
+      ]
+    }
+  },
+  "matched_scaling": {
+    "speedup_2w": 1.202933041736831,
+    "speedup_4w": 0.9899275533031938,
+    "efficiency_2w": 0.6014665208684155,
+    "efficiency_4w": 0.24748188832579845
+  },
+  "serial_vs_parallel_mode_comparison": {
+    "speedup_vs_legacy_2w": 1.2332862603654038,
+    "speedup_vs_legacy_4w": 1.0149060736441735
+  }
+}

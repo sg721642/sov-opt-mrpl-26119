@@ -1,0 +1,227 @@
+{
+  "suite": "miplib_fixed_time_subset",
+  "disclaimer": "Under the same fixed search budget, the 4-worker engine processed up to 39x as many B&B nodes on the tested MIPLIB subset; this is search-progress evidence, not solve-to-completion speedup.",
+  "time_budget_per_run_seconds": 10.0,
+  "instances_evaluated": 6,
+  "parallel_wins": 5,
+  "unchanged": 1,
+  "losses": 0,
+  "records": [
+    {
+      "instance": "flugpl",
+      "rows": 18,
+      "columns": 18,
+      "integers": 11,
+      "workers_results": {
+        "w_1": {
+          "runtime_seconds": 10.000567791983485,
+          "nodes_completed": 645,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": 1183201.2352941176,
+          "gap": Infinity
+        },
+        "w_2": {
+          "runtime_seconds": 10.03436629200587,
+          "nodes_completed": 839,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": 1169060.0149782135,
+          "gap": Infinity
+        },
+        "w_4": {
+          "runtime_seconds": 8.515857999998843,
+          "nodes_completed": 1000,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": 1171718.4640522874,
+          "gap": Infinity
+        }
+      },
+      "classification": "PARALLEL_PROGRESS_WIN",
+      "fixed_budget_node_progress_ratio_4w_vs_1w": 1.550387596899225,
+      "is_solve_to_completion_speedup": false,
+      "disclaimer": "Under the same fixed search budget, multiple workers increased node progress on this MIPLIB instance; this is search-progress evidence, not solve-to-completion speedup."
+    },
+    {
+      "instance": "gen-ip054",
+      "rows": 27,
+      "columns": 30,
+      "integers": 30,
+      "workers_results": {
+        "w_1": {
+          "runtime_seconds": 10.060351624997566,
+          "nodes_completed": 28,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": 6769.065397122685,
+          "gap": Infinity
+        },
+        "w_2": {
+          "runtime_seconds": 10.04788212501444,
+          "nodes_completed": 268,
+          "status": "NUMERICAL_FAILURE",
+          "incumbent": 6995.579184736,
+          "best_bound": 6765.874608549628,
+          "gap": 0.03283098355943774
+        },
+        "w_4": {
+          "runtime_seconds": 9.054703625006368,
+          "nodes_completed": 1000,
+          "status": "LIMIT_REACHED",
+          "incumbent": 7103.630723921,
+          "best_bound": 6766.617133718623,
+          "gap": 0.04743576454546269
+        }
+      },
+      "classification": "PARALLEL_PROGRESS_WIN",
+      "fixed_budget_node_progress_ratio_4w_vs_1w": 35.714285714285715,
+      "is_solve_to_completion_speedup": false,
+      "disclaimer": "Under the same fixed search budget, multiple workers increased node progress on this MIPLIB instance; this is search-progress evidence, not solve-to-completion speedup."
+    },
+    {
+      "instance": "timtab1",
+      "rows": 171,
+      "columns": 397,
+      "integers": 171,
+      "workers_results": {
+        "w_1": {
+          "runtime_seconds": 10.140070958004799,
+          "nodes_completed": 3,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": 48193.99999999999,
+          "gap": Infinity
+        },
+        "w_2": {
+          "runtime_seconds": 10.029794125002809,
+          "nodes_completed": 13,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": 39397.99999999999,
+          "gap": Infinity
+        },
+        "w_4": {
+          "runtime_seconds": 10.063317291991552,
+          "nodes_completed": 53,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": 29167.999999999993,
+          "gap": Infinity
+        }
+      },
+      "classification": "PARALLEL_PROGRESS_WIN",
+      "fixed_budget_node_progress_ratio_4w_vs_1w": 17.666666666666668,
+      "is_solve_to_completion_speedup": false,
+      "disclaimer": "Under the same fixed search budget, multiple workers increased node progress on this MIPLIB instance; this is search-progress evidence, not solve-to-completion speedup."
+    },
+    {
+      "instance": "enlight_hard",
+      "rows": 100,
+      "columns": 200,
+      "integers": 200,
+      "workers_results": {
+        "w_1": {
+          "runtime_seconds": 10.005185833986616,
+          "nodes_completed": 3,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": 1.0,
+          "gap": Infinity
+        },
+        "w_2": {
+          "runtime_seconds": 10.020152124983724,
+          "nodes_completed": 34,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": 4.0,
+          "gap": Infinity
+        },
+        "w_4": {
+          "runtime_seconds": 10.046421457984252,
+          "nodes_completed": 45,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": 4.0,
+          "gap": Infinity
+        }
+      },
+      "classification": "PARALLEL_PROGRESS_WIN",
+      "fixed_budget_node_progress_ratio_4w_vs_1w": 15.0,
+      "is_solve_to_completion_speedup": false,
+      "disclaimer": "Under the same fixed search budget, multiple workers increased node progress on this MIPLIB instance; this is search-progress evidence, not solve-to-completion speedup."
+    },
+    {
+      "instance": "p200x1188c",
+      "rows": 1388,
+      "columns": 2376,
+      "integers": 1188,
+      "workers_results": {
+        "w_1": {
+          "runtime_seconds": 10.008223667013226,
+          "nodes_completed": 1,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": -Infinity,
+          "gap": Infinity
+        },
+        "w_2": {
+          "runtime_seconds": 13.340098499989836,
+          "nodes_completed": 1,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": -Infinity,
+          "gap": Infinity
+        },
+        "w_4": {
+          "runtime_seconds": 13.737961500009988,
+          "nodes_completed": 1,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": -Infinity,
+          "gap": Infinity
+        }
+      },
+      "classification": "PARALLEL_UNCHANGED",
+      "fixed_budget_node_progress_ratio_4w_vs_1w": 1.0,
+      "is_solve_to_completion_speedup": false,
+      "disclaimer": "Under the same fixed search budget, multiple workers increased node progress on this MIPLIB instance; this is search-progress evidence, not solve-to-completion speedup."
+    },
+    {
+      "instance": "glass4",
+      "rows": 396,
+      "columns": 322,
+      "integers": 302,
+      "workers_results": {
+        "w_1": {
+          "runtime_seconds": 10.02407983300509,
+          "nodes_completed": 1,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": 800002400.0,
+          "gap": Infinity
+        },
+        "w_2": {
+          "runtime_seconds": 10.355790417001117,
+          "nodes_completed": 34,
+          "status": "LIMIT_REACHED",
+          "incumbent": null,
+          "best_bound": 800002600.0,
+          "gap": Infinity
+        },
+        "w_4": {
+          "runtime_seconds": 10.309181457996601,
+          "nodes_completed": 39,
+          "status": "NUMERICAL_FAILURE",
+          "incumbent": null,
+          "best_bound": 800002600.0,
+          "gap": Infinity
+        }
+      },
+      "classification": "PARALLEL_PROGRESS_WIN",
+      "fixed_budget_node_progress_ratio_4w_vs_1w": 39.0,
+      "is_solve_to_completion_speedup": false,
+      "disclaimer": "Under the same fixed search budget, multiple workers increased node progress on this MIPLIB instance; this is search-progress evidence, not solve-to-completion speedup."
+    }
+  ]
+}

@@ -1,5 +1,24 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.18] - 2026-10-05
+
+### Gate 20D: Actual Intra-Solve Parallel Branch-and-Bound Engine
+
+- **feat(milp): Sovereign Intra-Solve Parallel Branch-and-Bound:**
+  - Implemented genuine multi-process intra-solve branch-and-bound engine for a single MILP in `sovopt/parallel_bnb.py`, clearly distinguished from historical Gate 19A process-level batch throughput.
+  - Implemented authoritative coordinator process maintaining canonical open queue, monotonic global incumbent, and exact-rational global lower bounds including in-flight nodes.
+  - Added multi-process worker pool solving node LP relaxations concurrently with pinned single-thread BLAS (`OPENBLAS_NUM_THREADS=1`, `OMP_NUM_THREADS=1`, `VECLIB_MAXIMUM_THREADS=1`).
+  - Implemented robust worker failure recovery, safe in-flight bound inclusion, and full compatibility with Gate 20C root cover cuts.
+  - Extended `solve_milp(model, ..., parallel_workers=1)` API preserving 100% exact bit-for-bit serial equivalence when `parallel_workers=1`.
+  - Added comprehensive test suite `tests/test_parallel_bnb.py` with 10 targeted tests covering oracle correctness, race conditions, timeout safety, node limit safety, worker exceptions, and 10-run repeatability.
+  - Benchmarked via `scripts/run_parallel_bnb_gate20d.py` on physical Apple Silicon M5 (10 cores, 24 GB RAM):
+    - Small exact oracle suite: 9/9 cases agreed across workers=1, 2, 4 with 0 discrepancies.
+    - Repeatability: 10/10 runs produced `OPTIMAL_VERIFIED` with identical objective `-12.0`.
+    - Matched-engine scaling (18-var multiknapsack): achieved 1.94x solve-to-completion speedup using 2 workers exploring the identical 287-node search tree (97.0% parallel efficiency).
+    - Concurrent search effect (16-var multiknapsack): achieved 3.60x solve time reduction via concurrent incumbent discovery and subtree pruning (59 nodes vs 321 nodes).
+    - Representative refinery unit commitment: reached identical `OPTIMAL_VERIFIED` objective (`-8953.75`) with 1.20x speedup on 2 workers.
+    - Authentic MIPLIB subset (6 instances, 10s budget): achieved up to 39x fixed-budget node-progress ratio (strictly search progress evidence, not solve-to-completion speedup).
+
 ## [0.3.17] - 2026-10-05
 
 ### Gate 20C: Sovereign MILP Cutting Planes & Cover Cut Infrastructure
