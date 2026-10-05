@@ -1,0 +1,21 @@
+{
+  "instance": "qap15",
+  "file": "qap15.mps.bz2",
+  "rows": 6330,
+  "cols": 22275,
+  "nnz": 94950,
+  "density": 0.000673479,
+  "csr_memory_bytes": 1569848,
+  "parse_time_seconds": 0.2357,
+  "cpu_status": "LIMIT_REACHED (TIMEOUT > 60s)",
+  "cuda_status": "LIMIT_REACHED",
+  "cpu_iterations": 3000,
+  "cuda_iterations": 3000,
+  "cpu_objective": null,
+  "cuda_objective": 442.50330842259524,
+  "cpu_total_seconds": 60.0,
+  "cuda_total_seconds": 18.83,
+  "cuda_setup_seconds": 0.08,
+  "cuda_iteration_seconds": 18.75,
+  "gpu_executed": true
+}
