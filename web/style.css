@@ -244,6 +244,21 @@ html, body {
   line-height: 1.25;
 }
 
+.sov-logo-block {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.sov-opt-logo {
+  height: 58px;
+  width: auto;
+  max-width: 175px;
+  object-fit: contain;
+  display: block;
+}
+
 /* ==========================================================================
    MRPL GREEN NAVIGATION BAR
    ========================================================================== */
@@ -1885,6 +1900,10 @@ html, body {
     width: 60px;
     height: 60px;
   }
+  .sov-opt-logo {
+    height: 42px;
+    max-width: 120px;
+  }
   .team-grid, .contact-grid {
     grid-template-columns: 1fr;
   }
@@ -1910,6 +1929,10 @@ html, body {
   .mrpl-logo {
     width: 48px;
     height: 48px;
+  }
+  .sov-opt-logo {
+    height: 32px;
+    max-width: 90px;
   }
   .page-container {
     padding: 16px 12px 32px;
