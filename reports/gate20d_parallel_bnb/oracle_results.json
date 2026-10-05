@@ -1,0 +1,115 @@
+{
+  "suite": "small_exact_oracle_parallel",
+  "cases_count": 9,
+  "all_agreed": true,
+  "results": {
+    "binary_knapsack_1": {
+      "status_w1": "OPTIMAL_VERIFIED",
+      "status_w2": "OPTIMAL_VERIFIED",
+      "status_w4": "OPTIMAL_VERIFIED",
+      "obj_w1": 12.0,
+      "obj_w2": 12.0,
+      "obj_w4": 12.0,
+      "nodes_w1": 11,
+      "nodes_w2": 7,
+      "nodes_w4": 7,
+      "agreed": true
+    },
+    "multi_knapsack": {
+      "status_w1": "OPTIMAL_VERIFIED",
+      "status_w2": "OPTIMAL_VERIFIED",
+      "status_w4": "OPTIMAL_VERIFIED",
+      "obj_w1": 37.0,
+      "obj_w2": 37.0,
+      "obj_w4": 37.0,
+      "nodes_w1": 1,
+      "nodes_w2": 3,
+      "nodes_w4": 3,
+      "agreed": true
+    },
+    "general_integer_box": {
+      "status_w1": "OPTIMAL_VERIFIED",
+      "status_w2": "OPTIMAL_VERIFIED",
+      "status_w4": "OPTIMAL_VERIFIED",
+      "obj_w1": -6.0,
+      "obj_w2": -6.0,
+      "obj_w4": -6.0,
+      "nodes_w1": 1,
+      "nodes_w2": 1,
+      "nodes_w4": 1,
+      "agreed": true
+    },
+    "negative_objective": {
+      "status_w1": "OPTIMAL_VERIFIED",
+      "status_w2": "OPTIMAL_VERIFIED",
+      "status_w4": "OPTIMAL_VERIFIED",
+      "obj_w1": -125.0,
+      "obj_w2": -125.0,
+      "obj_w4": -125.0,
+      "nodes_w1": 1,
+      "nodes_w2": 1,
+      "nodes_w4": 1,
+      "agreed": true
+    },
+    "infeasible_milp": {
+      "status_w1": "INFEASIBLE_CERTIFIED",
+      "status_w2": "INFEASIBLE_CERTIFIED",
+      "status_w4": "INFEASIBLE_CERTIFIED",
+      "obj_w1": null,
+      "obj_w2": null,
+      "obj_w4": null,
+      "nodes_w1": 1,
+      "nodes_w2": 1,
+      "nodes_w4": 1,
+      "agreed": true
+    },
+    "multiple_optima": {
+      "status_w1": "OPTIMAL_VERIFIED",
+      "status_w2": "OPTIMAL_VERIFIED",
+      "status_w4": "OPTIMAL_VERIFIED",
+      "obj_w1": 1.0,
+      "obj_w2": 1.0,
+      "obj_w4": 1.0,
+      "nodes_w1": 1,
+      "nodes_w2": 1,
+      "nodes_w4": 1,
+      "agreed": true
+    },
+    "weak_lp_relaxation": {
+      "status_w1": "OPTIMAL_VERIFIED",
+      "status_w2": "OPTIMAL_VERIFIED",
+      "status_w4": "OPTIMAL_VERIFIED",
+      "obj_w1": 1.0,
+      "obj_w2": 1.0,
+      "obj_w4": 1.0,
+      "nodes_w1": 1,
+      "nodes_w2": 1,
+      "nodes_w4": 1,
+      "agreed": true
+    },
+    "fractional_root": {
+      "status_w1": "OPTIMAL_VERIFIED",
+      "status_w2": "OPTIMAL_VERIFIED",
+      "status_w4": "OPTIMAL_VERIFIED",
+      "obj_w1": 4.0,
+      "obj_w2": 4.0,
+      "obj_w4": 4.0,
+      "nodes_w1": 1,
+      "nodes_w2": 1,
+      "nodes_w4": 1,
+      "agreed": true
+    },
+    "degenerate_small": {
+      "status_w1": "OPTIMAL_VERIFIED",
+      "status_w2": "OPTIMAL_VERIFIED",
+      "status_w4": "OPTIMAL_VERIFIED",
+      "obj_w1": 0.0,
+      "obj_w2": 0.0,
+      "obj_w4": 0.0,
+      "nodes_w1": 1,
+      "nodes_w2": 1,
+      "nodes_w4": 1,
+      "agreed": true
+    }
+  }
+}

@@ -1,0 +1,605 @@
+{
+  "suite": "synthetic_scaling",
+  "workloads": [
+    {
+      "workload": "synthetic_multiknapsack_16var",
+      "disclaimer": "Synthetic B&B scaling workload \u2014 not benchmark accuracy evidence.",
+      "variables": 16,
+      "constraints": 3,
+      "legacy_serial": {
+        "median_runtime_seconds": 0.6754829999990761,
+        "median_nodes": 67,
+        "search_throughput_nodes_per_sec": 99.18828453135258,
+        "status": "OPTIMAL_VERIFIED",
+        "objective": -276.0,
+        "repeats": [
+          {
+            "repeat": 1,
+            "runtime_seconds": 0.6754829999990761,
+            "nodes": 67,
+            "status": "OPTIMAL_VERIFIED",
+            "objective": -276.0
+          },
+          {
+            "repeat": 2,
+            "runtime_seconds": 0.6745414589822758,
+            "nodes": 67,
+            "status": "OPTIMAL_VERIFIED",
+            "objective": -276.0
+          },
+          {
+            "repeat": 3,
+            "runtime_seconds": 0.6753749169874936,
+            "nodes": 67,
+            "status": "OPTIMAL_VERIFIED",
+            "objective": -276.0
+          },
+          {
+            "repeat": 4,
+            "runtime_seconds": 0.6812979579844978,
+            "nodes": 67,
+            "status": "OPTIMAL_VERIFIED",
+            "objective": -276.0
+          },
+          {
+            "repeat": 5,
+            "runtime_seconds": 0.6777331249904819,
+            "nodes": 67,
+            "status": "OPTIMAL_VERIFIED",
+            "objective": -276.0
+          }
+        ]
+      },
+      "matched_parallel_engine": {
+        "w_1": {
+          "median_runtime_seconds": 1.5491347079805564,
+          "median_nodes": 321,
+          "search_throughput_nodes_per_sec": 207.21245114858596,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -276.0,
+          "worker_pids": [
+            40641,
+            40643,
+            40644,
+            40646,
+            40648
+          ],
+          "repeats": [
+            {
+              "repeat": 1,
+              "runtime_seconds": 1.568358165997779,
+              "nodes": 321,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40641
+              ]
+            },
+            {
+              "repeat": 2,
+              "runtime_seconds": 1.558087292010896,
+              "nodes": 321,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40643
+              ]
+            },
+            {
+              "repeat": 3,
+              "runtime_seconds": 1.5414239169913344,
+              "nodes": 321,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40644
+              ]
+            },
+            {
+              "repeat": 4,
+              "runtime_seconds": 1.5435918340226635,
+              "nodes": 321,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40646
+              ]
+            },
+            {
+              "repeat": 5,
+              "runtime_seconds": 1.5491347079805564,
+              "nodes": 321,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40648
+              ]
+            }
+          ]
+        },
+        "w_2": {
+          "median_runtime_seconds": 0.4298126250214409,
+          "median_nodes": 59,
+          "search_throughput_nodes_per_sec": 137.26911813504043,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -276.0,
+          "worker_pids": [
+            40652,
+            40653,
+            40654,
+            40655,
+            40656,
+            40657,
+            40658,
+            40659,
+            40660,
+            40661
+          ],
+          "repeats": [
+            {
+              "repeat": 1,
+              "runtime_seconds": 0.4281699589919299,
+              "nodes": 59,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40652,
+                40653
+              ]
+            },
+            {
+              "repeat": 2,
+              "runtime_seconds": 0.4286392919893842,
+              "nodes": 59,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40654,
+                40655
+              ]
+            },
+            {
+              "repeat": 3,
+              "runtime_seconds": 0.4305699579999782,
+              "nodes": 59,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40656,
+                40657
+              ]
+            },
+            {
+              "repeat": 4,
+              "runtime_seconds": 0.4298126250214409,
+              "nodes": 59,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40658,
+                40659
+              ]
+            },
+            {
+              "repeat": 5,
+              "runtime_seconds": 0.43880254100076854,
+              "nodes": 59,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40660,
+                40661
+              ]
+            }
+          ]
+        },
+        "w_4": {
+          "median_runtime_seconds": 0.5253955420048442,
+          "median_nodes": 63,
+          "search_throughput_nodes_per_sec": 119.90965846341182,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -276.0,
+          "worker_pids": [
+            40667,
+            40668,
+            40669,
+            40670,
+            40671,
+            40672,
+            40673,
+            40674,
+            40675,
+            40676,
+            40677,
+            40678,
+            40679,
+            40680,
+            40681,
+            40682,
+            40684,
+            40685,
+            40686,
+            40687
+          ],
+          "repeats": [
+            {
+              "repeat": 1,
+              "runtime_seconds": 0.5376490420021582,
+              "nodes": 63,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40667,
+                40668,
+                40669,
+                40670
+              ]
+            },
+            {
+              "repeat": 2,
+              "runtime_seconds": 0.5253955420048442,
+              "nodes": 67,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40671,
+                40672,
+                40673,
+                40674
+              ]
+            },
+            {
+              "repeat": 3,
+              "runtime_seconds": 0.4820411669788882,
+              "nodes": 63,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40675,
+                40676,
+                40677,
+                40678
+              ]
+            },
+            {
+              "repeat": 4,
+              "runtime_seconds": 0.4945374999952037,
+              "nodes": 63,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40679,
+                40680,
+                40681,
+                40682
+              ]
+            },
+            {
+              "repeat": 5,
+              "runtime_seconds": 0.5511119999864604,
+              "nodes": 101,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -276.0,
+              "worker_pids": [
+                40684,
+                40685,
+                40686,
+                40687
+              ]
+            }
+          ]
+        }
+      },
+      "matched_scaling": {
+        "speedup_2w": 3.60420941079448,
+        "speedup_4w": 2.9485113293296146,
+        "efficiency_2w": 1.80210470539724,
+        "efficiency_4w": 0.7371278323324036
+      },
+      "serial_vs_parallel_mode_comparison": {
+        "speedup_vs_legacy_2w": 1.5715755207641473,
+        "speedup_vs_legacy_4w": 1.2856656480592066
+      }
+    },
+    {
+      "workload": "synthetic_multiknapsack_18var",
+      "disclaimer": "Synthetic B&B scaling workload \u2014 not benchmark accuracy evidence.",
+      "variables": 18,
+      "constraints": 4,
+      "legacy_serial": {
+        "median_runtime_seconds": 2.3151000419748016,
+        "median_nodes": 141,
+        "search_throughput_nodes_per_sec": 60.904495461770935,
+        "status": "OPTIMAL_VERIFIED",
+        "objective": -305.0,
+        "repeats": [
+          {
+            "repeat": 1,
+            "runtime_seconds": 2.3151000419748016,
+            "nodes": 141,
+            "status": "OPTIMAL_VERIFIED",
+            "objective": -305.0
+          },
+          {
+            "repeat": 2,
+            "runtime_seconds": 2.3150235840003006,
+            "nodes": 141,
+            "status": "OPTIMAL_VERIFIED",
+            "objective": -305.0
+          },
+          {
+            "repeat": 3,
+            "runtime_seconds": 2.317060334025882,
+            "nodes": 141,
+            "status": "OPTIMAL_VERIFIED",
+            "objective": -305.0
+          },
+          {
+            "repeat": 4,
+            "runtime_seconds": 2.319299958006013,
+            "nodes": 141,
+            "status": "OPTIMAL_VERIFIED",
+            "objective": -305.0
+          },
+          {
+            "repeat": 5,
+            "runtime_seconds": 2.314421290997416,
+            "nodes": 141,
+            "status": "OPTIMAL_VERIFIED",
+            "objective": -305.0
+          }
+        ]
+      },
+      "matched_parallel_engine": {
+        "w_1": {
+          "median_runtime_seconds": 3.44517300001462,
+          "median_nodes": 287,
+          "search_throughput_nodes_per_sec": 83.30496030207543,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -305.0,
+          "worker_pids": [
+            40695,
+            40698,
+            40700,
+            40702,
+            40704
+          ],
+          "repeats": [
+            {
+              "repeat": 1,
+              "runtime_seconds": 3.44517300001462,
+              "nodes": 287,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40695
+              ]
+            },
+            {
+              "repeat": 2,
+              "runtime_seconds": 3.4759505830006674,
+              "nodes": 287,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40698
+              ]
+            },
+            {
+              "repeat": 3,
+              "runtime_seconds": 3.41221358301118,
+              "nodes": 287,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40700
+              ]
+            },
+            {
+              "repeat": 4,
+              "runtime_seconds": 3.4514362909831107,
+              "nodes": 287,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40702
+              ]
+            },
+            {
+              "repeat": 5,
+              "runtime_seconds": 3.439393292006571,
+              "nodes": 287,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40704
+              ]
+            }
+          ]
+        },
+        "w_2": {
+          "median_runtime_seconds": 1.776029083004687,
+          "median_nodes": 287,
+          "search_throughput_nodes_per_sec": 161.59645286576796,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -305.0,
+          "worker_pids": [
+            40710,
+            40711,
+            40712,
+            40713,
+            40715,
+            40716,
+            40718,
+            40719,
+            40721,
+            40722
+          ],
+          "repeats": [
+            {
+              "repeat": 1,
+              "runtime_seconds": 1.6642526669893414,
+              "nodes": 287,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40710,
+                40711
+              ]
+            },
+            {
+              "repeat": 2,
+              "runtime_seconds": 1.8114264580071904,
+              "nodes": 301,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40712,
+                40713
+              ]
+            },
+            {
+              "repeat": 3,
+              "runtime_seconds": 1.776029083004687,
+              "nodes": 287,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40715,
+                40716
+              ]
+            },
+            {
+              "repeat": 4,
+              "runtime_seconds": 1.7891933330101892,
+              "nodes": 299,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40718,
+                40719
+              ]
+            },
+            {
+              "repeat": 5,
+              "runtime_seconds": 1.731886333989678,
+              "nodes": 287,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40721,
+                40722
+              ]
+            }
+          ]
+        },
+        "w_4": {
+          "median_runtime_seconds": 1.495821624994278,
+          "median_nodes": 331,
+          "search_throughput_nodes_per_sec": 221.28306909673552,
+          "status": "OPTIMAL_VERIFIED",
+          "objective": -305.0,
+          "worker_pids": [
+            40728,
+            40729,
+            40730,
+            40731,
+            40733,
+            40734,
+            40735,
+            40736,
+            40737,
+            40738,
+            40739,
+            40740,
+            40742,
+            40743,
+            40744,
+            40745,
+            40747,
+            40748,
+            40749,
+            40750
+          ],
+          "repeats": [
+            {
+              "repeat": 1,
+              "runtime_seconds": 1.495821624994278,
+              "nodes": 321,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40728,
+                40729,
+                40730,
+                40731
+              ]
+            },
+            {
+              "repeat": 2,
+              "runtime_seconds": 1.4733324580010958,
+              "nodes": 347,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40733,
+                40734,
+                40735,
+                40736
+              ]
+            },
+            {
+              "repeat": 3,
+              "runtime_seconds": 1.6064865830121562,
+              "nodes": 321,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40737,
+                40738,
+                40739,
+                40740
+              ]
+            },
+            {
+              "repeat": 4,
+              "runtime_seconds": 1.5044689159840345,
+              "nodes": 347,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40742,
+                40743,
+                40744,
+                40745
+              ]
+            },
+            {
+              "repeat": 5,
+              "runtime_seconds": 1.4544673330092337,
+              "nodes": 331,
+              "status": "OPTIMAL_VERIFIED",
+              "objective": -305.0,
+              "worker_pids": [
+                40747,
+                40748,
+                40749,
+                40750
+              ]
+            }
+          ]
+        }
+      },
+      "matched_scaling": {
+        "speedup_2w": 1.9398178965549788,
+        "speedup_4w": 2.303197749282304,
+        "efficiency_2w": 0.9699089482774894,
+        "efficiency_4w": 0.575799437320576
+      },
+      "serial_vs_parallel_mode_comparison": {
+        "speedup_vs_legacy_2w": 1.3035259749565102,
+        "speedup_vs_legacy_4w": 1.547711306810167
+      }
+    }
+  ]
+}

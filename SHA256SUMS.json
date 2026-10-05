@@ -20,7 +20,7 @@
     "mode": "text-lf"
   },
   "CHANGELOG.md": {
-    "sha256": "bfe68f724951f6fb3fc3a23f69c8c5338dd6e6c39ab6d2e99ad0750ab30aa747",
+    "sha256": "979b82407df11cc2cfbcc1f99145197c4777f686d4ad6e2622808de920b01323",
     "mode": "text-lf"
   },
   "Dockerfile": {
@@ -617,6 +617,38 @@
   },
   "reports/gate20c_milp_cuts/validity_tests.json": {
     "sha256": "1f71002d878a838931e8c1483552a5109d0fa54d28b62d12ea65ba1b3f33e089",
+    "mode": "text-lf"
+  },
+  "reports/gate20d_parallel_bnb/README.md": {
+    "sha256": "3001178a6857c76249d31d71c54afedf407bfe09d2a858b33578c17ef029278d",
+    "mode": "text-lf"
+  },
+  "reports/gate20d_parallel_bnb/architecture_audit.md": {
+    "sha256": "1a10b98e15d4ac8792129a73174549788bcae3dd0eb5606e6c2661aba3dd5a26",
+    "mode": "text-lf"
+  },
+  "reports/gate20d_parallel_bnb/correctness_invariants.md": {
+    "sha256": "79dc70f058b00bc4eabd7ed59fd748ea2faf8cc7dfe133bb1c4ab9af05bd7cb6",
+    "mode": "text-lf"
+  },
+  "reports/gate20d_parallel_bnb/miplib_parallel.json": {
+    "sha256": "98ccf35a926f265c85f09a30827dc0af5939c7258bcdf436fdbf7db869d578bd",
+    "mode": "text-lf"
+  },
+  "reports/gate20d_parallel_bnb/oracle_results.json": {
+    "sha256": "3740250e3ac325551d98e1f609e5d6e86bc00e7540868dc8b0282d8f6eab603f",
+    "mode": "text-lf"
+  },
+  "reports/gate20d_parallel_bnb/performance_results.json": {
+    "sha256": "416850381eabc8534b0ebb610d4beb4b9f7b3b7e12819da61f52e794b01982a6",
+    "mode": "text-lf"
+  },
+  "reports/gate20d_parallel_bnb/refinery_parallel.json": {
+    "sha256": "d792c38d17af46ae9ea560f1049e7642115f73fc6e195ce3aeee3256ef11a5bd",
+    "mode": "text-lf"
+  },
+  "reports/gate20d_parallel_bnb/repeatability.json": {
+    "sha256": "56ba9b48add60bb5a73ed7c78e3c59586a60f167367933fea839b4e690bb552b",
     "mode": "text-lf"
   },
   "reports/gpu/ablation_pdhg_cpu_baseline.json": {
@@ -1615,6 +1647,10 @@
     "sha256": "9f69183affbe61c21d06f12c8f94cf1e590a9f628467a4c1bc5dd5131c3344aa",
     "mode": "text-lf"
   },
+  "scripts/run_parallel_bnb_gate20d.py": {
+    "sha256": "2f30ec2b099300bc1f6d2f667072386b3a0e59cc24db392cc8a1f61633fffd36",
+    "mode": "text-lf"
+  },
   "scripts/run_sparse_stress.py": {
     "sha256": "788fb0cb3a546c8d91f42131fb396d4b50810197e9d2c63863b438921283e800",
     "mode": "text-lf"
@@ -1668,7 +1704,7 @@
     "mode": "text-lf"
   },
   "sovopt/milp.py": {
-    "sha256": "0872596329b7e96c088eafd00f6e6e74c998cbd98acd8d94c66af0875fbfce9a",
+    "sha256": "02af3c1e7c48a2b71b37cb1cb6d8be3cb1d5835389aca6445b71bcba89eeef4e",
     "mode": "text-lf"
   },
   "sovopt/model.py": {
@@ -1677,6 +1713,10 @@
   },
   "sovopt/mps.py": {
     "sha256": "9deaf09cfbb4d53a428d218bf65ed429f188717ecbd4e6690a4c39d098429b5c",
+    "mode": "text-lf"
+  },
+  "sovopt/parallel_bnb.py": {
+    "sha256": "9afd1d732131f1f9caa23a01d8fa348ad7882f2e69842b557d6f8a1c76ebf517",
     "mode": "text-lf"
   },
   "sovopt/pdhg.py": {
@@ -1773,6 +1813,10 @@
   },
   "tests/test_numerical_stress.py": {
     "sha256": "5aea2627ccd7db5d9cc50d5d9d8eaf9d81e6c74abf61b18c52e0bb19e82964d2",
+    "mode": "text-lf"
+  },
+  "tests/test_parallel_bnb.py": {
+    "sha256": "218586932d529076079d5e7b7c1d4fe2ba4a065280e66be8a9b2f98e07b115e6",
     "mode": "text-lf"
   },
   "tests/test_presolve.py": {

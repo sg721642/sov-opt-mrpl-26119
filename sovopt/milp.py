@@ -59,6 +59,7 @@ def exact_objective(model: Model, x: np.ndarray) -> F:
 
 def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
                time_limit: float = 30.0,
+               parallel_workers: int = 1,
                use_warm_starts: bool = True,
                use_pseudocosts: bool = True,
                use_strong_branching: bool = True,
@@ -70,6 +71,7 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
     """Solve mixed-integer linear programming (MILP) problem via sovereign B&B.
 
     Features:
+    - Intra-solve parallel multi-process search when parallel_workers > 1.
     - Parent/child LP basis warm starts using DualBasisState.
     - Pseudocost branching with history tracking and dynamic initialization.
     - Limited strong-branching bootstrap on unreliable candidates.
@@ -82,6 +84,23 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
     - Objective offset handling in exact rational arithmetic.
     - Comprehensive MILP telemetry tracking.
     """
+    workers_req = kwargs.get('workers', parallel_workers)
+    engine_req = kwargs.get('engine', 'auto')
+    if workers_req > 1 or engine_req == 'parallel':
+        from .parallel_bnb import solve_milp_parallel
+        return solve_milp_parallel(
+            model=model, tol=tol, max_nodes=max_nodes, time_limit=time_limit,
+            parallel_workers=workers_req,
+            use_warm_starts=use_warm_starts,
+            use_pseudocosts=use_pseudocosts,
+            use_strong_branching=use_strong_branching,
+            use_heuristics=use_heuristics,
+            use_cuts=use_cuts,
+            node_selection=node_selection,
+            cut_config=cut_config,
+            **kwargs
+        )
+
     start_time = time.perf_counter()
     orig_model = model
 
