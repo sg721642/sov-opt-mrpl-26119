@@ -16,18 +16,25 @@ def _reported_objective(model, x, Q=None):
     xld = np.asarray(x, np.longdouble)
     cld = model.c.astype(np.longdouble)
     if Q is None:
-        Q_use = np.zeros((len(x), len(x)), dtype=np.longdouble)
+        raw = float(cld @ xld)
+    elif hasattr(Q, 'dot'):
+        raw = float(cld @ xld + xld @ Q.dot(xld) / 2.0)
     else:
         Q_use = np.asarray(Q, dtype=np.longdouble)
-    raw = float(cld @ xld + xld @ Q_use @ xld / 2.0)
+        raw = float(cld @ xld + xld @ Q_use @ xld / 2.0)
     if model.maximize:
         return -raw + model.obj_offset
     return raw + model.obj_offset
 
 def verify(model, x, z=None, tol=1e-7, check_integer=True):
     x = np.asarray(x, np.longdouble)
-    G, h, _ = model.inequalities()
-    G = G.astype(np.longdouble)
+    from .sparse import CSRMatrix
+    is_sparse = isinstance(model.A, CSRMatrix)
+    if is_sparse:
+        G, h, _ = model.sparse_inequalities(bounds=True)
+    else:
+        G, h, _ = model.inequalities()
+        G = G.astype(np.longdouble)
     h = h.astype(np.longdouble)
 
     if x.shape != model.c.shape or not np.isfinite(x).all():
@@ -47,9 +54,14 @@ def verify(model, x, z=None, tol=1e-7, check_integer=True):
     box_viol = float(max(lb_viol.max() if len(lb_viol) else 0.0, ub_viol.max() if len(ub_viol) else 0.0))
 
     if len(h) > 0:
-        activity = G @ x
-        violation = np.maximum(activity - h, 0.0)
-        scale = 1.0 + np.abs(h) + np.abs(G) @ np.abs(x)
+        if is_sparse:
+            activity = G.dot(x)
+            violation = np.maximum(activity - h, 0.0)
+            scale = 1.0 + np.abs(h) + G.abs_dot(np.abs(x))
+        else:
+            activity = G @ x
+            violation = np.maximum(activity - h, 0.0)
+            scale = 1.0 + np.abs(h) + np.abs(G) @ np.abs(x)
         primal = float(np.max(violation / scale, initial=0.0))
         absolute = float(np.max(violation, initial=0.0))
     else:
@@ -60,9 +72,16 @@ def verify(model, x, z=None, tol=1e-7, check_integer=True):
     absolute = max(absolute, box_viol)
 
     integ = float(max((abs(x[j] - np.rint(x[j])) for j in model.integer), default=0.0))
-    Q_arr = np.zeros((len(x), len(x)), dtype=float) if model.Q is None else np.asarray(model.Q, dtype=float)
-    grad = Q_arr.astype(np.longdouble) @ x + model.c
-    obj = _reported_objective(model, x, Q_arr)
+    if model.Q is None:
+        grad = model.c.astype(np.longdouble)
+        obj = _reported_objective(model, x, None)
+    elif hasattr(model.Q, 'dot'):
+        grad = model.Q.dot(x).astype(np.longdouble) + model.c
+        obj = _reported_objective(model, x, model.Q)
+    else:
+        Q_arr = np.asarray(model.Q, dtype=np.longdouble)
+        grad = Q_arr @ x + model.c
+        obj = _reported_objective(model, x, Q_arr)
 
     report = dict(
         feasible=primal <= tol and (not check_integer or integ <= tol),
@@ -85,11 +104,21 @@ def verify(model, x, z=None, tol=1e-7, check_integer=True):
                 complementarity_passed=False,
             )
             return report
-        raw_obj = float(model.c.astype(np.longdouble) @ x + x @ Q_arr.astype(np.longdouble) @ x / 2.0)
+        if model.Q is None:
+            raw_obj = float(model.c.astype(np.longdouble) @ x)
+        elif hasattr(model.Q, 'dot'):
+            raw_obj = float(model.c.astype(np.longdouble) @ x + x @ model.Q.dot(x) / 2.0)
+        else:
+            raw_obj = float(model.c.astype(np.longdouble) @ x + x @ Q_arr @ x / 2.0)
         scale_obj = 1.0 + abs(raw_obj)
         dual = float(np.max(np.maximum(-z, 0.0), initial=0.0))
-        stat_denom = 1.0 + np.max(np.abs(grad)) + np.max(np.abs(G.T) @ np.abs(z))
-        station = float(np.max(np.abs(grad + G.T @ z)) / stat_denom)
+        if is_sparse:
+            abs_GTz = G.abs_transpose_dot(np.abs(z))
+            stat_denom = 1.0 + np.max(np.abs(grad)) + np.max(abs_GTz)
+            station = float(np.max(np.abs(grad + G.transpose_dot(z))) / stat_denom)
+        else:
+            stat_denom = 1.0 + np.max(np.abs(grad)) + np.max(np.abs(G.T) @ np.abs(z))
+            station = float(np.max(np.abs(grad + G.T @ z)) / stat_denom)
         comp_denom = scale_obj + np.max(np.abs(z * h))
         comp = float(np.max(np.abs(z * (activity - h))) / comp_denom)
         gap_denom = scale_obj + abs(float(z @ h))

@@ -40,9 +40,21 @@ class Model:
     @classmethod
     def from_dict(cls, d):
         c=np.asarray(d['c'],dtype=float); n=len(c)
-        A=np.asarray(d.get('A',[]),dtype=float).reshape((-1,n))
+        A_raw = d.get('A', [])
+        from .sparse import CSRMatrix
+        if isinstance(A_raw, CSRMatrix):
+            A = A_raw
+        elif d.get('A_format') == 'csr':
+            A = CSRMatrix(d['A_shape'][0], d['A_shape'][1],
+                          np.asarray(d['A_indptr'], dtype=np.int64),
+                          np.asarray(d['A_indices'], dtype=np.int64),
+                          np.asarray(d['A_data'], dtype=np.float64),
+                          validate=False)
+        else:
+            A=np.asarray(A_raw,dtype=float).reshape((-1,n))
         def vec(k,default):
-            return np.asarray([default if v is None else v for v in d.get(k,[default]*len(A))],float)
+            num_rows = A.shape[0] if hasattr(A, 'shape') else len(A)
+            return np.asarray([default if v is None else v for v in d.get(k,[default]*num_rows)],float)
         # Default upper bound is +inf (unbounded above) when not specified
         upper_raw = d.get('upper', None)
         if upper_raw is None:
@@ -62,17 +74,37 @@ class Model:
         obj.validate(); return obj
 
     def validate(self, max_vars=None, max_rows=None):
-        n=len(self.c); m=len(self.A)
-        if max_vars is None:
-            max_vars = 5000 if (self.Q is not None or hasattr(self, 'qplib_meta')) else (5000 if self.integer else 5000)
-        if max_rows is None:
-            max_rows = 15000 if (self.Q is not None or hasattr(self, 'qplib_meta')) else (5000 if self.integer else 5000)
-        if not (0 < n <= max_vars and 0 <= m <= max_rows):
-            raise ValueError(f'Declared resource limit: 1..{max_vars} variables, <={max_rows} input rows (got {n} vars, {m} rows)')
-        if self.A.shape!=(m,n) or any(v.shape!=(n,) for v in [self.lower,self.upper]): raise ValueError('Invalid dimensions')
+        from .sparse import CSRMatrix
+        is_sparse = isinstance(self.A, CSRMatrix)
+        n = len(self.c)
+        m = self.A.shape[0] if hasattr(self.A, 'shape') else len(self.A)
+
+        if is_sparse:
+            # Sovereign sparse memory and dimension guard:
+            # Safe for large-scale models up to 10M variables / rows provided sparse bytes <= 2.0 GB
+            if not (0 < n <= 10_000_000 and 0 <= m <= 10_000_000):
+                raise ValueError(f'Declared sparse dimension limit: 1..10000000 vars/rows (got {n} vars, {m} rows)')
+            if self.A.shape != (m, n):
+                raise ValueError('Invalid dimensions: sparse matrix shape does not match (m, n)')
+            if self.A.memory_bytes > 2_000_000_000:
+                raise ValueError(f'Sparse model exceeds memory guard: {self.A.memory_bytes / 1e6:.1f} MB > 2000 MB')
+            if not np.all(np.isfinite(self.A.data)):
+                raise ValueError('Objective coefficients and constraint matrix must be finite')
+        else:
+            if max_vars is None:
+                max_vars = 5000 if (self.Q is not None or hasattr(self, 'qplib_meta')) else (5000 if self.integer else 5000)
+            if max_rows is None:
+                max_rows = 15000 if (self.Q is not None or hasattr(self, 'qplib_meta')) else (5000 if self.integer else 5000)
+            if not (0 < n <= max_vars and 0 <= m <= max_rows):
+                raise ValueError(f'Declared resource limit: 1..{max_vars} variables, <={max_rows} input rows (got {n} vars, {m} rows)')
+            if self.A.shape != (m, n):
+                raise ValueError('Invalid dimensions')
+            if not np.isfinite(self.A).all():
+                raise ValueError('Objective coefficients and constraint matrix must be finite')
+
+        if any(v.shape!=(n,) for v in [self.lower,self.upper]): raise ValueError('Invalid dimensions')
         if any(v.shape!=(m,) for v in [self.row_lower,self.row_upper]): raise ValueError('Invalid row bound dimensions')
-        # c and A must be finite; variable bounds may be infinite
-        if not (np.isfinite(self.c).all() and np.isfinite(self.A).all()): raise ValueError('Objective coefficients and constraint matrix must be finite')
+        if not np.isfinite(self.c).all(): raise ValueError('Objective coefficients and constraint matrix must be finite')
         if not np.isfinite(self.obj_offset): raise ValueError('obj_offset must be finite')
         if np.isnan(self.lower).any() or np.isnan(self.upper).any(): raise ValueError('NaN variable bounds')
         if np.isnan(self.row_lower).any() or np.isnan(self.row_upper).any(): raise ValueError('NaN row bounds')
@@ -102,8 +134,17 @@ class Model:
         is handled by the simplex ratio test (no leaving variable => LP is unbounded).
         The original model (including infinite bounds) is preserved in self.lower/upper.
         """
+        from .sparse import CSRMatrix
+        if isinstance(self.A, CSRMatrix):
+            m, n = self.A.shape
+            if m * n > 25_000_000:
+                raise ValueError(f"Cannot materialize dense inequalities for large sparse model ({m}x{n}). Use sparse_inequalities() instead.")
+            A_mat = self.A.to_dense()
+        else:
+            A_mat = self.A
+
         rows=[]; rhs=[]; labels=[]
-        for i,a in enumerate(self.A):
+        for i,a in enumerate(A_mat):
             if np.isfinite(self.row_upper[i]): rows.append(a); rhs.append(self.row_upper[i]); labels.append(f'row {i} upper')
             if np.isfinite(self.row_lower[i]): rows.append(-a); rhs.append(-self.row_lower[i]); labels.append(f'row {i} lower')
         if bounds:
@@ -116,12 +157,88 @@ class Model:
             return np.zeros((0,len(self.c)),float), np.zeros(0,float), []
         return np.asarray(rows,float).reshape((-1,len(self.c))),np.asarray(rhs,float),labels
 
+    def sparse_inequalities(self, bounds=False):
+        """Return (G_csr, h, labels) for G*x <= h in sovereign CSRMatrix format without dense arrays."""
+        from .sparse import CSRMatrix, csr_from_dense
+        n = len(self.c)
+        m = self.A.shape[0] if hasattr(self.A, 'shape') else len(self.A)
+
+        upper_finite = np.isfinite(self.row_upper)
+        lower_finite = np.isfinite(self.row_lower)
+        rhs = []
+        labels = []
+
+        if isinstance(self.A, CSRMatrix):
+            new_indptr = [0]
+            indices_list = []
+            data_list = []
+
+            for i in range(m):
+                start = self.A.indptr[i]
+                end = self.A.indptr[i + 1]
+                row_cols = self.A.indices[start:end]
+                row_vals = self.A.data[start:end]
+
+                if upper_finite[i]:
+                    indices_list.append(row_cols)
+                    data_list.append(row_vals)
+                    new_indptr.append(new_indptr[-1] + len(row_cols))
+                    rhs.append(float(self.row_upper[i]))
+                    labels.append(f'row {i} upper')
+
+                if lower_finite[i]:
+                    indices_list.append(row_cols)
+                    data_list.append(-row_vals)
+                    new_indptr.append(new_indptr[-1] + len(row_cols))
+                    rhs.append(float(-self.row_lower[i]))
+                    labels.append(f'row {i} lower')
+
+            if bounds:
+                for j in range(n):
+                    var_name = self.names[j] if j < len(self.names) else f'x{j}'
+                    if np.isfinite(self.upper[j]):
+                        indices_list.append(np.array([j], dtype=np.int64))
+                        data_list.append(np.array([1.0], dtype=np.float64))
+                        new_indptr.append(new_indptr[-1] + 1)
+                        rhs.append(float(self.upper[j]))
+                        labels.append(f'{var_name} upper')
+                    if np.isfinite(self.lower[j]):
+                        indices_list.append(np.array([j], dtype=np.int64))
+                        data_list.append(np.array([-1.0], dtype=np.float64))
+                        new_indptr.append(new_indptr[-1] + 1)
+                        rhs.append(float(-self.lower[j]))
+                        labels.append(f'{var_name} lower')
+
+            m_ineq = len(new_indptr) - 1
+            if indices_list:
+                new_indices = np.concatenate(indices_list)
+                new_data = np.concatenate(data_list)
+            else:
+                new_indices = np.zeros(0, dtype=np.int64)
+                new_data = np.zeros(0, dtype=np.float64)
+
+            G_csr = CSRMatrix(m_ineq, n, np.array(new_indptr, dtype=np.int64), new_indices, new_data, validate=False)
+            return G_csr, np.asarray(rhs, dtype=np.float64), labels
+        else:
+            G, h, labels = self.inequalities(bounds=bounds)
+            return csr_from_dense(G), h, labels
+
     def to_dict(self):
+        from .sparse import CSRMatrix
         fin=lambda a:[None if not np.isfinite(v) else float(v) for v in a]
-        d=dict(name=self.name,names=list(self.names),c=self.c.tolist(),A=self.A.tolist(),
+        d=dict(name=self.name,names=list(self.names),c=self.c.tolist(),
                row_lower=fin(self.row_lower),row_upper=fin(self.row_upper),
                lower=fin(self.lower),upper=fin(self.upper),
                integer=list(self.integer),Q=None if self.Q is None else self.Q.tolist())
+        if isinstance(self.A, CSRMatrix):
+            d['A_format'] = 'csr'
+            d['A_shape'] = list(self.A.shape)
+            d['A_indptr'] = self.A.indptr.tolist()
+            d['A_indices'] = self.A.indices.tolist()
+            d['A_data'] = self.A.data.tolist()
+            d['A'] = []
+        else:
+            d['A'] = self.A.tolist()
         if self.maximize: d['maximize']=True
         if self.obj_offset!=0.0: d['obj_offset']=self.obj_offset
         return d

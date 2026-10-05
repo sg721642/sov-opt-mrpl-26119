@@ -1,0 +1,17 @@
+{
+  "problem_id": "sparse_10000",
+  "seed": 51,
+  "rows": 5000,
+  "columns": 10000,
+  "nonzeros": 30000,
+  "backend": "pdhg-cpu",
+  "status": "LIMIT_REACHED",
+  "iterations": 3000,
+  "objective": -20950.957738171615,
+  "verification_status": "FULL_KKT_FAILED",
+  "wall_clock_seconds": 57.75338030000057,
+  "iteration_seconds": 47.887659399997574,
+  "measured_repeat_number": 3,
+  "device": "CPU (Intel Core 5 210H)",
+  "commit_sha": "9fc1d17682551833ed39f4eace99f49076a21a8c"
+}

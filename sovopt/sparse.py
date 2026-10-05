@@ -36,8 +36,34 @@ class CSRMatrix:
 
     __slots__ = ('n_rows', 'n_cols', 'indptr', 'indices', 'data')
 
-    def __init__(self, n_rows: int, n_cols: int, indptr: np.ndarray, indices: np.ndarray, data: np.ndarray,
-                 validate: bool = True):
+    def __init__(self, *args, n_rows: int | None = None, n_cols: int | None = None,
+                 indptr: np.ndarray | None = None, indices: np.ndarray | None = None, data: np.ndarray | None = None,
+                 row_ptr: np.ndarray | None = None, col_idx: np.ndarray | None = None, values: np.ndarray | None = None,
+                 shape: tuple[int, int] | None = None, validate: bool = True):
+        # Handle positional args: (n_rows, n_cols, indptr, indices, data)
+        if len(args) >= 5:
+            n_rows, n_cols, indptr, indices, data = args[:5]
+        elif len(args) == 3:
+            # (row_ptr, col_idx, values)
+            row_ptr, col_idx, values = args[:3]
+
+        if row_ptr is not None:
+            indptr = row_ptr
+        if col_idx is not None:
+            indices = col_idx
+        if values is not None:
+            data = values
+
+        if shape is not None:
+            n_rows, n_cols = shape
+        elif n_rows is None or n_cols is None:
+            if indptr is not None:
+                n_rows = len(indptr) - 1
+            if indices is not None and len(indices) > 0:
+                n_cols = int(np.max(indices)) + 1
+            else:
+                n_cols = 0
+
         self.n_rows = int(n_rows)
         self.n_cols = int(n_cols)
         self.indptr = np.asarray(indptr, dtype=np.int64)
@@ -46,6 +72,9 @@ class CSRMatrix:
 
         if validate:
             self.validate()
+
+    def __len__(self) -> int:
+        return self.n_rows
 
     @property
     def shape(self) -> tuple[int, int]:
@@ -59,6 +88,27 @@ class CSRMatrix:
     def density(self) -> float:
         total = self.n_rows * self.n_cols
         return (self.nnz / total) if total > 0 else 0.0
+
+    @property
+    def row_ptr(self) -> np.ndarray:
+        return self.indptr
+
+    @property
+    def col_idx(self) -> np.ndarray:
+        return self.indices
+
+    @property
+    def values(self) -> np.ndarray:
+        return self.data
+
+    @property
+    def dtype(self) -> np.dtype:
+        return self.data.dtype
+
+    @property
+    def memory_bytes(self) -> int:
+        """Estimated memory footprint of CSR data structures in bytes."""
+        return int(self.indptr.nbytes + self.indices.nbytes + self.data.nbytes)
 
     def validate(self) -> None:
         """Validate structure, monotonically increasing pointers, and index bounds."""
@@ -83,6 +133,15 @@ class CSRMatrix:
             if np.min(self.indices) < 0 or np.max(self.indices) >= self.n_cols:
                 raise SparseIndexError(f"indices contains elements outside [0, {self.n_cols - 1}]")
 
+        # Check monotonicity of column indices within each row
+        for r in range(self.n_rows):
+            start = self.indptr[r]
+            end = self.indptr[r + 1]
+            if end - start > 1:
+                row_cols = self.indices[start:end]
+                if np.any(np.diff(row_cols) <= 0):
+                    raise ValueError(f"Column indices within row {r} must be strictly increasing")
+
         if not np.all(np.isfinite(self.data)):
             raise ValueError("CSR data contains non-finite entries (NaN or Inf)")
 
@@ -91,13 +150,17 @@ class CSRMatrix:
                          self.indptr.copy(), self.indices.copy(), self.data.copy(),
                          validate=False)
 
-    def matvec(self, x: np.ndarray) -> np.ndarray:
-        """Compute y = A @ x (shape m)."""
+    def dot(self, x: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
+        """Compute y = A @ x (shape m), optionally writing into out."""
         x_arr = np.asarray(x, dtype=np.float64)
         if x_arr.shape != (self.n_cols,):
-            raise SparseShapeError(f"matvec dimension mismatch: matrix has {self.n_cols} cols, x has shape {x_arr.shape}")
+            raise SparseShapeError(f"dot dimension mismatch: matrix has {self.n_cols} cols, x has shape {x_arr.shape}")
 
-        y = np.zeros(self.n_rows, dtype=np.float64)
+        if out is None:
+            out = np.zeros(self.n_rows, dtype=np.float64)
+        else:
+            out.fill(0.0)
+
         indptr = self.indptr
         indices = self.indices
         data = self.data
@@ -106,16 +169,24 @@ class CSRMatrix:
             start = indptr[i]
             end = indptr[i + 1]
             if start < end:
-                y[i] = np.dot(data[start:end], x_arr[indices[start:end]])
-        return y
+                out[i] = np.dot(data[start:end], x_arr[indices[start:end]])
+        return out
 
-    def rmatvec(self, y: np.ndarray) -> np.ndarray:
-        """Compute x = A.T @ y (shape n)."""
+    def matvec(self, x: np.ndarray) -> np.ndarray:
+        """Compute y = A @ x (shape m). Alias for dot(x)."""
+        return self.dot(x)
+
+    def transpose_dot(self, y: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
+        """Compute x = A.T @ y (shape n), optionally writing into out."""
         y_arr = np.asarray(y, dtype=np.float64)
         if y_arr.shape != (self.n_rows,):
-            raise SparseShapeError(f"rmatvec dimension mismatch: matrix has {self.n_rows} rows, y has shape {y_arr.shape}")
+            raise SparseShapeError(f"transpose_dot dimension mismatch: matrix has {self.n_rows} rows, y has shape {y_arr.shape}")
 
-        x = np.zeros(self.n_cols, dtype=np.float64)
+        if out is None:
+            out = np.zeros(self.n_cols, dtype=np.float64)
+        else:
+            out.fill(0.0)
+
         indptr = self.indptr
         indices = self.indices
         data = self.data
@@ -126,8 +197,82 @@ class CSRMatrix:
             if start < end:
                 val = y_arr[i]
                 if val != 0.0:
-                    np.add.at(x, indices[start:end], data[start:end] * val)
-        return x
+                    np.add.at(out, indices[start:end], data[start:end] * val)
+        return out
+
+    def rmatvec(self, y: np.ndarray) -> np.ndarray:
+        """Compute x = A.T @ y (shape n). Alias for transpose_dot(y)."""
+        return self.transpose_dot(y)
+
+    def abs_dot(self, x: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
+        """Compute y = |A| @ x (shape m), optionally writing into out."""
+        x_arr = np.asarray(x, dtype=np.float64)
+        if x_arr.shape != (self.n_cols,):
+            raise SparseShapeError(f"abs_dot dimension mismatch: matrix has {self.n_cols} cols, x has shape {x_arr.shape}")
+
+        if out is None:
+            out = np.zeros(self.n_rows, dtype=np.float64)
+        else:
+            out.fill(0.0)
+
+        indptr = self.indptr
+        indices = self.indices
+        abs_data = np.abs(self.data)
+
+        for i in range(self.n_rows):
+            start = indptr[i]
+            end = indptr[i + 1]
+            if start < end:
+                out[i] = np.dot(abs_data[start:end], x_arr[indices[start:end]])
+        return out
+
+    def abs_transpose_dot(self, y: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
+        """Compute x = |A|^T @ y (shape n), optionally writing into out."""
+        y_arr = np.asarray(y, dtype=np.float64)
+        if y_arr.shape != (self.n_rows,):
+            raise SparseShapeError(f"abs_transpose_dot dimension mismatch: matrix has {self.n_rows} rows, y has shape {y_arr.shape}")
+
+        if out is None:
+            out = np.zeros(self.n_cols, dtype=np.float64)
+        else:
+            out.fill(0.0)
+
+        indptr = self.indptr
+        indices = self.indices
+        abs_data = np.abs(self.data)
+
+        for i in range(self.n_rows):
+            start = indptr[i]
+            end = indptr[i + 1]
+            if start < end:
+                val = y_arr[i]
+                if val != 0.0:
+                    np.add.at(out, indices[start:end], abs_data[start:end] * val)
+        return out
+
+    def transpose(self) -> CSRMatrix:
+        """Return transpose A.T as a canonical CSRMatrix in O(nnz) without dense conversion."""
+        csc = self.to_csc()
+        return CSRMatrix(self.n_cols, self.n_rows, csc.indptr, csc.indices, csc.data, validate=False)
+
+    def row_sums(self, abs_vals: bool = False) -> np.ndarray:
+        """Compute row sums in O(nnz)."""
+        d = np.abs(self.data) if abs_vals else self.data
+        sums = np.zeros(self.n_rows, dtype=np.float64)
+        indptr = self.indptr
+        for i in range(self.n_rows):
+            start = indptr[i]
+            end = indptr[i + 1]
+            if start < end:
+                sums[i] = np.sum(d[start:end])
+        return sums
+
+    def col_sums(self, abs_vals: bool = False) -> np.ndarray:
+        """Compute column sums in O(nnz)."""
+        d = np.abs(self.data) if abs_vals else self.data
+        if len(d) == 0:
+            return np.zeros(self.n_cols, dtype=np.float64)
+        return np.bincount(self.indices, weights=d, minlength=self.n_cols).astype(np.float64)
 
     def get_row(self, i: int) -> tuple[np.ndarray, np.ndarray]:
         """Return (col_indices, values) for row i."""
@@ -289,6 +434,9 @@ class CSCMatrix:
         if validate:
             self.validate()
 
+    def __len__(self) -> int:
+        return self.n_rows
+
     @property
     def shape(self) -> tuple[int, int]:
         return (self.n_rows, self.n_cols)
@@ -301,6 +449,27 @@ class CSCMatrix:
     def density(self) -> float:
         total = self.n_rows * self.n_cols
         return (self.nnz / total) if total > 0 else 0.0
+
+    @property
+    def col_ptr(self) -> np.ndarray:
+        return self.indptr
+
+    @property
+    def row_idx(self) -> np.ndarray:
+        return self.indices
+
+    @property
+    def values(self) -> np.ndarray:
+        return self.data
+
+    @property
+    def dtype(self) -> np.dtype:
+        return self.data.dtype
+
+    @property
+    def memory_bytes(self) -> int:
+        """Estimated memory footprint of CSC data structures in bytes."""
+        return int(self.indptr.nbytes + self.indices.nbytes + self.data.nbytes)
 
     def validate(self) -> None:
         """Validate structure, monotonically increasing pointers, and index bounds."""

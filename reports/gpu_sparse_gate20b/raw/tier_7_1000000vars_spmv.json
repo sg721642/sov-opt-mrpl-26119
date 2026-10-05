@@ -1,0 +1,33 @@
+{
+  "benchmark": "1M_spmv_microbenchmark",
+  "provenance": "AUTOMATIC",
+  "machine": "Acer Nitro V 16S (ANV16S-71)",
+  "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+  "n_vars": 1000000,
+  "n_rows": 500000,
+  "nnz_per_row": 6,
+  "actual_nnz": 2999993,
+  "seed": 57,
+  "csr_memory_bytes": 51999896,
+  "csr_build_seconds": 0.19384590000117896,
+  "gpu_upload_seconds": 0.10802300000068499,
+  "spmv_cuda_ms_all": [
+    0.18450000061420724,
+    0.1784999985829927,
+    0.1767999965522904,
+    0.17779999689082615,
+    0.17550000120536424
+  ],
+  "spmv_cuda_ms_median": 0.17779999689082615,
+  "spmv_transpose_cuda_ms_all": [
+    0.2832000027410686,
+    0.2010000025620684,
+    0.1993000005313661,
+    0.1975999985006638,
+    0.19749999773921445
+  ],
+  "spmv_transpose_cuda_ms_median": 0.1993000005313661,
+  "benchmark_timestamp": "2026-10-05",
+  "commit_sha": "9fc1d17682551833ed39f4eace99f49076a21a8c",
+  "notes": "Vectorized CSR generation. 5-rep timed runs after 1 warmup. Saved automatically from spmv_bench.py \u2014 not reconstructed manually."
+}

@@ -25,7 +25,7 @@ CHECKSUM_FILE = ROOT / "SHA256SUMS.json"
 RAW_EXTENSIONS = {
     ".mps", ".qplib", ".sol", ".solu", ".lp",
     ".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf",
-    ".gz", ".zip", ".tar", ".bin", ".pyc",
+    ".gz", ".bz2", ".zip", ".tar", ".bin", ".pyc",
 }
 
 

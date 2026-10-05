@@ -11,7 +11,7 @@ import numpy as np
 
 from .model import Model
 from .linalg import NumericalError
-from .sparse import csc_from_triplets, CSCMatrix
+from .sparse import csc_from_triplets, CSCMatrix, CSRMatrix
 from .sparse_lu import SparseBasisEngine, PLATFORM_LONGDOUBLE_EXTENDED
 from .verify import verify, verify_unbounded_certificate
 
@@ -498,8 +498,17 @@ def solve_dual_simplex(model, basis_state: Optional[DualBasisState] = None,
     cost = np.concatenate([c, np.zeros(m, dtype=np.float64)])
 
     # Construct M directly in CSC without materializing dense M
-    r_nz, c_nz = np.nonzero(A)
-    v_nz = A[r_nz, c_nz].astype(np.float64)
+    if isinstance(A, CSRMatrix):
+        r_nz = np.repeat(np.arange(A.n_rows, dtype=np.int64), np.diff(A.indptr))
+        c_nz = A.indices.astype(np.int64, copy=False)
+        v_nz = A.data.astype(np.float64, copy=False)
+    elif isinstance(A, CSCMatrix):
+        c_nz = np.repeat(np.arange(A.n_cols, dtype=np.int64), np.diff(A.col_ptr))
+        r_nz = A.row_idx.astype(np.int64, copy=False)
+        v_nz = A.values.astype(np.float64, copy=False)
+    else:
+        r_nz, c_nz = np.nonzero(A)
+        v_nz = A[r_nz, c_nz].astype(np.float64)
     r_slack = np.arange(m, dtype=np.int64)
     c_slack = np.arange(n, total_cols, dtype=np.int64)
     v_slack = np.ones(m, dtype=np.float64)

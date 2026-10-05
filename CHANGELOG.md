@@ -1,5 +1,18 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.16] - 2026-10-05
+
+### Gate 20B: Physical RTX 5050 True-Sparse CUDA Validation & Evidence Reconciliation
+
+- **feat(gpu): Physical RTX 5050 True-Sparse CUDA Validation:**
+  - Evaluated sovereign CSR-based CUDA PDHG acceleration against CPU PDHG across 7 synthetic true-sparse tiers (10K to 1M variables) on Acer Nitro V 16S (Intel Core 5 210H, NVIDIA RTX 5050 Laptop GPU, 8 GB VRAM).
+  - Validated 5.81x end-to-end wall-clock speedup on 10,000-variable true-sparse tier with identical objective endpoints (-20950.9577, diff = 0.0) and LIMIT_REACHED termination.
+  - Recorded 448x steady-state kernel throughput ratio (47.86s CPU vs 0.107s CUDA iteration time) as a secondary engineering metric.
+  - Successfully ingested and evaluated authentic Mittelmann benchmark instances on CUDA: `chromaticindex1024-7` reached OPTIMAL_VERIFIED in 80.21s with KKT certificate.
+  - Evaluated 1M-variable sparse LP with sovereign CSR SpMV (0.18 ms) and Transpose-SpMV (0.20 ms) latencies on consumer RTX 5050 hardware; end-to-end solve hit 60s timeout without speedup inference.
+  - Reconciled evidence via `scripts/reconcile_gpu_gate20b.py` with explicit provenance tracking (`AUTOMATIC` vs `RECOVERED_FROM_LOG`).
+  - Added Windows BLAS crash guard in `tests/test_sparse_core.py` using `np.einsum` for test baseline references.
+
 ## [0.3.15] - 2026-10-05
 
 ### Gate 19A: Final CPU / Benchmark / Evidence Hardening Pass

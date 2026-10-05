@@ -1,0 +1,21 @@
+{
+  "instance": "brazil3",
+  "file": "brazil3.mps.bz2",
+  "rows": 14646,
+  "cols": 23968,
+  "nnz": 133184,
+  "density": 0.0003794,
+  "csr_memory_bytes": 2248128,
+  "parse_time_seconds": 0.4242,
+  "cpu_status": "LIMIT_REACHED (TIMEOUT > 60s)",
+  "cuda_status": "LIMIT_REACHED",
+  "cpu_iterations": 3000,
+  "cuda_iterations": 3000,
+  "cpu_objective": null,
+  "cuda_objective": 0.9156419101206124,
+  "cpu_total_seconds": 60.0,
+  "cuda_total_seconds": 29.86,
+  "cuda_setup_seconds": 0.12,
+  "cuda_iteration_seconds": 29.74,
+  "gpu_executed": true
+}

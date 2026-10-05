@@ -1,0 +1,21 @@
+{
+  "instance": "supportcase10",
+  "file": "supportcase10.mps.bz2",
+  "rows": 165684,
+  "cols": 14770,
+  "nnz": 555082,
+  "density": 0.0002268,
+  "csr_memory_bytes": 10206792,
+  "parse_time_seconds": 1.7431,
+  "cpu_status": "LIMIT_REACHED (TIMEOUT > 60s)",
+  "cuda_status": "LIMIT_REACHED",
+  "cpu_iterations": 3000,
+  "cuda_iterations": 3000,
+  "cpu_objective": null,
+  "cuda_objective": 6.336551481092484,
+  "cpu_total_seconds": 60.0,
+  "cuda_total_seconds": 58.17,
+  "cuda_setup_seconds": 0.45,
+  "cuda_iteration_seconds": 57.72,
+  "gpu_executed": true
+}

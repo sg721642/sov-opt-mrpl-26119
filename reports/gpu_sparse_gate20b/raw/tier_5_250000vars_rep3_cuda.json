@@ -1,0 +1,17 @@
+{
+  "problem_id": "sparse_250000",
+  "seed": 55,
+  "rows": 125000,
+  "columns": 250000,
+  "nonzeros": 750000,
+  "backend": "pdhg-cuda",
+  "status": "LIMIT_REACHED (TIMEOUT > 240s)",
+  "iterations": 2000,
+  "objective": null,
+  "verification_status": null,
+  "wall_clock_seconds": 240.0216486999998,
+  "iteration_seconds": 240.0216486999998,
+  "measured_repeat_number": 3,
+  "device": "NVIDIA GeForce RTX 5050 Laptop GPU",
+  "commit_sha": "9fc1d17682551833ed39f4eace99f49076a21a8c"
+}

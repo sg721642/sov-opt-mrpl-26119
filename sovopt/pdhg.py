@@ -9,26 +9,40 @@ import time
 import numpy as np
 from .verify import verify
 from .cuda_backend import is_cuda_available, CUDABackend
+from .sparse import CSRMatrix as SovereignCSRMatrix, csr_from_dense
 
-class CSRMatrix:
-    """Sovereign CPU Compressed Sparse Row representation."""
+class CSRMatrix(SovereignCSRMatrix):
+    """Sovereign CPU Compressed Sparse Row representation with dense-array fallback."""
 
-    def __init__(self, A):
-        self.m, self.n = A.shape
-        r, j = np.nonzero(A)
-        self.r = np.asarray(r, dtype=np.int32)
-        self.j = np.asarray(j, dtype=np.int32)
-        self.a = np.asarray(A[r, j], dtype=np.float64)
-        self.p = np.asarray(np.r_[0, np.cumsum(np.bincount(r, minlength=self.m))], dtype=np.int32)
-
-    def dot(self, x, out=None):
-        if out is None:
-            out = np.zeros(self.m, dtype=np.float64)
+    def __init__(self, A_or_m, n=None, indptr=None, indices=None, data=None, validate=True):
+        if n is None and indptr is None:
+            if isinstance(A_or_m, SovereignCSRMatrix):
+                super().__init__(A_or_m.n_rows, A_or_m.n_cols, A_or_m.indptr, A_or_m.indices, A_or_m.data, validate=False)
+            else:
+                csr = csr_from_dense(A_or_m)
+                super().__init__(csr.n_rows, csr.n_cols, csr.indptr, csr.indices, csr.data, validate=False)
         else:
-            out.fill(0.0)
-        if len(self.r) > 0:
-            np.add.at(out, self.r, self.a * x[self.j])
-        return out
+            super().__init__(A_or_m, n, indptr, indices, data, validate=validate)
+
+    @property
+    def m(self):
+        return self.n_rows
+
+    @property
+    def n(self):
+        return self.n_cols
+
+    @property
+    def p(self):
+        return self.indptr
+
+    @property
+    def j(self):
+        return self.indices
+
+    @property
+    def a(self):
+        return self.data
 
 
 def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, restart=1000, scaling=True, **kwargs):
@@ -82,48 +96,49 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
         to_cpu = np.asarray
         sync = lambda: None
 
-    # Extract standard inequality form: G * x <= h
-    G, h, _ = model.inequalities(bounds=False)
+    # Extract standard inequality form: G * x <= h in sovereign CSR format
+    if hasattr(model, 'sparse_inequalities'):
+        G_sp, h, _ = model.sparse_inequalities(bounds=False)
+    else:
+        G_raw, h, _ = model.inequalities(bounds=False)
+        G_sp = csr_from_dense(G_raw)
+
     n = len(model.c)
     m = len(h)
 
     setup_start = time.perf_counter()
 
+    GT_sp = G_sp.transpose()
+
     if cuda is not None:
-        r_G, j_G = np.nonzero(G)
-        a_G = G[r_G, j_G]
-        ord_G = np.argsort(r_G, kind="stable")
-        r_G = r_G[ord_G].astype(np.int32)
-        j_G = j_G[ord_G].astype(np.int32)
-        a_G = a_G[ord_G].astype(np.float64)
-        p_G = np.r_[0, np.cumsum(np.bincount(r_G, minlength=m))].astype(np.int32)
+        p_G = G_sp.indptr.astype(np.int32)
+        j_G = G_sp.indices.astype(np.int32)
+        a_G = G_sp.data.astype(np.float64)
         A = cuda.build_csr(p_G, j_G, a_G, (m, n))
 
-        r_GT, j_GT = np.nonzero(G.T)
-        a_GT = G.T[r_GT, j_GT]
-        ord_GT = np.argsort(r_GT, kind="stable")
-        r_GT = r_GT[ord_GT].astype(np.int32)
-        j_GT = j_GT[ord_GT].astype(np.int32)
-        a_GT = a_GT[ord_GT].astype(np.float64)
-        p_GT = np.r_[0, np.cumsum(np.bincount(r_GT, minlength=n))].astype(np.int32)
+        p_GT = GT_sp.indptr.astype(np.int32)
+        j_GT = GT_sp.indices.astype(np.int32)
+        a_GT = GT_sp.data.astype(np.float64)
         AT = cuda.build_csr(p_GT, j_GT, a_GT, (n, m))
     else:
-        A = CSRMatrix(G)
-        AT = CSRMatrix(G.T)
+        A = G_sp
+        AT = GT_sp
 
     c = xp.asarray(model.c, dtype=xp.float64)
     lo = xp.asarray(model.lower, dtype=xp.float64)
     hi = xp.asarray(model.upper, dtype=xp.float64)
     hh = xp.asarray(h, dtype=xp.float64)
 
-    # Step-size preconditioning
+    # Step-size preconditioning in O(nnz)
+    row_abs = G_sp.row_sums(abs_vals=True)
+    col_abs = G_sp.col_sums(abs_vals=True)
     if scaling:
-        tau_denom = np.maximum(np.sum(np.abs(G), axis=0), 1.0)
-        sigma_denom = np.maximum(np.sum(np.abs(G), axis=1), 1.0)
+        tau_denom = np.maximum(col_abs, 1.0)
+        sigma_denom = np.maximum(row_abs, 1.0)
         tau = xp.asarray(0.99 / tau_denom, dtype=xp.float64)
         sigma = xp.asarray(0.99 / sigma_denom, dtype=xp.float64)
     else:
-        bound = max(1.0, float(np.sqrt(np.max(np.sum(np.abs(G), axis=0), initial=0.0) * np.max(np.sum(np.abs(G), axis=1), initial=0.0))))
+        bound = max(1.0, float(np.sqrt(np.max(col_abs, initial=0.0) * np.max(row_abs, initial=0.0))))
         tau = xp.full(n, 0.99 / bound, dtype=xp.float64)
         sigma = xp.full(m, 0.99 / bound, dtype=xp.float64)
 
@@ -181,7 +196,7 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
     setup_seconds = time.perf_counter() - setup_start
     compute_start = time.perf_counter()
 
-    AT_cpu = AT if isinstance(AT, CSRMatrix) else CSRMatrix(G.T)
+    AT_cpu = GT_sp
 
     def checked_cpu(xc, yc):
         grad = model.c + AT_cpu.dot(yc)
@@ -206,6 +221,9 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
     restarts_count = 0
     convergence_checks_count = 0
     verification_seconds = 0.0
+
+    check_freq = max(1, int(kwargs.get('check_freq', 100)))
+    time_limit = kwargs.get('time_limit', None)
 
     k = 0
     for k in range(1, max_iter + 1):
@@ -234,7 +252,7 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
             avgy += (y - avgy) * inv_count
 
         # Periodic KKT check & numerical guard
-        if k % 100 == 0 or k == max_iter:
+        if k % check_freq == 0 or k == max_iter:
             xc = to_cpu(x)
             yc = to_cpu(y)
             if not (np.isfinite(xc).all() and np.isfinite(yc).all()):
@@ -281,6 +299,8 @@ def solve_pdhg(model, device='cpu', backend=None, tol=1e-7, max_iter=50000, rest
                 relative_gap=vr.get('relative_duality_gap'),
             ))
             if vr.get('kkt_passed', False):
+                break
+            if time_limit is not None and (time.perf_counter() - compute_start) >= float(time_limit):
                 break
 
         # Deterministic periodic restart
