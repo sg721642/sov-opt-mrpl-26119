@@ -2,14 +2,55 @@
 
 **Sovereign Numerical Optimization Core**
 
-Smart India Hackathon 2026  
-MRPL Problem Statement 26119  
-Team VarunNetra · Team ID 177365
+Smart India Hackathon 2026 · Problem Statement MRPL PS 26119<br>
+Team VarunNetra · Team ID 177365 · Rajiv Gandhi Institute of Petroleum Technology (RGIPT)<br>
+**Release:** `SOV-OPT v0.3.2` · **Core Freeze Commit:** `17e46f2`<br>
+**Live Cloud Portal:** [https://sov-opt-mrpl-26119.onrender.com](https://sov-opt-mrpl-26119.onrender.com) (CPU-only cloud instance)<br>
+**Repository:** [https://github.com/sg721642/sov-opt-mrpl-26119](https://github.com/sg721642/sov-opt-mrpl-26119)
 
-SOV-OPT is a sovereign LP/MILP/convex-QP optimization core developed for industrial refinery-planning workflows, with independent numerical verification, safe solver status semantics, optional GPU acceleration, and an auditable Trust Passport workflow.
+---
 
-**Live Demo:** https://sov-opt-mrpl-26119.onrender.com  
-**Repository:** https://github.com/sg721642/sov-opt-mrpl-26119
+## ⚡ 30-Second Judge Executive Summary
+
+1. **What is SOV-OPT?**
+   SOV-OPT is an indigenous, dependency-free mathematical optimization core built from first principles in pure Python and NumPy (`numpy==2.3.5`). It contains **zero third-party solver dependencies or wrappers** (no HiGHS, SCIP, CBC, PuLP, CVXPY, Gurobi, or CPLEX inside the core).
+
+2. **Why MRPL Needs It**
+   Designed to **reduce dependency on proprietary commercial solvers** for refinery production planning, blending, and conversion scheduling, delivering complete source-code auditability, transparent mathematical provenance, and verifiable computational trust.
+
+3. **Sovereignty Boundary & Verification Guarantee**
+   The core solver (`sovopt/`) is strictly sovereign. An **independent Numerical Trust Layer** re-evaluates Karush-Kuhn-Tucker (KKT) residuals, complementary slackness, integer tolerances, and certificate rays directly on unscaled original equations before any result is accepted as `OPTIMAL_VERIFIED`.
+
+4. **Core Capabilities**
+   - **Continuous LP:** Revised primal simplex and bounded-variable dual simplex with threshold Markowitz sparse LU ($u=0.1$) and PFI eta updates; first-order restarted PDHG.
+   - **MILP:** Branch-and-bound with pseudocost branching, dual warm starts, safe primal heuristics (rounding and root diving), and **validated binary cover cuts** (40–54.5% node reduction on knapsack/oracle benchmarks).
+   - **Intra-Solve Parallel B&B:** Genuine multi-process tree search with shared incumbent and bound synchronization (**1.94× speedup on 2 workers with 97.0% parallel efficiency** on identical 287-node search).
+   - **Convex QP:** Infeasible-start Mehrotra predictor-corrector primal-dual interior point method with exact Lagrangian KKT verification.
+   - **GPU Acceleration:** Restarted Primal-Dual Hybrid Gradient (PDHG) implemented via custom CUDA C++ `RawKernel` SpMV routines (**5.81× end-to-end acceleration** over CPU on 10K true-sparse workload on physical RTX 5050).
+   - **Diagnostic Infeasibility:** Exact rational Farkas ray certificates ($\mathbb{Q}$) and Farkas Lens diagnostic ranking (*diagnostic ranking, not a minimal IIS*).
+
+5. **Verified Evidence Summary**
+   - **Netlib LP:** 17 authentic instances solved and KKT verified; differentially compared against HiGHS 1.15.1.
+   - **MIPLIB 2017:** 38 authentic instances evaluated under honest bounded budgets (`LIMIT_REACHED` reported without false claims); up to 39× fixed-budget node progress with 4 parallel workers.
+   - **QPLIB 2018:** 4 authentic convex QP instances evaluated and KKT verified.
+   - **Hans Mittelmann LP:** 4 authentic instances acquired (`qap15`, `brazil3`, `chromaticindex1024-7`, `supportcase10`); on the physical RTX 5050 CUDA backend, SOV-OPT reached `OPTIMAL_VERIFIED` for the authentic Mittelmann `chromaticindex1024-7` instance in the recorded 80.21 s run, with the returned solution passing the project's numerical KKT verification.
+   - **Physical GPU:** 5.81× end-to-end acceleration on 10K true-sparse PDHG on physical NVIDIA RTX 5050 Laptop GPU; 448.3× steady-state compute-loop ratio (secondary microbenchmark metric).
+   - **Scale Stress Validation:** 1M-variable $\times$ 500K-row true-sparse GPU representation and SpMV were validated on the physical RTX 5050 (1,000,000 variables $\times$ 500,000 rows $\times$ 2,999,993 nonzeros; GPU upload ~108.0 ms, SpMV median ~0.178 ms, transpose SpMV median ~0.199 ms across 5 timed repetitions; representation stress test, not an optimization solve). Earlier Gate 20A CPU sparse representation stress test evaluated 2,500,000 nonzeros. Architectural guard rail at 10M variables.
+
+6. **How to Run & Verify**
+   ```bash
+   # 1. Run full 368-test automated regression suite (357 passed, 11 skipped)
+   .venv/bin/python -m unittest discover -s tests -v
+
+   # 2. Verify repository cryptographic integrity ledger (SHA-256)
+   .venv/bin/python scripts/verify_checksums.py
+
+   # 3. Launch local interactive workstation
+   python server.py --host 127.0.0.1 --port 8000
+   ```
+
+7. **External Solver Baseline Policy**
+   External solvers (HiGHS 1.15.1, SciPy) are used exclusively in isolated subprocess worker scripts (`scripts/baseline_worker.py`) for differential benchmarking. Every result, including baseline speed advantages and timeout/limit cases, is published transparently without cherry-picking.
 
 ---
 
@@ -92,10 +133,10 @@ Trust Passport & Telemetry Output
 
 | Problem Class | Core Method | Linear Algebra Backend | Verification Method |
 | :--- | :--- | :--- | :--- |
-| **Linear Program (LP)** | Revised Primal Simplex / Bounded-Variable Dual Simplex (Devex pricing, Harris ratio test) | Sovereign Sparse LU (Threshold Markowitz $u=0.1$, PFI eta updates) & Dense LU | Original-model KKT residuals ($r_p, r_d, \text{comp} \le 10^{-7}$) & exact basis duals |
-| **Mixed-Integer LP (MILP)** | Branch-and-Bound with pseudocosts, strong branching bootstrap, and dual warm starts | Sovereign Sparse LU & Dense LU | Integer residual verification ($\le 10^{-6}$) & exact rational lower bound ($\mathbb{Q}$) |
+| **Linear Program (LP)** | Revised Primal Simplex / Bounded-Variable Dual Simplex (Devex pricing, Harris ratio test) | Sovereign Sparse CSR/CSC LU (Threshold Markowitz $u=0.1$, PFI eta updates) & Dense LU | Original-model KKT residuals ($r_p, r_d, \text{comp} \le 10^{-7}$) & exact basis duals |
+| **Mixed-Integer LP (MILP)** | Branch-and-Bound with pseudocosts, dual warm starts, validated binary cover cuts, safe primal heuristics, & intra-solve parallel search | Sovereign Sparse CSR/CSC & Dense LU | Integer residual verification ($\le 10^{-6}$) & exact rational lower bound ($\mathbb{Q}$) |
 | **Convex Quadratic (QP)** | Infeasible-start Mehrotra predictor-corrector Primal-Dual Interior-Point Method | Dense normal equations factorization ($LDL^T$ / LU) | Equality-aware KKT stationarity, primal/dual residuals, & eigenvalue check |
-| **First-Order LP (GPU/CPU)** | Restarted Primal-Dual Hybrid Gradient (PDHG / Chambolle-Pock) with $\ell_1$ preconditioning | Custom CUDA C++ `RawKernel` SpMV (GPU) / Sovereign `CSRMatrix` (CPU) | Independent CPU simplex basis reconstruction & original-model KKT audit |
+| **First-Order LP (GPU/CPU)** | Restarted Primal-Dual Hybrid Gradient (PDHG / Chambolle-Pock) with $\ell_1$ preconditioning | Custom CUDA C++ `RawKernel` SpMV (GPU, 5.81× on 10K true-sparse LP) / Sovereign `CSRMatrix` (CPU) | Independent CPU simplex basis reconstruction & original-model KKT audit |
 
 ---
 
@@ -163,7 +204,7 @@ The built-in digital twin simulates an integrated hydroskimming/reforming/cracki
   - `refinery-qp`: Nonlinear catalytic cracking yield trade-offs and quality penalty curves.
   - `refinery-infeasible`: Demand commitments exceeding total CDU hydraulic capacity.
 
-*Disclaimer: All process unit capacities, stream yields, and pricing coefficients are representative open-literature engineering approximations used to demonstrate solver mechanics.*
+> **Dataset & Model Disclosure:** *Demonstration model — representative open-literature refinery data (Gary & Handwerk; Meyers); not actual MRPL operational data. All units, yields and economics are representative engineering approximations. Numerically verified for the evaluated prototype model.*
 
 ---
 
@@ -171,25 +212,47 @@ The built-in digital twin simulates an integrated hydroskimming/reforming/cracki
 
 - **CPU Path (Default):** Pure Python and standard NumPy. Requires no GPU hardware, compilers, or binary extensions. Runs identically across Linux, macOS, and Windows.
 - **GPU Path (Restarted PDHG):** Utilizes NVIDIA CUDA via CuPy device arrays and custom C++ `RawKernel` SpMV routines. Supported on NVIDIA hardware with compute capability $\ge 7.0$.
-- **Render Production Service:** The live deployment runs in a standard cloud container utilizing the sovereign CPU engine.
+- **Render Production Service:** The live deployment runs in a standard cloud container utilizing the sovereign CPU engine (**CPU-only; no GPU in cloud container**).
 - **Hardware Isolation:** On systems lacking CUDA support (such as Apple Silicon or CPU cloud nodes), requests for CUDA execution truthfully return `status="CUDA_UNAVAILABLE"` with `gpu_executed=false`.
 
 ---
 
 ## Physical GPU Validation
 
-Physical CUDA validation was conducted on a dedicated Acer Laptop equipped with an **NVIDIA GeForce RTX 5050 Laptop GPU** (8 GB VRAM, Driver 572.16, CUDA 12.8, Compute Capability 12.0) running Linux x86_64, evaluated against the frozen 18-instance Netlib continuous LP suite (`data/manifests/gpu_pdhg_lp.json`):
+Physical CUDA validation was conducted on a dedicated Acer Laptop equipped with an **NVIDIA GeForce RTX 5050 Laptop GPU** (8 GB VRAM, Driver 572.16, CUDA 12.8, Compute Capability 12.0) running Linux x86_64:
 
-- **1.81× aggregate CUDA optimization improvement:** Gate 9 CUDA optimizations improved aggregate suite execution time by 1.81× compared to the initial Gate 8 CUDA implementation (189.69s vs 342.64s).
-- **1.07× same-machine aggregate CPU/CUDA ratio:** Across the full 18-instance suite, same-machine execution yielded a 1.07× aggregate ratio (203.56s CPU vs 189.69s CUDA).
-- **1.13× repository-relative LARGE stratum ratio:** Across the largest instances in the suite, same-machine execution yielded a 1.13× ratio (172.04s CPU vs 152.60s CUDA).
+- **Gate 20B True-Sparse PDHG Acceleration (Primary Result):** On a 10,000-variable true-sparse LP workload (`sparse_10k`), both CPU and CUDA backends executed 3,000 iterations from the same random seed, converging to the identical objective ($-20950.957738171615$). The GPU completed in 9.95s compared to 57.75s on CPU, demonstrating an authentic **5.81× end-to-end acceleration**.
+- **Steady-State Compute-Loop Ratio (Secondary Metric):** Under a dedicated microbenchmark measuring raw inner-loop SpMV and vector arithmetic without host-to-device transfers, a 448.3× compute-loop ratio was observed. *Engineering note: This is strictly a steady-state loop ratio, NOT an end-to-end solve speedup.*
+- **Scale Stress Validation:** 1M-variable $\times$ 500K-row true-sparse GPU representation and SpMV were validated on the physical RTX 5050 (1,000,000 variables $\times$ 500,000 rows $\times$ 2,999,993 nonzeros; GPU upload ~108.0 ms, SpMV median ~0.178 ms, transpose SpMV median ~0.199 ms across 5 timed repetitions; representation stress test, not an optimization solve. Earlier Gate 20A CPU sparse representation stress test evaluated 2,500,000 nonzeros).
+- **Authentic Mittelmann Instance:** On the physical RTX 5050 CUDA backend, SOV-OPT reached `OPTIMAL_VERIFIED` for the authentic Mittelmann `chromaticindex1024-7` instance in the recorded 80.21 s run, with the returned solution passing the project's numerical KKT verification.
+- **Historical Gate 9 Netlib Baseline:** Preserved separately (1.07× same-machine aggregate CPU/CUDA ratio across 18 Netlib instances; 1.81× internal CUDA optimization factor).
+- **Render Cloud Disclaimer:** The public Render cloud deployment runs strictly on CPU. GPU results shown here derive from physical hardware runs on the lab Acer RTX 5050 machine.
 
-**Engineering Transparency Disclosures:**
-1. **A $\ge 2\times$ same-machine GPU acceleration over CPU was not demonstrated.** First-order methods on small-to-moderate Netlib instances are bottlenecked by iteration latency and kernel launch overhead.
-2. The stratum designation **"LARGE" is relative to the repository benchmark suite** and should not be interpreted as modern industrial-scale workload size.
-3. Speedup metrics are not conflated: 1.81× represents an internal CUDA code-generation and memory-coalescing improvement factor, not an end-to-end GPU-versus-CPU speedup.
+Full raw execution logs, profiler telemetry, and verification manifests are preserved under [`reports/gpu_sparse_gate20b/`](reports/gpu_sparse_gate20b/) and [`reports/gpu_gate9_final_51b71bb/`](reports/gpu_gate9_final_51b71bb/).
 
-Full driver logs, profiler telemetry, and per-instance runtimes are recorded in [`reports/gpu_gate9_final_51b71bb/`](reports/gpu_gate9_final_51b71bb/).
+---
+
+## Intra-Solve Parallel Branch-and-Bound (Multicore)
+
+SOV-OPT implements genuine intra-solve multi-process branch-and-bound for individual MILP solves:
+- **Tree Coordination:** Central coordinator manages node dispatch, incumbent sharing, global bound tracking, and canonical pseudocost state.
+- **Worker Processes:** Independent worker processes evaluate continuous LP relaxations via warm-started dual simplex.
+- **Matched Engine Scaling (Primary Headline):** On an 18-variable multiknapsack workload using the matched coordinator engine, runtime scaled from 3.445s (1 worker) to 1.776s (2 workers) while exploring the **exact same 287-node search tree**, achieving **1.94x matched-engine solve-to-completion speedup using 2 workers while exploring the identical 287-node search tree, with 97.0% measured parallel efficiency** and identical verified solution.
+- **Search-Order Pruning Effect (Secondary Headline):** On a 16-variable multiknapsack, concurrent worker exploration discovered incumbents earlier, reducing explored nodes from 321 to 59 and yielding a **3.60× solve time reduction** (reported separately due to search divergence).
+- **MIPLIB Fixed-Budget Search Progress:** Across 38 MIPLIB instances evaluated under identical 10-second budgets, 4 workers evaluated up to 39× more branch-and-bound nodes than serial search (*search-progress metric, not solve-to-completion speedup*).
+- **Historical Batch Throughput:** Process-level concurrent batch dispatch across independent problem instances achieved 2.65× on 4 workers (preserved as separate throughput evidence).
+
+Full telemetry and scaling logs are recorded under [`reports/gate20d_parallel_bnb/`](reports/gate20d_parallel_bnb/).
+
+---
+
+## Validated Cutting Planes
+
+- **Binary Cover Cuts:** Automated separation of knapsack cover inequalities with greedy lifting; **0 invalid cuts found under exhaustive binary-oracle validity testing on the tested small models** (100% exhaustive binary-oracle validity agreement on the tested small models). Evaluated on knapsack/oracle MILPs, achieving a **40–54.5% reduction in branch-and-bound search nodes**.
+- **Authentic MIPLIB Evaluation:** Evaluated across 38 authentic MIPLIB instances: 0 improved, 38 unchanged, 0 worsened, with zero correctness regressions or numerical failures.
+- **Gomory / GMI Cuts Deferred:** Postponed for mathematical safety (Option C: current dual simplex interface does not expose a proof-safe original-space tableau mapping).
+
+Full verification and oracle logs are recorded under [`reports/gate20c_milp_cuts/`](reports/gate20c_milp_cuts/).
 
 ---
 
@@ -200,6 +263,7 @@ All performance benchmarks use publicly verifiable problem instances with frozen
 - **Netlib LP:** Authentic linear programming instances (AFIRO, SC50A, SC50B, BLEND, and WOODINFE) from the Netlib repository.
 - **MIPLIB 2017:** Mixed-integer linear programming instances (FLUGPL) evaluated against official ground-truth objective solutions (`miplib2017-v37.solu`).
 - **QPLIB 2018:** Continuous convex quadratic instances (QPLIB_8845, QPLIB_9002) from the ZIB mathematical benchmark collection.
+- **Hans Mittelmann LP:** Authentic large-scale LP benchmark instances (`qap15`, `brazil3`, `chromaticindex1024-7`, `supportcase10`) from the ASU Plato benchmark repository.
 
 Manifest integrity, file sources, and SHA-256 digests are recorded in [`data/manifest.json`](data/manifest.json) and [`data/CATALOGUE.md`](data/CATALOGUE.md).
 
@@ -207,10 +271,10 @@ Manifest integrity, file sources, and SHA-256 digests are recorded in [`data/man
 
 ## Validation & Testing
 
-The test suite covers linear algebra invariants, simplex correctness, QP KKT stationarity, MILP branching semantics, certificate falsification, and HTTP API integration.
+The test suite covers linear algebra invariants, simplex correctness, QP KKT stationarity, MILP branching semantics, cover cut validity, parallel B&B race safety, certificate falsification, and HTTP API integration.
 
 ```bash
-# Run full unit and regression test suite
+# Run full unit and regression test suite (368 tests)
 .venv/bin/python -m unittest discover -s tests -v
 
 # Verify cryptographic manifest checksums
@@ -218,9 +282,9 @@ The test suite covers linear algebra invariants, simplex correctness, QP KKT sta
 ```
 
 **Current Test Results (Local clean environment):**
-- **Ran 344 tests in 62.5s**
-- **330 passed, 14 skipped, 0 failures, 0 errors** (skipped tests correspond to optional loopback network sockets and GPU-only hardware requirements).
-- `verify_checksums.py`: **SUCCESS** (All 313 tracked files match expected SHA-256 digests).
+- **Ran 368 tests in 66.8s**
+- **357 passed, 11 skipped, 0 failures, 0 errors** (skipped tests correspond to optional loopback network sockets and GPU-only hardware requirements).
+- `verify_checksums.py`: **SUCCESS** (All tracked files match expected SHA-256 digests).
 
 ---
 
@@ -296,9 +360,9 @@ SOV-OPT enforces strict, unambiguous solver status semantics:
 
 ```text
 sov-opt-mrpl-26119/
-├── sovopt/              # Sovereign optimization core (simplex, dual simplex, milp, qp, pdhg, verify)
+├── sovopt/              # Sovereign optimization core (simplex, dual simplex, milp, qp, pdhg, verify, sparse, cuts)
 ├── web/                 # Web portal frontend (index.html, app.js, style.css, static assets)
-├── tests/               # Comprehensive automated test suite (344 unit and integration tests)
+├── tests/               # Comprehensive automated test suite (368 unit and integration tests)
 ├── scripts/             # Offline verification, benchmarking, checksum, and reporting tooling
 ├── data/                # Frozen public benchmark datasets, catalogue, and integrity manifests
 ├── reports/             # Verified benchmark reports, physical GPU telemetry, and audit summaries
@@ -360,9 +424,14 @@ Smart India Hackathon 2026 · Team ID: 177365
 
 ## Roadmap
 
-Planned research extensions for subsequent development phases:
+### Completed in v0.3.2
+- ✓ **Sovereign Sparse Core:** True CSR/CSC matrices, Markowitz threshold LU ($u=0.1$), PFI eta updates, SpMV stress-tested to 1,000,000 variables.
+- ✓ **Physical GPU Acceleration (RTX 5050):** 5.81× end-to-end acceleration on 10K true-sparse PDHG; 448.3× steady-state compute-loop ratio.
+- ✓ **Validated Binary Cover Cuts:** Exact cover separation and lifting; 40–54.5% node reduction on targeted knapsack benchmarks.
+- ✓ **Intra-Solve Parallel B&B:** Genuine multi-process tree search; 1.94× matched 2-worker scaling (97.0% efficiency) on identical search tree.
+- ✓ **Mittelmann Benchmark Subset:** 4 authentic instances evaluated; on physical RTX 5050 CUDA backend, SOV-OPT reached `OPTIMAL_VERIFIED` for `chromaticindex1024-7` in the recorded 80.21 s run, with the returned solution passing the project's numerical KKT verification.
 
-- **Parallel Branch-and-Bound:** Multi-threaded tree search with concurrent bounding and lock-free node pools.
-- **Cutting Plane Infrastructure:** Generation of Gomory Mixed-Integer (GMI) and Mixed-Integer Rounding (MIR) cuts.
+### Planned Research Extensions
+- **Gomory Mixed-Integer (GMI) Cuts:** Developing a proof-safe original-space tableau/basis mapping for dual simplex.
 - **Nonlinear & Pooling Formulations:** McCormick relaxation envelopes and Successive Linear Programming (SLP) for multi-component crude blending and pooling models.
 - **Extended Mixed-Integer Quadratic Programming (MIQP):** Branch-and-bound exploration over convex quadratic objectives.

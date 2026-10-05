@@ -20,7 +20,7 @@
     "mode": "text-lf"
   },
   "CHANGELOG.md": {
-    "sha256": "979b82407df11cc2cfbcc1f99145197c4777f686d4ad6e2622808de920b01323",
+    "sha256": "35344b53f21ae2519e874c56248f62bb760a52af8ea45cf065ad633b147d8b1a",
     "mode": "text-lf"
   },
   "Dockerfile": {
@@ -28,7 +28,7 @@
     "mode": "text-lf"
   },
   "README.md": {
-    "sha256": "57aa4be262e70b45374a2f095bd46cf8fec68a18cc66cbbf507d74636e068c4b",
+    "sha256": "8b823822ebb277c281ad54460724a4450ad493cdf796cdb9022f15acad6969d7",
     "mode": "text-lf"
   },
   "START_HERE.html": {
@@ -456,7 +456,7 @@
     "mode": "text-lf"
   },
   "docs/BENCHMARK_METHODOLOGY.md": {
-    "sha256": "a44fde0e819d974028bc889fef9d350aa4a8b68d897ba3a38a7fd73ba729168d",
+    "sha256": "302d3a2f55cf466c6c58ad4b7a6267ce69161b7969133e328028259f471e8091",
     "mode": "text-lf"
   },
   "docs/DEPLOYMENT.md": {
@@ -488,7 +488,7 @@
     "mode": "text-lf"
   },
   "docs/QPLIB_SUPPORT.md": {
-    "sha256": "09b1614588fdb945a031125e6e4a73211685d0bf5f771d465a0edd3677e130bc",
+    "sha256": "90518981e22442ed829af54e8fb806d9cd325233d17c5291805ec6ad320791fa",
     "mode": "text-lf"
   },
   "docs/QP_IPM.md": {
@@ -496,7 +496,7 @@
     "mode": "text-lf"
   },
   "docs/REPRODUCE.md": {
-    "sha256": "ca5feeb5385e17322ef9c37c4bbf39cfb4c836b28fd91de488cd27404dbfc4fb",
+    "sha256": "5ca21c8088c889d2cd52f8ba764df7faddde54c2abf04c1e863dcd71597556e1",
     "mode": "text-lf"
   },
   "docs/SPARSE_ALGEBRA_AUDIT.md": {
@@ -569,6 +569,26 @@
   },
   "reports/external_validation.json": {
     "sha256": "9b0955cb157d614cfc38d4f1bb89768bf53b49a07c4b5de02b4f002c44f4275b",
+    "mode": "text-lf"
+  },
+  "reports/final_sih_evidence_sync/README.md": {
+    "sha256": "caa886915b06fce434e23ebef47158ea5282bf81bc10117a35a321797f9f55a3",
+    "mode": "text-lf"
+  },
+  "reports/final_sih_evidence_sync/audit.md": {
+    "sha256": "ea689824dd5fb047478303528624c0e0887883401ef21ae3960830dfca49afca",
+    "mode": "text-lf"
+  },
+  "reports/final_sih_evidence_sync/coverage_matrix.json": {
+    "sha256": "1ec527be4fcfb4783f83acbff8020988b1bb9b88b8ca88cedd5fd83e6d296d92",
+    "mode": "text-lf"
+  },
+  "reports/final_sih_evidence_sync/public_claims.json": {
+    "sha256": "b28be7a31b2356c8b3f680720cf8ef5a680ec5706e79ed8f3992bc67565b8a3c",
+    "mode": "text-lf"
+  },
+  "reports/final_sih_evidence_sync/version_manifest.json": {
+    "sha256": "b8042366f9473e2a524e9dce7b5b89018914646239205dab1cfd17a9e8664068",
     "mode": "text-lf"
   },
   "reports/gate20a_sparse_mittelmann/README.md": {
@@ -1848,7 +1868,7 @@
     "mode": "text-lf"
   },
   "web/app.js": {
-    "sha256": "5e0c93ba483903174bde3cc01d060592e1ca761e27053dfd1b7375b3bb2fb1c9",
+    "sha256": "5bceb79cb98d6f5684fba94c72836e939f86e498bde9ccb7f57fb95d93ef1f40",
     "mode": "text-lf"
   },
   "web/assets/MRPL_logo.jpg": {
@@ -1880,7 +1900,7 @@
     "mode": "raw"
   },
   "web/index.html": {
-    "sha256": "479d5c39fabf45c5fc0221ec88f2ab837297bb882d22762e3ae30836a1c85dde",
+    "sha256": "48aee9657b2f0125b5d93d1238d81530a965b7c929ee4369f564af1948407e34",
     "mode": "text-lf"
   },
   "web/style.css": {

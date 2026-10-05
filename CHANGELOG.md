@@ -1,5 +1,22 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.19] - 2026-10-05
+
+### Final SIH Evidence Synchronization & Public Claim Harmonization
+
+- **docs & web: Final SIH Evidence Synchronization & Public Claim Harmonization:**
+  - Harmonized all public web surfaces, documentation (`README.md`, `docs/REPRODUCE.md`, `docs/QPLIB_SUPPORT.md`, `docs/BENCHMARK_METHODOLOGY.md`), and API metadata with the feature-frozen solver core (`17e46f218f826dd58f5592aa8e75966753f76c32`).
+  - Added a prominent **30-Second Judge Executive Summary** to `README.md` highlighting project identity, sovereignty boundary, core capabilities, physically measured evidence, and 1-click reproduction commands.
+  - Updated canonical test suite count across all surfaces to **368 tests run: 357 passed, 11 skipped, 0 failures, 0 errors**.
+  - Synchronized the **Problem Statement Coverage Matrix** across all 20 solver requirements in `web/index.html` and `reports/final_sih_evidence_sync/coverage_matrix.json`, updating statuses for True Sparse Core, Physical GPU Validation, Validated Binary Cover Cuts, Intra-Solve Parallel B&B, and Hans Mittelmann benchmark instances.
+  - Harmonized GPU acceleration claims: 5.81× end-to-end acceleration over CPU on a 10,000-variable true-sparse PDHG workload on physical NVIDIA RTX 5050 Laptop GPU; clearly separated the 448.3× steady-state compute-loop ratio as a secondary microbenchmark metric; explicitly disclosed that the public Render cloud deployment is CPU-only.
+  - Harmonized multicore headlines: 1.94x matched-engine solve-to-completion speedup using 2 workers while exploring the identical 287-node search tree, with 97.0% measured parallel efficiency on 18-variable multiknapsack; 3.60× secondary solve-time reduction on 16-variable knapsack due to concurrent search-order pruning; up to 39× fixed-budget node progress on MIPLIB; preserved historical 2.65× independent batch throughput dispatch as a distinct metric.
+  - Harmonized cutting planes: validated binary cover cuts (40–54.5% node reduction on targeted knapsack/oracle MILPs with 0 invalid cuts found under exhaustive binary-oracle validity testing on tested small models; 38 MIPLIB instances evaluated); explicitly documented that Gomory/GMI cuts were deferred for mathematical proof safety.
+  - Clarified refinery digital twin positioning: representative open-literature parameters (Gary & Handwerk), not actual MRPL operational data; "numerically verified for the evaluated prototype model" replaces production-cleared claims.
+  - Clarified Trust Passport semantics: independent unscaled verification layer, floating-point KKT residuals vs MILP verified incumbent and safe bounds, and SHA-256 model fingerprint as an integrity/reproducibility identifier (not a digital signature).
+  - Clarified Farkas Lens positioning: "Diagnostic ranking — not a minimal IIS."
+  - Created single source of truth files in `reports/final_sih_evidence_sync/`: `audit.md`, `public_claims.json`, `coverage_matrix.json`, and `version_manifest.json`.
+
 ## [0.3.18] - 2026-10-05
 
 ### Gate 20D: Actual Intra-Solve Parallel Branch-and-Bound Engine
@@ -44,8 +61,8 @@
   - Evaluated sovereign CSR-based CUDA PDHG acceleration against CPU PDHG across 7 synthetic true-sparse tiers (10K to 1M variables) on Acer Nitro V 16S (Intel Core 5 210H, NVIDIA RTX 5050 Laptop GPU, 8 GB VRAM).
   - Validated 5.81x end-to-end wall-clock speedup on 10,000-variable true-sparse tier with identical objective endpoints (-20950.9577, diff = 0.0) and LIMIT_REACHED termination.
   - Recorded 448x steady-state kernel throughput ratio (47.86s CPU vs 0.107s CUDA iteration time) as a secondary engineering metric.
-  - Successfully ingested and evaluated authentic Mittelmann benchmark instances on CUDA: `chromaticindex1024-7` reached OPTIMAL_VERIFIED in 80.21s with KKT certificate.
-  - Evaluated 1M-variable sparse LP with sovereign CSR SpMV (0.18 ms) and Transpose-SpMV (0.20 ms) latencies on consumer RTX 5050 hardware; end-to-end solve hit 60s timeout without speedup inference.
+  - Successfully ingested and evaluated authentic Mittelmann benchmark instances on CUDA: `chromaticindex1024-7` reached OPTIMAL_VERIFIED in 80.21s under numerical floating-point KKT verification.
+  - Validated 1M-variable × 500K-row true-sparse GPU representation and SpMV on physical RTX 5050 (1,000,000 variables × 500,000 rows × 2,999,993 nonzeros; GPU upload ~108.0 ms, SpMV median ~0.178 ms, transpose SpMV median ~0.199 ms; representation stress test, not an optimization solve).
   - Reconciled evidence via `scripts/reconcile_gpu_gate20b.py` with explicit provenance tracking (`AUTOMATIC` vs `RECOVERED_FROM_LOG`).
   - Added Windows BLAS crash guard in `tests/test_sparse_core.py` using `np.einsum` for test baseline references.
 

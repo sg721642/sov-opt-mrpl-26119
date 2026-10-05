@@ -1,0 +1,76 @@
+{
+  "claims_audit": {
+    "project_scope": {
+      "approved_headline": "A sovereign optimization core designed to reduce dependency on proprietary commercial solvers.",
+      "prohibited_phrasing": [
+        "Eliminates dependency on proprietary commercial solvers",
+        "Commercial replacement for Gurobi/CPLEX",
+        "Production-ready refinery dispatcher",
+        "Safe for production refinery dispatch"
+      ]
+    },
+    "refinery_model": {
+      "approved_statement": "Demonstration model — representative open-literature refinery data; not actual MRPL operational data. All units, yields and economics are representative engineering approximations. Numerically verified for the evaluated prototype model.",
+      "prohibited_phrasing": [
+        "Actual MRPL operational data",
+        "Production refinery cleared",
+        "Safe for live dispatch"
+      ]
+    },
+    "gpu_evidence": {
+      "approved_primary_headline": "On a physical NVIDIA RTX 5050 Laptop GPU, SOV-OPT demonstrated a 5.81x end-to-end acceleration over its CPU backend on the tested 10,000-variable true-sparse fixed-iteration PDHG workload (both backends executed 3,000 iterations to the same final objective).",
+      "approved_secondary_metric": "448.3x steady-state compute-loop timing ratio under the measured microbenchmark boundary (secondary metric, strictly NOT end-to-end solver speedup).",
+      "prohibited_phrasing": [
+        "5.81x faster optimal solve",
+        "448x solver speedup",
+        "448x optimization speedup",
+        "Cloud GPU acceleration on Render"
+      ],
+      "cloud_disclaimer": "Physical GPU validation — not executed on Render. Render environment is CPU-only."
+    },
+    "large_scale": {
+      "approved_1m_statement": "1M-variable x 500K-row true-sparse GPU representation and SpMV were validated on the physical RTX 5050 (1,000,000 variables x 500,000 rows x 2,999,993 nonzeros; GPU upload ~108.0 ms, SpMV median ~0.178 ms, transpose SpMV median ~0.199 ms across 5 timed repetitions; representation stress test, not an optimization solve. Earlier Gate 20A CPU sparse representation stress test evaluated 2,500,000 nonzeros).",
+      "approved_10m_guard_statement": "A 10,000,000-variable ceiling is a configured architectural guard rail in the sparse data model subject to an explicit memory ceiling; it is not an empirically benchmarked solve size.",
+      "prohibited_phrasing": [
+        "1M-variable problem solved optimally",
+        "10M variables solved",
+        "Million-variable optimal solve"
+      ]
+    },
+    "cutting_planes": {
+      "approved_statement": "Validated binary cover cuts improved root relaxation and reduced branch-and-bound nodes by 40–54.5% on targeted knapsack/oracle MILPs with 0 invalid cuts found under exhaustive binary-oracle validity testing on the tested small models (100% exhaustive binary-oracle validity agreement on the tested small models). Across the 38-instance authentic MIPLIB pass, results were unchanged overall (0 improved, 38 unchanged, 0 worsened, with zero correctness regressions). Gomory/GMI cuts were deferred because the current dual-simplex interface does not yet expose a proof-safe original-space tableau/basis mapping.",
+      "prohibited_phrasing": [
+        "Gomory cuts implemented",
+        "GMI cuts implemented"
+      ]
+    },
+    "parallel_branch_and_bound": {
+      "approved_primary_headline": "SOV-OPT implements genuine intra-solve multi-process branch-and-bound. On a tested MILP workload, 1.94x matched-engine solve-to-completion speedup using 2 workers while exploring the identical 287-node search tree, with 97.0% measured parallel efficiency and preserving the same verified solution.",
+      "approved_secondary_search_effect": "On another tested workload, parallel incumbent discovery and subtree pruning reduced total wall time by 3.60x; because the parallel search explored a different number of nodes (59 vs 321), this result is reported separately from pure worker-scaling evidence.",
+      "approved_miplib_statement": "On selected authentic MIPLIB instances under equal fixed-time budgets, the 4-worker engine completed up to 39x as many branch-and-bound nodes. This is search-progress evidence, not solve-to-completion speedup.",
+      "approved_historical_multicore_statement": "Process-level concurrent dispatch across independent instances (2.65x on 4 workers) — NOT parallel branch-and-bound.",
+      "prohibited_phrasing": [
+        "39x solver speedup",
+        "39x faster solve",
+        "39x optimization acceleration",
+        "Linear scaling across 16 cores"
+      ]
+    },
+    "trust_passport": {
+      "approved_statement": "The solver cannot simply declare a result optimal; an independent verification layer checks the returned solution against the original mathematical model before the result is accepted. LP/QP OPTIMAL_VERIFIED represents floating-point numerical KKT verification within declared tolerances. MILP represents a verified integer incumbent plus safe bound/tree-closure logic. SHA-256 fingerprints serve as reproducibility and integrity identifiers.",
+      "prohibited_phrasing": [
+        "Digitally signed certificate",
+        "Cryptographically certified result",
+        "Tamper-proof mathematical proof",
+        "Formal proof of global optimality for all problem classes"
+      ]
+    },
+    "farkas_lens": {
+      "approved_statement": "Diagnostic ranking — not a minimal IIS.",
+      "prohibited_phrasing": [
+        "Minimal Irreducible Infeasible Subsystem (IIS)",
+        "Exact IIS certificate"
+      ]
+    }
+  }
+}

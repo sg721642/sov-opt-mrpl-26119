@@ -147,11 +147,14 @@
         <div class="sih-team-strip" role="region" aria-label="Smart India Hackathon Team Details">
           <span class="sih-title">Smart India Hackathon 2026</span>
           <span class="sih-separator"></span>
-          <span class="sih-meta-label">TEAM NAME</span>
-          <strong class="sih-meta-value">VarunNetra</strong>
+          <span class="sih-meta-label">TEAM</span>
+          <strong class="sih-meta-value">VarunNetra (177365)</strong>
           <span class="sih-separator"></span>
-          <span class="sih-meta-label">TEAM ID</span>
-          <strong class="sih-meta-value">177365</strong>
+          <span class="sih-meta-label">VERSION</span>
+          <strong class="sih-meta-value">v0.3.2</strong>
+          <span class="sih-separator"></span>
+          <span class="sih-meta-label">CORE FREEZE</span>
+          <strong class="sih-meta-value mono">17e46f2</strong>
         </div>
 
         <!-- ===================================================================
@@ -208,15 +211,19 @@
                   <div class="slide-badge-row">
                     <span class="badge badge-team">Team VarunNetra · Team ID 177365</span>
                     <span class="badge badge-inst">RGIPT</span>
+                    <span class="badge badge-version" style="background: var(--mrpl-green); color: #fff; font-weight: 600;">v0.3.2 (17e46f2)</span>
                   </div>
                   <div class="hero-philosophy-card" style="margin-top: 14px; margin-bottom: 18px;">
                     <div class="hero-statement">GPU accelerates. CPU verifies.</div>
-                    <div class="hero-substatement">Mathematical LP, MILP, and convex QP optimization for refinery planning workflows.</div>
+                    <div class="hero-substatement">Built from first principles in pure NumPy &amp; Python stdlib to reduce dependency on proprietary commercial solvers. Numerically verified prototype for refinery planning workflows.</div>
                   </div>
                   <div class="hero-ctas">
                     <button class="btn btn-primary btn-lg" onclick="window.sovApp.switchTab('overview')">
                       <span data-i18n="enter_workspace">Enter Solver Workspace</span>
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                    <button class="btn btn-secondary btn-lg" id="btn-judge-demo" onclick="window.sovApp.runJudgeDemo ? window.sovApp.runJudgeDemo() : window.sovApp.switchTab('optimization')" title="Execute verified solve and view Trust Passport">
+                      <span>⚡ 1-Click Judge Demo</span>
                     </button>
                     <button class="btn btn-secondary btn-lg" onclick="window.sovApp.switchTab('trust')">
                       <span data-i18n="view_trust">View Trust &amp; Verification</span>
@@ -551,27 +558,27 @@
                 <div class="slide-text">
                   <div class="slide-eyebrow">Physical Hardware Benchmarking</div>
                   <h2 class="slide-title">Measured. Audited. Reproducible.</h2>
-                  <div class="slide-subtitle">Physical Acer RTX 5050 Laptop GPU (12.0 CC · 8GB VRAM)</div>
+                  <div class="slide-subtitle">Physical NVIDIA RTX 5050 Laptop GPU (12.0 CC · 8GB VRAM) &amp; Multi-Core CPU</div>
                   <p class="slide-desc">
-                    All performance claims are backed by commit-hashed execution logs on physical NVIDIA hardware. Measured results strictly preserve differential comparisons without synthetic inflation.
+                    Physical hardware validation logs backed by commit hashes. 5.81× end-to-end GPU acceleration on 10K true-sparse PDHG; 1.94× matched parallel B&amp;B speedup on 2 CPU workers. Public Render deployment is CPU-only.
                   </p>
                   <div class="slide-evidence-stats">
                     <div class="slide-stat-item">
-                      <div class="stat-num">1.81×</div>
-                      <div class="stat-lbl">CUDA Improvement (Gate 9 vs Gate 8)</div>
+                      <div class="stat-num">5.81×</div>
+                      <div class="stat-lbl">10K Sparse PDHG (GPU / CPU)</div>
                     </div>
                     <div class="slide-stat-item">
-                      <div class="stat-num">1.07×</div>
-                      <div class="stat-lbl">Aggregate Speedup (CPU / CUDA)</div>
+                      <div class="stat-num">1.94×</div>
+                      <div class="stat-lbl">Matched Parallel B&amp;B (2 Cores)</div>
                     </div>
                     <div class="slide-stat-item">
-                      <div class="stat-num">1.13×</div>
-                      <div class="stat-lbl">Speedup on LARGE Netlib Stratum</div>
+                      <div class="stat-num">448.3×</div>
+                      <div class="stat-lbl">Steady-State Loop Ratio (Microbench)</div>
                     </div>
                   </div>
                   <div class="hero-ctas" style="margin-top: 18px;">
                     <button class="btn btn-primary btn-lg" onclick="window.sovApp.switchTab('benchmarks')">
-                      <span>View Hardware Benchmarks</span>
+                      <span>Inspect Physical Hardware Results</span>
                     </button>
                     <button class="btn btn-secondary btn-lg" onclick="window.sovApp.switchTab('reports')">
                       <span>Audit Reports</span>
@@ -582,15 +589,15 @@
                   <div class="hero-schematic-card">
                     <div class="hero-schematic-header">
                       <span class="hero-schematic-title">Physical Hardware Telemetry</span>
-                      <span class="badge badge-olive">RTX 5050 (Driver 576.83)</span>
+                      <span class="badge badge-olive">RTX 5050 (Driver 572.16)</span>
                     </div>
                     <div class="hardware-telemetry-body">
-                      <div class="hw-item"><span>Platform:</span> <strong>Acer Nitro 5 (NVIDIA RTX 5050)</strong></div>
+                      <div class="hw-item"><span>GPU Platform:</span> <strong>Acer Nitro V 16 (NVIDIA RTX 5050)</strong></div>
                       <div class="hw-item"><span>Compute Capability:</span> <strong>SM 12.0 (Blackwell Architecture)</strong></div>
-                      <div class="hw-item"><span>VRAM Allocation:</span> <strong>7.96 GB GDDR6</strong></div>
-                      <div class="hw-item"><span>Frozen Suite:</span> <strong>18 Netlib Benchmark Problems</strong></div>
-                      <div class="hw-item"><span>Validation SHA:</span> <strong class="mono" style="font-size: 11px;">51b71bb8468b</strong></div>
-                      <div class="hw-item"><span>Verification Status:</span> <strong style="color: var(--mrpl-deep-green);">Independent CPU Audit (Passed)</strong></div>
+                      <div class="hw-item"><span>Sparse LP Workload:</span> <strong>10,000 vars · 5.81× speedup</strong></div>
+                      <div class="hw-item"><span>Mittelmann Instance:</span> <strong>chromaticindex1024-7 (OPTIMAL_VERIFIED)</strong></div>
+                      <div class="hw-item"><span>Scale Stress (1M vars):</span> <strong>SpMV Ingestion Validated</strong></div>
+                      <div class="hw-item"><span>Cloud Environment:</span> <strong style="color: var(--text-secondary);">Render Web Service (CPU-Only)</strong></div>
                     </div>
                   </div>
                 </div>
@@ -636,10 +643,11 @@
         <div class="home-announcements-strip">
           <div class="announcement-badge">Verification Records</div>
           <div class="announcement-content">
-            <span class="announcement-item">✓ Sovereign solver core: validated by the repository's automated numerical and integration test suite.</span>
-            <span class="announcement-item">✓ Model-fingerprinted Trust Passport generated for every accepted solve.</span>
-            <span class="announcement-item">✓ Infinite-precision rational Farkas rays certify structural infeasibility.</span>
-            <span class="announcement-item">✓ Historical Acer RTX 5050 CUDA evidence preserved for differential comparison.</span>
+            <span class="announcement-item">✓ 368 automated regression tests: 357 passed, 11 skipped, 0 failures.</span>
+            <span class="announcement-item">✓ Physical RTX 5050 GPU: 5.81× end-to-end acceleration on 10K true-sparse PDHG; Render cloud is CPU-only.</span>
+            <span class="announcement-item">✓ Intra-solve parallel B&amp;B: 1.94× speedup on 2 workers (97.0% efficiency) on identical search tree.</span>
+            <span class="announcement-item">✓ Validated binary cover cuts: 40–54.5% node reduction; 38 MIPLIB instances evaluated.</span>
+            <span class="announcement-item">✓ Refinery twin: representative open-literature data (Gary &amp; Handwerk); numerically verified prototype.</span>
           </div>
         </div>
 
@@ -1457,7 +1465,7 @@
             </div>
             <div class="trust-passport-cell">
               <span class="cell-label">Solver version &amp; commit</span>
-              <span class="cell-value mono" id="trust-card-commit">v0.3.2 (899ff0a8)</span>
+              <span class="cell-value mono" id="trust-card-commit">v0.3.2 (17e46f2)</span>
             </div>
             <div class="trust-passport-cell">
               <span class="cell-label">Execution backend</span>
@@ -1477,7 +1485,7 @@
           <div class="trust-notice-banner">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
             <div>
-              <strong>Audit Notice:</strong> The SHA-256 model fingerprint is an integrity identifier; this Passport is not a digital signature. Results are verified on the original unscaled constraint model.
+              <strong>Audit Notice:</strong> The SHA-256 model fingerprint is an integrity identifier; this Passport is not a digital signature. Results are verified on the original unscaled constraint model. LP/QP OPTIMAL_VERIFIED represents floating-point numerical KKT verification within declared tolerances; MILP represents verified integer incumbent plus safe bound/tree-closure logic.
             </div>
           </div>
         </div>
@@ -1521,10 +1529,10 @@
            =================================================================== -->
       <section id="view-benchmarks" class="view-section">
         <div class="page-header">
-          <div class="page-eyebrow">Physical validation</div>
-          <h1 class="page-title">Acer RTX 5050 physical GPU benchmark center</h1>
+          <div class="page-eyebrow">Physical validation &amp; scaling evidence</div>
+          <h1 class="page-title">Physical GPU &amp; multi-core benchmark center</h1>
           <p class="page-intro">
-            Evidence measured on physical NVIDIA hardware under AC mains power. Same-machine comparisons against host CPU.
+            Evidence measured on physical NVIDIA RTX 5050 hardware and multi-core CPU. Same-machine comparisons against host baseline; Render cloud service is strictly CPU-only.
           </p>
         </div>
 
@@ -1532,16 +1540,249 @@
           <div style="display: flex; gap: 32px; flex-wrap: wrap;">
             <div><span class="spec-strip-label">GPU hardware</span><div style="font-weight: 600;">NVIDIA GeForce RTX 5050 Laptop GPU</div></div>
             <div><span class="spec-strip-label">VRAM</span><div style="font-weight: 600;">8 GB GDDR6</div></div>
-            <div><span class="spec-strip-label">Compute capability</span><div style="font-weight: 600;">12.0</div></div>
-            <div><span class="spec-strip-label">NVIDIA driver</span><div style="font-weight: 600;">576.83</div></div>
-            <div><span class="spec-strip-label">CUDA build / runtime</span><div class="mono" style="font-size: 12px;">12.9 / 12090</div></div>
+            <div><span class="spec-strip-label">Compute capability</span><div style="font-weight: 600;">12.0 (Blackwell Architecture)</div></div>
+            <div><span class="spec-strip-label">NVIDIA driver</span><div style="font-weight: 600;">572.16 (Linux x86_64)</div></div>
+            <div><span class="spec-strip-label">CUDA runtime</span><div class="mono" style="font-size: 12px;">12.8 / 12080</div></div>
+            <div><span class="spec-strip-label">Cloud deployment</span><div style="font-weight: 600; color: var(--text-secondary);">Render Web Service (CPU-Only)</div></div>
           </div>
         </div>
 
+        <!-- Gate 20B Physical RTX 5050 True-Sparse Benchmark -->
         <div class="table-section">
           <div class="table-header">
-            <h3 class="table-title">Gate 8 baseline vs Gate 9 performance engineering</h3>
-            <div class="table-subtitle">Architectural optimizations implemented to eliminate Python/CUDA dispatch bottlenecks</div>
+            <h3 class="table-title">Gate 20B Physical True-Sparse GPU Validation (NVIDIA RTX 5050)</h3>
+            <div class="table-subtitle">Physical hardware evaluation on Acer Nitro V 16 · Sovereign CSR/CSC sparse representation</div>
+          </div>
+          <div class="table-scroll-wrap">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Benchmark workload</th>
+                  <th>CPU baseline</th>
+                  <th>CUDA RTX 5050</th>
+                  <th>Acceleration factor</th>
+                  <th>Termination &amp; verification</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>10,000-var True-Sparse LP (3,000 iter)</strong></td>
+                  <td>57.7534 s (median)</td>
+                  <td><strong>9.9461 s</strong> (median)</td>
+                  <td><span class="badge badge-olive">5.81× speedup</span></td>
+                  <td>Both reached identical obj -20950.9577; LIMIT_REACHED on fixed iter</td>
+                </tr>
+                <tr>
+                  <td><strong>Steady-State Compute-Loop Microbenchmark</strong></td>
+                  <td>47.86 s (kernel loop)</td>
+                  <td><strong>0.1068 s</strong> (kernel loop)</td>
+                  <td><span class="badge badge-olive">448.3× loop ratio</span></td>
+                  <td>Secondary microbenchmark metric — strictly NOT end-to-end solve speedup</td>
+                </tr>
+                <tr>
+                  <td><strong>Mittelmann: chromaticindex1024-7</strong></td>
+                  <td>LIMIT_REACHED (30s)</td>
+                  <td><strong>80.21 s</strong></td>
+                  <td><span class="badge badge-olive">OPTIMAL_VERIFIED</span></td>
+                  <td>OPTIMAL_VERIFIED under numerical floating-point KKT verification on RTX 5050 CUDA backend</td>
+                </tr>
+                <tr>
+                  <td><strong>1M-var × 500K-row True-Sparse GPU Representation &amp; SpMV</strong></td>
+                  <td>1,000,000 vars × 500,000 rows × 2,999,993 nonzeros</td>
+                  <td><strong>GPU upload ~108.0 ms · SpMV ~0.178 ms · T-SpMV ~0.199 ms</strong></td>
+                  <td><span class="badge badge-neutral">Validated</span></td>
+                  <td>1M-variable × 500K-row true-sparse GPU representation and SpMV validated on physical RTX 5050 (5 timed reps; representation stress test, not an optimization solve. Earlier Gate 20A CPU stress test evaluated 2,500,000 nonzeros)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 8px; line-height: 1.5;">
+            ⚠ <strong>Transparency disclosure:</strong> The 5.81× factor represents end-to-end acceleration on a 10K true-sparse fixed-iteration PDHG workload (both backends executed 3,000 iterations to the same objective). The 448.3× ratio measures the inner compute loop in isolation. The public Render service is CPU-only.
+          </div>
+        </div>
+
+        <!-- Authentic Hans Mittelmann LP Benchmark Suite -->
+        <div class="table-section" style="margin-top: 28px;">
+          <div class="table-header">
+            <h3 class="table-title">Authentic Hans Mittelmann LP Benchmark Suite</h3>
+            <div class="table-subtitle">Large-scale LP instances from the Arizona State University Plato benchmark repository</div>
+          </div>
+          <div class="table-scroll-wrap">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Instance</th>
+                  <th>Dimensions (m × n)</th>
+                  <th>Nonzeros</th>
+                  <th>SOV-OPT Status</th>
+                  <th>SOV-OPT Time</th>
+                  <th>HiGHS 1.15.1 Baseline</th>
+                  <th>Verification Outcome</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code class="mono">chromaticindex1024-7</code></td>
+                  <td>1,024 × 2,187</td>
+                  <td>4,374</td>
+                  <td><span style="color:#2e7d32;font-weight:600">OPTIMAL_VERIFIED</span></td>
+                  <td>80.21 s (RTX 5050)</td>
+                  <td>OPTIMAL (0.04 s)</td>
+                  <td>Passed unscaled KKT audit</td>
+                </tr>
+                <tr>
+                  <td><code class="mono">brazil3</code></td>
+                  <td>124,534 × 203,792</td>
+                  <td>477,882</td>
+                  <td><span style="color:#f57c00;font-weight:600">LIMIT_REACHED</span></td>
+                  <td>30.0 s (budget cap)</td>
+                  <td>OPTIMAL (2.68 s)</td>
+                  <td>Sparse CSR ingestion verified</td>
+                </tr>
+                <tr>
+                  <td><code class="mono">qap15</code></td>
+                  <td>6,330 × 44,130</td>
+                  <td>110,670</td>
+                  <td><span style="color:#f57c00;font-weight:600">LIMIT_REACHED</span></td>
+                  <td>30.0 s (budget cap)</td>
+                  <td>LIMIT_REACHED (30.0 s)</td>
+                  <td>Both solvers hit bounded evaluation limit</td>
+                </tr>
+                <tr>
+                  <td><code class="mono">supportcase10</code></td>
+                  <td>14,942 × 68,079</td>
+                  <td>171,940</td>
+                  <td><span style="color:#f57c00;font-weight:600">LIMIT_REACHED</span></td>
+                  <td>30.0 s (budget cap)</td>
+                  <td>OPTIMAL (0.64 s)</td>
+                  <td>Sparse CSR ingestion verified</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 8px; line-height: 1.5;">
+            ℹ All four Mittelmann instances were parsed and evaluated with zero memory crashes. Instances exceeding the evaluation budget honestly report <strong>LIMIT_REACHED</strong> without false optimality claims.
+          </div>
+        </div>
+
+        <!-- Gate 20D Genuine Intra-Solve Parallel Branch-and-Bound -->
+        <div class="table-section" style="margin-top: 28px;">
+          <div class="table-header">
+            <h3 class="table-title">Gate 20D Genuine Intra-Solve Parallel Branch-and-Bound</h3>
+            <div class="table-subtitle">Multi-process coordinator/worker tree search for a single MILP solve · Apple Silicon M5 (10 cores)</div>
+          </div>
+          <div class="table-scroll-wrap">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Workload / Experiment</th>
+                  <th>1 Worker (Serial)</th>
+                  <th>2 Workers</th>
+                  <th>4 Workers</th>
+                  <th>Scaling Result</th>
+                  <th>Search tree behavior</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>18-var Multiknapsack (Matched Control)</strong></td>
+                  <td>3.4452 s (287 nodes)</td>
+                  <td>1.7760 s (287 nodes)</td>
+                  <td>1.0820 s (287 nodes)</td>
+                  <td><span class="badge badge-olive">1.94× on 2W (97.0% eff)</span></td>
+                  <td><strong>Exact identical 287 nodes</strong> explored; 1.94x matched-engine solve-to-completion speedup using 2 workers while exploring the identical 287-node search tree, with 97.0% measured parallel efficiency.</td>
+                </tr>
+                <tr>
+                  <td><strong>16-var Multiknapsack (Search-Order Effect)</strong></td>
+                  <td>2.1481 s (321 nodes)</td>
+                  <td>0.5960 s (59 nodes)</td>
+                  <td>0.8652 s (65 nodes)</td>
+                  <td><span class="badge badge-olive">3.60× solve reduction</span></td>
+                  <td>Concurrent incumbent discovery pruned tree (59 vs 321 nodes)</td>
+                </tr>
+                <tr>
+                  <td><strong>Authentic MIPLIB Subset (10s Budget)</strong></td>
+                  <td>Baseline node count</td>
+                  <td>Up to 18× nodes</td>
+                  <td>Up to 39× nodes</td>
+                  <td><span class="badge badge-olive">39× node progress</span></td>
+                  <td>Fixed-budget search progress metric — strictly NOT solve speedup</td>
+                </tr>
+                <tr>
+                  <td><strong>Process Batch Throughput (Historical)</strong></td>
+                  <td>1.00× (1 process)</td>
+                  <td>1.92× (2 processes)</td>
+                  <td>2.65× (4 processes)</td>
+                  <td><span class="badge badge-neutral">2.65× throughput</span></td>
+                  <td>Process-level dispatch across independent instances (distinct from B&amp;B)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 8px; line-height: 1.5;">
+            ℹ <strong>Architecture distinction:</strong> Intra-solve parallel B&amp;B coordinates workers on <em>one</em> tree with shared incumbent and bound tracking. Batch throughput dispatches <em>separate</em> problems concurrently across independent processes.
+          </div>
+        </div>
+
+        <!-- Gate 20C Validated Cutting Planes -->
+        <div class="table-section" style="margin-top: 28px;">
+          <div class="table-header">
+            <h3 class="table-title">Gate 20C Validated Cutting Planes &amp; Cover Cut Infrastructure</h3>
+            <div class="table-subtitle">Knapsack cover separation with greedy lifting · 0 invalid cuts found under exhaustive binary-oracle validity testing on tested small models</div>
+          </div>
+          <div class="table-scroll-wrap">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Cut type / Evaluation</th>
+                  <th>Target benchmark</th>
+                  <th>Nodes without cuts</th>
+                  <th>Nodes with cuts</th>
+                  <th>Impact / Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Binary Cover Cuts (Exact Separation)</strong></td>
+                  <td>Targeted Knapsack / Oracle Cases</td>
+                  <td>11 to 20 nodes</td>
+                  <td>5 to 11 nodes</td>
+                  <td><span class="badge badge-olive">40.0% to 54.5% node reduction</span><br><small style="color:var(--text-secondary)">0 invalid cuts found under exhaustive binary-oracle validity testing on tested small models</small></td>
+                </tr>
+                <tr>
+                  <td><strong>Authentic MIPLIB 2017 Suite</strong></td>
+                  <td>38 Authentic MIPLIB Instances</td>
+                  <td>Evaluated under 10s</td>
+                  <td>Evaluated under 10s</td>
+                  <td><strong>0 improved, 38 unchanged, 0 worsened</strong>; 0 numerical failures</td>
+                </tr>
+                <tr>
+                  <td><strong>Refinery Digital Twin MILP</strong></td>
+                  <td>Unit Commitment Fixture</td>
+                  <td>9 nodes (OPTIMAL)</td>
+                  <td>9 nodes (OPTIMAL)</td>
+                  <td>Continuous-coupled rows safely excluded; objective -8953.75 verified</td>
+                </tr>
+                <tr>
+                  <td><strong>Gomory Mixed-Integer (GMI) Cuts</strong></td>
+                  <td>General LP Tableaux</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td><span class="badge badge-neutral" style="background:#e0e0e0;color:#424242;">Deferred for Safety</span> (Option C: tableau mapping audit)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 8px; line-height: 1.5;">
+            ℹ Gomory/GMI cuts were deferred because the current dual simplex basis interface does not expose a proof-safe original-space tableau mapping. Preserving zero false cuts takes strict priority over uncertified features.
+          </div>
+        </div>
+
+        <!-- Historical Gate 8 vs Gate 9 Architecture Table -->
+        <div class="table-section" style="margin-top: 28px;">
+          <div class="table-header">
+            <h3 class="table-title">Historical Gate 8 vs Gate 9 CUDA Architecture Engineering</h3>
+            <div class="table-subtitle">Preserved baseline optimizations implemented to eliminate Python/CUDA dispatch bottlenecks</div>
           </div>
           <div class="table-scroll-wrap">
             <table class="editorial-table">
@@ -1587,18 +1828,6 @@
               </tbody>
             </table>
           </div>
-        </div>
-
-        <!-- GPU Semantics Disclosure -->
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-sm); padding: 14px 18px; margin-top: 20px; font-size: 12.5px; color: var(--text-secondary); line-height: 1.55;">
-          <strong style="color: var(--text-primary);">GPU performance clarification:</strong>
-          <ul style="margin: 6px 0 0 18px; padding: 0;">
-            <li><strong>1.81×</strong> = Gate 9 CUDA vs Gate 8 CUDA aggregate implementation improvement (189.69 s vs 342.64 s) — <em>not</em> CPU vs GPU.</li>
-            <li><strong>1.07×</strong> = Same-machine aggregate CPU/CUDA ratio across 18 Netlib instances (203.56 s CPU vs 189.69 s CUDA).</li>
-            <li><strong>1.13×</strong> = Repository-relative LARGE stratum CPU/CUDA ratio (172.04 s vs 152.60 s).</li>
-            <li>A <strong>≥ 2× same-machine GPU acceleration over CPU was not demonstrated.</strong> First-order methods on small-to-moderate Netlib instances are bottlenecked by kernel launch latency, not floating-point throughput.</li>
-            <li>The <strong>public Render deployment is CPU-only.</strong> GPU results shown here come from separate physical RTX 5050 validation on an Acer laptop (Linux x86_64, Driver 572.16, CUDA 12.8).</li>
-          </ul>
         </div>
 
         <!-- SOV-OPT vs HiGHS Comparison -->
@@ -1659,8 +1888,7 @@
             <div class="table-subtitle">Process-level concurrent dispatch across independent instances — NOT parallel branch-and-bound</div>
           </div>
           <div style="background: #f1f8e9; border: 1px solid #c5e1a5; border-radius: 4px; padding: 10px 14px; font-size: 12px; margin-bottom: 12px; color: #33691e;">
-            ℹ <strong>Architecture note:</strong> SOV-OPT simplex and MILP branch-and-bound algorithms execute serially per solve.
-            Multicore scaling operates at the process batch level (concurrent independent solves via worker processes), matching production API server worker architecture.
+            ℹ <strong>Architecture note:</strong> Multicore batch scaling operates at the process level (concurrent independent solves via worker processes), matching production API server worker architecture.
           </div>
           <div id="batch-throughput-wrap" class="table-scroll-wrap">
             <div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px;" id="batch-throughput-loading-msg">Loading parallel batch throughput results…</div>
@@ -1699,9 +1927,24 @@
               <button id="btn-copy-g9" class="copy-btn" onclick="window.sovApp.copyText('51b71bb8468bd4375e572b2537d69e30a0e60684', 'btn-copy-g9')">Copy</button>
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
-              <span style="font-size: 12.5px;">Gate 9.1 cross-platform checksum portability commit:</span>
-              <code class="mono" style="color: var(--rust);">395c6c62bbbbd93b15a086c48e4defb81fc75a19</code>
-              <button id="btn-copy-g91" class="copy-btn" onclick="window.sovApp.copyText('395c6c62bbbbd93b15a086c48e4defb81fc75a19', 'btn-copy-g91')">Copy</button>
+              <span style="font-size: 12.5px;">Gate 20A True Sparse Core &amp; Mittelmann commit:</span>
+              <code class="mono" style="color: var(--rust);">7a99de412d9b5fdcd8993d31d3354c096ef2f055</code>
+              <button id="btn-copy-g20a" class="copy-btn" onclick="window.sovApp.copyText('7a99de412d9b5fdcd8993d31d3354c096ef2f055', 'btn-copy-g20a')">Copy</button>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12.5px;">Gate 20B Physical RTX 5050 Sparse GPU commit:</span>
+              <code class="mono" style="color: var(--rust);">42f9099e6cf0917ff6c5c0626364f2402bb3107f</code>
+              <button id="btn-copy-g20b" class="copy-btn" onclick="window.sovApp.copyText('42f9099e6cf0917ff6c5c0626364f2402bb3107f', 'btn-copy-g20b')">Copy</button>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12.5px;">Gate 20C Validated Binary Cover Cuts commit:</span>
+              <code class="mono" style="color: var(--rust);">fb2dbc5f82b9d488c8d56bab15e29c44a8575fe5</code>
+              <button id="btn-copy-g20c" class="copy-btn" onclick="window.sovApp.copyText('fb2dbc5f82b9d488c8d56bab15e29c44a8575fe5', 'btn-copy-g20c')">Copy</button>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12.5px;">Gate 20D Intra-Solve Parallel B&amp;B Freeze commit:</span>
+              <code class="mono" style="color: var(--mrpl-green); font-weight: 600;">17e46f218f826dd58f5592aa8e75966753f76c32</code>
+              <button id="btn-copy-g20d" class="copy-btn" onclick="window.sovApp.copyText('17e46f218f826dd58f5592aa8e75966753f76c32', 'btn-copy-g20d')">Copy</button>
             </div>
           </div>
         </div>
@@ -1723,22 +1966,40 @@
               </thead>
               <tbody>
                 <tr>
-                  <td><code class="mono">reports/gpu_gate9_final_51b71bb/summary.json</code></td>
+                  <td><code class="mono">reports/gpu_sparse_gate20b/results.json</code></td>
                   <td>JSON</td>
                   <td>Raw byte</td>
-                  <td>18-instance CPU vs CUDA timing and discrepancy summary</td>
+                  <td>Gate 20B physical RTX 5050 10K true-sparse PDHG and SpMV results</td>
                 </tr>
                 <tr>
-                  <td><code class="mono">reports/gpu_gate9_final_51b71bb/environment.json</code></td>
+                  <td><code class="mono">reports/gate20d_parallel_bnb/performance_results.json</code></td>
                   <td>JSON</td>
                   <td>Raw byte</td>
-                  <td>Hardware, driver version 576.83, and runtime records</td>
+                  <td>Gate 20D intra-solve parallel B&amp;B matched scaling and search progress logs</td>
+                </tr>
+                <tr>
+                  <td><code class="mono">reports/gate20c_milp_cuts/results.json</code></td>
+                  <td>JSON</td>
+                  <td>Raw byte</td>
+                  <td>Gate 20C binary cover cuts oracle validation and 38-instance MIPLIB telemetry</td>
+                </tr>
+                <tr>
+                  <td><code class="mono">reports/gate20a_sparse_mittelmann/mittelmann_results.json</code></td>
+                  <td>JSON</td>
+                  <td>Raw byte</td>
+                  <td>4 authentic Hans Mittelmann instances bounded evaluation and verification</td>
+                </tr>
+                <tr>
+                  <td><code class="mono">reports/final_sih_evidence_sync/coverage_matrix.json</code></td>
+                  <td>JSON</td>
+                  <td>Text-LF</td>
+                  <td>Authoritative 20-row Problem Statement Coverage Matrix</td>
                 </tr>
                 <tr>
                   <td><code class="mono">data/manifest.json</code></td>
                   <td>JSON</td>
                   <td>Text-LF</td>
-                  <td>Catalog of 81 authentic public benchmark instances</td>
+                  <td>Catalog of authentic public benchmark instances and SHA-256 digests</td>
                 </tr>
               </tbody>
             </table>
@@ -1761,31 +2022,31 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td>LP solving (primal &amp; dual simplex)</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>17 Netlib LP instances, 344-test suite</td></tr>
-                <tr><td>MILP (Branch-and-Bound)</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>38 MIPLIB instances; LIMIT_REACHED reported honestly</td></tr>
-                <tr><td>Convex QP (IPM)</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>4 QPlib instances; KKT verified</td></tr>
-                <tr><td>Presolve &amp; scaling</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Ruiz equilibration; redundant-row detection; test_presolve.py</td></tr>
-                <tr><td>Sparse linear algebra</td><td><span style="color:#f57c00;font-weight:600">PARTIAL</span></td><td>Sparse LU; dense fallback for large instances; test_sparse.py</td></tr>
-                <tr><td>GPU acceleration (PDHG CUDA)</td><td><span style="color:#f57c00;font-weight:600">PARTIAL</span></td><td>RTX 5050 physical validation; CPU-only on Render; 1.07× aggregate</td></tr>
-                <tr><td>Multi-core CPU</td><td><span style="color:#f57c00;font-weight:600">PARTIAL</span></td><td>Process batch throughput (2.65× on 4 workers); intra-solve simplex/B&amp;B remain serial</td></tr>
-                <tr><td>Branch-and-Bound with warm starts</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Dual warm-start at each B&amp;B node; pseudocost branching</td></tr>
-                <tr><td>Heuristics</td><td><span style="color:#9e9e9e;font-weight:600">ROADMAP</span></td><td>Planned: feasibility pump, rounding; not in current release</td></tr>
-                <tr><td>Cutting planes</td><td><span style="color:#9e9e9e;font-weight:600">ROADMAP</span></td><td>Planned: Gomory cuts; not in current release</td></tr>
-                <tr><td>Large-scale sparse capability</td><td><span style="color:#f57c00;font-weight:600">PARTIAL</span></td><td>Sparse stress test (preprocessing/matvec); dense LP cap applies to full solve</td></tr>
-                <tr><td>Industrial refinery model</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>4-period MRPL digital twin; representative open-literature data (Gary &amp; Handwerk)</td></tr>
-                <tr><td>Netlib public benchmarks</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>17 instances; SHA-256 frozen; SOV-OPT vs HiGHS comparison</td></tr>
-                <tr><td>MIPLIB public benchmarks</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>38 instances; SHA-256 frozen; status reported honestly</td></tr>
-                <tr><td>QPlib public benchmarks</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>4 instances; SHA-256 frozen</td></tr>
-                <tr><td>Mittelmann benchmark</td><td><span style="color:#616161;font-weight:600">NOT YET DEMONSTRATED</span></td><td>Instance acquisition not completed; recorded as gap in documentation</td></tr>
-                <tr><td>External solver comparison</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>SOV-OPT vs HiGHS 1.15.1 via subprocess isolation; all results reported</td></tr>
-                <tr><td>Numerical robustness / verification</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>KKT residuals; exact rational Farkas; 10 numerical stress test categories</td></tr>
-                <tr><td>Infeasibility certificates</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Exact Farkas rays (exact rational arithmetic); verified in test_audit_gate11.py</td></tr>
-                <tr><td>Trust Passport / provenance</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>SHA-256 model fingerprint; algorithm, version, timestamp, KKT residuals</td></tr>
+                <tr><td>LP solving (primal &amp; dual simplex)</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>17 Netlib LP instances; 368-test suite; KKT verified; exact rational Farkas ray extraction.</td></tr>
+                <tr><td>MILP (Branch-and-Bound)</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>38 authentic MIPLIB instances; rational lower bounds; LIMIT_REACHED reported honestly.</td></tr>
+                <tr><td>Convex QP (Interior Point Method)</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>4 authentic QPlib instances; exact Lagrangian KKT verification.</td></tr>
+                <tr><td>Presolve &amp; scaling</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Ruiz equilibration, bound tightening, redundant-row detection, postsolve recovery.</td></tr>
+                <tr><td>Sparse linear algebra</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Sovereign CSR/CSC matrices, Markowitz threshold LU, FTRAN/BTRAN, PFI eta updates, sparse SpMV.</td></tr>
+                <tr><td>GPU acceleration (PDHG CUDA)</td><td><span style="color:#1565c0;font-weight:600">PHYSICAL HARDWARE VALIDATED</span></td><td>5.81× end-to-end acceleration on physical NVIDIA RTX 5050 on 10K true-sparse PDHG workload. Render remains CPU-only.</td></tr>
+                <tr><td>Multi-core CPU</td><td><span style="color:#1565c0;font-weight:600">INTRA-SOLVE PARALLEL B&amp;B VALIDATED</span></td><td>1.94x matched-engine solve-to-completion speedup using 2 workers while exploring the identical 287-node search tree, with 97.0% measured parallel efficiency. Historical 2.65× independent batch dispatch preserved separately.</td></tr>
+                <tr><td>Branch-and-Bound with warm starts</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Dual simplex warm starts via DualBasisState, pseudocost branching, and strong branching bootstrap.</td></tr>
+                <tr><td>Cutting planes</td><td><span style="color:#2e7d32;font-weight:600">VALIDATED BINARY COVER CUTS</span></td><td>Validated binary cover cuts reduce B&amp;B nodes by 40–54.5% on knapsack/oracle MILPs with 0 invalid cuts found under exhaustive binary-oracle validity testing on tested small models; 38 MIPLIB instances evaluated.</td></tr>
+                <tr><td>Gomory / GMI cuts</td><td><span style="color:#e65100;font-weight:600">DEFERRED FOR SAFETY</span></td><td>Option C selected: deferred because current dual simplex interface does not expose a proof-safe original-space tableau mapping.</td></tr>
+                <tr><td>Heuristics</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Safe rounding heuristic with continuous subproblem solve; conservative root diving heuristic.</td></tr>
+                <tr><td>Large-scale capability (1M variables)</td><td><span style="color:#e65100;font-weight:600">REPRESENTATION/SPMV STRESS VALIDATED</span></td><td>1M-variable × 500K-row true-sparse GPU representation and SpMV were validated on the physical RTX 5050 (1,000,000 variables × 500,000 rows × 2,999,993 nonzeros; GPU upload ~108.0 ms, SpMV median ~0.178 ms, transpose SpMV median ~0.199 ms across 5 timed repetitions; representation stress test, not an optimization solve. Earlier Gate 20A CPU sparse stress test evaluated 2,500,000 nonzeros).</td></tr>
+                <tr><td>Industrial refinery model</td><td><span style="color:#2e7d32;font-weight:600">REPRESENTATIVE PROTOTYPE MODEL</span></td><td>4-period MRPL digital twin fixture (Gary &amp; Handwerk literature data; strictly representative engineering approximations, not proprietary MRPL operational data).</td></tr>
+                <tr><td>Netlib public benchmarks</td><td><span style="color:#2e7d32;font-weight:600">AUTHENTIC BENCHMARK EVIDENCE</span></td><td>17 instances; SHA-256 manifest frozen; differential comparison against HiGHS 1.15.1.</td></tr>
+                <tr><td>MIPLIB public benchmarks</td><td><span style="color:#2e7d32;font-weight:600">AUTHENTIC BENCHMARK EVIDENCE</span></td><td>38 instances evaluated; raw observations stored; fixed-budget node progress documented.</td></tr>
+                <tr><td>Mittelmann benchmark subset</td><td><span style="color:#2e7d32;font-weight:600">AUTHENTIC SUBSET EVIDENCE</span></td><td>4 authentic Hans Mittelmann instances acquired (qap15, brazil3, chromaticindex1024-7, supportcase10); on physical RTX 5050 CUDA backend, SOV-OPT reached OPTIMAL_VERIFIED for chromaticindex1024-7 in the recorded 80.21 s run, with the returned solution passing the project's numerical KKT verification.</td></tr>
+                <tr><td>QPLIB public benchmarks</td><td><span style="color:#2e7d32;font-weight:600">AUTHENTIC BENCHMARK EVIDENCE</span></td><td>4 authentic QPlib instances evaluated and KKT verified.</td></tr>
+                <tr><td>External solver comparison</td><td><span style="color:#2e7d32;font-weight:600">HiGHS BENCHMARK-ONLY</span></td><td>Isolated subprocess evaluation against HiGHS 1.15.1; zero external solver code inside sovereign solver core.</td></tr>
+                <tr><td>Numerical verification</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Independent verification layer checking primal feasibility, dual feasibility, complementary slackness, and integer tolerances.</td></tr>
+                <tr><td>Trust Passport / provenance</td><td><span style="color:#2e7d32;font-weight:600">IMPLEMENTED</span></td><td>Reproducibility fingerprint with SHA-256 model hash, algorithm name, solve timestamp, commit SHA, and exact residual metrics.</td></tr>
               </tbody>
             </table>
           </div>
           <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 8px; line-height: 1.5;">
-            Status labels: <strong>IMPLEMENTED</strong> = active, tested; <strong>PARTIAL</strong> = working but with known limitations; <strong>EXPERIMENTAL</strong> = proof-of-concept only; <strong>ROADMAP</strong> = planned, not present; <strong>NOT YET DEMONSTRATED</strong> = not completed.
+            Status labels: <strong>IMPLEMENTED</strong> = active, tested; <strong>PHYSICAL HARDWARE VALIDATED</strong> = verified on physical lab hardware; <strong>VALIDATED BINARY COVER CUTS</strong> = 0 invalid cuts found under exhaustive binary-oracle validity testing on tested small models; <strong>DEFERRED FOR SAFETY</strong> = postponed to ensure zero proof violation; <strong>REPRESENTATION/SPMV STRESS VALIDATED</strong> = sparse storage and matvec stress tested (not full solve); <strong>AUTHENTIC BENCHMARK EVIDENCE</strong> = evaluated against official ground truth; <strong>REPRESENTATIVE PROTOTYPE MODEL</strong> = open-literature engineering baseline.
           </div>
         </div>
 
@@ -1793,7 +2054,7 @@
         <div class="table-section" style="margin-top: 28px;">
           <div class="table-header">
             <h3 class="table-title">Numerical Stress Cases</h3>
-            <div class="table-subtitle">Internal mathematical unit fixtures — not public benchmark data. Results from test_numerical_stress.py (344-test suite).</div>
+            <div class="table-subtitle">Internal mathematical unit fixtures — not public benchmark data. Results from test_numerical_stress.py (368-test suite).</div>
           </div>
           <div class="table-scroll-wrap">
             <table class="editorial-table">
@@ -1935,7 +2196,22 @@
               <button id="btn-copy-cli-mcore" class="copy-btn" onclick="window.sovApp.copyText('python scripts/run_batch_throughput.py', 'btn-copy-cli-mcore')">Copy</button>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
-              <span style="font-size: 12px;">Run test suite (344 tests):</span>
+              <span style="font-size: 12px;">Intra-solve parallel B&amp;B evaluation:</span>
+              <code class="mono" style="font-size: 11.5px;">python scripts/run_parallel_bnb_gate20d.py</code>
+              <button id="btn-copy-cli-par" class="copy-btn" onclick="window.sovApp.copyText('python scripts/run_parallel_bnb_gate20d.py', 'btn-copy-cli-par')">Copy</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12px;">Cutting-plane cover separation evaluation:</span>
+              <code class="mono" style="font-size: 11.5px;">python scripts/run_milp_cuts_gate20c.py</code>
+              <button id="btn-copy-cli-cuts" class="copy-btn" onclick="window.sovApp.copyText('python scripts/run_milp_cuts_gate20c.py', 'btn-copy-cli-cuts')">Copy</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12px;">Physical GPU evidence reconciliation:</span>
+              <code class="mono" style="font-size: 11.5px;">python scripts/reconcile_gpu_gate20b.py</code>
+              <button id="btn-copy-cli-gpu" class="copy-btn" onclick="window.sovApp.copyText('python scripts/reconcile_gpu_gate20b.py', 'btn-copy-cli-gpu')">Copy</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-surface-subtle); border-radius: var(--radius-xs); flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12px;">Run test suite (368 tests):</span>
               <code class="mono" style="font-size: 11.5px;">python -m unittest discover -s tests -v</code>
               <button id="btn-copy-cli-tst" class="copy-btn" onclick="window.sovApp.copyText('python -m unittest discover -s tests -v', 'btn-copy-cli-tst')">Copy</button>
             </div>
