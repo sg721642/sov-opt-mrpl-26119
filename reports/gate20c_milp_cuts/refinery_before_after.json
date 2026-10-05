@@ -1,0 +1,36 @@
+{
+  "problem": "refinery_unit_commitment_milp",
+  "model_type": "representative_synthetic_fixture",
+  "provenance_disclaimer": "Representative model for unit commitment; strictly NOT MRPL proprietary refinery data.",
+  "variables": 42,
+  "constraints": 40,
+  "integer_variables": 6,
+  "binary_variables": 6,
+  "cuts_off": {
+    "status": "OPTIMAL_VERIFIED",
+    "objective": -8953.75,
+    "nodes": 9,
+    "pruned": 5,
+    "root_bound": -8973.550000000001,
+    "best_bound": -8953.75,
+    "gap": 0.0,
+    "runtime_seconds": 3.683886708022328
+  },
+  "cuts_on": {
+    "status": "OPTIMAL_VERIFIED",
+    "objective": -8953.75,
+    "nodes": 9,
+    "pruned": 5,
+    "root_bound_before": -8973.550000000001,
+    "root_bound_after": -8973.550000000001,
+    "root_bound_improvement_abs": 0.0,
+    "root_bound_improvement_pct": 0.0,
+    "cuts_generated": 0,
+    "cuts_accepted": 0,
+    "best_bound": -8953.75,
+    "gap": 0.0,
+    "runtime_seconds": 3.7682266250194516
+  },
+  "objective_verified_agreement": true,
+  "node_reduction": 0
+}

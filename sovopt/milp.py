@@ -19,6 +19,7 @@ from .model import Model
 from .dual_simplex import solve_dual_simplex, DualBasisState
 from .simplex import solve_lp
 from .verify import verify, safe_lower_bound, downward_float, upward_float
+from .cuts import CutConfig, CutPool, separate_cover_cuts, append_rows_to_matrix
 
 
 @dataclass
@@ -62,7 +63,9 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
                use_pseudocosts: bool = True,
                use_strong_branching: bool = True,
                use_heuristics: bool = True,
+               use_cuts: bool = True,
                node_selection: str = 'hybrid',
+               cut_config: Optional[CutConfig] = None,
                **kwargs) -> Dict[str, Any]:
     """Solve mixed-integer linear programming (MILP) problem via sovereign B&B.
 
@@ -74,11 +77,13 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
     - Verified incumbent propagation against untouched original model.
     - Safe rounding heuristic with continuous subproblem solve.
     - Conservative diving heuristic from root LP.
+    - Sovereign cutting planes (Binary Cover Cuts) at root node.
     - Rigorous Neumaier-Shcherbina exact rational Lagrangian lower bounds.
     - Objective offset handling in exact rational arithmetic.
     - Comprehensive MILP telemetry tracking.
     """
     start_time = time.perf_counter()
+    orig_model = model
 
     # Root lower bound from variable box:
     def box_lb(m: Model) -> Union[F, float]:
@@ -147,6 +152,19 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
         'root_lp_time': 0.0,
         'root_lp_bound': None,
         'deadline_checks': 0,
+        'cuts_enabled': bool(kwargs.get('cuts_enabled', use_cuts)),
+        'cut_rounds': 0,
+        'cuts_generated': 0,
+        'cuts_accepted': 0,
+        'cover_cuts_generated': 0,
+        'cover_cuts_accepted': 0,
+        'gomory_or_gmi_generated': 0,
+        'gomory_or_gmi_accepted': 0,
+        'root_bound_before_cuts': None,
+        'root_bound_after_cuts': None,
+        'root_bound_improvement_abs': 0.0,
+        'root_bound_improvement_pct': 0.0,
+        'cut_time_seconds': 0.0,
     }
 
     # Pseudocost data structures
@@ -254,6 +272,83 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
     slb_root = safe_lower_bound(root_model, res_root.get('dual_exact_fraction', res_root.get('dual')))
     root_bound = slb_root if slb_root is not None else rootlb
     telemetry['root_lp_bound'] = downward_float(root_bound) if root_bound != -math.inf else -math.inf
+    telemetry['root_bound_before_cuts'] = telemetry['root_lp_bound']
+    telemetry['root_bound_after_cuts'] = telemetry['root_lp_bound']
+    x_root = np.array(res_root['x'])
+
+    # Root Node Cutting Plane Loop
+    frac_root = [j for j in model.integer if abs(x_root[j] - round(x_root[j])) > tol]
+    if frac_root and telemetry['cuts_enabled']:
+        cfg = cut_config or CutConfig()
+        cut_pool = CutPool(cfg)
+        t0_cuts = time.perf_counter()
+
+        for round_idx in range(cfg.max_cut_rounds_root):
+            if check_deadline():
+                break
+            frac_curr = [j for j in model.integer if abs(x_root[j] - round(x_root[j])) > tol]
+            if not frac_curr:
+                break
+
+            # Separate cover cuts from current root relaxation
+            new_cover_cuts = separate_cover_cuts(root_model, x_root, config=cfg, source_node=1,
+                                                 integer_vars=model.integer)
+            telemetry['cover_cuts_generated'] += len(new_cover_cuts)
+            telemetry['cuts_generated'] += len(new_cover_cuts)
+
+            round_accepted = []
+            for c in new_cover_cuts:
+                if cut_pool.add(c):
+                    round_accepted.append(c)
+                    telemetry['cover_cuts_accepted'] += 1
+                    telemetry['cuts_accepted'] += 1
+                    if len(round_accepted) >= cfg.max_cuts_per_round:
+                        break
+
+            if not round_accepted:
+                break
+
+            # Augment root model with accepted cuts
+            k_cuts = len(round_accepted)
+            cut_coeffs = np.array([c.coefficients for c in round_accepted], dtype=np.float64)
+            cut_rhs = np.array([c.rhs for c in round_accepted], dtype=np.float64)
+
+            aug_A = append_rows_to_matrix(root_model.A, cut_coeffs)
+            aug_rl = np.concatenate([root_model.row_lower, np.full(k_cuts, -np.inf)])
+            aug_ru = np.concatenate([root_model.row_upper, cut_rhs])
+            aug_model = replace(root_model, A=aug_A, row_lower=aug_rl, row_upper=aug_ru)
+
+            # Re-solve root LP relaxation
+            res_aug = solve_node_lp(aug_model, basis_state=None)
+            if res_aug.get('status') == 'OPTIMAL_VERIFIED':
+                root_model = aug_model
+                res_root = res_aug
+                x_root = np.array(res_aug['x'])
+                telemetry['cut_rounds'] += 1
+
+                # Recompute exact rational safe lower bound
+                slb_aug = safe_lower_bound(root_model, res_aug.get('dual_exact_fraction', res_aug.get('dual')))
+                if slb_aug is not None:
+                    if root_bound == -math.inf or slb_aug > root_bound:
+                        root_bound = slb_aug
+                        telemetry['root_lp_bound'] = downward_float(root_bound)
+                        telemetry['root_bound_after_cuts'] = telemetry['root_lp_bound']
+            else:
+                break
+
+        telemetry['cut_time_seconds'] = float(time.perf_counter() - t0_cuts)
+
+        # Compute bound improvement
+        b_before = telemetry['root_bound_before_cuts']
+        b_after = telemetry['root_bound_after_cuts']
+        if b_before is not None and b_after is not None and b_before != -math.inf and b_after != -math.inf:
+            imp_abs = max(0.0, float(b_after - b_before))
+            telemetry['root_bound_improvement_abs'] = imp_abs
+            telemetry['root_bound_improvement_pct'] = float((imp_abs / max(1.0, abs(float(b_before)))) * 100.0)
+
+        # Augment active model for child nodes if cuts were added
+        if telemetry['cuts_accepted'] > 0:
+            model = replace(model, A=root_model.A, row_lower=root_model.row_lower, row_upper=root_model.row_upper)
 
     root_node = MILPNode(
         node_id=1,
@@ -269,7 +364,7 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
         basis_state=res_root.get('basis_state'),
         warm_start_source=None,
         creation_order=1,
-        x_sol=np.array(res_root['x']),
+        x_sol=x_root,
     )
 
     inc: Optional[np.ndarray] = None
@@ -280,14 +375,13 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
     serial = 1
 
     # Check root integrality
-    x_root = root_node.x_sol
     fractional = [j for j in model.integer if abs(x_root[j] - round(x_root[j])) > tol]
     if not fractional:
         xr = x_root.copy()
         for j in model.integer:
             xr[j] = round(xr[j])
-        vr = verify(model, xr, tol=tol)
-        val = exact_objective(model, xr)
+        vr = verify(orig_model, xr, tol=tol)
+        val = exact_objective(orig_model, xr)
         if vr['feasible']:
             inc = xr
             incval = val
@@ -761,7 +855,7 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
         if inc is not None:
             reported_obj = float(incval + offset_F)
             gap = max(0.0, float(incval - global_lower)) / (1.0 + abs(reported_obj)) if global_lower not in (None, -math.inf) else float('inf')
-            vr = verify(model, inc, tol=tol)
+            vr = verify(orig_model, inc, tol=tol)
             result.update(x=inc.tolist(), objective=reported_obj, verification=vr, relative_gap=gap)
             if not open_nodes and not failure and gap <= tol:
                 result['status'] = 'OPTIMAL_VERIFIED'
@@ -789,7 +883,7 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
         if inc is not None:
             reported_obj = float(-incval + offset_F)
             gap = max(0.0, float(incval - global_lower)) / (1.0 + abs(reported_obj)) if global_lower not in (None, -math.inf) else float('inf')
-            vr = verify(model, inc, tol=tol)
+            vr = verify(orig_model, inc, tol=tol)
             result.update(x=inc.tolist(), objective=reported_obj, verification=vr, relative_gap=gap)
             if not open_nodes and not failure and gap <= tol:
                 result['status'] = 'OPTIMAL_VERIFIED'
@@ -803,6 +897,14 @@ def solve_milp(model: Model, tol: float = 1e-7, max_nodes: int = 1000,
                 result['status'] = 'LIMIT_REACHED'
         else:
             result['status'] = 'NUMERICAL_FAILURE' if failure else 'LIMIT_REACHED' if open_nodes else 'INFEASIBLE_CERTIFIED'
+
+    # Update summary telemetry
+    telemetry['nodes_explored'] = nodes
+    telemetry['nodes_pruned'] = telemetry['pruned_by_bound'] + telemetry['pruned_by_infeasibility'] + telemetry['pruned_by_integrality']
+    telemetry['incumbent'] = result.get('objective')
+    telemetry['best_bound'] = result.get('best_bound')
+    telemetry['final_gap'] = result.get('relative_gap', float('inf'))
+    result.update(telemetry)
 
     if failure:
         result['message'] = failure

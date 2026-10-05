@@ -20,7 +20,7 @@
     "mode": "text-lf"
   },
   "CHANGELOG.md": {
-    "sha256": "6dbb2c3da16866a2eee32f9c880b19e1aeeeb71dba5fbaaa21101ff9d317419b",
+    "sha256": "bfe68f724951f6fb3fc3a23f69c8c5338dd6e6c39ab6d2e99ad0750ab30aa747",
     "mode": "text-lf"
   },
   "Dockerfile": {
@@ -589,6 +589,34 @@
   },
   "reports/gate20a_sparse_mittelmann/sparse_stress.json": {
     "sha256": "91106112f471acfdd215328e64263545ecf7f027c60ffbf576294b30ed3d2184",
+    "mode": "text-lf"
+  },
+  "reports/gate20c_milp_cuts/README.md": {
+    "sha256": "8d1f5e035d403449b4c0b1340cf1ac7ca04aa0d285dcb94c83a8de2874cb19bd",
+    "mode": "text-lf"
+  },
+  "reports/gate20c_milp_cuts/architecture_audit.md": {
+    "sha256": "cfe12492fb7d790defd5c767c34623f767d85fda0fb584dee6eb64bc7f5ff1ab",
+    "mode": "text-lf"
+  },
+  "reports/gate20c_milp_cuts/gomory_feasibility.md": {
+    "sha256": "a153c47fbdc8197daaa44ab2f18a4395fc43a854c9fe80592be27409a97f6216",
+    "mode": "text-lf"
+  },
+  "reports/gate20c_milp_cuts/miplib_before_after.json": {
+    "sha256": "2160cd13b0d655fe3a9d515751039b9c08c19017601a461acd1ee8dd0c460bc4",
+    "mode": "text-lf"
+  },
+  "reports/gate20c_milp_cuts/refinery_before_after.json": {
+    "sha256": "30057545429c921135f40283a5063fbb61a78efebd1ecb05bdc9345e464855ee",
+    "mode": "text-lf"
+  },
+  "reports/gate20c_milp_cuts/results.json": {
+    "sha256": "99ec1bf218ad8b4fe3beb0490dfc734d47d0a2284fa622a0c459203e0f165950",
+    "mode": "text-lf"
+  },
+  "reports/gate20c_milp_cuts/validity_tests.json": {
+    "sha256": "1f71002d878a838931e8c1483552a5109d0fa54d28b62d12ea65ba1b3f33e089",
     "mode": "text-lf"
   },
   "reports/gpu/ablation_pdhg_cpu_baseline.json": {
@@ -1579,6 +1607,10 @@
     "sha256": "d2fd6c8a5b9c2067d25182f54d2d7cde235bdfe5abd97e7fde42e08a142940a2",
     "mode": "text-lf"
   },
+  "scripts/run_milp_cuts_gate20c.py": {
+    "sha256": "a31119e988eb5d424aa7eeb62275174ac6899530025478e8fe013aa45f2a4c0f",
+    "mode": "text-lf"
+  },
   "scripts/run_mittelmann_bench.py": {
     "sha256": "9f69183affbe61c21d06f12c8f94cf1e590a9f628467a4c1bc5dd5131c3344aa",
     "mode": "text-lf"
@@ -1615,6 +1647,10 @@
     "sha256": "dbf3a06b47cad087243197028e0b0489d360a6e968cccb63e8698b1f3ee45a42",
     "mode": "text-lf"
   },
+  "sovopt/cuts.py": {
+    "sha256": "dac39d3f799a6257b806d8a6abffa9e8574ce4454e39857dc084c729afe7581a",
+    "mode": "text-lf"
+  },
   "sovopt/dispatcher.py": {
     "sha256": "01721b11b7fc13f75f394caa571620b4b3a0fb9e22ef3285d1fe43f59093f5a8",
     "mode": "text-lf"
@@ -1632,7 +1668,7 @@
     "mode": "text-lf"
   },
   "sovopt/milp.py": {
-    "sha256": "55ce17ddfc101b9428083a4ee9234fce6354b01d8000032e927cfdfcd28eb036",
+    "sha256": "0872596329b7e96c088eafd00f6e6e74c998cbd98acd8d94c66af0875fbfce9a",
     "mode": "text-lf"
   },
   "sovopt/model.py": {
@@ -1668,7 +1704,7 @@
     "mode": "text-lf"
   },
   "sovopt/sparse.py": {
-    "sha256": "fafd1d27dac0516ff4f6574979f94495ab9c90a37571a76a34dbc24fe1183db9",
+    "sha256": "1196e4c3e41fb177cc9910ac82cd06bd21fcd1b42963d1ea45604bce14d6c748",
     "mode": "text-lf"
   },
   "sovopt/sparse_lu.py": {
@@ -1676,7 +1712,7 @@
     "mode": "text-lf"
   },
   "sovopt/transforms.py": {
-    "sha256": "21ddf831815696907950e7498dc473515bf9a2d8d97d506646e25d979e53e44f",
+    "sha256": "768b208de33b5335dea301e345b6b7ae41563c885b12de72978d9d5671b04c13",
     "mode": "text-lf"
   },
   "sovopt/trust_passport.py": {
@@ -1705,6 +1741,10 @@
   },
   "tests/test_checksum_portability.py": {
     "sha256": "10d5b918b604789db06d357df1d675b05b31e34187f6c47e277e0319d7c2bb47",
+    "mode": "text-lf"
+  },
+  "tests/test_cuts.py": {
+    "sha256": "c5f539c3d1e49b58599f8908862a182b065efbab545fe11d270e8bb620e8878c",
     "mode": "text-lf"
   },
   "tests/test_dual_simplex.py": {

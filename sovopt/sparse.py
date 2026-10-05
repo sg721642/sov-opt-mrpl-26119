@@ -76,6 +76,36 @@ class CSRMatrix:
     def __len__(self) -> int:
         return self.n_rows
 
+    def __getitem__(self, key: int | tuple[int, int]) -> float | np.ndarray:
+        """Indexed access: A[i, j] returns scalar value; A[i] returns dense 1D row."""
+        if isinstance(key, tuple):
+            if len(key) != 2:
+                raise IndexError("CSRMatrix 2D indexing requires (row, col)")
+            i, j = key
+            if not (0 <= i < self.n_rows):
+                raise IndexError(f"Row index {i} out of bounds for matrix with {self.n_rows} rows")
+            if not (0 <= j < self.n_cols):
+                raise IndexError(f"Column index {j} out of bounds for matrix with {self.n_cols} cols")
+            start = self.indptr[i]
+            end = self.indptr[i + 1]
+            if start == end:
+                return 0.0
+            cols = self.indices[start:end]
+            idx = np.searchsorted(cols, j)
+            if idx < len(cols) and cols[idx] == j:
+                return float(self.data[start + idx])
+            return 0.0
+        elif isinstance(key, (int, np.integer)):
+            i = int(key)
+            if not (0 <= i < self.n_rows):
+                raise IndexError(f"Row index {i} out of bounds for matrix with {self.n_rows} rows")
+            row = np.zeros(self.n_cols, dtype=np.float64)
+            cols, vals = self.get_row(i)
+            row[cols] = vals
+            return row
+        else:
+            raise TypeError(f"Invalid index type for CSRMatrix: {type(key)}")
+
     @property
     def shape(self) -> tuple[int, int]:
         return (self.n_rows, self.n_cols)
@@ -436,6 +466,36 @@ class CSCMatrix:
 
     def __len__(self) -> int:
         return self.n_rows
+
+    def __getitem__(self, key: int | tuple[int, int]) -> float | np.ndarray:
+        """Indexed access: A[i, j] returns scalar value; A[j] returns dense 1D column."""
+        if isinstance(key, tuple):
+            if len(key) != 2:
+                raise IndexError("CSCMatrix 2D indexing requires (row, col)")
+            i, j = key
+            if not (0 <= i < self.n_rows):
+                raise IndexError(f"Row index {i} out of bounds for matrix with {self.n_rows} rows")
+            if not (0 <= j < self.n_cols):
+                raise IndexError(f"Column index {j} out of bounds for matrix with {self.n_cols} cols")
+            start = self.indptr[j]
+            end = self.indptr[j + 1]
+            if start == end:
+                return 0.0
+            rows = self.indices[start:end]
+            idx = np.searchsorted(rows, i)
+            if idx < len(rows) and rows[idx] == i:
+                return float(self.data[start + idx])
+            return 0.0
+        elif isinstance(key, (int, np.integer)):
+            j = int(key)
+            if not (0 <= j < self.n_cols):
+                raise IndexError(f"Column index {j} out of bounds for matrix with {self.n_cols} cols")
+            col = np.zeros(self.n_rows, dtype=np.float64)
+            rows, vals = self.get_col(j)
+            col[rows] = vals
+            return col
+        else:
+            raise TypeError(f"Invalid index type for CSCMatrix: {type(key)}")
 
     @property
     def shape(self) -> tuple[int, int]:
