@@ -1,0 +1,21 @@
+{
+  "instance": "chromaticindex1024-7",
+  "file": "chromaticindex1024-7.mps.bz2",
+  "rows": 67583,
+  "cols": 73728,
+  "nnz": 270324,
+  "density": 5.425e-05,
+  "csr_memory_bytes": 4865856,
+  "parse_time_seconds": 1.2229,
+  "cpu_status": "LIMIT_REACHED (TIMEOUT > 60s)",
+  "cuda_status": "OPTIMAL_VERIFIED",
+  "cpu_iterations": 3000,
+  "cuda_iterations": 2700,
+  "cpu_objective": null,
+  "cuda_objective": 3.000000001640899,
+  "cpu_total_seconds": 60.0,
+  "cuda_total_seconds": 80.21,
+  "cuda_setup_seconds": 0.25,
+  "cuda_iteration_seconds": 79.96,
+  "gpu_executed": true
+}

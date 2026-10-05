@@ -1,0 +1,17 @@
+{
+  "problem_id": "sparse_25000",
+  "seed": 52,
+  "rows": 12500,
+  "columns": 25000,
+  "nonzeros": 75000,
+  "backend": "pdhg-cpu",
+  "status": "LIMIT_REACHED (TIMEOUT > 120s)",
+  "iterations": 3000,
+  "objective": null,
+  "verification_status": null,
+  "wall_clock_seconds": 120.02667060000022,
+  "iteration_seconds": 120.02667060000022,
+  "measured_repeat_number": 3,
+  "device": "CPU (Intel Core 5 210H)",
+  "commit_sha": "9fc1d17682551833ed39f4eace99f49076a21a8c"
+}

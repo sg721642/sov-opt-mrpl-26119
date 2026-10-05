@@ -71,7 +71,7 @@ class TestSparseCore(unittest.TestCase):
 
             # Dense equivalent
             A_dense = csr.to_dense()
-            y_dense = A_dense @ x
+            y_dense = np.einsum('ij,j->i', A_dense, x)
 
             np.testing.assert_allclose(y_sp, y_dense, rtol=1e-12, atol=1e-12,
                                        err_msg=f"SpMV mismatch at n={n}")
@@ -102,7 +102,7 @@ class TestSparseCore(unittest.TestCase):
 
             # Dense equivalent
             A_dense = csr.to_dense()
-            x_dense = A_dense.T @ y
+            x_dense = np.einsum('ji,j->i', A_dense, y)
 
             np.testing.assert_allclose(x_sp, x_dense, rtol=1e-12, atol=1e-12,
                                        err_msg=f"SpMV-transpose mismatch at n={n}")

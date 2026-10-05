@@ -20,7 +20,7 @@
     "mode": "text-lf"
   },
   "CHANGELOG.md": {
-    "sha256": "1ac6c42538e54b9c43e4233278fc476de4970fb4a9e6d4e34d2bebee8dd9752b",
+    "sha256": "6dbb2c3da16866a2eee32f9c880b19e1aeeeb71dba5fbaaa21101ff9d317419b",
     "mode": "text-lf"
   },
   "Dockerfile": {
@@ -1484,7 +1484,7 @@
     "mode": "text-lf"
   },
   "tests/test_sparse_core.py": {
-    "sha256": "b14624e9cfe52429a6cbbed996b7dd5239da6550592d7e31a4d7e292335e85ec",
+    "sha256": "4afcbd35679d8145741620d23bd9d2f57803bc08a3442bec2ffdc14e40a1df14",
     "mode": "text-lf"
   },
   "web/app.js": {
