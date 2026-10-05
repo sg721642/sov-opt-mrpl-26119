@@ -1,0 +1,107 @@
+{
+  "title": "Problem Statement Coverage Matrix — MRPL SIH 2026 PS 26119",
+  "solver_version": "0.3.2",
+  "core_freeze_commit": "17e46f218f826dd58f5592aa8e75966753f76c32",
+  "matrix": [
+    {
+      "requirement": "LP solving (primal & dual simplex)",
+      "status": "IMPLEMENTED",
+      "evidence": "17 Netlib LP instances; 368-test suite; KKT verified; exact rational Farkas ray extraction."
+    },
+    {
+      "requirement": "MILP (Branch-and-Bound)",
+      "status": "IMPLEMENTED",
+      "evidence": "38 authentic MIPLIB instances; rational lower bounds; LIMIT_REACHED reported honestly."
+    },
+    {
+      "requirement": "Convex QP (Interior Point Method)",
+      "status": "IMPLEMENTED",
+      "evidence": "4 authentic QPlib instances; exact Lagrangian KKT verification."
+    },
+    {
+      "requirement": "Presolve & scaling",
+      "status": "IMPLEMENTED",
+      "evidence": "Ruiz equilibration, bound tightening, redundant-row detection, postsolve recovery."
+    },
+    {
+      "requirement": "Sparse linear algebra",
+      "status": "IMPLEMENTED",
+      "evidence": "Sovereign CSR/CSC matrices, Markowitz threshold LU, FTRAN/BTRAN, PFI eta updates, sparse SpMV."
+    },
+    {
+      "requirement": "GPU acceleration (PDHG CUDA)",
+      "status": "PHYSICAL HARDWARE VALIDATED",
+      "evidence": "5.81x end-to-end acceleration on physical NVIDIA RTX 5050 on 10K true-sparse PDHG workload. Render remains CPU-only."
+    },
+    {
+      "requirement": "Multi-core CPU",
+      "status": "INTRA-SOLVE PARALLEL B&B VALIDATED",
+      "evidence": "1.94x matched-engine solve-to-completion speedup using 2 workers while exploring the identical 287-node search tree, with 97.0% measured parallel efficiency. Historical 2.65x independent batch dispatch preserved separately."
+    },
+    {
+      "requirement": "Branch-and-Bound with warm starts",
+      "status": "IMPLEMENTED",
+      "evidence": "Dual simplex warm starts via DualBasisState, pseudocost branching, and strong branching bootstrap."
+    },
+    {
+      "requirement": "Cutting planes",
+      "status": "VALIDATED BINARY COVER CUTS",
+      "evidence": "Validated binary cover cuts reduce B&B nodes by 40–54.5% on knapsack/oracle MILPs with 0 invalid cuts found under exhaustive binary-oracle validity testing on tested small models; 38 MIPLIB instances evaluated."
+    },
+    {
+      "requirement": "Gomory / GMI cuts",
+      "status": "DEFERRED FOR SAFETY",
+      "evidence": "Option C selected: deferred because current dual simplex interface does not expose a proof-safe original-space tableau mapping."
+    },
+    {
+      "requirement": "Heuristics",
+      "status": "IMPLEMENTED",
+      "evidence": "Safe rounding heuristic with continuous subproblem solve; conservative root diving heuristic."
+    },
+    {
+      "requirement": "Large-scale capability (1M variables)",
+      "status": "REPRESENTATION/SPMV STRESS VALIDATED — NOT FULL OPTIMAL SOLVE",
+      "evidence": "1M-variable x 500K-row true-sparse GPU representation and SpMV were validated on the physical RTX 5050 (1,000,000 variables x 500,000 rows x 2,999,993 nonzeros; GPU upload ~108.0 ms, SpMV median ~0.178 ms, transpose SpMV median ~0.199 ms across 5 timed repetitions; representation stress test, not an optimization solve. Earlier Gate 20A CPU sparse stress test evaluated 2,500,000 nonzeros); 10M architectural guard rail."
+    },
+    {
+      "requirement": "Industrial refinery model",
+      "status": "REPRESENTATIVE PROTOTYPE MODEL",
+      "evidence": "4-period MRPL digital twin fixture (Gary & Handwerk literature data; strictly representative engineering approximations, not proprietary MRPL operational data)."
+    },
+    {
+      "requirement": "Netlib public benchmarks",
+      "status": "AUTHENTIC BENCHMARK EVIDENCE",
+      "evidence": "17 instances; SHA-256 manifest frozen; differential comparison against HiGHS 1.15.1."
+    },
+    {
+      "requirement": "MIPLIB public benchmarks",
+      "status": "AUTHENTIC BENCHMARK EVIDENCE",
+      "evidence": "38 instances evaluated; raw observations stored; fixed-budget node progress documented."
+    },
+    {
+      "requirement": "Mittelmann benchmark subset",
+      "status": "AUTHENTIC SUBSET EVIDENCE",
+      "evidence": "4 authentic Hans Mittelmann instances acquired (qap15, brazil3, chromaticindex1024-7, supportcase10); on physical RTX 5050 CUDA backend, SOV-OPT reached OPTIMAL_VERIFIED for chromaticindex1024-7 in the recorded 80.21 s run, with the returned solution passing the project's numerical KKT verification."
+    },
+    {
+      "requirement": "QPLIB public benchmarks",
+      "status": "AUTHENTIC BENCHMARK EVIDENCE",
+      "evidence": "4 authentic QPlib instances evaluated and KKT verified."
+    },
+    {
+      "requirement": "External solver comparison",
+      "status": "HiGHS BENCHMARK-ONLY",
+      "evidence": "Isolated subprocess evaluation against HiGHS 1.15.1; zero external solver code inside sovereign solver core."
+    },
+    {
+      "requirement": "Numerical verification",
+      "status": "IMPLEMENTED",
+      "evidence": "Independent verification layer checking primal feasibility, dual feasibility, complementary slackness, and integer tolerances."
+    },
+    {
+      "requirement": "Trust Passport / provenance",
+      "status": "IMPLEMENTED",
+      "evidence": "Reproducibility fingerprint with SHA-256 model hash, algorithm name, solve timestamp, commit SHA, and exact residual metrics."
+    }
+  ]
+}

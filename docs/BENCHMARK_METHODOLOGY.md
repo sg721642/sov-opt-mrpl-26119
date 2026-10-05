@@ -1,7 +1,7 @@
 # Benchmark Methodology & Integrity Guarantees — SOV-OPT
 
 **MRPL SIH Problem Statement 26119**  
-**Solver Version:** `0.3.1` (Gate 7 Complete)  
+**Solver Version:** `0.3.2`
 **Sovereign Solver Core:** Python standard library and NumPy only.  
 **Differential Solvers:** HiGHS / SciPy invoked exclusively in isolated subprocess worker processes.
 

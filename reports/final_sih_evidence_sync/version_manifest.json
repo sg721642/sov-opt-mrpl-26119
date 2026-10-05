@@ -1,0 +1,29 @@
+{
+  "public_version": "0.3.2",
+  "project_title": "SOV-OPT — Sovereign Numerical Optimization Core",
+  "problem_statement": "MRPL SIH 2026 PS 26119",
+  "team_name": "Team VarunNetra",
+  "team_id": "177365",
+  "institution": "Rajiv Gandhi Institute of Petroleum Technology (RGIPT)",
+  "finalization_branch": "final-sih-evidence-sync",
+  "core_freeze_main_sha": "17e46f218f826dd58f5592aa8e75966753f76c32",
+  "freeze_status": "FEATURE_FROZEN",
+  "canonical_test_suite": {
+    "total_tests": 368,
+    "passed": 357,
+    "skipped": 11,
+    "failures": 0,
+    "errors": 0
+  },
+  "cloud_deployment": {
+    "platform": "Render Web Service",
+    "hardware": "CPU-only (no GPU acceleration in cloud container)",
+    "health_endpoint": "https://sov-opt-mrpl-26119.onrender.com/health",
+    "api_health_endpoint": "https://sov-opt-mrpl-26119.onrender.com/api/health",
+    "status": "HEALTHY"
+  },
+  "physical_hardware_evaluations": {
+    "mac_cpu": "Apple Silicon MacBook Air (Apple M5, 10 Cores, 24 GB Unified Memory)",
+    "physical_gpu": "NVIDIA GeForce RTX 5050 Laptop GPU (Acer Nitro V 16)"
+  }
+}

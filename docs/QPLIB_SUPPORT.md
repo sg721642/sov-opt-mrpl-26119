@@ -3,7 +3,7 @@
 **MRPL SIH Problem Statement 26119**  
 **Specification Reference:** QPLIB 2018 (Furini et al., *Mathematical Programming Computation*, 2019)  
 **Primary Source:** https://qplib.zib.de/doc.html  
-**Solver Version:** `0.3.1`  
+**Solver Version:** `0.3.2`
 **Core Dependencies:** Python standard library and NumPy only.
 
 ---

@@ -811,7 +811,7 @@
   "Ruiz / Geometric Scaling": "रूइज़ / ज्यामितीय स्केलिंग",
   "Run solve to compute": "गणना के लिए सॉल्व चलाएँ",
   "Run test suite (298 tests):": "परीक्षण सूट चलाएँ (298 परीक्षण):",
-  "Run test suite (344 tests):": "परीक्षण सूट चलाएँ (344 परीक्षण):",
+  "Run test suite (368 tests):": "परीक्षण सूट चलाएँ (368 परीक्षण):",
   "SC-01: Base equilibrium": "SC-01: आधार संतुलन",
   "SC-02: High-Basrah heavy": "SC-02: उच्च-बसरा हेवी",
   "SC-03": "SC-03",
@@ -2962,9 +2962,9 @@
     }
 
     if (commitEl) {
-      const commit = res.solver_commit ? res.solver_commit.substring(0, 8) : '899ff0a8';
+      const commit = res.solver_commit ? res.solver_commit.substring(0, 8) : '17e46f21';
       const ver = res.solver_version || '0.3.2';
-      commitEl.textContent = `v${ver} (${commit})`;
+      commitEl.textContent = `v${ver} (${commit.substring(0, 7)})`;
     }
 
     if (backendEl) {
@@ -3376,10 +3376,29 @@
       document.body.removeChild(textArea);
     }
 
+    async function runJudgeDemo() {
+      switchTab('optimization');
+      const modelSelect = document.getElementById('solver-model-select');
+      if (modelSelect) {
+        modelSelect.value = 'refinery-milp';
+        STATE.activeModel = 'refinery-milp';
+      }
+      const backendSelect = document.getElementById('solver-backend-select');
+      if (backendSelect) {
+        backendSelect.value = 'cpu';
+        STATE.activeBackend = 'cpu';
+      }
+      await triggerSolve();
+      setTimeout(() => {
+        switchTab('trust');
+      }, 350);
+    }
+
     window.sovApp = window.sovApp || {};
     Object.assign(window.sovApp, {
       switchTab: switchTab,
       triggerSolve: triggerSolve,
+      runJudgeDemo: runJudgeDemo,
       setLanguage: setLanguage,
       updateLanguageToggle: updateLanguageToggle,
       I18N: I18N,
@@ -3838,6 +3857,7 @@
   window.selectScenario = selectScenario;
   window.setLanguage = setLanguage;
   window.updateLanguageToggle = updateLanguageToggle;
+  window.runJudgeDemo = () => window.sovApp && window.sovApp.runJudgeDemo && window.sovApp.runJudgeDemo();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
