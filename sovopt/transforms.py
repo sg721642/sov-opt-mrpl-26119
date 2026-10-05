@@ -34,6 +34,7 @@ def transform_model(model):
     """Transform model into standard non-negative variables t >= 0 with separated equality and inequality rows."""
     n = len(model.c)
     m = len(model.A)
+    A_mat = model.A.to_dense() if hasattr(model.A, 'to_dense') else model.A
     var_specs = []
     curr_trans_idx = 0
     obj_constant = 0.0
@@ -113,7 +114,7 @@ def transform_model(model):
         row_t = np.zeros(n_trans, dtype=float)
         for spec in var_specs:
             j = spec['orig_idx']
-            a_ij = model.A[i, j]
+            a_ij = A_mat[i, j]
             if a_ij == 0.0:
                 continue
             vtype = spec['type']
@@ -140,7 +141,7 @@ def transform_model(model):
         row_t = np.zeros(n_trans, dtype=float)
         for spec in var_specs:
             j = spec['orig_idx']
-            a_ij = model.A[i, j]
+            a_ij = A_mat[i, j]
             if a_ij == 0.0:
                 continue
             vtype = spec['type']
@@ -164,7 +165,7 @@ def transform_model(model):
         row_t = np.zeros(n_trans, dtype=float)
         for spec in var_specs:
             j = spec['orig_idx']
-            a_ij = -model.A[i, j]
+            a_ij = -A_mat[i, j]
             if a_ij == 0.0:
                 continue
             vtype = spec['type']

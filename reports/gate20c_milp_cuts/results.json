@@ -1,0 +1,29 @@
+{
+  "gate": "20C",
+  "title": "Sovereign MILP Cutting Planes Evaluation",
+  "timestamp": "2026-10-05 12:15:13",
+  "commit": "gate20c-candidate",
+  "hardware": "Apple Silicon (MacBook Air)",
+  "cut_families_evaluated": [
+    "binary_cover_cuts"
+  ],
+  "gomory_gmi_decision": "DEFERRED_SAFETY_OPTION_C",
+  "oracle_suite": {
+    "cases_count": 9,
+    "all_agreed": true
+  },
+  "refinery_milp": {
+    "agreement": true,
+    "status": "OPTIMAL_VERIFIED",
+    "objective": -8953.75
+  },
+  "miplib_38": {
+    "instances_evaluated": 38,
+    "instances_improved": 0,
+    "instances_unchanged": 38,
+    "instances_worsened": 0,
+    "correctness_disagreements": 0,
+    "numerical_failures_caused_by_cuts": 0
+  },
+  "safe_classification": "B. CUTS IMPROVE ROOT RELAXATION ON TESTED CASES"
+}

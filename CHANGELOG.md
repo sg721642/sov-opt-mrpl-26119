@@ -1,5 +1,22 @@
 # Changelog — SOV-OPT MRPL PS 26119
 
+## [0.3.17] - 2026-10-05
+
+### Gate 20C: Sovereign MILP Cutting Planes & Cover Cut Infrastructure
+
+- **feat(milp): Sovereign MILP Cutting-Plane Infrastructure & Root Cut Loop:**
+  - Implemented safe, sovereign cutting-plane separation in `sovopt/cuts.py` (`Cut`, `CutConfig`, `CutValidationResult`, `CutPool`, `separate_cover_cuts`, `append_rows_to_matrix`).
+  - Integrated root relaxation cut loop in `sovopt/milp.py` with safety gates: violation threshold >= 1e-4, parallel cosine screening (< 0.999), condition/norm bounds, and duplicate suppression.
+  - Added indexed access (`__getitem__`) on `CSRMatrix` and `CSCMatrix` in `sovopt/sparse.py` for scalar (i, j) and 1D dense row/col extraction.
+  - Upgraded `sovopt/transforms.py` standard form transformation to handle sparse `CSRMatrix` instances gracefully.
+  - Formally conducted Gomory/GMI feasibility audit on `sovopt/dual_simplex.py`; documented and selected Option C (Cover cuts only, Gomory deferred) to maintain mathematical proof and zero invalid cuts.
+  - Created test suite `tests/test_cuts.py` with 8 comprehensive tests (2^n binary enumeration, minimal covers, boundary conditions, negative coefficient refusal, mixed continuous refusal, numerical safeguards).
+  - Created benchmark harness `scripts/run_milp_cuts_gate20c.py` and generated reports in `reports/gate20c_milp_cuts/`:
+    - Validated binary cover cuts improved root relaxation and reduced branch-and-bound nodes by 40–54.5% on targeted knapsack/oracle MILPs. Across the 38-instance authentic MIPLIB pass, the cut-enabled configuration produced no correctness regressions and no overall measurable improvement.
+    - Representative refinery MILP remained OPTIMAL_VERIFIED with identical objective and node count; its continuous-coupled rows were conservatively excluded from binary cover separation.
+    - Gomory/GMI separation was deliberately deferred because the current dual simplex interface does not expose a proof-safe original-space tableau/basis mapping.
+    - MIPLIB 38 suite: Evaluated all 38 authentic instances under 10.0s time limit (0 improved, 38 unchanged, 0 worsened, 0 correctness disagreements, 0 cut-caused numerical failures).
+
 ## [0.3.16] - 2026-10-05
 
 ### Gate 20B: Physical RTX 5050 True-Sparse CUDA Validation & Evidence Reconciliation
